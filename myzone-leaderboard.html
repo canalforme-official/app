@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"> <!-- Spécifie l'encodage UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myzone Leaderboard - Canal Forme</title>
+    <style>
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-size: 20.8px; /* Augmenté de 30% par rapport à 16px */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    background-color: #000000;
+}
+
+.logo {
+    max-width: 325px; /* Augmenté de 30% par rapport à 250px */
+    height: auto;
+}
+
+.month-block {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 39px; /* Augmenté de 30% par rapport à 30px */
+    border-radius: 10px; /* Légèrement augmenté pour l'esthétique */
+    width: 95%;
+    max-width: 1040px; /* Augmenté de 30% par rapport à 800px */
+    box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
+    margin-top: 39px; /* Augmenté de 30% par rapport à 30px */
+    position: relative;
+}
+
+.month-title {
+    font-size: 3.25em; /* Augmenté de 30% par rapport à 2.5em */
+    font-weight: bold;
+    color: #ff0000;
+    margin-bottom: 32.5px; /* Augmenté de 30% par rapport à 25px */
+    text-align: center;
+}
+
+.last-update {
+    position: absolute;
+    top: -39px; /* Ajusté pour la nouvelle taille */
+    right: 0;
+    color: #ffffff;
+    font-size: 1.3em; /* Augmenté de 30% par rapport à 1em */
+    display: none;
+}
+
+.podium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 455px; /* Augmenté de 30% par rapport à 350px */
+    margin-bottom: 65px; /* Augmenté de 30% par rapport à 50px */
+}
+
+.podium-step {
+    width: 30%;
+    margin: 0 1%;
+    background-color: #f0f0f0;
+    border-top-left-radius: 10px; /* Légèrement augmenté */
+    border-top-right-radius: 10px; /* Légèrement augmenté */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 19.5px; /* Augmenté de 30% par rapport à 15px */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.podium-step.first { height: 390px; background-color: #ffd700; } /* Couleur d'origine maintenue */
+.podium-step.second { height: 325px; background-color: #c0c0c0; } /* Couleur d'origine maintenue */
+.podium-step.third { height: 260px; background-color: #cd7f32; } /* Couleur d'origine maintenue */
+
+.podium-rank {
+    font-size: 52px; /* Augmenté de 30% par rapport à 40px */
+    font-weight: bold;
+    margin-bottom: 19.5px; /* Augmenté de 30% par rapport à 15px */
+}
+
+.podium-nickname {
+    font-size: 28.6px; /* Augmenté de 30% par rapport à 22px */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 19.5px; /* Augmenté de 30% par rapport à 15px */
+    height: 65px; /* Augmenté de 30% par rapport à 50px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.podium-icon {
+    width: 78px; /* Augmenté de 30% par rapport à 60px */
+    height: 78px; /* Augmenté de 30% par rapport à 60px */
+    margin-bottom: 19.5px; /* Augmenté de 30% par rapport à 15px */
+}
+
+.podium-meps {
+    font-size: 33.8px; /* Augmenté de 30% par rapport à 26px */
+    font-weight: bold;
+}
+
+.leaderboard {
+    width: 100%;
+}
+
+.leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 26px 0; /* Augmenté de 30% par rapport à 20px 0 */
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 28.6px; /* Augmenté de 30% par rapport à 22px */
+}
+
+.leaderboard-row:last-child {
+    border-bottom: none;
+}
+
+.rank {
+    font-weight: bold;
+    width: 65px; /* Augmenté de 30% par rapport à 50px */
+}
+
+.nickname {
+    flex-grow: 1;
+    text-align: left;
+    padding: 0 26px; /* Augmenté de 30% par rapport à 0 20px */
+}
+
+.meps {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.status-icon {
+    width: 52px; /* Augmenté de 30% par rapport à 40px */
+    height: 52px; /* Augmenté de 30% par rapport à 40px */
+    margin-right: 19.5px; /* Augmenté de 30% par rapport à 15px */
+}
+
+.meps-value {
+    margin-right: 10px; /* Légèrement augmenté pour l'espacement */
+}
+
+.meps-label {
+    font-size: 0.9em;
+    color: #888;
+}
+
+.refresh-btn {
+    background-color: #ff0000;
+    color: #ffffff;
+    border: none;
+    padding: 19.5px 39px; /* Augmenté de 30% par rapport à 15px 30px */
+    font-size: 1.56em; /* Augmenté de 30% par rapport à 1.2em */
+    border-radius: 6px; /* Légèrement augmenté */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 39px; /* Augmenté de 30% par rapport à 30px */
+}
+
+.refresh-btn:hover {
+    background-color: #cc0000;
+}
+
+#countdown {
+    position: absolute;
+    top: -39px; /* Ajusté pour la nouvelle taille */
+    left: 0;
+    color: #ffffff;
+    font-size: 1.3em; /* Augmenté de 30% par rapport à 1em */
+}
+
+#loading {
+    font-size: 1.82em; /* Augmenté de 30% par rapport à 1.4em */
+    color: #ff0000;
+    margin-top: 39px; /* Augmenté de 30% par rapport à 30px */
+}
+
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.loading-logo {
+    width: 150px; /* Augmenté de 30% par rapport à 150px */
+    height: 150px; /* Augmenté de 30% par rapport à 150px */
+    margin-bottom: 30px; /* Augmenté de 30% par rapport à 30px */
+    animation: zoom-logo 1.5s ease-in-out infinite;
+}
+
+@keyframes zoom-logo {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+#loadingMessage {
+    color: #ffffff;
+    font-size: 1.82em; /* Augmenté de 30% par rapport à 1.4em */
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 78px; /* Augmenté de 30% par rapport à 60px */
+    height: 78px; /* Augmenté de 30% par rapport à 60px */
+    border: 8px solid #f3f3f3; /* Légèrement augmenté */
+    border-top: 8px solid #ff0000; /* Légèrement augmenté */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-top: 39px; /* Augmenté de 30% par rapport à 30px */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Styles pour les appareils mobiles */
+@media (max-width: 600px) {
+    body {
+        font-size: 18.2px; /* Augmenté de 30% par rapport à 14px */
+    }
+
+    .month-block {
+        padding: 26px; /* Ajusté pour les mobiles */
+    }
+
+    .podium {
+        height: 390px; /* Ajusté pour les mobiles */
+    }
+
+    .podium-step.first { height: 338px; } /* Ajusté pour les mobiles */
+    .podium-step.second { height: 286px; } /* Ajusté pour les mobiles */
+    .podium-step.third { height: 234px; } /* Ajusté pour les mobiles */
+
+    .podium-rank {
+        font-size: 44.2px; /* Augmenté de 30% par rapport à 34px */
+    }
+
+    .podium-nickname {
+        font-size: 23.4px; /* Augmenté de 30% par rapport à 18px */
+    }
+
+    .podium-meps {
+        font-size: 28.6px; /* Augmenté de 30% par rapport à 22px */
+    }
+
+    .leaderboard-row {
+        font-size: 23.4px; /* Augmenté de 30% par rapport à 18px */
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Canal Forme Logo" class="loading-logo">
+        <div id="loadingMessage">Chargement du leaderboard...</div>
+        <div class="loading-spinner"></div>
+    </div>
+    <div class="logo-container">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Canal Forme Logo" class="logo">
+    </div>
+    <div class="container">
+        <div class="month-block current-month-block">
+            <div id="countdown"></div>
+            <div class="last-update hidden">Dernière mise à jour : <span id="lastUpdateTime"></span></div>
+            <div id="currentMonthTitle" class="month-title"></div>
+            <div id="currentMonthPodium"></div>
+            <div id="currentMonthLeaderboard"></div>
+        </div>
+        <div class="month-block previous-month-block" id="previousMonthBlock" style="display: none;">
+            <div id="previousMonthTitle" class="month-title"></div>
+            <div id="previousMonthPodium"></div>
+            <div id="previousMonthLeaderboard"></div>
+        </div>
+    </div>
+    <div id="loading" style="display:none;">Chargement...</div>
+
+    <script>
+let isFirstLoad = true;  // Variable pour savoir si c'est le premier chargement
+let countdownInterval;   // Variable globale pour stocker l'intervalle de compte à rebours
+
+// Fonction pour afficher l'overlay de chargement uniquement lors du premier chargement
+function showLoadingOverlay() {
+    if (isFirstLoad) {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+}
+
+// Fonction pour cacher l'overlay de chargement
+function hideLoadingOverlay() {
+    if (isFirstLoad) {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        isFirstLoad = false;  // Désactive l'affichage de l'overlay pour les chargements suivants
+    }
+}
+
+// Fonction pour charger le leaderboard
+function loadLeaderboard() {
+    fetch('https://script.google.com/macros/s/AKfycbwqhVmMeT-I8cYsQNEnYMRJd5k_4-1BDm_g1fqKkVsNMOt9b-Cg-AXAl2OYeJ3fbuLL/exec')
+        .then(response => response.json())
+        .then(data => {
+            displayLeaderboard(data);
+            hideLoadingOverlay();  // Cache l'overlay après le premier chargement
+            startCountdown(60);  // Démarre le compte à rebours de 60 secondes
+        })
+        .catch(error => {
+            handleError(error);
+            hideLoadingOverlay();
+        });
+}
+
+// Fonction pour démarrer le compte à rebours
+function startCountdown(duration) {
+    // Annule l'intervalle existant si un compte à rebours est déjà en cours
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+
+    let timer = duration;
+    const countdownElement = document.getElementById('countdown');
+
+    function updateCountdown() {
+        let minutes = Math.floor(timer / 60);
+        let seconds = timer % 60;
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(countdownInterval);
+            loadLeaderboard();  // Recharge le leaderboard à la fin du compte à rebours
+        }
+    }
+
+    updateCountdown();  // Mise à jour immédiate
+    countdownInterval = setInterval(updateCountdown, 1000);  // Met à jour chaque seconde
+}
+
+        // Fonction pour afficher le leaderboard avec podium
+        function displayLeaderboard(data) {
+            document.getElementById('loading').style.display = 'none';
+            var today = new Date();
+            var dayOfMonth = today.getDate();
+
+            document.getElementById('currentMonthTitle').textContent = data.current.month;
+            document.getElementById('currentMonthPodium').innerHTML = createPodium(data.current.data.slice(0, 3));
+            document.getElementById('currentMonthLeaderboard').innerHTML = createLeaderboardTable(data.current.data.slice(3, dayOfMonth <= 7 ? 10 : 20));
+
+            if (dayOfMonth <= 7 && data.previous) {
+                document.getElementById('previousMonthTitle').textContent = data.previous.month;
+                document.getElementById('previousMonthPodium').innerHTML = createPodium(data.previous.data.slice(0, 3));
+                document.getElementById('previousMonthLeaderboard').innerHTML = createLeaderboardTable(data.previous.data.slice(3, 10));
+                document.getElementById('previousMonthBlock').style.display = 'block';
+            } else {
+                document.getElementById('previousMonthBlock').style.display = 'none';
+            }
+
+            updateLastUpdateTime();  // Mise à jour de l'heure de dernière mise à jour
+        }
+
+        // Les autres fonctions (podium, leaderboard, compte à rebours) restent inchangées...
+        function createPodium(topThree) {
+            // Génère le podium en HTML
+            const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd
+            let podiumHtml = '<div class="podium">';
+            podiumOrder.forEach((index, i) => {
+                const user = topThree[index];
+                const position = ['second', 'first', 'third'][i];
+                podiumHtml += `
+                    <div class="podium-step ${position}">
+                        <div class="podium-rank">${user.position}</div>
+                        <div class="podium-nickname">${user.nickname}</div>
+                        <img src="${user.iconLink}" alt="${user.status}" class="podium-icon">
+                        <div class="podium-meps">${formatNumber(user.meps)} MEPs</div>
+                    </div>`;
+            });
+            podiumHtml += '</div>';
+            return podiumHtml;
+        }
+
+        function createLeaderboardTable(leaderboardData) {
+            var tableHtml = '<div class="leaderboard">';
+            leaderboardData.forEach(function(user) {
+                tableHtml += `
+                    <div class="leaderboard-row">
+                        <span class="rank">${user.position}</span>
+                        <span class="nickname">${user.nickname}</span>
+                        <span class="meps">
+                            <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
+                            <span class="meps-value">${formatNumber(user.meps)}</span>
+                            <span class="meps-label">MEPs</span>
+                        </span>
+                    </div>`;
+            });
+            tableHtml += '</div>';
+            return tableHtml;
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function updateLastUpdateTime() {
+            var now = new Date();
+            var formattedTime = now.toLocaleString('fr-FR', { 
+                year: 'numeric', 
+                month: 'numeric', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('lastUpdateTime').textContent = formattedTime;
+        }
+
+        function handleError(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('currentMonthLeaderboard').innerHTML = 'Erreur lors du chargement du leaderboard: ' + error.message;
+        }
+
+        window.onload = loadLeaderboard;
+    </script>
+</body>
+</html>
