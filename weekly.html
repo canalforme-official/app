@@ -154,12 +154,11 @@
   
     .course-block {
       margin-bottom: 10px;
-      border-radius: 10px; /* Bords arrondis */
+      border-radius: 10px; /* Ajout des bords arrondis */
       border: 1px solid #ccc; /* Contour léger */
-      background-color: #ffffff; /* Fond blanc pour les cours mixtes */
     }
   
-    /* Styles pour les cours "100% Femmes" et "Piscine" */
+    /* Contour léger spécifique pour les cours "100% Femmes" et "Piscine" */
     .course-block.women-only {
       background-color: #FFF0F5;
       border: 1px solid #FF69B4; /* Contour rose clair */
@@ -309,18 +308,11 @@
   
       /* Ajustement des largeurs de colonnes */
       .weekly-schedule .time-cell {
-        width: 20px; /* Réduction de la largeur */
-        writing-mode: vertical-rl;
-        transform: rotate(180deg);
-        font-size: 0.8em;
-        white-space: nowrap;
-        padding: 2px;
-        text-align: center;
-        border-right: 1px solid #ccc;
+        width: 40px; /* Réduction de la largeur pour la colonne des heures */
       }
   
       .weekly-schedule .course-cell {
-        width: calc((100% - 20px) / 7);
+        width: calc((100% - 40px) / 7);
         padding: 2px;
       }
   
@@ -357,6 +349,7 @@
       }
     }
   </style>
+  
   
   
   
