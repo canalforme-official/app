@@ -1,284 +1,293 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"> <!-- Spécifie l'encodage UTF-8 -->
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Myzone Leaderboard - Canal Forme</title>
     <style>
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #000000;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-}
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+        }
 
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-}
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-.logo-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 20px 0;
-    background-color: #000000;
-}
+        .logo-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            background-color: #000000;
+        }
 
-.logo {
-    max-width: 250px;
-    height: auto;
-}
+        .logo {
+            max-width: 200px;
+            height: auto;
+        }
 
-.month-block {
-    background-color: #ffffff;
-    color: #000000;
-    padding: 30px;
-    border-radius: 10px;
-    width: 95%;
-    max-width: 800px;
-    box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
-    margin-top: 30px;
-    position: relative;
-}
+        .month-block {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+            border-radius: 10px;
+            width: 95%;
+            max-width: 600px;
+            box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
+            margin-top: 20px;
+            position: relative;
+        }
 
-.month-title {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #ff0000;
-    margin-bottom: 25px;
-    text-align: center;
-}
+        .month-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ff0000;
+            margin-bottom: 15px;
+            text-align: center;
+        }
 
-.last-update {
-    position: absolute;
-    top: -30px;
-    right: 0;
-    color: #ffffff;
-    font-size: 1em;
-    display: none;
-}
+        .last-update {
+            position: absolute;
+            top: -20px;
+            right: 0;
+            color: #ffffff;
+            font-size: 0.9em;
+            display: none;
+        }
 
-.podium {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    height: 350px;
-    margin-bottom: 50px;
-}
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 200px;
+            margin-bottom: 30px;
+        }
 
-.podium-step {
-    width: 30%;
-    margin: 0 1%;
-    background-color: #f0f0f0;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+        .podium-step {
+            width: 30%;
+            margin: 0 1%;
+            background-color: #f0f0f0;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
 
-.podium-step.first { height: 300px; background-color: #ffd700; } /* Or */
-.podium-step.second { height: 250px; background-color: #c0c0c0; } /* Argent */
-.podium-step.third { height: 200px; background-color: #cd7f32; } /* Bronze */
+        .podium-step.first { height: 160px; background-color: #ffd700; } /* Or */
+        .podium-step.second { height: 140px; background-color: #c0c0c0; } /* Argent */
+        .podium-step.third { height: 120px; background-color: #cd7f32; } /* Bronze */
 
-.podium-rank {
-    font-size: 40px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
+        .podium-rank {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-.podium-nickname {
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 15px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .podium-nickname {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+        }
 
-.podium-icon {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 15px;
-}
+        .podium-meps {
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.podium-meps {
-    font-size: 26px;
-    font-weight: bold;
-}
+        .podium-meps .meps-label {
+            color: #000000; /* Change la couleur du suffixe MEPs en noir */
+        }
 
-.leaderboard {
-    width: 100%;
-}
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
 
-.leaderboard-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 22px;
-}
+        .leaderboard {
+            width: 100%;
+        }
 
-.leaderboard-row:last-child {
-    border-bottom: none;
-}
+        .leaderboard-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 16px;
+        }
 
-.rank {
-    font-weight: bold;
-    width: 50px;
-}
+        .leaderboard-row:last-child {
+            border-bottom: none;
+        }
 
-.nickname {
-    flex-grow: 1;
-    text-align: left;
-    padding: 0 20px;
-}
+        .rank {
+            font-weight: bold;
+            width: 30px;
+            text-align: left;
+        }
 
-.meps {
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-}
+        .nickname {
+            flex-grow: 1;
+            text-align: left;
+            padding: 0 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-.status-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
-}
+        .meps {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
 
-.meps-value {
-    margin-right: 10px;
-}
+        .leaderboard .status-icon {
+            width: 25px;
+            height: 25px;
+            margin-right: 5px;
+        }
 
-.meps-label {
-    font-size: 0.9em;
-    color: #888;
-}
+        .meps-value {
+            margin-right: 5px;
+        }
 
-.refresh-btn {
-    background-color: #ff0000;
-    color: #ffffff;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.2em;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 30px;
-}
+        .meps-label {
+            font-size: 0.8em;
+            color: #888;
+        }
 
-.refresh-btn:hover {
-    background-color: #cc0000;
-}
+        #countdown {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            color: #ffffff;
+            font-size: 0.9em;
+        }
 
-#countdown {
-    position: absolute;
-    top: -30px;
-    left: 0;
-    color: #ffffff;
-    font-size: 1em;
-}
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
 
-#loading {
-    font-size: 1.4em;
-    color: #ff0000;
-    margin-top: 30px;
-}
+        .loading-logo {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+            animation: zoom-logo 1.5s ease-in-out infinite;
+        }
 
-#loadingOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-}
+        @keyframes zoom-logo {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
 
-.loading-logo {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 30px;
-    animation: zoom-logo 1.5s ease-in-out infinite;
-}
+        #loadingMessage {
+            color: #ffffff;
+            font-size: 1em;
+            text-align: center;
+        }
 
-@keyframes zoom-logo {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
 
-#loadingMessage {
-    color: #ffffff;
-    font-size: 1.4em;
-    text-align: center;
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #ff0000;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-top: 30px;
-}
+        /* Styles pour les appareils mobiles */
+        @media (max-width: 600px) {
+            body {
+                font-size: 12px;
+            }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+            .month-block {
+                padding: 15px;
+            }
 
-/* Styles pour les appareils mobiles */
-@media (max-width: 600px) {
-    body {
-        font-size: 14px;
-    }
+            .podium {
+                height: 160px;
+            }
 
-    .month-block {
-        padding: 20px;
-    }
+            .podium-step.first { height: 140px; }
+            .podium-step.second { height: 120px; }
+            .podium-step.third { height: 100px; }
 
-    .podium {
-        height: 300px;
-    }
+            .podium-rank {
+                font-size: 18px;
+            }
 
-    .podium-step.first { height: 260px; }
-    .podium-step.second { height: 220px; }
-    .podium-step.third { height: 180px; }
+            .podium-nickname {
+                font-size: 14px;
+            }
 
-    .podium-rank {
-        font-size: 34px;
-    }
+            .podium-meps {
+                font-size: 14px;
+            }
 
-    .podium-nickname {
-        font-size: 18px;
-    }
+            .leaderboard-row {
+                font-size: 14px;
+                padding: 8px 0;
+            }
 
-    .podium-meps {
-        font-size: 22px;
-    }
+            .rank {
+                width: 25px;
+            }
 
-    .leaderboard-row {
-        font-size: 18px;
-    }
-}
+            .leaderboard .status-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .status-icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -304,152 +313,152 @@ body {
             <div id="previousMonthLeaderboard"></div>
         </div>
     </div>
-    <div id="loading" style="display:none;">Chargement...</div>
 
     <script>
-let isFirstLoad = true;  // Variable pour savoir si c'est le premier chargement
-let countdownInterval;   // Variable globale pour stocker l'intervalle de compte à rebours
+        let isFirstLoad = true;  // Variable pour savoir si c'est le premier chargement
+        let countdownInterval;   // Variable globale pour stocker l'intervalle de compte à rebours
 
-// Fonction pour afficher l'overlay de chargement uniquement lors du premier chargement
-function showLoadingOverlay() {
-    if (isFirstLoad) {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-    }
-}
-
-// Fonction pour cacher l'overlay de chargement
-function hideLoadingOverlay() {
-    if (isFirstLoad) {
-        document.getElementById('loadingOverlay').style.display = 'none';
-        isFirstLoad = false;  // Désactive l'affichage de l'overlay pour les chargements suivants
-    }
-}
-
-// Fonction pour charger le leaderboard
-function loadLeaderboard() {
-    fetch('https://script.google.com/macros/s/AKfycbwqhVmMeT-I8cYsQNEnYMRJd5k_4-1BDm_g1fqKkVsNMOt9b-Cg-AXAl2OYeJ3fbuLL/exec')
-        .then(response => response.json())
-        .then(data => {
-            displayLeaderboard(data);
-            hideLoadingOverlay();  // Cache l'overlay après le premier chargement
-            startCountdown(60);  // Démarre le compte à rebours de 60 secondes
-        })
-        .catch(error => {
-            handleError(error);
-            hideLoadingOverlay();
-        });
-}
-
-// Fonction pour démarrer le compte à rebours
-function startCountdown(duration) {
-    // Annule l'intervalle existant si un compte à rebours est déjà en cours
-    if (countdownInterval) {
-        clearInterval(countdownInterval);
-    }
-
-    let timer = duration;
-    const countdownElement = document.getElementById('countdown');
-
-    function updateCountdown() {
-        let minutes = Math.floor(timer / 60);
-        let seconds = timer % 60;
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
-
-        if (--timer < 0) {
-            clearInterval(countdownInterval);
-            loadLeaderboard();  // Recharge le leaderboard à la fin du compte à rebours
+        // Fonction pour afficher l'overlay de chargement uniquement lors du premier chargement
+        function showLoadingOverlay() {
+            if (isFirstLoad) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            }
         }
-    }
 
-    updateCountdown();  // Mise à jour immédiate
-    countdownInterval = setInterval(updateCountdown, 1000);  // Met à jour chaque seconde
-}
+        // Fonction pour cacher l'overlay de chargement
+        function hideLoadingOverlay() {
+            if (isFirstLoad) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                isFirstLoad = false;  // Désactive l'affichage de l'overlay pour les chargements suivants
+            }
+        }
 
-// Fonction pour afficher le leaderboard avec podium
-function displayLeaderboard(data) {
-    document.getElementById('loading').style.display = 'none';
-    var today = new Date();
-    var dayOfMonth = today.getDate();
+        // Fonction pour charger le leaderboard
+        function loadLeaderboard() {
+            fetch('https://script.google.com/macros/s/AKfycbwqhVmMeT-I8cYsQNEnYMRJd5k_4-1BDm_g1fqKkVsNMOt9b-Cg-AXAl2OYeJ3fbuLL/exec')
+                .then(response => response.json())
+                .then(data => {
+                    displayLeaderboard(data);
+                    hideLoadingOverlay();  // Cache l'overlay après le premier chargement
+                    startCountdown(60);  // Démarre le compte à rebours de 60 secondes
+                })
+                .catch(error => {
+                    handleError(error);
+                    hideLoadingOverlay();
+                });
+        }
 
-    document.getElementById('currentMonthTitle').textContent = data.current.month;
-    document.getElementById('currentMonthPodium').innerHTML = createPodium(data.current.data.slice(0, 3));
-    document.getElementById('currentMonthLeaderboard').innerHTML = createLeaderboardTable(data.current.data.slice(3, dayOfMonth <= 7 ? 10 : 20));
+        // Fonction pour démarrer le compte à rebours
+        function startCountdown(duration) {
+            // Annule l'intervalle existant si un compte à rebours est déjà en cours
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
 
-    if (dayOfMonth <= 7 && data.previous) {
-        document.getElementById('previousMonthTitle').textContent = data.previous.month;
-        document.getElementById('previousMonthPodium').innerHTML = createPodium(data.previous.data.slice(0, 3));
-        document.getElementById('previousMonthLeaderboard').innerHTML = createLeaderboardTable(data.previous.data.slice(3, 10));
-        document.getElementById('previousMonthBlock').style.display = 'block';
-    } else {
-        document.getElementById('previousMonthBlock').style.display = 'none';
-    }
+            let timer = duration;
+            const countdownElement = document.getElementById('countdown');
 
-    updateLastUpdateTime();  // Mise à jour de l'heure de dernière mise à jour
-}
+            function updateCountdown() {
+                let minutes = Math.floor(timer / 60);
+                let seconds = timer % 60;
 
-function createPodium(topThree) {
-    // Génère le podium en HTML
-    const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd
-    let podiumHtml = '<div class="podium">';
-    podiumOrder.forEach((index, i) => {
-        const user = topThree[index];
-        const position = ['second', 'first', 'third'][i];
-        podiumHtml += `
-            <div class="podium-step ${position}">
-                <div class="podium-rank">${user.position}</div>
-                <div class="podium-nickname">${user.nickname}</div>
-                <img src="${user.iconLink}" alt="${user.status}" class="podium-icon">
-                <div class="podium-meps">${formatNumber(user.meps)} MEPs</div>
-            </div>`;
-    });
-    podiumHtml += '</div>';
-    return podiumHtml;
-}
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
 
-function createLeaderboardTable(leaderboardData) {
-    var tableHtml = '<div class="leaderboard">';
-    leaderboardData.forEach(function(user) {
-        tableHtml += `
-            <div class="leaderboard-row">
-                <span class="rank">${user.position}</span>
-                <span class="nickname">${user.nickname}</span>
-                <span class="meps">
-                    <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
-                    <span class="meps-value">${formatNumber(user.meps)}</span>
-                    <span class="meps-label">MEPs</span>
-                </span>
-            </div>`;
-    });
-    tableHtml += '</div>';
-    return tableHtml;
-}
+                countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
 
-function formatNumber(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-}
+                if (--timer < 0) {
+                    clearInterval(countdownInterval);
+                    loadLeaderboard();  // Recharge le leaderboard à la fin du compte à rebours
+                }
+            }
 
-function updateLastUpdateTime() {
-    var now = new Date();
-    var formattedTime = now.toLocaleString('fr-FR', { 
-        year: 'numeric', 
-        month: 'numeric', 
-        day: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
-    document.getElementById('lastUpdateTime').textContent = formattedTime;
-}
+            updateCountdown();  // Mise à jour immédiate
+            countdownInterval = setInterval(updateCountdown, 1000);  // Met à jour chaque seconde
+        }
 
-function handleError(error) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('currentMonthLeaderboard').innerHTML = 'Erreur lors du chargement du leaderboard: ' + error.message;
-}
+        // Fonction pour afficher le leaderboard avec podium
+        function displayLeaderboard(data) {
+            var today = new Date();
+            var dayOfMonth = today.getDate();
 
-window.onload = loadLeaderboard;
+            document.getElementById('currentMonthTitle').textContent = data.current.month;
+            document.getElementById('currentMonthPodium').innerHTML = createPodium(data.current.data.slice(0, 3));
+            document.getElementById('currentMonthLeaderboard').innerHTML = createLeaderboardTable(data.current.data.slice(3, dayOfMonth <= 7 ? 10 : 20));
+
+            if (dayOfMonth <= 7 && data.previous) {
+                document.getElementById('previousMonthTitle').textContent = data.previous.month;
+                document.getElementById('previousMonthPodium').innerHTML = createPodium(data.previous.data.slice(0, 3));
+                document.getElementById('previousMonthLeaderboard').innerHTML = createLeaderboardTable(data.previous.data.slice(3, 10));
+                document.getElementById('previousMonthBlock').style.display = 'block';
+            } else {
+                document.getElementById('previousMonthBlock').style.display = 'none';
+            }
+
+            updateLastUpdateTime();  // Mise à jour de l'heure de dernière mise à jour
+        }
+
+        function createPodium(topThree) {
+            // Génère le podium en HTML
+            const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd
+            let podiumHtml = '<div class="podium">';
+            podiumOrder.forEach((index, i) => {
+                const user = topThree[index];
+                const position = ['second', 'first', 'third'][i];
+                podiumHtml += `
+                    <div class="podium-step ${position}">
+                        <div class="podium-rank">${user.position}</div>
+                        <div class="podium-nickname">${user.nickname}</div>
+                        <div class="podium-meps">
+                            <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
+                            <span class="meps-value">${formatNumber(user.meps)}</span>
+                            <span class="meps-label">MEPs</span>
+                        </div>
+                    </div>`;
+            });
+            podiumHtml += '</div>';
+            return podiumHtml;
+        }
+
+        function createLeaderboardTable(leaderboardData) {
+            var tableHtml = '<div class="leaderboard">';
+            leaderboardData.forEach(function(user) {
+                tableHtml += `
+                    <div class="leaderboard-row">
+                        <span class="rank">${user.position}</span>
+                        <span class="nickname">${user.nickname}</span>
+                        <span class="meps">
+                            <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
+                            <span class="meps-value">${formatNumber(user.meps)}</span>
+                            <span class="meps-label">MEPs</span>
+                        </span>
+                    </div>`;
+            });
+            tableHtml += '</div>';
+            return tableHtml;
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function updateLastUpdateTime() {
+            var now = new Date();
+            var formattedTime = now.toLocaleString('fr-FR', { 
+                year: 'numeric', 
+                month: 'numeric', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('lastUpdateTime').textContent = formattedTime;
+        }
+
+        function handleError(error) {
+            document.getElementById('currentMonthLeaderboard').innerHTML = 'Erreur lors du chargement du leaderboard: ' + error.message;
+        }
+
+        window.onload = loadLeaderboard;
     </script>
 </body>
 </html>
