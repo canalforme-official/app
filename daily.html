@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning du jour</title>
-    <!-- Favicon -->
-    <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/a4d5232f-9127-e32c-00fe-10dc007e956e.png" type="image/png">
+  <meta charset="UTF-8">
+  <title>Planning du jour</title>
+  <!-- Favicon -->
+  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/a4d5232f-9127-e32c-00fe-10dc007e956e.png" type="image/png">
 
-<!-- DailyStyles.html -->
-<style>
+  <!-- Meta viewport to prevent zooming -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <style>
     /* Styles généraux */
     body {
       font-family: Arial, sans-serif;
@@ -16,8 +17,10 @@
       color: #333;
       margin: 0;
       padding: 20px;
+      /* Smoother scrolling */
+      scroll-behavior: smooth;
     }
-  
+
     h1 {
       color: #333;
       font-size: 2.5em;
@@ -25,7 +28,7 @@
       padding: 20px 0 10px 0;
       position: relative;
     }
-  
+
     .date {
       position: absolute;
       top: 20px;
@@ -33,7 +36,7 @@
       font-size: 1.4em;
       color: #808080;
     }
-  
+
     /* Styles pour la timeline */
     .timeline {
       position: relative;
@@ -42,13 +45,13 @@
       margin: 0 auto;
       border-left: 2px solid #ccc;
     }
-  
+
     .timeline-block {
       padding-left: 20px;
       margin-bottom: 20px;
       position: relative;
     }
-  
+
     .timeline-block::before {
       content: '';
       position: absolute;
@@ -60,14 +63,14 @@
       border-radius: 50%;
       background-color: #ccc;
     }
-  
+
     .time {
       font-size: 1.4em;
       color: #999;
       position: relative;
       top: -5px;
     }
-  
+
     /* Styles pour les blocs de cours */
     .course-block {
       position: relative;
@@ -80,31 +83,32 @@
       max-width: 800px;
       margin: 0 auto;
     }
-  
+
     /* Styles pour le type de cours */
     .course-type {
       position: absolute;
       top: 10px;
       right: 20px;
       font-size: 0.8em;
+      font-weight: bold;
     }
-  
+
     /* Couleurs pour les cours "100% Femmes" */
     .course-block.women-only:not(.current):not(.starting-soon) .course-type {
       color: #FF69B4;
     }
-  
+
     .course-block.women-only {
       border: 2px solid #FF69B4;
       background-color: #FFF0F5;
       box-shadow: 0px 0px 15px 5px rgba(255, 105, 180, 0.5);
     }
-  
+
     /* Couleurs pour les cours mixtes */
     .course-block.mixte:not(.current):not(.starting-soon) .course-type {
       color: #808080;
     }
-  
+
     /* Cours passés */
     .course-block.past {
       border: 2px solid #aaa;
@@ -112,12 +116,12 @@
       box-shadow: 0px 3px 10px rgba(150, 150, 150, 0.2);
       color: #aaa;
     }
-  
+
     /* Cours à venir */
     .course-block.upcoming {
       box-shadow: 0px 6px 15px rgba(150, 150, 150, 0.5);
     }
-  
+
     /* Cours qui vont bientôt démarrer */
     .course-block.starting-soon {
       font-size: 1.3em;
@@ -125,95 +129,95 @@
       animation: heartbeat-blink 1.5s ease-in-out infinite;
       box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.4);
     }
-  
+
     .course-block.starting-soon.mixte {
       border: 2px solid #808080;
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-mixte 1.5s ease-in-out infinite;
     }
-  
+
     .course-block.starting-soon.women-only {
       border: 2px solid #FF69B4;
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-femmes 1.5s ease-in-out infinite;
       box-shadow: 0px 0px 15px 5px rgba(255, 105, 180, 0.5);
     }
-  
+
     /* Cours en cours */
     .course-block.current {
       font-size: 1.3em;
       padding: 20px 30px;
       box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.4);
     }
-  
+
     .course-block.current.mixte {
       border: 2px solid #808080;
       background-color: #D3D3D3;
       color: #FFF;
     }
-  
+
     .course-block.current.women-only {
       border: 2px solid #FF69B4;
       background-color: #FF69B4;
       color: #FFF;
       box-shadow: 0px 0px 15px 5px rgba(255, 105, 180, 0.5);
     }
-  
+
     /* Animation pour le rebond */
     @keyframes heartbeat-blink {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
     }
-  
+
     /* Clignotement pour les cours mixtes */
     @keyframes blink-mixte {
       0%, 100% { background-color: #f9f9f9; color: #000; }
       50% { background-color: #D3D3D3; color: #FFF; }
     }
-  
+
     /* Clignotement pour les cours "100% Femmes" */
     @keyframes blink-femmes {
       0%, 100% { background-color: #FFF0F5; color: #000; }
       50% { background-color: #FF69B4; color: #FFF; }
     }
-  
+
     /* Style pour le titre du cours */
     .course-title {
       font-size: 1.5em;
       font-weight: bold;
       margin-bottom: 5px;
     }
-  
+
     .course-coach {
       font-size: 1em;
       color: #666;
       margin-bottom: 5px;
     }
-  
+
     .course-studio {
       font-size: 0.9em;
       color: #555;
     }
-  
+
     .countdown {
       position: absolute;
       bottom: 2px;
       right: 20px;
-      font-size: 0.7em;
+      font-size: 0.9em;
       font-weight: bold;
     }
-  
+
     .focus {
       scroll-margin-top: 50px;
     }
-  
+
     .logo {
       text-align: center;
       margin-top: 40px;
     }
-  
+
     .logo img {
       width: 25%;
     }
-  
+
     /* Styles pour les boutons de navigation */
     .navigation {
       position: fixed;
@@ -225,7 +229,7 @@
       pointer-events: none;
       z-index: 1000;
     }
-  
+
     .navigation button {
       background: rgba(255, 255, 255, 0.5);
       border: none;
@@ -236,17 +240,17 @@
       outline: none;
       color: black;
     }
-  
+
     .navigation button:disabled {
       visibility: hidden;
     }
-  
+
     @media screen and (min-width: 1025px) {
       .navigation {
         display: none;
       }
     }
-  
+
     /* Overlay de chargement */
     #loadingOverlay {
       position: fixed;
@@ -261,7 +265,7 @@
       z-index: 2000;
       flex-direction: column;
     }
-  
+
     /* Style du message de chargement */
     #loadingMessage {
       margin-top: 50px;
@@ -274,45 +278,43 @@
       padding: 10px;
       border-radius: 10px;
     }
-  
+
     #loadingMessage strong {
       font-weight: bold;
     }
-  
+
     /* Logo animé lors du chargement */
     .loading-logo {
       display: flex;
       justify-content: center;
       align-items: center;
     }
-  
-    /* Logo animé lors du chargement */
+
     .loading-logo img {
-      width: 50px;  /* Réduire la taille du logo de moitié */
+      width: 50px;
       height: 50px;
       animation: zoom-logo 1.5s ease-in-out infinite;
     }
-  
+
     @keyframes zoom-logo {
       0% {
         transform: scale(1);
       }
       50% {
-        transform: scale(1.5);  /* Zoomer */
+        transform: scale(1.5);
       }
       100% {
-        transform: scale(1);  /* Revenir à la taille initiale */
+        transform: scale(1);
       }
     }
-  
-  
+
     /* Styles spécifiques aux cours du studio "Piscine" */
     .course-block.piscine {
       border: 2px solid #1E90FF;
       background-color: #E0F7FF;
       box-shadow: 0px 0px 15px 5px rgba(30, 144, 255, 0.5);
     }
-  
+
     /* Styles pour les cours en cours ou démarrant bientôt dans "Piscine" */
     .course-block.piscine.current {
       border: 2px solid #1E90FF;
@@ -320,80 +322,80 @@
       color: #FFF;
       box-shadow: 0px 0px 15px 5px rgba(30, 144, 255, 0.5);
     }
-  
+
     .course-block.piscine.starting-soon {
       border: 2px solid #1E90FF;
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-piscine 1.5s ease-in-out infinite;
       box-shadow: 0px 0px 15px 5px rgba(30, 144, 255, 0.5);
     }
-  
+
     /* Animation pour le clignotement des cours "Piscine" */
     @keyframes blink-piscine {
       0%, 100% { background-color: #E0F7FF; color: #000; }
       50% { background-color: #1E90FF; color: #FFF; }
     }
-  
+
     /* Styles pour les appareils mobiles */
     @media screen and (max-width: 1024px) {
       body {
         padding: 10px 15px;
       }
-  
+
       .timeline {
         margin-left: 0;
       }
-  
+
       .course-block {
         padding-top: 15px;
         padding-bottom: 15px;
       }
-  
+
       .course-block.past .course-title,
       .course-block.upcoming .course-title {
         font-size: 1.2em;
       }
-  
+
       .course-block.current .course-title,
       .course-block.starting-soon .course-title {
         font-size: 1.3em;
       }
-  
+
       .course-coach {
         font-size: 0.9em;
       }
-  
+
       .course-studio {
         font-size: 0.7em;
       }
-  
+
       .time {
         font-size: 1.2em;
       }
-  
+
       h1 {
         font-size: 1.8em;
       }
-  
+
       .date {
         font-size: 1em;
       }
-  
+
       .logo img {
         width: 50%;
       }
     }
-  
+
     .coach-images {
-      display: flex; /* Afficher les images des coachs côte à côte */
-      gap: 0px; /* Espace entre les images */
+      display: flex;
+      gap: 0px;
     }
-  
+
     .coach-photo {
       width: 30px;
       height: 30px;
       border-radius: 50%;
     }
-  
+
     .course-coach img {
       width: 30px;
       height: 30px;
@@ -401,263 +403,316 @@
       vertical-align: middle;
       margin-right: 10px;
     }
-  
-  /* Style pour le bouton de la vue hebdomadaire */
-  .weekly-view-button {
-    position: fixed;
-    top: 10px; /* Le premier bouton reste à 10px du haut */
-    right: 10px;
-    z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 8px;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .weekly-view-button img {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    filter: brightness(0); /* Icone en noir */
-  }
-  
-  /* Animation au survol */
-  .weekly-view-button:hover {
-    background-color: rgba(255, 255, 255, 0.9); /* Réduire encore la transparence au survol */
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4); /* Renforcer l'ombre portée au survol */
-  }
-  
-  /* Style pour le bouton de retour à aujourd'hui */
-  .today-view-button {
-    position: fixed;
-    right: 10px; /* Le `top` sera géré par JavaScript */
-    z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 8px;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .today-view-button button {
-    width: 100%;
-    height: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%; /* Assure que tout le bouton est circulaire */
-  }
-  
-  .today-view-button img {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-  }
-  
-  /* Animation au survol */
-  .today-view-button:hover {
-    background-color: rgba(255, 255, 255, 0.9); /* Réduire encore la transparence au survol */
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4); /* Renforcer l'ombre portée au survol */
-  }
-  
-  
-  /* Styles pour le tableau du planning hebdomadaire */
-  .weekly-schedule {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0 auto;
-  }
-  
-  .weekly-schedule th, .weekly-schedule td {
-    padding: 10px;
-    vertical-align: top;
-    border: none; /* Pas de bordures pour un look moderne */
-  }
-  
-  .weekly-schedule thead th {
-    background-color: #f2f2f2;
-    text-align: center;
-    font-size: 1.2em;
-    border-bottom: 2px solid #ccc;
-  }
-  
-  .time-cell {
-    font-weight: bold;
-    text-align: center;
-    background-color: #f9f9f9;
-    border-right: 2px solid #ccc;
-  }
-  
-  .course-cell {
-    min-width: 100px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .course-block {
-    margin-bottom: 10px;
-    /* Styles supplémentaires si nécessaire */
-  }
-  
-  </style>
-    
 
+    /* Style pour le bouton de la vue hebdomadaire */
+    .weekly-view-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background-color: rgba(255, 0, 0, 0.5); /* Transparent red background */
+      padding: 8px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .weekly-view-button img {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      filter: brightness(0) invert(1); /* White icon */
+    }
+
+    /* Animation au survol */
+    .weekly-view-button:hover {
+      background-color: rgba(255, 0, 0, 0.7);
+      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Style pour le bouton de retour à aujourd'hui */
+    .today-view-button {
+      position: fixed;
+      right: 10px;
+      z-index: 1000;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 8px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .today-view-button button {
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .today-view-button img {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+
+    /* Animation au survol */
+    .today-view-button:hover {
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+    }
+  </style>
 </head>
 <body onload="initializePage();">
-    <!-- Bouton Weekly view -->
-    <div class="weekly-view-button">
-        <a href="./weekly.html">
-            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4e5c83d2-8068-c5e7-bffe-8a8e959b9591.png" alt="Vue Hebdomadaire">
-        </a>
+
+  <!-- Bouton Weekly view -->
+  <div class="weekly-view-button">
+    <a href="./weekly.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4e5c83d2-8068-c5e7-bffe-8a8e959b9591.png" alt="Vue Hebdomadaire">
+    </a>
+  </div>
+
+  <!-- Bouton pour revenir à aujourd'hui -->
+  <div class="today-view-button" id="todayViewButton" style="display: none;">
+    <button onclick="returnToToday()">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/87c4d60c-96fd-da4b-3996-eba4f5622ec8.png" alt="Retour à aujourd'hui">
+    </button>
+  </div>
+
+  <!-- Boutons de navigation -->
+  <div class="navigation">
+    <button id="prevDay" onclick="changeDay(-1)">&#9664;</button>
+    <button id="nextDay" onclick="changeDay(1)">&#9654;</button>
+  </div>
+
+  <h1 id="dayOfWeek"></h1>
+  <div class="date" id="dateStr"></div>
+  <div class="timeline" id="timeline">
+    <!-- Les cours seront injectés ici -->
+  </div>
+
+  <!-- Overlay de chargement -->
+  <div id="loadingOverlay" style="display: none;">
+    <div class="loading-logo">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Logo du Club">
     </div>
+    <div id="loadingMessage">Chargement du planning</div>
+  </div>
 
-    <!-- Bouton pour revenir à aujourd'hui -->
-    <div class="today-view-button" id="todayViewButton" style="display: none;">
-        <button onclick="returnToToday()" style="background: none; border: none; cursor: pointer; width: 100%; height: 100%;">
-            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/87c4d60c-96fd-da4b-3996-eba4f5622ec8.png" alt="Retour à aujourd'hui">
-        </button>
-    </div>
+  <script>
+    let currentDayIndex = new Date().getDay();
+    const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
+    let allData = [];
 
-    <!-- Boutons de navigation -->
-    <div class="navigation">
-        <button id="prevDay" onclick="changeDay(-1)">&#9664;</button>
-        <button id="nextDay" onclick="changeDay(1)">&#9654;</button>
-    </div>
+    function fetchAllData() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      document.getElementById('loadingMessage').innerHTML = 'Chargement du planning...';
 
-    <h1 id="dayOfWeek"></h1>
-    <div class="date" id="dateStr"></div>
-    <div class="timeline" id="timeline">
-        <!-- Les cours seront injectés ici -->
-    </div>
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          allData = data.slice(1); // Ignorer la première ligne (titres)
+          displaySchedule(currentDayIndex);
+          document.getElementById('loadingOverlay').style.display = 'none';
 
-    <!-- Overlay de chargement -->
-    <div id="loadingOverlay" style="display: none;">
-        <div class="loading-logo">
-            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Logo du Club">
-        </div>
-        <div id="loadingMessage">Chargement du planning</div>
-    </div>
-
-    <script>
-        let currentDayIndex = new Date().getDay();
-        const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
-        let allData = [];
-
-        function fetchAllData() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingMessage').innerHTML = 'Chargement du planning...';
-
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    allData = data.slice(1); // Ignorer la première ligne (titres)
-                    displaySchedule(currentDayIndex);
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la récupération des données :', error);
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                });
-        }
-
-        function displaySchedule(dayIndex) {
-            const scheduleDiv = document.getElementById('timeline');
-            const dayOfWeek = getDayName(dayIndex);
-            const today = new Date();
-            today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
-            const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-
-            document.getElementById('dayOfWeek').innerText = dayOfWeek;
-            document.getElementById('dateStr').innerText = dateStr;
-
-            const dayData = allData.filter(course => course.day === dayOfWeek);
-
-            if (dayData.length > 0) {
-                let html = '';
-                dayData.forEach(course => {
-                  const courseDiv = `
-                    <div class="timeline-block">
-                        <div class="time">${course.startTime} - ${course.endTime}</div>
-                        <div class="course-block ${course.type === '100% Femmes' ? 'women-only' : 'mixte'} ${course.studio === 'Piscine' ? 'piscine' : ''}">
-                            <div class="course-title">
-                                ${course.logo && course.logo !== 'default-logo.png' 
-                                    ? `<img src="${course.logo}" alt="${course.name}" style="max-width: 180px; max-height: 70px;" />` 
-                                    : course.name}
-                            </div>
-                            <div class="course-coach"><img src="${course.coachImage}" alt="Coach" style="max-width: 30px; max-height: 30px;" /> ${course.coach}</div>
-                            <div class="course-studio">${course.studio}</div>
-                        </div>
-                    </div>`;
-                    html += courseDiv;
-                });
-                scheduleDiv.innerHTML = html;
-            } else {
-                scheduleDiv.innerHTML = '<p>Aucun cours pour aujourd\'hui.</p>';
-            }
-
-            toggleTodayButton(dayIndex);
-            scrollToCurrentCourse();
-        }
-
-        function getDayName(dayIndex) {
-            const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-            return days[dayIndex];
-        }
-
-        function returnToToday() {
-            currentDayIndex = new Date().getDay();
-            displaySchedule(currentDayIndex);
-        }
-
-        function toggleTodayButton(dayIndex) {
-            const todayIndex = new Date().getDay();
-            document.getElementById('todayViewButton').style.display = dayIndex === todayIndex ? 'none' : 'block';
-        }
-
-        function changeDay(direction) {
-            currentDayIndex = (currentDayIndex + direction + 7) % 7;
-            displaySchedule(currentDayIndex);
-        }
-
-        function scrollToCurrentCourse() {
-            // Fonction de défilement vers le cours en cours (si nécessaire)
-        }
-
-        function initializePage() {
-            fetchAllData();
-            updateCurrentYear();
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Gestion de la position du bouton todayView
-            var weeklyButton = document.querySelector('.weekly-view-button');
-            var todayButton = document.querySelector('.today-view-button');
-            if (weeklyButton && todayButton) {
-                var weeklyButtonHeight = weeklyButton.offsetHeight;
-                todayButton.style.top = (weeklyButtonHeight + 20) + 'px'; // Espacement entre les deux boutons
-            }
+          // Initialize countdowns and scrolling
+          if (isToday(currentDayIndex)) {
+            initializeCountdowns();
+            scrollToNextUpcomingCourse();
+            // Update every 15 minutes
+            setInterval(refreshSchedule, 900000); // 15 minutes
+          }
+        })
+        .catch(error => {
+          console.error('Erreur lors de la récupération des données :', error);
+          document.getElementById('loadingOverlay').style.display = 'none';
         });
+    }
 
-        function updateCurrentYear() {
-        const currentYear = new Date().getFullYear();
-        document.getElementById('current-year').textContent = currentYear;
-}
-    </script>
+    function displaySchedule(dayIndex) {
+      const scheduleDiv = document.getElementById('timeline');
+      const dayOfWeek = getDayName(dayIndex);
+      const today = new Date();
+      today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
+      const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 
-    <footer>
-        <p>MARRAKECH CANAL FORME &copy; <span id="current-year"></span> All rights reserved</p>
-    </footer>
+      document.getElementById('dayOfWeek').innerText = dayOfWeek;
+      document.getElementById('dateStr').innerText = dateStr;
+
+      const dayData = allData.filter(course => course.day === dayOfWeek);
+
+      if (dayData.length > 0) {
+        let html = '';
+        dayData.forEach((course, index) => {
+          let courseTypeClass = '';
+          if (course.type === '100% Femmes') {
+            courseTypeClass = 'women-only';
+          } else if (course.type === 'Mixte') {
+            courseTypeClass = 'mixte';
+          }
+
+          // Studio "Piscine"
+          if (course.studio === 'Piscine') {
+            courseTypeClass += ' piscine';
+          }
+
+          // Determine course status
+          let courseStatusClass = '';
+          const now = new Date();
+          const currentTime = now.getHours() * 60 + now.getMinutes();
+          const [startHour, startMinute] = course.startTime.split(':').map(Number);
+          const [endHour, endMinute] = course.endTime.split(':').map(Number);
+          const courseStartTime = startHour * 60 + startMinute;
+          const courseEndTime = endHour * 60 + endMinute;
+
+          let countdownHTML = '';
+
+          if (isToday(dayIndex)) {
+            if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+              courseStatusClass = 'current focus';
+            } else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15) {
+              courseStatusClass = 'starting-soon focus';
+              countdownHTML = `<div class="countdown" data-start-time="${course.startTime}"></div>`;
+            } else if (currentTime < courseStartTime) {
+              courseStatusClass = 'upcoming';
+            } else {
+              courseStatusClass = 'past';
+            }
+          } else {
+            courseStatusClass = 'upcoming';
+          }
+
+          // Course type display
+          const courseTypeDisplay = `<div class="course-type">${course.type}</div>`;
+
+          const courseDiv = `
+          <div class="timeline-block">
+            <div class="time">${course.startTime} - ${course.endTime}</div>
+            <div class="course-block ${courseTypeClass} ${courseStatusClass}" id="${courseStatusClass.includes('focus') ? 'focus-course' : ''}">
+              ${courseTypeDisplay}
+              <div class="course-title">
+                ${course.logo && course.logo !== 'default-logo.png'
+                  ? `<img src="${course.logo}" alt="${course.name}" style="max-width: 180px; max-height: 70px;" />`
+                  : course.name}
+              </div>
+              <div class="course-coach"><img src="${course.coachImage}" alt="Coach" /> ${course.coach}</div>
+              <div class="course-studio">${course.studio}</div>
+              ${countdownHTML}
+            </div>
+          </div>`;
+          html += courseDiv;
+        });
+        scheduleDiv.innerHTML = html;
+      } else {
+        scheduleDiv.innerHTML = '<p>Aucun cours pour aujourd\'hui.</p>';
+      }
+
+      toggleTodayButton(dayIndex);
+      if (isToday(dayIndex)) {
+        scrollToNextUpcomingCourse();
+        initializeCountdowns();
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function isToday(dayIndex) {
+      return dayIndex === new Date().getDay();
+    }
+
+    function getDayName(dayIndex) {
+      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      return days[dayIndex];
+    }
+
+    function returnToToday() {
+      currentDayIndex = new Date().getDay();
+      displaySchedule(currentDayIndex);
+    }
+
+    function toggleTodayButton(dayIndex) {
+      const todayIndex = new Date().getDay();
+      document.getElementById('todayViewButton').style.display = dayIndex === todayIndex ? 'none' : 'block';
+    }
+
+    function changeDay(direction) {
+      currentDayIndex = (currentDayIndex + direction + 7) % 7;
+      displaySchedule(currentDayIndex);
+    }
+
+    function scrollToNextUpcomingCourse() {
+      const focusCourse = document.getElementById('focus-course');
+      if (focusCourse) {
+        focusCourse.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function initializeCountdowns() {
+      updateCountdowns();
+      setInterval(updateCountdowns, 1000);
+    }
+
+    function updateCountdowns() {
+      const countdownElements = document.querySelectorAll('.countdown');
+      const now = new Date();
+      countdownElements.forEach(el => {
+        const startTimeStr = el.getAttribute('data-start-time');
+        const [startHour, startMinute] = startTimeStr.split(':').map(Number);
+        const startTime = new Date();
+        startTime.setHours(startHour, startMinute, 0, 0);
+        const diff = startTime - now;
+        if (diff > 0) {
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
+          el.innerHTML = `Commence dans ${minutes} min ${seconds} s`;
+        } else {
+          el.innerHTML = 'Commence maintenant';
+        }
+      });
+    }
+
+    function refreshSchedule() {
+      if (isToday(currentDayIndex)) {
+        displaySchedule(currentDayIndex);
+      }
+    }
+
+    function initializePage() {
+      fetchAllData();
+      updateCurrentYear();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Gestion de la position du bouton todayView
+      var weeklyButton = document.querySelector('.weekly-view-button');
+      var todayButton = document.querySelector('.today-view-button');
+      if (weeklyButton && todayButton) {
+        var weeklyButtonHeight = weeklyButton.offsetHeight;
+        todayButton.style.top = (weeklyButtonHeight + 20) + 'px'; // Espacement entre les deux boutons
+      }
+    });
+
+    function updateCurrentYear() {
+      const currentYear = new Date().getFullYear();
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.innerHTML = `<p>MARRAKECH CANAL FORME &copy; ${currentYear} All rights reserved</p>`;
+      }
+    }
+  </script>
+
+  <footer></footer>
 </body>
 </html>
