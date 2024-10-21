@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <base target="_top">
- 
-
+  
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/a4d5232f-9127-e32c-00fe-10dc007e956e.png" type="image/png">
 
@@ -17,15 +16,36 @@
       margin: 0;
       padding: 20px;
     }
-  
+
     h1 {
       color: #333;
-      font-size: 1.5em;
+      font-size: 2em; /* Réduction de la taille du titre */
       margin: 0;
-      padding: 20px 0 10px 0;
+      padding: 10px 0;
       position: relative;
     }
-  
+
+    /* Styles pour le conteneur des filtres */
+    .filters {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filters label {
+      font-size: 0.9em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .filters input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
     /* Overlay de chargement */
     #loadingOverlay {
       position: fixed;
@@ -40,7 +60,7 @@
       z-index: 2000;
       flex-direction: column;
     }
-  
+
     /* Style du message de chargement */
     #loadingMessage {
       margin-top: 50px;
@@ -53,20 +73,20 @@
       padding: 10px;
       border-radius: 10px;
     }
-  
+
     /* Logo animé lors du chargement */
     .loading-logo {
       display: flex;
       justify-content: center;
       align-items: center;
     }
-  
+
     .loading-logo img {
       width: 50px;
       height: 50px;
       animation: zoom-logo 1.5s ease-in-out infinite;
     }
-  
+
     @keyframes zoom-logo {
       0% {
         transform: scale(1);
@@ -78,7 +98,7 @@
         transform: scale(1);
       }
     }
-  
+
     /* Style pour le bouton de retour à la vue quotidienne */
     .today-view-button {
       position: fixed;
@@ -95,7 +115,7 @@
       align-items: center;
       justify-content: center;
     }
-  
+
     .today-view-button a {
       display: flex;
       align-items: center;
@@ -104,19 +124,19 @@
       height: 100%;
       text-decoration: none;
     }
-  
+
     .today-view-button img {
       width: 30px;
       height: 30px;
       cursor: pointer;
     }
-  
+
     /* Animation au survol */
     .today-view-button:hover {
       background-color: rgba(255, 255, 255, 0.9);
       box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
     }
-  
+
     /* Styles pour le tableau du planning hebdomadaire */
     .weekly-schedule {
       width: 100%;
@@ -124,52 +144,68 @@
       margin: 0 auto;
       table-layout: fixed;
     }
-  
+
     .weekly-schedule th, .weekly-schedule td {
       padding: 10px;
       vertical-align: top;
       border: none;
     }
-  
+
     .weekly-schedule thead th {
       background-color: #f2f2f2;
       text-align: center;
       font-size: 1.2em;
       border-bottom: 2px solid #ccc;
     }
-  
-    .time-cell {
-      font-weight: bold;
-      text-align: center;
-      background-color: #f9f9f9;
-      border-right: 2px solid #ccc;
-      width: 80px; /* Ajustez cette valeur selon vos préférences */
+
+    /* Styles pour la cellule des heures */
+    .weekly-schedule th:first-child,
+    .weekly-schedule td.time-cell {
+      width: 30px; /* Utilisez la même largeur pour l'en-tête et les cellules des heures */
+      min-width: 20px; /* Assure que la largeur reste constante */
+      max-width: 40px;
+      text-align: center; /* Centre le texte */
+      padding: 5px; /* Ajuste le padding pour éviter que le texte soit collé */
     }
-  
+
+    /* Alternance de couleurs pour les time-cell */
+    .weekly-schedule td.time-cell-white {
+      background-color: white;
+      color: black;
+      text-align: center;
+    }
+
+    .weekly-schedule td.time-cell-grey {
+      background-color: #f0f0f0;
+      color: black;
+      text-align: center;
+    }
+
     .course-cell {
       min-width: 100px;
       text-align: center;
       border-bottom: 1px solid #eee;
     }
-  
+
     .course-block {
       margin-bottom: 10px;
-      border-radius: 10px; /* Ajout des bords arrondis */
+      border-radius: 10px; /* Bords arrondis */
       border: 1px solid #ccc; /* Contour léger */
       background-color: #ffffff; /* Fond blanc pour les cours mixtes */
     }
-  
-    /* Contour léger spécifique pour les cours "100% Femmes" et "Piscine" */
+
+    /* Styles pour les cours "100% Femmes" */
     .course-block.women-only {
       background-color: #FFF0F5;
       border: 1px solid #FF69B4; /* Contour rose clair */
     }
-  
+
+    /* Styles pour les cours "Piscine" */
     .course-block.piscine {
       background-color: #E0F7FF;
       border: 1px solid #1E90FF; /* Contour bleu clair */
     }
-  
+
     /* Styles spécifiques pour les logos de cours */
     .logo-cours {
       max-width: 90%;
@@ -178,27 +214,18 @@
       display: block;
       margin: 0 auto;
     }
-  
+
     /* Styles pour les lignes blanches et grises */
     .course-row-white {
       background-color: white;
       color: black;
     }
-  
+
     .course-row-grey {
       background-color: #f0f0f0;
       color: black;
     }
-  
-    /* Alternance de couleur pour les "time-cell" */
-    .time-cell-white {
-      background-color: white;
-    }
-  
-    .time-cell-grey {
-      background-color: #f0f0f0;
-    }
-  
+
     /* Styles pour rendre l'en-tête sticky avec une ombre diffuse */
     .weekly-schedule thead {
       position: sticky;
@@ -206,14 +233,14 @@
       z-index: 10;
       background-color: white;
     }
-  
+
     .weekly-schedule thead th {
       position: sticky;
       top: 0;
       z-index: 10;
       background-color: #f2f2f2;
     }
-  
+
     .weekly-schedule thead::after {
       content: '';
       position: absolute;
@@ -229,16 +256,6 @@
       pointer-events: none;
     }
 
-          /* Assurez-vous que la première cellule d'en-tête (les heures) ait la même largeur que les cellules des heures */
-.weekly-schedule th:first-child,
-.weekly-schedule td.time-cell {
-  width: 30px; /* Utilisez la même largeur pour l'en-tête et les cellules des heures */
-  min-width: 20px; /* Assure que la largeur reste constante */
-  max-width: 40px;
-  text-align: center; /* Centre le texte */
-  padding: 5px; /* Ajuste le padding pour éviter que le texte soit collé */
-}
-  
     /* Styles pour les cours */
     .course-info {
       font-size: 1em;
@@ -246,7 +263,7 @@
       color: #000;
       margin-bottom: 4px;
     }
-  
+
     .single-coach {
       font-size: 0.8em;
       display: flex;
@@ -254,19 +271,19 @@
       justify-content: flex-start;
       margin-top: 1px;
     }
-  
+
     .single-coach img {
       width: 20px;
       height: 20px;
       border-radius: 50%;
       margin-right: 10px;
     }
-  
+
     .multiple-coaches {
       text-align: center;
       font-size: 0.8em;
     }
-  
+
     /* Styles spécifiques pour les appareils mobiles avec rotation */
     @media screen and (max-width: 767px) {
       html, body {
@@ -276,7 +293,7 @@
         padding: 0;
         overflow: hidden;
       }
-  
+
       body {
         transform: rotate(90deg);
         transform-origin: bottom left;
@@ -286,7 +303,7 @@
         width: 100vh;
         height: 100vw;
       }
-  
+
       .content-wrapper {
         width: 100%;
         height: 100%;
@@ -295,18 +312,18 @@
         padding: 10px;
         box-sizing: border-box;
       }
-  
+
       #weeklySchedule {
         width: 100%;
         height: auto;
       }
-  
+
       .weekly-schedule {
         width: 100%;
         font-size: 0.7em;
         table-layout: fixed;
       }
-  
+
       .weekly-schedule th,
       .weekly-schedule td {
         padding: 5px 2px;
@@ -317,33 +334,45 @@
         margin: 0;
       }
 
+      /* Ajustement des largeurs de colonnes */
+      .weekly-schedule .time-cell {
+        width: 20px; /* Réduction de la largeur */
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-size: 0.8em;
+        white-space: nowrap;
+        padding: 2px;
+        text-align: center;
+        border-right: 1px solid #ccc;
+      }
+
       .weekly-schedule .course-cell {
-        width: calc((100% - 40px) / 7);
+        width: calc((100% - 20px) / 7);
         padding: 2px;
       }
-  
+
       /* Réduction des paddings et marges */
       .weekly-schedule .course-block {
         padding: 2px;
         margin-bottom: 2px;
       }
-  
+
       .weekly-schedule .course-info {
         margin-bottom: 2px;
       }
-  
+
       /* Ajustement des polices */
       .weekly-schedule .course-info {
         font-size: 0.8em !important;
         white-space: normal !important;
       }
-  
+
       .single-coach,
       .multiple-coaches {
         font-size: 0.7em !important;
         white-space: normal !important;
       }
-  
+
       /* Placer le bouton de retour à la vue quotidienne en haut à droite */
       .today-view-button {
         transform: none !important;
@@ -353,28 +382,50 @@
         left: auto !important;
         bottom: auto !important;
       }
+
+      /* Styles pour les filtres en vue mobile */
+      .filters {
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+
+      .filters label {
+        font-size: 0.8em;
+      }
     }
   </style>
-  
-  
-  
-  
 </head>
 <body onload="initializeWeeklyPage();">
 
   <div class="content-wrapper">
 
-  <!-- Bouton pour revenir à la vue quotidienne -->
-  <div class="today-view-button">
-    <a href="./daily.html">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/87c4d60c-96fd-da4b-3996-eba4f5622ec8.png" alt="Vue Quotidienne">
-    </a>
-  </div>
+    <!-- Bouton pour revenir à la vue quotidienne -->
+    <div class="today-view-button">
+      <a href="./daily.html">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/87c4d60c-96fd-da4b-3996-eba4f5622ec8.png" alt="Vue Quotidienne">
+      </a>
+    </div>
 
-  <h1>Planning Hebdomadaire</h1>
+    <h1>Planning Hebdomadaire</h1>
 
-  <!-- Le planning hebdomadaire sera inséré ici -->
-  <div id="weeklySchedule"></div>
+    <!-- Filtres -->
+    <div class="filters">
+      <label>
+        <input type="checkbox" id="filter-women-only" checked>
+        100% Femmes
+      </label>
+      <label>
+        <input type="checkbox" id="filter-piscine" checked>
+        Piscine
+      </label>
+      <label>
+        <input type="checkbox" id="filter-mixte" checked>
+        Mixte
+      </label>
+    </div>
+
+    <!-- Le planning hebdomadaire sera inséré ici -->
+    <div id="weeklySchedule"></div>
 
   </div>
 
@@ -411,13 +462,17 @@
 
           // Cacher l'overlay de chargement
           document.getElementById('loadingOverlay').style.display = 'none';
+
+          // Ajouter des écouteurs d'événements pour les filtres
+          document.getElementById('filter-women-only').addEventListener('change', applyFilters);
+          document.getElementById('filter-piscine').addEventListener('change', applyFilters);
+          document.getElementById('filter-mixte').addEventListener('change', applyFilters);
         })
         .catch(error => {
           console.error('Erreur lors de la récupération des données :', error);
           document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
         });
     }
-
 
     function generateWeeklyScheduleHtml() {
       var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
@@ -521,11 +576,11 @@
               var coachImagesHtml = '';
               if (course.coach.length === 1) {
                 var coachImageUrl = course.coachImage || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
-                coachImagesHtml = '<div class="single-coach" style="display:flex;align-items:center;justify-content:flex-start;margin-top:1px;">' +
-                                  '<img src="' + coachImageUrl + '" alt="' + course.coach[0] + '" style="width:20px;height:20px;border-radius:50%;margin-right:10px;">' +
+                coachImagesHtml = '<div class="single-coach">' +
+                                  '<img src="' + coachImageUrl + '" alt="' + course.coach[0] + '">' +
                                   '<span>' + course.coach[0] + '</span></div>';
               } else if (course.coach.length > 1) {
-                coachImagesHtml = '<div class="multiple-coaches" style="text-align:center;">';
+                coachImagesHtml = '<div class="multiple-coaches">';
                 course.coach.forEach(function(coachName) {
                   coachImagesHtml += '<span>' + coachName.trim() + '</span><br>';
                 });
@@ -533,13 +588,13 @@
               }
 
               var courseClasses = 'course-block';
-              if (course.type === "100% Femmes") {
+              if (course.type === '100% Femmes') {
                 courseClasses += ' women-only';
               } else {
                 courseClasses += ' mixte';
               }
 
-              if (course.studio === "Piscine") {
+              if (course.studio === 'Piscine') {
                 courseClasses += ' piscine';
               }
 
@@ -561,6 +616,36 @@
 
       return html;
     }
+
+    function applyFilters() {
+      // Obtenir l'état des filtres
+      var showWomenOnly = document.getElementById('filter-women-only').checked;
+      var showPiscine = document.getElementById('filter-piscine').checked;
+      var showMixte = document.getElementById('filter-mixte').checked;
+
+      // Sélectionner tous les blocs de cours
+      var courseBlocks = document.querySelectorAll('.course-block');
+
+      courseBlocks.forEach(function(block) {
+        // Obtenir les classes du bloc de cours
+        var classes = block.classList;
+
+        // Déterminer si le bloc doit être affiché ou non
+        var show = false;
+
+        if (classes.contains('women-only') && showWomenOnly) {
+          show = true;
+        } else if (classes.contains('piscine') && showPiscine) {
+          show = true;
+        } else if (classes.contains('mixte') && showMixte) {
+          show = true;
+        }
+
+        // Afficher ou masquer le bloc
+        block.style.display = show ? 'block' : 'none';
+      });
+    }
   </script>
+
 </body>
 </html>
