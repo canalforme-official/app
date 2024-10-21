@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <base target="_top">
-  
+  <meta charset="UTF-8">
+  <title>Planning Hebdomadaire</title>
+
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/a4d5232f-9127-e32c-00fe-10dc007e956e.png" type="image/png">
 
@@ -17,22 +18,26 @@
       padding: 20px;
     }
 
-    h1 {
+    /* Style pour la disposition du titre et des filtres */
+    .header-wrapper {
+      display: flex;
+      justify-content: space-between; /* Sépare le titre et les filtres */
+      align-items: center; /* Aligne verticalement au centre */
+      margin-bottom: 10px; /* Espace en dessous du header */
+      flex-wrap: wrap;
+    }
+
+    .header-wrapper h1 {
       color: #333;
-      font-size: 2em; /* Réduction de la taille du titre */
+      font-size: 1.8em; /* Réduction de la taille du titre */
       margin: 0;
-      padding: 10px 0;
-      position: relative;
     }
 
     /* Styles pour le conteneur des filtres */
     .filters {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 10px; /* Espace entre les filtres */
     }
 
     .filters label {
@@ -111,7 +116,7 @@
       width: 50px;
       height: 50px;
       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
     }
@@ -161,11 +166,11 @@
     /* Styles pour la cellule des heures */
     .weekly-schedule th:first-child,
     .weekly-schedule td.time-cell {
-      width: 30px; /* Utilisez la même largeur pour l'en-tête et les cellules des heures */
-      min-width: 20px; /* Assure que la largeur reste constante */
+      width: 30px; /* Largeur de la colonne des heures */
+      min-width: 20px;
       max-width: 40px;
-      text-align: center; /* Centre le texte */
-      padding: 5px; /* Ajuste le padding pour éviter que le texte soit collé */
+      text-align: center;
+      padding: 5px;
     }
 
     /* Alternance de couleurs pour les time-cell */
@@ -189,21 +194,21 @@
 
     .course-block {
       margin-bottom: 10px;
-      border-radius: 10px; /* Bords arrondis */
-      border: 1px solid #ccc; /* Contour léger */
+      border-radius: 10px;
+      border: 1px solid #ccc;
       background-color: #ffffff; /* Fond blanc pour les cours mixtes */
     }
 
     /* Styles pour les cours "100% Femmes" */
     .course-block.women-only {
       background-color: #FFF0F5;
-      border: 1px solid #FF69B4; /* Contour rose clair */
+      border: 1px solid #FF69B4;
     }
 
     /* Styles pour les cours "Piscine" */
     .course-block.piscine {
       background-color: #E0F7FF;
-      border: 1px solid #1E90FF; /* Contour bleu clair */
+      border: 1px solid #1E90FF;
     }
 
     /* Styles spécifiques pour les logos de cours */
@@ -336,13 +341,13 @@
 
       /* Ajustement des largeurs de colonnes */
       .weekly-schedule .time-cell {
-        width: 20px; /* Réduction de la largeur */
+        width: 20px;
         writing-mode: vertical-rl;
         font-size: 0.8em;
         white-space: nowrap;
         padding: 2px;
         text-align: center;
-        border-right: 1px solid #ccc;
+        transform: none; /* Supprime la rotation supplémentaire */
       }
 
       .weekly-schedule .course-cell {
@@ -374,22 +379,38 @@
 
       /* Placer le bouton de retour à la vue quotidienne en haut à droite */
       .today-view-button {
-        transform: none !important;
+        display:flex !important;
         position: fixed !important;
-        top: 10px !important;
+        bottom: 10px !important;
         right: 10px !important;
         left: auto !important;
-        bottom: auto !important;
+        top: auto !important;
+        transform: none !important;
       }
 
       /* Styles pour les filtres en vue mobile */
+      .header-wrapper {
+        flex-direction: row; /* Forcer l'alignement en ligne des filtres et du titre */
+        justify-content: space-between;
+        align-items: center;
+        width: 100%; /* Assurer que tout occupe 100% de l'écran */
+        flex-wrap: nowrap; /* Empêcher le retour à la ligne */
+      }
+
+      .header-wrapper h1 {
+        font-size: 1.5em; /* Réduction supplémentaire de la taille du titre pour les petits écrans */
+        margin: 0;
+        flex-shrink: 1; /* Réduire la taille du titre si nécessaire */
+      }
+
       .filters {
-        justify-content: center;
-        margin-bottom: 10px;
+        justify-content: center; 
+        flex-wrap: nowrap; /* Empêche le retour à la ligne des filtres */
+        gap: 5px; /* Réduire l'espace entre les filtres */
       }
 
       .filters label {
-        font-size: 0.8em;
+        font-size: 0.8em; /* Réduction de la taille des filtres */
       }
     }
   </style>
@@ -405,22 +426,23 @@
       </a>
     </div>
 
-    <h1>Planning Hebdomadaire</h1>
-
-    <!-- Filtres -->
-    <div class="filters">
-      <label>
-        <input type="checkbox" id="filter-women-only" checked>
-        100% Femmes
-      </label>
-      <label>
-        <input type="checkbox" id="filter-piscine" checked>
-        Piscine
-      </label>
-      <label>
-        <input type="checkbox" id="filter-mixte" checked>
-        Mixte
-      </label>
+    <!-- En-tête avec le titre et les filtres -->
+    <div class="header-wrapper">
+      <h1>Planning Hebdomadaire</h1>
+      <div class="filters">
+        <label>
+          <input type="checkbox" id="filter-mixte" checked>
+          Mixte
+        </label>
+        <label>
+          <input type="checkbox" id="filter-women-only" checked>
+          100% Femmes
+        </label>
+        <label>
+          <input type="checkbox" id="filter-piscine" checked>
+          Piscine
+        </label>
+      </div>
     </div>
 
     <!-- Le planning hebdomadaire sera inséré ici -->
@@ -463,9 +485,9 @@
           document.getElementById('loadingOverlay').style.display = 'none';
 
           // Ajouter des écouteurs d'événements pour les filtres
+          document.getElementById('filter-mixte').addEventListener('change', applyFilters);
           document.getElementById('filter-women-only').addEventListener('change', applyFilters);
           document.getElementById('filter-piscine').addEventListener('change', applyFilters);
-          document.getElementById('filter-mixte').addEventListener('change', applyFilters);
         })
         .catch(error => {
           console.error('Erreur lors de la récupération des données :', error);
@@ -618,9 +640,9 @@
 
     function applyFilters() {
       // Obtenir l'état des filtres
+      var showMixte = document.getElementById('filter-mixte').checked;
       var showWomenOnly = document.getElementById('filter-women-only').checked;
       var showPiscine = document.getElementById('filter-piscine').checked;
-      var showMixte = document.getElementById('filter-mixte').checked;
 
       // Sélectionner tous les blocs de cours
       var courseBlocks = document.querySelectorAll('.course-block');
@@ -630,14 +652,16 @@
         var classes = block.classList;
 
         // Déterminer si le bloc doit être affiché ou non
-        var show = false;
+        var show = true;
 
-        if (classes.contains('women-only') && showWomenOnly) {
-          show = true;
-        } else if (classes.contains('piscine') && showPiscine) {
-          show = true;
-        } else if (classes.contains('mixte') && showMixte) {
-          show = true;
+        if (classes.contains('mixte') && !showMixte) {
+          show = false;
+        }
+        if (classes.contains('women-only') && !showWomenOnly) {
+          show = false;
+        }
+        if (classes.contains('piscine') && !showPiscine) {
+          show = false;
         }
 
         // Afficher ou masquer le bloc
