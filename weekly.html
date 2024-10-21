@@ -228,6 +228,16 @@
                   rgba(0, 0, 0, 0) 100%);
       pointer-events: none;
     }
+
+          /* Assurez-vous que la première cellule d'en-tête (les heures) ait la même largeur que les cellules des heures */
+.weekly-schedule th:first-child,
+.weekly-schedule td.time-cell {
+  width: 30px; /* Utilisez la même largeur pour l'en-tête et les cellules des heures */
+  min-width: 20px; /* Assure que la largeur reste constante */
+  max-width: 40px;
+  text-align: center; /* Centre le texte */
+  padding: 5px; /* Ajuste le padding pour éviter que le texte soit collé */
+}
   
     /* Styles pour les cours */
     .course-info {
@@ -306,12 +316,7 @@
         border: none;
         margin: 0;
       }
-  
-      /* Ajustement des largeurs de colonnes */
-      .weekly-schedule .time-cell {
-        width: 40px; /* Réduction de la largeur pour la colonne des heures */
-      }
-  
+
       .weekly-schedule .course-cell {
         width: calc((100% - 40px) / 7);
         padding: 2px;
