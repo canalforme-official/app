@@ -10,6 +10,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <style>
+    /* Désactivation de la sélection de texte */
+    body, button, a {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
     /* Styles généraux */
     body {
       font-family: Arial, sans-serif;
@@ -231,18 +238,31 @@
     }
 
     .navigation button {
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.8);
       border: none;
       font-size: 2em;
       padding: 10px;
       cursor: pointer;
       pointer-events: all;
       outline: none;
+      border-radius: 50%;
+      transition: background-color 0.3s ease, transform 0.2s ease;
       color: black;
     }
 
+    /* Animation au survol des boutons */
+    .navigation button:hover {
+        background-color: rgba(255, 0, 0, 0.6); /* Rouge transparent */
+        transform: scale(1.1); /* Légère augmentation au survol */
+    }
+
+    .navigation button:active {
+        transform: scale(1.05); /* Réduction légère à l'appui */
+    }
+
+    /* Désactivation des boutons invisibles */
     .navigation button:disabled {
-      visibility: hidden;
+        visibility: hidden;
     }
 
     @media screen and (min-width: 1025px) {
@@ -410,7 +430,7 @@
       top: 10px;
       right: 10px;
       z-index: 1000;
-      background-color: rgba(255, 0, 0, 0.5); /* Transparent red background */
+      background-color: rgba(255, 0, 0, 0.5);
       padding: 8px;
       border-radius: 50%;
       width: 50px;
@@ -419,7 +439,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+   }
 
     .weekly-view-button img {
       width: 30px;
@@ -432,7 +453,7 @@
     .weekly-view-button:hover {
       background-color: rgba(255, 0, 0, 0.7);
       box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
-    }
+    } 
 
     /* Style pour le bouton de retour à aujourd'hui */
     .today-view-button {
@@ -513,7 +534,7 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-    const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
+        const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
     let allData = [];
 
     function fetchAllData() {
@@ -638,9 +659,24 @@
     }
 
     function returnToToday() {
-      currentDayIndex = new Date().getDay();
-      displaySchedule(currentDayIndex);
+        const todayIndex = new Date().getDay(); // Obtenir l'index du jour actuel
+
+        // Si l'utilisateur n'est pas déjà sur aujourd'hui, changer le jour
+        if (currentDayIndex !== todayIndex) {
+            currentDayIndex = todayIndex; // Réinitialiser currentDayIndex au jour actuel
+
+            // Afficher l'overlay de chargement avec le message approprié
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingMessage').innerHTML = 'Chargement du planning d\'<strong>aujourd\'hui</strong>...';
+
+            // Recalculer et afficher le planning pour aujourd'hui
+            setTimeout(() => {
+                displaySchedule(currentDayIndex);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 500); // Délai pour simuler le chargement
+        }
     }
+
 
     function toggleTodayButton(dayIndex) {
       const todayIndex = new Date().getDay();
@@ -648,16 +684,53 @@
     }
 
     function changeDay(direction) {
-      currentDayIndex = (currentDayIndex + direction + 7) % 7;
-      displaySchedule(currentDayIndex);
+        const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+        
+        // Calculer le prochain jour
+        currentDayIndex = (currentDayIndex + direction + 7) % 7;
+        const nextDay = weekDays[currentDayIndex];
+
+        // Afficher l'overlay de chargement avec le nom du jour
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('loadingMessage').innerHTML = 'Chargement du planning du <strong>' + nextDay + '</strong>';
+
+        // Générer et afficher le planning du jour
+        setTimeout(() => {
+            displaySchedule(currentDayIndex);
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }, 500);  // Ajout d'un délai de 500ms pour simuler le chargement
     }
 
     function scrollToNextUpcomingCourse() {
-      const focusCourse = document.getElementById('focus-course');
-      if (focusCourse) {
-        focusCourse.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinutes = now.getMinutes();
+        let nextUpcomingCourse = null;
+
+        // Sélectionner tous les blocs de cours
+        const courseBlocks = document.querySelectorAll('.timeline-block');
+
+        courseBlocks.forEach((block) => {
+            const timeElement = block.querySelector('.time');
+            const [startTime] = timeElement.innerText.split(" - ");
+            const [startHour, startMin] = startTime.split(":").map(Number);
+
+            // Comparer l'heure actuelle avec l'heure de début du cours
+            if (startHour > currentHour || (startHour === currentHour && startMin > currentMinutes)) {
+                if (!nextUpcomingCourse) {
+                    nextUpcomingCourse = block;  // Trouver le premier cours à venir
+                }
+            }
+        });
+
+        // Si un prochain cours est trouvé, défiler vers lui
+        if (nextUpcomingCourse) {
+            nextUpcomingCourse.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            console.log('Aucun cours à venir trouvé.');
+        }
     }
+
 
     function initializeCountdowns() {
       updateCountdowns();
