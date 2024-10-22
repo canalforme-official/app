@@ -16,10 +16,10 @@
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
-        /* Ajout pour améliorer le clic sur mobile */
         -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
-        touch-action: manipulation; /* Désactive certains comportements tactiles par défaut */
+        touch-action: manipulation; /* Améliore la réactivité sur mobile */
     }
+
     /* Styles généraux */
     body {
       font-family: Arial, sans-serif;
@@ -27,7 +27,6 @@
       color: #333;
       margin: 0;
       padding: 20px;
-      /* Smoother scrolling */
       scroll-behavior: smooth;
     }
 
@@ -249,28 +248,32 @@
       pointer-events: all;
       outline: none;
       border-radius: 50%;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      transition: transform 0.2s ease;
       color: black;
-      /* Ajouts pour améliorer le clic sur mobile */
-      touch-action: manipulation; /* Désactive certains comportements tactiles par défaut */
-      -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Animation au survol des boutons */
-    .navigation button:hover {
-        background-color: rgba(255, 0, 0, 0.6); /* Rouge transparent */
-        transform: scale(1.1); /* Légère augmentation au survol */
+    /* Styles pour les états :hover uniquement sur les appareils avec support du survol */
+    @media (hover: hover) {
+      .navigation button:hover {
+        background-color: rgba(255, 0, 0, 0.6);
+        transform: scale(1.1);
+      }
     }
 
+    /* Styles pour l'état :active */
     .navigation button:active {
-        transform: scale(1.05); /* Réduction légère à l'appui */
-        background-color: rgba(255, 0, 0, 0.4); /* Couleur plus claire pour l'état actif */
-        transition: background-color 0.1s ease; /* Transition rapide pour l'état actif */
+      transform: scale(1.05);
     }
 
-    /* Désactivation des boutons invisibles */
     .navigation button:disabled {
-        visibility: hidden;
+      visibility: hidden;
     }
 
     @media screen and (min-width: 1025px) {
@@ -447,8 +450,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-      /* Ajout pour améliorer le clic sur mobile */
+      transition: transform 0.2s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
@@ -457,20 +459,21 @@
       width: 30px;
       height: 30px;
       cursor: pointer;
-      filter: brightness(0) invert(1); /* White icon */
+      filter: brightness(0) invert(1);
     }
 
-    /* Animation au survol */
-    .weekly-view-button:hover {
-      background-color: rgba(255, 0, 0, 0.7);
-      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
-      transform: scale(1.05); /* Légère augmentation au survol */
+    /* Styles :hover pour le bouton weekly-view */
+    @media (hover: hover) {
+      .weekly-view-button:hover {
+        background-color: rgba(255, 0, 0, 0.7);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+        transform: scale(1.05);
+      }
     }
 
+    /* État :active pour le bouton weekly-view */
     .weekly-view-button:active {
-      transform: scale(1); /* Retour à la taille normale à l'appui */
-      background-color: rgba(255, 0, 0, 0.6); /* Couleur plus claire à l'appui */
-      transition: background-color 0.1s ease;
+      transform: scale(1.05);
     }
 
     /* Style pour le bouton de retour à aujourd'hui */
@@ -487,8 +490,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-      /* Ajout pour améliorer le clic sur mobile */
+      transition: transform 0.2s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
@@ -511,19 +513,22 @@
       cursor: pointer;
     }
 
-    /* Animation au survol */
-    .today-view-button:hover {
-      background-color: rgba(255, 255, 255, 0.9);
-      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
-      transform: scale(1.05); /* Légère augmentation au survol */
+    /* Styles :hover pour le bouton today-view */
+    @media (hover: hover) {
+      .today-view-button:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+        transform: scale(1.05);
+      }
     }
 
+    /* État :active pour le bouton today-view */
     .today-view-button:active {
-      transform: scale(1); /* Retour à la taille normale à l'appui */
-      background-color: rgba(255, 255, 255, 0.8); /* Couleur plus claire à l'appui */
-      transition: background-color 0.1s ease;
+      transform: scale(1.05);
     }
+
 </style>
+
 
 </head>
 <body onload="initializePage();">
