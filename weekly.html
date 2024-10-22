@@ -21,15 +21,15 @@
     /* Style pour la disposition du titre et des filtres */
     .header-wrapper {
       display: flex;
-      justify-content: space-between; /* Sépare le titre et les filtres */
-      align-items: center; /* Aligne verticalement au centre */
-      margin-bottom: 10px; /* Espace en dessous du header */
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
     .header-wrapper h1 {
       color: #333;
-      font-size: 1.8em; /* Réduction de la taille du titre */
+      font-size: 1.8em;
       margin: 0;
     }
 
@@ -37,7 +37,7 @@
     .filters {
       display: flex;
       align-items: center;
-      gap: 10px; /* Espace entre les filtres */
+      gap: 10px;
     }
 
     .filters label {
@@ -147,28 +147,43 @@
       width: 100%;
       border-collapse: collapse;
       margin: 0 auto;
-      table-layout: fixed;
+      table-layout: fixed; /* Assure une largeur égale des colonnes */
     }
 
     .weekly-schedule th, .weekly-schedule td {
-      padding: 10px;
+      padding: 5px; /* Réduction du padding */
       vertical-align: top;
       border: none;
     }
 
+    /* Ligne des titres avec fond rouge moins transparent et texte blanc */
     .weekly-schedule thead th {
-      background-color: #f2f2f2;
+      background-color: rgba(255, 0, 0, 0.3); /* Augmente l'opacité du fond */
+      color: white; /* Texte en blanc */
       text-align: center;
       font-size: 1.2em;
       border-bottom: 2px solid #ccc;
+      position: relative;
+    }
+
+    /* Animation améliorée pour le jour actuel */
+    .weekly-schedule thead th.today {
+      animation: pulse 1.5s infinite;
+      color: yellow; /* Changement de la couleur du texte pour le jour actuel */
+    }
+
+    /* Keyframes ajustés pour une animation plus prononcée */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
     /* Styles pour la cellule des heures */
     .weekly-schedule th:first-child,
     .weekly-schedule td.time-cell {
-      width: 30px; /* Largeur de la colonne des heures */
+      width: 50px;
       min-width: 20px;
-      max-width: 40px;
+      max-width: 60px;
       text-align: center;
       padding: 5px;
     }
@@ -186,17 +201,53 @@
       text-align: center;
     }
 
+    /* Ajustement des cellules des cours */
     .course-cell {
       min-width: 100px;
       text-align: center;
       border-bottom: 1px solid #eee;
+      position: relative;
+      padding: 5px; /* Réduction du padding */
     }
 
+    /* Ajustement des blocs de cours */
     .course-block {
-      margin-bottom: 10px;
+      margin-bottom: 5px; /* Réduction de l'espace entre les blocs */
       border-radius: 10px;
       border: 1px solid #ccc;
       background-color: #ffffff; /* Fond blanc pour les cours mixtes */
+      position: relative;
+      overflow: visible;
+      transition: transform 0.3s;
+      z-index: 1; /* Assure que le bloc est sous le cercle de compte à rebours */
+    }
+
+    /* Effet de rebond pour les cours commençant dans moins de 15 minutes */
+    .course-block.starting-soon {
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Styles pour le cercle du compte à rebours */
+    .countdown-circle {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 20px; /* Taille réduite du cercle */
+      height: 20px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6em; /* Taille du texte conservée */
+      font-weight: bold;
+      z-index: 5; /* Assure que le cercle est au-dessus de tout */
     }
 
     /* Styles pour les cours "100% Femmes" */
@@ -236,14 +287,7 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      background-color: white;
-    }
-
-    .weekly-schedule thead th {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background-color: #f2f2f2;
+      background-color: rgba(255, 0, 0, 0.7); /* Mettre à jour pour correspondre à la transparence du fond */
     }
 
     .weekly-schedule thead::after {
@@ -287,6 +331,12 @@
     .multiple-coaches {
       text-align: center;
       font-size: 0.8em;
+    }
+
+    /* Cacher les coachs si le filtre est décoché */
+    .hide-coaches .single-coach,
+    .hide-coaches .multiple-coaches {
+      display: none;
     }
 
     /* Styles spécifiques pour les appareils mobiles avec rotation */
@@ -347,7 +397,7 @@
         white-space: nowrap;
         padding: 2px;
         text-align: center;
-        transform: none; /* Supprime la rotation supplémentaire */
+        transform: none;
       }
 
       .weekly-schedule .course-cell {
@@ -377,7 +427,16 @@
         white-space: normal !important;
       }
 
-      /* Placer le bouton de retour à la vue quotidienne en haut à droite */
+      /* Ajustement de la taille du cercle de compte à rebours en rotation */
+      .countdown-circle {
+        width: 15px;
+        height: 15px;
+        font-size: 0.5em;
+        top: -8px;
+        right: -8px;
+      }
+
+      /* Placer le bouton de retour à la vue quotidienne en bas à droite */
       .today-view-button {
         display:flex !important;
         position: fixed !important;
@@ -390,27 +449,27 @@
 
       /* Styles pour les filtres en vue mobile */
       .header-wrapper {
-        flex-direction: row; /* Forcer l'alignement en ligne des filtres et du titre */
+        flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        width: 100%; /* Assurer que tout occupe 100% de l'écran */
-        flex-wrap: nowrap; /* Empêcher le retour à la ligne */
+        width: 100%;
+        flex-wrap: nowrap;
       }
 
       .header-wrapper h1 {
-        font-size: 1.5em; /* Réduction supplémentaire de la taille du titre pour les petits écrans */
+        font-size: 1.5em;
         margin: 0;
-        flex-shrink: 1; /* Réduire la taille du titre si nécessaire */
+        flex-shrink: 1;
       }
 
       .filters {
-        justify-content: center; 
-        flex-wrap: nowrap; /* Empêche le retour à la ligne des filtres */
-        gap: 5px; /* Réduire l'espace entre les filtres */
+        justify-content: center;
+        flex-wrap: nowrap;
+        gap: 5px;
       }
 
       .filters label {
-        font-size: 0.8em; /* Réduction de la taille des filtres */
+        font-size: 0.8em;
       }
     }
   </style>
@@ -442,6 +501,10 @@
           <input type="checkbox" id="filter-piscine" checked>
           Piscine
         </label>
+        <label>
+          <input type="checkbox" id="filter-coach" checked>
+          Coach
+        </label>
       </div>
     </div>
 
@@ -467,6 +530,13 @@
       document.getElementById('loadingOverlay').style.display = 'flex';
       document.getElementById('loadingMessage').innerHTML = 'Chargement du planning hebdomadaire';
 
+      // Récupérer l'état des filtres depuis les paramètres d'URL
+      const urlParams = new URLSearchParams(window.location.search);
+      document.getElementById('filter-mixte').checked = urlParams.get('mixte') !== 'false';
+      document.getElementById('filter-women-only').checked = urlParams.get('women-only') !== 'false';
+      document.getElementById('filter-piscine').checked = urlParams.get('piscine') !== 'false';
+      document.getElementById('filter-coach').checked = urlParams.get('coach') !== 'false';
+
       // Récupérer les données du backend
       fetch('https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
         .then(response => response.json())
@@ -488,6 +558,19 @@
           document.getElementById('filter-mixte').addEventListener('change', applyFilters);
           document.getElementById('filter-women-only').addEventListener('change', applyFilters);
           document.getElementById('filter-piscine').addEventListener('change', applyFilters);
+          document.getElementById('filter-coach').addEventListener('change', applyFilters);
+
+          // Appliquer les filtres initiaux
+          applyFilters();
+
+          // Scroll automatique vers l'heure actuelle
+          scrollToCurrentTime();
+
+          // Mettre à jour les cercles de compte à rebours
+          updateCountdownCircles();
+
+          // Mettre à jour les cercles chaque minute
+          setInterval(updateCountdownCircles, 60000);
         })
         .catch(error => {
           console.error('Erreur lors de la récupération des données :', error);
@@ -497,6 +580,9 @@
 
     function generateWeeklyScheduleHtml() {
       var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+      var todayIndex = new Date().getDay();
+      var todayName = weekDays[todayIndex];
 
       var daysWithCourses = new Set();
       var timesWithCourses = new Set();
@@ -536,7 +622,8 @@
           endTime: endTime,
           type: type,
           logo: logoUrl,
-          coachImage: coachImageUrl
+          coachImage: coachImageUrl,
+          startTime: startTime
         });
       }
 
@@ -553,7 +640,11 @@
 
       html += '<thead><tr><th></th>';
       for (var i = 0; i < daysArray.length; i++) {
-        html += '<th>' + daysArray[i] + '</th>';
+        var dayClass = '';
+        if (daysArray[i] === todayName) {
+          dayClass = 'today';
+        }
+        html += '<th class="' + dayClass + '">' + daysArray[i] + '</th>';
       }
       html += '</tr></thead>';
 
@@ -619,7 +710,29 @@
                 courseClasses += ' piscine';
               }
 
+              // Vérifier si le cours commence dans moins de 15 minutes
+              var now = new Date();
+              var courseDate = new Date();
+              courseDate.setHours(parseInt(course.startTime.split(':')[0]), parseInt(course.startTime.split(':')[1]), 0, 0);
+              var dayOffset = weekDays.indexOf(day) - now.getDay();
+              if (dayOffset < 0) dayOffset += 7;
+              courseDate.setDate(now.getDate() + dayOffset);
+
+              var timeDifference = (courseDate - now) / 60000; // Différence en minutes
+
+              var isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
+
+              if (isStartingSoon) {
+                courseClasses += ' starting-soon';
+              }
+
               courseDisplay += '<div class="' + courseClasses + '">';
+
+              // Ajouter le cercle de compte à rebours si le cours commence bientôt
+              if (isStartingSoon) {
+                courseDisplay += '<div class="countdown-circle" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
+              }
+
               courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
               courseDisplay += coachImagesHtml;
               courseDisplay += '</div>';
@@ -643,6 +756,7 @@
       var showMixte = document.getElementById('filter-mixte').checked;
       var showWomenOnly = document.getElementById('filter-women-only').checked;
       var showPiscine = document.getElementById('filter-piscine').checked;
+      var showCoach = document.getElementById('filter-coach').checked;
 
       // Sélectionner tous les blocs de cours
       var courseBlocks = document.querySelectorAll('.course-block');
@@ -667,6 +781,56 @@
         // Afficher ou masquer le bloc
         block.style.display = show ? 'block' : 'none';
       });
+
+      // Afficher ou masquer les coachs
+      var scheduleElement = document.getElementById('weeklySchedule');
+      if (!showCoach) {
+        scheduleElement.classList.add('hide-coaches');
+      } else {
+        scheduleElement.classList.remove('hide-coaches');
+      }
+    }
+
+    // Fonction pour mettre à jour les cercles de compte à rebours
+    function updateCountdownCircles() {
+      var countdownCircles = document.querySelectorAll('.countdown-circle');
+
+      countdownCircles.forEach(function(circle) {
+        var timeDiff = parseInt(circle.getAttribute('data-time-diff'));
+        if (timeDiff >= 0) {
+          circle.textContent = timeDiff + "'";
+          circle.setAttribute('data-time-diff', timeDiff - 1);
+        } else {
+          // Retirer le cercle si le temps est écoulé
+          circle.parentElement.classList.remove('starting-soon');
+          circle.remove();
+        }
+      });
+    }
+
+    // Fonction pour scroller automatiquement vers l'heure actuelle
+    function scrollToCurrentTime() {
+      var now = new Date();
+      var currentHour = now.getHours();
+      var currentMinutes = now.getMinutes();
+
+      var times = document.querySelectorAll('.time-cell');
+
+      var targetRow = null;
+
+      for (var i = 0; i < times.length; i++) {
+        var timeText = times[i].textContent;
+        var [hour, minute] = timeText.split(':').map(Number);
+
+        if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+          targetRow = times[i].parentElement;
+          break;
+        }
+      }
+
+      if (targetRow) {
+        targetRow.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      }
     }
   </script>
 
