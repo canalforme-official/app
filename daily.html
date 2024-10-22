@@ -16,6 +16,9 @@
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
+        /* Ajout pour améliorer le clic sur mobile */
+        -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
+        touch-action: manipulation; /* Désactive certains comportements tactiles par défaut */
     }
     /* Styles généraux */
     body {
@@ -248,6 +251,9 @@
       border-radius: 50%;
       transition: background-color 0.3s ease, transform 0.2s ease;
       color: black;
+      /* Ajouts pour améliorer le clic sur mobile */
+      touch-action: manipulation; /* Désactive certains comportements tactiles par défaut */
+      -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
     }
 
     /* Animation au survol des boutons */
@@ -258,6 +264,8 @@
 
     .navigation button:active {
         transform: scale(1.05); /* Réduction légère à l'appui */
+        background-color: rgba(255, 0, 0, 0.4); /* Couleur plus claire pour l'état actif */
+        transition: background-color 0.1s ease; /* Transition rapide pour l'état actif */
     }
 
     /* Désactivation des boutons invisibles */
@@ -439,8 +447,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-   }
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      /* Ajout pour améliorer le clic sur mobile */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     .weekly-view-button img {
       width: 30px;
@@ -453,7 +464,14 @@
     .weekly-view-button:hover {
       background-color: rgba(255, 0, 0, 0.7);
       box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
-    } 
+      transform: scale(1.05); /* Légère augmentation au survol */
+    }
+
+    .weekly-view-button:active {
+      transform: scale(1); /* Retour à la taille normale à l'appui */
+      background-color: rgba(255, 0, 0, 0.6); /* Couleur plus claire à l'appui */
+      transition: background-color 0.1s ease;
+    }
 
     /* Style pour le bouton de retour à aujourd'hui */
     .today-view-button {
@@ -469,6 +487,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      /* Ajout pour améliorer le clic sur mobile */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .today-view-button button {
@@ -493,8 +515,16 @@
     .today-view-button:hover {
       background-color: rgba(255, 255, 255, 0.9);
       box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+      transform: scale(1.05); /* Légère augmentation au survol */
     }
-  </style>
+
+    .today-view-button:active {
+      transform: scale(1); /* Retour à la taille normale à l'appui */
+      background-color: rgba(255, 255, 255, 0.8); /* Couleur plus claire à l'appui */
+      transition: background-color 0.1s ease;
+    }
+</style>
+
 </head>
 <body onload="initializePage();">
 
@@ -534,7 +564,7 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-        const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
+    const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
     let allData = [];
 
     function fetchAllData() {
