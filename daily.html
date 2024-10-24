@@ -11,7 +11,7 @@
 
   <style>
     /* Désactivation de la sélection de texte */
-    body, button, a {
+    body, button, a, img {
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
@@ -413,6 +413,8 @@
 
       .logo img {
         width: 50%;
+        max-height: 80px; /* Définit une hauteur maximale pour le logo */
+        height: auto; /* Conserve le ratio de l'image */
       }
     }
 
@@ -456,8 +458,8 @@
     }
 
     .weekly-view-button img {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       cursor: pointer;
       filter: brightness(0) invert(1);
     }
@@ -476,24 +478,68 @@
       transform: scale(1.05);
     }
 
-    /* Style pour le bouton de retour à aujourd'hui */
-    .today-view-button {
-      position: fixed;
-      right: 10px;
-      z-index: 1000;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 8px;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
+/* Réduction de la taille du bouton général */
+.today-view-button {
+  position: fixed;
+  bottom: 20px;
+  right: 10px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.5); /* Bouton noir transparent */
+  padding: 8px; /* Réduction de la zone cliquable */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  width: 50px; /* Réduction de la largeur du bouton */
+  height: 50px; /* Réduction de la hauteur du bouton */
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);
+  animation: auraPulse 1.5s ease-in-out infinite; /* Effet de pulsation de l'aura rouge */
+  
+}
+
+/* Ajustement de la taille du cercle extérieur */
+.today-view-button::before {
+  content: '';
+  width: 40px; /* Taille réduite du cercle extérieur */
+  height: 40px;
+  border-radius: 50%; /* Cercle parfait */
+  position: absolute;
+  border: 4px solid rgba(255, 0, 0, 0.7); /* Bord rouge */
+  box-sizing: border-box;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrement parfait */
+  z-index: 1; /* S'assurer que le cercle est cliquable */
+}
+
+/* Ajustement de la taille du cercle intérieur */
+.today-view-button::after {
+  content: '';
+  width: 13px; /* Taille réduite du cercle intérieur */
+  height: 13px;
+  background-color: rgba(255, 0, 0, 0.7); /* Cercle plein rouge */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrement parfait */
+  z-index: 2; /* Assure que ce disque est au-dessus et cliquable */
+}
+
+/* Nouvelle animation pour l'aura rouge (évite le conflit avec l'autre pulse) */
+@keyframes auraPulse {
+  0% {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.2), 0 0 55px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
+  }
+}
 
     .today-view-button button {
       width: 100%;
@@ -536,14 +582,13 @@
   <!-- Bouton Weekly view -->
   <div class="weekly-view-button">
     <a href="./weekly.html">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4e5c83d2-8068-c5e7-bffe-8a8e959b9591.png" alt="Vue Hebdomadaire">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8f9d5808-3db0-84ba-a4c9-24d99ec7043b.png" alt="Vue Hebdomadaire">
     </a>
   </div>
 
   <!-- Bouton pour revenir à aujourd'hui -->
   <div class="today-view-button" id="todayViewButton" style="display: none;">
     <button onclick="returnToToday()">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/87c4d60c-96fd-da4b-3996-eba4f5622ec8.png" alt="Retour à aujourd'hui">
     </button>
   </div>
 
@@ -816,7 +861,7 @@
       const currentYear = new Date().getFullYear();
       const footer = document.querySelector('footer');
       if (footer) {
-        footer.innerHTML = `<p>MARRAKECH CANAL FORME &copy; ${currentYear} All rights reserved</p>`;
+        footer.innerHTML = `<p>MARRAKECH CANAL FORME &copy; ${currentYear}</p>`;
       }
     }
   </script>
