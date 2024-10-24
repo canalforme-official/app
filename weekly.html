@@ -6,10 +6,19 @@
 
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/a4d5232f-9127-e32c-00fe-10dc007e956e.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* Styles généraux */
+    body, button, a, img {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
+    touch-action: manipulation; /* Améliore la réactivité sur mobile */
+    }
+
     body {
       font-family: Arial, sans-serif;
       background-color: #ffffff;
@@ -58,7 +67,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.6);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -122,6 +131,7 @@
   height: 50px; /* Réduction de la hauteur du bouton */
   box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);
   animation: auraPulse 1.5s ease-in-out infinite; /* Effet de pulsation de l'aura rouge */
+  display: none; /* Masque le bouton par défaut */
 }
 
 /* Ajustement de la taille du cercle extérieur */
@@ -156,15 +166,16 @@
 /* Animation pour l'aura */
 @keyframes auraPulse {
   0% {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4), 0 0 45px rgba(255, 0, 0, 0.2);
   }
   50% {
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.2), 0 0 55px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.6), 0 0 55px rgba(255, 0, 0, 0.3);
   }
   100% {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4), 0 0 45px rgba(255, 0, 0, 0.2);
   }
 }
+
 
 /* Styles :hover pour le bouton today-view */
 @media (hover: hover) {
@@ -265,6 +276,7 @@
       max-width: 60px;
       text-align: center;
       padding: 5px;
+      font-weight: bold; /* Ajout de cette ligne pour mettre le texte en gras */
     }
 
     /* Alternance de couleurs pour les time-cell */
@@ -311,23 +323,27 @@
       50% { transform: scale(1.05); }
     }
 
-    /* Styles pour le cercle du compte à rebours */
-    .countdown-circle {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      width: 20px; /* Taille réduite du cercle */
-      height: 20px;
-      background-color: red;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.6em; /* Taille du texte conservée */
-      font-weight: bold;
-      z-index: 5; /* Assure que le cercle est au-dessus de tout */
-    }
+/* Styles pour la pilule de compte à rebours */
+.countdown-pill {
+    position: absolute;
+    top: -10px; /* Décalage pour que la moitié supérieure de la pilule dépasse */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px; /* Largeur plus petite pour un look plus compact */
+    height: 20px; /* Hauteur ajustée */
+    background-color: red;
+    color: white;
+    border-radius: 10px; /* Forme de pilule avec des bords arrondis */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75em; /* Taille du texte plus petite */
+    font-weight: bold;
+    padding: 0; /* Réduction du padding */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 5; /* Assure que la pastille est au-dessus de tout */
+}
+
 
     /* Styles pour les cours "100% Femmes" */
     .course-block.women-only {
@@ -393,7 +409,7 @@
     }
 
     .single-coach {
-      font-size: 0.8em;
+      font-size: 1em;
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -401,15 +417,25 @@
     }
 
     .single-coach img {
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       margin-right: 10px;
+      margin-left: 10px; /* Ajoute de l'espace à gauche de l'image */
+      margin-bottom: 2px;
     }
 
+    /* Styles pour les coachs multiples avec uniquement les images */
     .multiple-coaches {
-      text-align: center;
-      font-size: 0.8em;
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Espacement entre les images */
+    }
+
+    .coach-image {
+      width: 20px; /* Largeur de l'image */
+      height: 20px; /* Hauteur de l'image */
+      border-radius: 50%; /* Pour que l'image soit ronde */
     }
 
     /* Cacher les coachs si le filtre est décoché */
@@ -524,6 +550,13 @@
       .multiple-coaches {
         font-size: 0.7em !important;
         white-space: normal !important;
+      }
+
+      .single-coach img {
+        width: 20px;
+        height: 20px;
+        margin-left: 0px; /* Ajoute de l'espace à gauche de l'image */
+        margin-bottom: 0px;
       }
 
       /* Ajustement de la taille du cercle de compte à rebours en rotation */
@@ -694,7 +727,7 @@
           .then(data => {
             // Stocke les données dans le cache avec une expiration de 60 minutes
             localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(cacheExpirationKey, now + 3600000); // Expire dans 60 minutes
+            localStorage.setItem(cacheExpirationKey, now + 360000); // Expire dans 60 minutes
             console.log('Données récupérées du serveur et stockées dans le cache');
             return data;  // Retourne les nouvelles données
           })
@@ -820,10 +853,11 @@
               } else if (course.coach.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
                 course.coach.forEach(function(coachName) {
-                  coachImagesHtml += '<span>' + coachName.trim() + '</span><br>';
+                  var coachImageUrl = course.coachImage || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';  // URL par défaut si pas d'image
+                  coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
                 });
                 coachImagesHtml += '</div>';
-              }
+}
 
               var courseClasses = 'course-block';
               if (course.type === '100% Femmes') {
@@ -856,7 +890,7 @@
 
               // Ajouter le cercle de compte à rebours si le cours commence bientôt
               if (isStartingSoon) {
-                courseDisplay += '<div class="countdown-circle" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
+                courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
               }
 
               courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
@@ -917,22 +951,31 @@
       }
     }
 
-    // Fonction pour mettre à jour les cercles de compte à rebours
-    function updateCountdownCircles() {
-      var countdownCircles = document.querySelectorAll('.countdown-circle');
+// Fonction pour mettre à jour les pastilles de compte à rebours en mm:ss
+function updateCountdownCircles() {
+    var countdownBadges = document.querySelectorAll('.countdown-pill');
 
-      countdownCircles.forEach(function(circle) {
-        var timeDiff = parseInt(circle.getAttribute('data-time-diff'));
+    countdownBadges.forEach(function(badge) {
+        var timeDiff = parseInt(badge.getAttribute('data-time-diff'));
+
         if (timeDiff >= 0) {
-          circle.textContent = timeDiff + "'";
-          circle.setAttribute('data-time-diff', timeDiff - 1);
+            // Calcul des minutes et des secondes
+            var minutes = Math.floor(timeDiff / 60);
+            var seconds = timeDiff % 60;
+
+            // Format mm:ss
+            var timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+
+            badge.textContent = timeString;
+            badge.setAttribute('data-time-diff', timeDiff - 1);
         } else {
-          // Retirer le cercle si le temps est écoulé
-          circle.parentElement.classList.remove('starting-soon');
-          circle.remove();
+            // Retirer la pastille si le temps est écoulé
+            badge.parentElement.classList.remove('starting-soon');
+            badge.remove();
         }
-      });
-    }
+    });
+}
+
 
     // Fonction pour scroller automatiquement vers l'heure actuelle
     function scrollToCurrentTime() {
