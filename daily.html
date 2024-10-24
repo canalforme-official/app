@@ -260,8 +260,8 @@
     }
 
     .navigation button img {
-        width: 30px; /* Adjust this size as needed */
-        height: 30px;
+        width: 26px; /* Adjust this size as needed */
+        height: 26px;
         pointer-events: none; /* Ensure the button click still works on the button, not the image */
     }
 
@@ -630,29 +630,55 @@
     let allData = [];
 
     function fetchAllData() {
-      document.getElementById('loadingOverlay').style.display = 'flex';
-      document.getElementById('loadingMessage').innerHTML = 'Chargement du planning...';
+  const now = new Date();
+  const cacheExpiration = 60 * 60 * 1000; // 1 heure en millisecondes
 
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          allData = data.slice(1); // Ignorer la première ligne (titres)
-          displaySchedule(currentDayIndex);
-          document.getElementById('loadingOverlay').style.display = 'none';
+  // Vérifier si le cache existe et s'il est toujours valide
+  const cachedData = localStorage.getItem('scheduleData');
+  const cachedTime = localStorage.getItem('scheduleTimestamp');
 
-          // Initialize countdowns and scrolling
-          if (isToday(currentDayIndex)) {
-            initializeCountdowns();
-            scrollToNextUpcomingCourse();
-            // Update every 15 minutes
-            setInterval(refreshSchedule, 900000); // 15 minutes
-          }
-        })
-        .catch(error => {
-          console.error('Erreur lors de la récupération des données :', error);
-          document.getElementById('loadingOverlay').style.display = 'none';
-        });
+  if (cachedData && cachedTime && now - new Date(cachedTime) < cacheExpiration) {
+    // Utiliser les données du cache
+    allData = JSON.parse(cachedData);
+    displaySchedule(currentDayIndex);
+
+    // Activer le défilement et les compte à rebours si c'est le jour actuel
+    if (isToday(currentDayIndex)) {
+      initializeCountdowns();
+      scrollToNextUpcomingCourse();
+      setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
     }
+  } else {
+    // Pas de cache ou cache expiré, récupérer les données depuis l'API
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    document.getElementById('loadingMessage').innerHTML = 'Chargement du planning...';
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        allData = data.slice(1); // Ignorer la première ligne (titres)
+        displaySchedule(currentDayIndex);
+
+        // Stocker les données dans le cache
+        localStorage.setItem('scheduleData', JSON.stringify(allData));
+        localStorage.setItem('scheduleTimestamp', now.toISOString());
+
+        document.getElementById('loadingOverlay').style.display = 'none';
+
+        // Activer les compte à rebours et le défilement pour le jour actuel
+        if (isToday(currentDayIndex)) {
+          initializeCountdowns();
+          scrollToNextUpcomingCourse();
+          setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des données :', error);
+        document.getElementById('loadingOverlay').style.display = 'none';
+      });
+  }
+}
+
 
     function displaySchedule(dayIndex) {
       const scheduleDiv = document.getElementById('timeline');
