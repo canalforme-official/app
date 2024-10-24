@@ -104,42 +104,90 @@
       }
     }
 
-    /* Style pour le bouton de retour à la vue quotidienne */
-    .today-view-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 8px;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
+/* Réduction de la taille du bouton général */
+.today-view-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.5); /* Bouton noir transparent */
+  padding: 8px; /* Réduction de la zone cliquable */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  width: 50px; /* Réduction de la largeur du bouton */
+  height: 50px; /* Réduction de la hauteur du bouton */
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);
+  animation: auraPulse 1.5s ease-in-out infinite; /* Effet de pulsation de l'aura rouge */
+  
+}
 
-    .today-view-button a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      text-decoration: none;
-    }
+/* Ajustement de la taille du cercle extérieur */
+.today-view-button::before {
+  content: '';
+  width: 40px; /* Taille réduite du cercle extérieur */
+  height: 40px;
+  border-radius: 50%; /* Cercle parfait */
+  position: absolute;
+  border: 4px solid rgba(255, 0, 0, 0.8); /* Bord rouge */
+  box-sizing: border-box;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrement parfait */
+  z-index: 1; /* S'assurer que le cercle est cliquable */
+}
+
+/* Ajustement de la taille du cercle intérieur */
+.today-view-button::after {
+  content: '';
+  width: 13px; /* Taille réduite du cercle intérieur */
+  height: 13px;
+  background-color: rgba(255, 0, 0, 0.8); /* Cercle plein rouge */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrement parfait */
+  z-index: 2; /* Assure que ce disque est au-dessus et cliquable */
+}
+
+/* Nouvelle animation pour l'aura rouge (évite le conflit avec l'autre pulse) */
+@keyframes auraPulse {
+  0% {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.2), 0 0 55px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
+  }
+}
+
+
+
+
+/* Le lien doit occuper toute la zone du bouton */
+.today-view-button a {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3; /* S'assurer que l'élément est cliquable */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
 
     .today-view-button img {
       width: 30px;
       height: 30px;
       cursor: pointer;
-    }
-
-    /* Animation au survol */
-    .today-view-button:hover {
-      background-color: rgba(255, 255, 255, 0.9);
-      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
     }
 
     /* Styles pour le tableau du planning hebdomadaire */
@@ -168,15 +216,34 @@
 
     /* Animation améliorée pour le jour actuel */
     .weekly-schedule thead th.today {
-      animation: pulse 1.5s infinite;
-      color: yellow; /* Changement de la couleur du texte pour le jour actuel */
+      background-color: rgba(255, 0, 0, 0.3); /* Conserve le fond uni rouge avec transparence */
+      position: relative;
+      color: white; /* Couleur du texte */
+      overflow: hidden; /* Cache l'effet en dehors du texte */
     }
 
-    /* Keyframes ajustés pour une animation plus prononcée */
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+  /* Superposition pour l'effet de lumière */
+  .weekly-schedule thead th.today::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%; /* Commence bien en dehors du texte */
+    width: 300%; /* Plus large que le conteneur pour simuler un balayage net */
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 55%, rgba(255,255,255,0) 100%);
+    animation: lightSweep 3s infinite ease-in-out; /* Animation plus lente et fluide */
+  }
+
+  /* Animation de balayage de lumière */
+  @keyframes lightSweep {
+    0% {
+      left: -150%;
     }
+    100% {
+      left: 150%;
+    }
+  }
+
 
     /* Styles pour la cellule des heures */
     .weekly-schedule th:first-child,
@@ -339,6 +406,7 @@
       display: none;
     }
 
+
     /* Styles spécifiques pour les appareils mobiles avec rotation */
     @media screen and (max-width: 767px) {
       html, body {
@@ -379,6 +447,7 @@
         table-layout: fixed;
       }
 
+
       .weekly-schedule th,
       .weekly-schedule td {
         padding: 5px 2px;
@@ -389,9 +458,27 @@
         margin: 0;
       }
 
+        /* Ajout de styles pour le first-child (colonne des heures) dans la ligne des titres */
+      .weekly-schedule th:first-child {
+        width: 30px; /* Largeur minimale pour la colonne des heures */
+        min-width: 20px;
+        max-width: 40px;
+        text-align: center;
+        writing-mode: vertical-rl; /* Texte vertical pour bien gérer la rotation */
+        white-space: nowrap;
+        padding: 2px;
+        transform: none;
+      }
+
+        /* Ajustement des autres colonnes dans la ligne */
+        .weekly-schedule th:not(:first-child) {
+        width: calc((100% - 30px) / 7); /* Les autres colonnes se partagent l'espace restant */
+        padding: 2px;
+      }
+
       /* Ajustement des largeurs de colonnes */
       .weekly-schedule .time-cell {
-        width: 20px;
+        width: 30px;
         writing-mode: vertical-rl;
         font-size: 0.8em;
         white-space: nowrap;
@@ -481,7 +568,6 @@
     <!-- Bouton pour revenir à la vue quotidienne -->
     <div class="today-view-button">
       <a href="./daily.html">
-        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/87c4d60c-96fd-da4b-3996-eba4f5622ec8.png" alt="Vue Quotidienne">
       </a>
     </div>
 
@@ -537,45 +623,73 @@
       document.getElementById('filter-piscine').checked = urlParams.get('piscine') !== 'false';
       document.getElementById('filter-coach').checked = urlParams.get('coach') !== 'false';
 
-      // Récupérer les données du backend
-      fetch('https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
-        .then(response => response.json())
-        .then(data => {
-          // Ignorer la première ligne (titres)
-          data = data.slice(1);
+      // Récupérer les données avec mise en cache via localStorage
+      fetchWeeklyData().then(data => {
+        // Ignorer la première ligne (titres)
+        data = data.slice(1);
 
-          // Assigner les données à la variable scheduleData
-          scheduleData = data;
+        // Assigner les données à la variable scheduleData
+        scheduleData = data;
 
-          // Générer le HTML du planning hebdomadaire
-          var weeklyHtml = generateWeeklyScheduleHtml();
-          document.getElementById('weeklySchedule').innerHTML = weeklyHtml;
+        // Générer le HTML du planning hebdomadaire
+        var weeklyHtml = generateWeeklyScheduleHtml();
+        document.getElementById('weeklySchedule').innerHTML = weeklyHtml;
 
-          // Cacher l'overlay de chargement
-          document.getElementById('loadingOverlay').style.display = 'none';
+        // Cacher l'overlay de chargement
+        document.getElementById('loadingOverlay').style.display = 'none';
 
-          // Ajouter des écouteurs d'événements pour les filtres
-          document.getElementById('filter-mixte').addEventListener('change', applyFilters);
-          document.getElementById('filter-women-only').addEventListener('change', applyFilters);
-          document.getElementById('filter-piscine').addEventListener('change', applyFilters);
-          document.getElementById('filter-coach').addEventListener('change', applyFilters);
+        // Ajouter des écouteurs d'événements pour les filtres
+        document.getElementById('filter-mixte').addEventListener('change', applyFilters);
+        document.getElementById('filter-women-only').addEventListener('change', applyFilters);
+        document.getElementById('filter-piscine').addEventListener('change', applyFilters);
+        document.getElementById('filter-coach').addEventListener('change', applyFilters);
 
-          // Appliquer les filtres initiaux
-          applyFilters();
+        // Appliquer les filtres initiaux
+        applyFilters();
 
-          // Scroll automatique vers l'heure actuelle
-          scrollToCurrentTime();
+        // Scroll automatique vers l'heure actuelle
+        scrollToCurrentTime();
 
-          // Mettre à jour les cercles de compte à rebours
-          updateCountdownCircles();
+        // Mettre à jour les cercles de compte à rebours
+        updateCountdownCircles();
 
-          // Mettre à jour les cercles chaque minute
-          setInterval(updateCountdownCircles, 60000);
-        })
-        .catch(error => {
-          console.error('Erreur lors de la récupération des données :', error);
-          document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
-        });
+        // Mettre à jour les cercles chaque minute
+        setInterval(updateCountdownCircles, 60000);
+      }).catch(error => {
+        console.error('Erreur lors de la récupération des données :', error);
+        document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
+      });
+
+      // Fonction pour récupérer les données avec mise en cache via localStorage
+      function fetchWeeklyData() {
+        const cacheKey = 'weeklyData';
+        const cacheExpirationKey = 'weeklyDataExpiration';
+        
+        // Vérifie si les données sont déjà en cache et si elles ne sont pas expirées
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheExpiration = localStorage.getItem(cacheExpirationKey);
+        const now = new Date().getTime();
+
+        // Si les données sont en cache et que la cache n'est pas expirée (60 minutes = 3600000 ms)
+        if (cachedData && cacheExpiration && now < cacheExpiration) {
+          console.log('Utilisation des données en cache');
+          return Promise.resolve(JSON.parse(cachedData));  // Retourne les données du cache
+        }
+
+        // Sinon, on fait un fetch pour obtenir les nouvelles données
+        return fetch('https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
+          .then(response => response.json())
+          .then(data => {
+            // Stocke les données dans le cache avec une expiration de 60 minutes
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            localStorage.setItem(cacheExpirationKey, now + 3600000); // Expire dans 60 minutes
+            console.log('Données récupérées du serveur et stockées dans le cache');
+            return data;  // Retourne les nouvelles données
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération des données :', error);
+          });
+      }
     }
 
     function generateWeeklyScheduleHtml() {
@@ -814,14 +928,17 @@
       var currentHour = now.getHours();
       var currentMinutes = now.getMinutes();
 
+      // Sélectionne toutes les cellules de temps
       var times = document.querySelectorAll('.time-cell');
 
+      // Détermine la ligne cible à faire défiler
       var targetRow = null;
 
       for (var i = 0; i < times.length; i++) {
         var timeText = times[i].textContent;
         var [hour, minute] = timeText.split(':').map(Number);
 
+        // Vérifie si l'heure est égale ou supérieure à l'heure actuelle
         if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
           targetRow = times[i].parentElement;
           break;
@@ -829,9 +946,29 @@
       }
 
       if (targetRow) {
-        targetRow.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        // Récupère la hauteur de la ligne des titres (sticky header)
+        var stickyHeader = document.querySelector('.weekly-schedule thead');
+        var headerHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
+
+        // Fait défiler la ligne cible avec un décalage de la hauteur du sticky header
+        var targetPosition = targetRow.getBoundingClientRect().top + window.scrollY - headerHeight;
+
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
       }
     }
+
+    // Exécute la fonction de scroll à chaque 15 minutes (900 000 ms)
+    setInterval(scrollToCurrentTime, 900000);
+
+    // Rafraîchit la page toutes les heures (3600 000 millisecondes = 1 heure)
+    setInterval(function() {
+      location.reload();
+    }, 3600000);  // 1 heure = 60 minutes * 60 secondes * 1000 millisecondes
+
+
   </script>
 
 </body>
