@@ -259,10 +259,16 @@
       justify-content: center;
     }
 
+    .navigation button img {
+        width: 30px; /* Adjust this size as needed */
+        height: 30px;
+        pointer-events: none; /* Ensure the button click still works on the button, not the image */
+    }
+
     /* Styles pour les états :hover uniquement sur les appareils avec support du survol */
     @media (hover: hover) {
       .navigation button:hover {
-        background-color: rgba(255, 0, 0, 0.6);
+        background-color: rgba(255, 255, 255, 0.6);
         transform: scale(1.1);
       }
     }
@@ -596,9 +602,13 @@
 
   <!-- Boutons de navigation -->
   <div class="navigation">
-    <button id="prevDay" onclick="changeDay(-1)">&#9664;</button>
-    <button id="nextDay" onclick="changeDay(1)">&#9654;</button>
-  </div>
+    <button id="prevDay" onclick="changeDay(-1)">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/78d64276-8c3e-a386-2885-2bbe34c80319.png" alt="Previous Day">
+    </button>
+    <button id="nextDay" onclick="changeDay(1)">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8ad9de66-44fa-f41e-9b4a-1ab563f063a3.png" alt="Next Day">
+    </button>
+</div>
 
   <h1 id="dayOfWeek"></h1>
   <div class="date" id="dateStr"></div>
