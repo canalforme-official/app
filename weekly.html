@@ -104,11 +104,11 @@
       }
     }
 
-/* Réduction de la taille du bouton général */
+/* Style du bouton de retour à aujourd'hui */
 .today-view-button {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  right: 10px;
   z-index: 1000;
   background-color: rgba(255, 255, 255, 0.5); /* Bouton noir transparent */
   padding: 8px; /* Réduction de la zone cliquable */
@@ -122,7 +122,6 @@
   height: 50px; /* Réduction de la hauteur du bouton */
   box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);
   animation: auraPulse 1.5s ease-in-out infinite; /* Effet de pulsation de l'aura rouge */
-  
 }
 
 /* Ajustement de la taille du cercle extérieur */
@@ -132,7 +131,7 @@
   height: 35px;
   border-radius: 50%; /* Cercle parfait */
   position: absolute;
-  border: 3px solid rgba(255, 0, 0, 0.8); /* Bord rouge */
+  border: 3px solid rgba(255, 0, 0, 0.7); /* Bord rouge */
   box-sizing: border-box;
   top: 50%;
   left: 50%;
@@ -145,7 +144,7 @@
   content: '';
   width: 11px; /* Taille réduite du cercle intérieur */
   height: 11px;
-  background-color: rgba(255, 0, 0, 0.8); /* Cercle plein rouge */
+  background-color: rgba(255, 0, 0, 0.7); /* Cercle plein rouge */
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -154,7 +153,7 @@
   z-index: 2; /* Assure que ce disque est au-dessus et cliquable */
 }
 
-/* Nouvelle animation pour l'aura rouge (évite le conflit avec l'autre pulse) */
+/* Animation pour l'aura */
 @keyframes auraPulse {
   0% {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.2), 0 0 45px rgba(0, 0, 0, 0.1);
@@ -167,6 +166,19 @@
   }
 }
 
+/* Styles :hover pour le bouton today-view */
+@media (hover: hover) {
+  .today-view-button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+    transform: scale(1.05);
+  }
+}
+
+/* État :active pour le bouton today-view */
+.today-view-button:active {
+  transform: scale(1.05);
+}
 
 
 
@@ -968,6 +980,7 @@
     });
   }
 }
+
 
 
     // Exécute la fonction de scroll à chaque 15 minutes (900 000 ms)
