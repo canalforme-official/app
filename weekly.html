@@ -128,11 +128,11 @@
 /* Ajustement de la taille du cercle extérieur */
 .today-view-button::before {
   content: '';
-  width: 40px; /* Taille réduite du cercle extérieur */
-  height: 40px;
+  width: 35px; /* Taille réduite du cercle extérieur */
+  height: 35px;
   border-radius: 50%; /* Cercle parfait */
   position: absolute;
-  border: 4px solid rgba(255, 0, 0, 0.8); /* Bord rouge */
+  border: 3px solid rgba(255, 0, 0, 0.8); /* Bord rouge */
   box-sizing: border-box;
   top: 50%;
   left: 50%;
@@ -143,8 +143,8 @@
 /* Ajustement de la taille du cercle intérieur */
 .today-view-button::after {
   content: '';
-  width: 13px; /* Taille réduite du cercle intérieur */
-  height: 13px;
+  width: 11px; /* Taille réduite du cercle intérieur */
+  height: 11px;
   background-color: rgba(255, 0, 0, 0.8); /* Cercle plein rouge */
   border-radius: 50%;
   position: absolute;
@@ -924,41 +924,51 @@
 
     // Fonction pour scroller automatiquement vers l'heure actuelle
     function scrollToCurrentTime() {
-      var now = new Date();
-      var currentHour = now.getHours();
-      var currentMinutes = now.getMinutes();
+  var now = new Date();
+  var currentHour = now.getHours();
+  var currentMinutes = now.getMinutes();
 
-      // Sélectionne toutes les cellules de temps
-      var times = document.querySelectorAll('.time-cell');
+  // Sélectionne toutes les cellules de temps
+  var times = document.querySelectorAll('.time-cell');
 
-      // Détermine la ligne cible à faire défiler
-      var targetRow = null;
+  // Détermine la ligne cible à faire défiler
+  var targetRow = null;
 
-      for (var i = 0; i < times.length; i++) {
-        var timeText = times[i].textContent;
-        var [hour, minute] = timeText.split(':').map(Number);
+  for (var i = 0; i < times.length; i++) {
+    var timeText = times[i].textContent.trim();
+    var [hour, minute] = timeText.split(':').map(Number);
 
-        // Vérifie si l'heure est égale ou supérieure à l'heure actuelle
-        if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
-          targetRow = times[i].parentElement;
-          break;
-        }
-      }
-
-      if (targetRow) {
-        // Récupère la hauteur de la ligne des titres (sticky header)
-        var stickyHeader = document.querySelector('.weekly-schedule thead');
-        var headerHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
-
-        // Fait défiler la ligne cible avec un décalage de la hauteur du sticky header
-        var targetPosition = targetRow.getBoundingClientRect().top + window.scrollY - headerHeight;
-
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
-      }
+    // Vérifie si l'heure est égale ou supérieure à l'heure actuelle
+    if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+      targetRow = times[i].parentElement;
+      break;
     }
+  }
+
+  if (targetRow) {
+    // Sélectionne le conteneur scrollable
+    var contentWrapper = document.querySelector('.content-wrapper');
+
+    // Obtenir la hauteur du bloc "Planning Hebdomadaire" (H1 + filtres)
+    var headerWrapper = document.querySelector('.header-wrapper');
+    var headerHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
+
+    // Obtenir la hauteur de la ligne des jours (thead)
+    var thead = document.querySelector('.weekly-schedule thead');
+    var theadHeight = thead ? thead.offsetHeight : 0;
+
+    // Calcul de la position cible : ajout de la hauteur du header + thead
+    var targetPosition = targetRow.offsetTop - headerHeight + (2 * theadHeight) + 4; // Ajouter pour descendre plus ajout manuel 3achwa2iy
+    
+
+    // Appliquer le défilement manuel
+    contentWrapper.scrollTo({
+      top: targetPosition,
+      behavior: 'smooth'
+    });
+  }
+}
+
 
     // Exécute la fonction de scroll à chaque 15 minutes (900 000 ms)
     setInterval(scrollToCurrentTime, 900000);
