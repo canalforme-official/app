@@ -113,6 +113,15 @@
       }
     }
 
+    @keyframes zoomPulse {
+      0%, 80% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+    }
+
 /* Style du bouton de retour à aujourd'hui */
 .today-view-button {
   position: fixed;
@@ -147,6 +156,7 @@
   left: 50%;
   transform: translate(-50%, -50%); /* Centrement parfait */
   z-index: 1; /* S'assurer que le cercle est cliquable */
+  animation: zoomPulse 1.5s ease-in-out infinite;
 }
 
 /* Ajustement de la taille du cercle intérieur */
@@ -161,6 +171,7 @@
   left: 50%;
   transform: translate(-50%, -50%); /* Centrement parfait */
   z-index: 2; /* Assure que ce disque est au-dessus et cliquable */
+  animation: zoomPulse 1.5s ease-in-out infinite;
 }
 
 /* Animation pour l'aura */
@@ -326,14 +337,14 @@
 /* Styles pour la pilule de compte à rebours */
 .countdown-pill {
     position: absolute;
-    top: -10px; /* Décalage pour que la moitié supérieure de la pilule dépasse */
+    top: -6px; /* Décalage pour que la moitié supérieure de la pilule dépasse */
     left: 50%;
     transform: translateX(-50%);
-    width: 60px; /* Largeur plus petite pour un look plus compact */
-    height: 20px; /* Hauteur ajustée */
+    width: 40px; /* Largeur plus petite pour un look plus compact */
+    height: 14px; /* Hauteur ajustée */
     background-color: red;
     color: white;
-    border-radius: 10px; /* Forme de pilule avec des bords arrondis */
+    border-radius: 7px; /* Forme de pilule avec des bords arrondis */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -442,6 +453,14 @@
     .hide-coaches .single-coach,
     .hide-coaches .multiple-coaches {
       display: none;
+    }
+
+    .content-wrapper {
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 80vh; /* Ajustez cette hauteur selon votre besoin */
+      padding: 10px;
+      box-sizing: border-box;
     }
 
 
@@ -699,7 +718,7 @@
         updateCountdownCircles();
 
         // Mettre à jour les cercles chaque minute
-        setInterval(updateCountdownCircles, 60000);
+        setInterval(updateCountdownCircles, 1000); // 1000 ms = 1 seconde
       }).catch(error => {
         console.error('Erreur lors de la récupération des données :', error);
         document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
@@ -878,9 +897,10 @@
               if (dayOffset < 0) dayOffset += 7;
               courseDate.setDate(now.getDate() + dayOffset);
 
-              var timeDifference = (courseDate - now) / 60000; // Différence en minutes
-
-              var isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
+              var timeDifference = (courseDate - now) / 1000; // Différence en secondes
+              
+              // 15 minutes = 900 secondes  
+              var isStartingSoon = timeDifference >= 0 && timeDifference <= 900;
 
               if (isStartingSoon) {
                 courseClasses += ' starting-soon';
@@ -951,6 +971,7 @@
       }
     }
 
+
 // Fonction pour mettre à jour les pastilles de compte à rebours en mm:ss
 function updateCountdownCircles() {
     var countdownBadges = document.querySelectorAll('.countdown-pill');
@@ -967,6 +988,8 @@ function updateCountdownCircles() {
             var timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 
             badge.textContent = timeString;
+
+            // Décrémente le temps restant de 1 seconde
             badge.setAttribute('data-time-diff', timeDiff - 1);
         } else {
             // Retirer la pastille si le temps est écoulé
@@ -1023,8 +1046,6 @@ function updateCountdownCircles() {
     });
   }
 }
-
-
 
     // Exécute la fonction de scroll à chaque 15 minutes (900 000 ms)
     setInterval(scrollToCurrentTime, 900000);
