@@ -345,6 +345,15 @@
       }
     }
 
+    @keyframes zoomPulse {
+      0%, 80% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+    }
+
     /* Styles spécifiques aux cours du studio "Piscine" */
     .course-block.piscine {
       border: 2px solid #1E90FF;
@@ -455,13 +464,20 @@
       width: 50px;
       height: 50px;
       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       transition: transform 0.2s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
+
+    /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
+      @media screen and (max-width: 768px) {
+        .weekly-view-button {
+          display: flex;
+        }
+      }
 
     .weekly-view-button img {
       width: 35px;
@@ -486,6 +502,7 @@
 
 /* Réduction de la taille du bouton général */
 .today-view-button {
+  display:flex;
   position: fixed;
   bottom: 20px;
   right: 10px;
@@ -493,7 +510,6 @@
   background-color: rgba(255, 255, 255, 0.5); /* Bouton noir transparent */
   padding: 8px; /* Réduction de la zone cliquable */
   border-radius: 50%;
-  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -502,7 +518,6 @@
   height: 50px; /* Réduction de la hauteur du bouton */
   box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);
   animation: auraPulse 1.5s ease-in-out infinite; /* Effet de pulsation de l'aura rouge */
-  
 }
 
 /* Ajustement de la taille du cercle extérieur */
@@ -518,6 +533,7 @@
   left: 50%;
   transform: translate(-50%, -50%); /* Centrement parfait */
   z-index: 1; /* S'assurer que le cercle est cliquable */
+  animation: zoomPulse 1.5s ease-in-out infinite;
 }
 
 /* Ajustement de la taille du cercle intérieur */
@@ -532,6 +548,7 @@
   left: 50%;
   transform: translate(-50%, -50%); /* Centrement parfait */
   z-index: 2; /* Assure que ce disque est au-dessus et cliquable */
+  animation: zoomPulse 1.5s ease-in-out infinite;
 }
 
 /* Nouvelle animation pour l'aura rouge (évite le conflit avec l'autre pulse) */
@@ -581,11 +598,37 @@
       transform: scale(1.05);
     }
 
+    .sticky-day-name {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 80%;
+      max-width:200px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px); /* Pour améliorer la lisibilité */
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.7em;
+      font-weight: bold;
+      color: #333;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+
 </style>
 
 
 </head>
 <body onload="initializePage();">
+  <!-- Bloc de texte collant pour le nom du jour -->
+<div id="stickyDayName" class="sticky-day-name"></div>
 
   <!-- Bouton Weekly view -->
   <div class="weekly-view-button">
@@ -595,7 +638,7 @@
   </div>
 
   <!-- Bouton pour revenir à aujourd'hui -->
-  <div class="today-view-button" id="todayViewButton" style="display: none;">
+  <div class="today-view-button" id="todayViewButton">
     <button onclick="returnToToday()">
     </button>
   </div>
@@ -689,6 +732,9 @@
 
       document.getElementById('dayOfWeek').innerText = dayOfWeek;
       document.getElementById('dateStr').innerText = dateStr;
+
+      // Ligne ajoutée pour mettre à jour le sticky
+      document.getElementById('stickyDayName').innerText = dayOfWeek;
 
       const dayData = allData.filter(course => course.day === dayOfWeek);
 
@@ -885,7 +931,7 @@
       updateCurrentYear();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    /*document.addEventListener('DOMContentLoaded', function () {
       // Gestion de la position du bouton todayView
       var weeklyButton = document.querySelector('.weekly-view-button');
       var todayButton = document.querySelector('.today-view-button');
@@ -893,7 +939,41 @@
         var weeklyButtonHeight = weeklyButton.offsetHeight;
         todayButton.style.top = (weeklyButtonHeight + 20) + 'px'; // Espacement entre les deux boutons
       }
+    });*/
+
+    document.addEventListener('DOMContentLoaded', function () {
+  // Gestion de la position du bouton todayView
+  var weeklyButton = document.querySelector('.weekly-view-button');
+  var todayButton = document.querySelector('.today-view-button');
+  if (weeklyButton && todayButton) {
+    var weeklyButtonHeight = weeklyButton.offsetHeight;
+    todayButton.style.top = (weeklyButtonHeight + 20) + 'px'; // Espacement entre les deux boutons
+  }
+
+  // Observer pour le titre sticky
+  const dayOfWeekElement = document.getElementById('dayOfWeek');
+  const stickyDayNameElement = document.getElementById('stickyDayName');
+
+  const observerOptions = {
+    root: null,
+    threshold: 0,
+  };
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) {
+        stickyDayNameElement.style.opacity = '1';
+        stickyDayNameElement.style.transform = 'translateY(0)';
+      } else {
+        stickyDayNameElement.style.opacity = '0';
+        stickyDayNameElement.style.transform = 'translateY(-100%)';
+      }
     });
+  }, observerOptions);
+
+  observer.observe(dayOfWeekElement);
+});
+
 
     function updateCurrentYear() {
       const currentYear = new Date().getFullYear();
