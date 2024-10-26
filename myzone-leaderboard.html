@@ -5,17 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Myzone Leaderboard - Canal Forme</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background-color: #000000;
             color: #ffffff;
             margin: 0;
             padding: 0;
-            font-size: 16px;
+            overflow-x: hidden;
         }
 
         .container {
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
@@ -41,19 +49,19 @@
             background-color: #ffffff;
             color: #000000;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 16px 16px 0 0;
             width: 95%;
             max-width: 600px;
             box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
-            margin-top: 20px;
+            margin-top: 10px; /* Réduit la distance avec le titre */
             position: relative;
         }
 
         .month-title {
-            font-size: 1.8em;
+            font-size: 1.5em;
             font-weight: bold;
-            color: #ff0000;
-            margin-bottom: 15px;
+            color: #ffffff;
+            margin-bottom: -30px;
             text-align: center;
         }
 
@@ -66,78 +74,12 @@
             display: none;
         }
 
-        .podium {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            height: 200px;
-            margin-bottom: 30px;
-        }
-
-        .podium-step {
-            width: 30%;
-            margin: 0 1%;
-            background-color: #f0f0f0;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
-        .podium-step.first { height: 160px; background-color: #ffd700; } /* Or */
-        .podium-step.second { height: 140px; background-color: #c0c0c0; } /* Argent */
-        .podium-step.third { height: 120px; background-color: #cd7f32; } /* Bronze */
-
-        .podium-rank {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .podium-nickname {
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 5px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 90%;
-        }
-
-        .podium-meps {
-            font-size: 16px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .podium-meps .meps-label {
-            color: #000000; /* Change la couleur du suffixe MEPs en noir */
-        }
-
-        .status-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-        }
-
         .leaderboard {
             width: 100%;
         }
 
         .leaderboard-row {
             display: flex;
-            justify-content: flex-start;
             align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid #e0e0e0;
@@ -152,10 +94,11 @@
             font-weight: bold;
             width: 30px;
             text-align: left;
+            flex-shrink: 0;
         }
 
         .nickname {
-            flex-grow: 1;
+            flex: 1;
             text-align: left;
             padding: 0 10px;
             white-space: nowrap;
@@ -163,33 +106,41 @@
             text-overflow: ellipsis;
         }
 
-        .meps {
+        .leaderboard-meps {
             display: flex;
             align-items: center;
             font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 4px;
+            min-width: 120px; /* Assure un espace pour l'icône et le texte */
+            max-width: 140px;
+            justify-content: space-between;
         }
 
-        .leaderboard .status-icon {
-            width: 25px;
-            height: 25px;
-            margin-right: 5px;
+        .leaderboard-meps .status-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 5px; /* Marge entre l'icône et le texte */
         }
 
-        .meps-value {
-            margin-right: 5px;
+        .leaderboard-meps .meps-value {
+            margin-right: 5px; /* Ajuste l'espace entre les éléments */
         }
 
-        .meps-label {
+        .leaderboard-meps .meps-label {
             font-size: 0.8em;
             color: #888;
+            text-align: right;
         }
 
+
         #countdown {
+            font-size: 0.7em; /* Diminue la taille de la police */
             position: absolute;
-            top: -20px;
-            left: 0;
-            color: #ffffff;
-            font-size: 0.9em;
+            top: 10px;
+            right: 10px;
+            color: #797979;
         }
 
         #loadingOverlay {
@@ -198,30 +149,36 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.6);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            flex-direction: column;
         }
 
-        .loading-logo {
+        .loading-logo img {
             width: 50px;
             height: 50px;
-            margin-bottom: 20px;
             animation: zoom-logo 1.5s ease-in-out infinite;
         }
 
         @keyframes zoom-logo {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
         }
 
         #loadingMessage {
-            color: #ffffff;
-            font-size: 1em;
+            margin-top: 50px;
+            font-size: 1.5em;
+            color: #fff;
             text-align: center;
+            width: 80%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
         }
 
         .loading-spinner {
@@ -249,26 +206,6 @@
                 padding: 15px;
             }
 
-            .podium {
-                height: 160px;
-            }
-
-            .podium-step.first { height: 140px; }
-            .podium-step.second { height: 120px; }
-            .podium-step.third { height: 100px; }
-
-            .podium-rank {
-                font-size: 18px;
-            }
-
-            .podium-nickname {
-                font-size: 14px;
-            }
-
-            .podium-meps {
-                font-size: 14px;
-            }
-
             .leaderboard-row {
                 font-size: 14px;
                 padding: 8px 0;
@@ -278,9 +215,9 @@
                 width: 25px;
             }
 
-            .leaderboard .status-icon {
-                width: 20px;
-                height: 20px;
+            .leaderboard-meps .status-icon {
+                width: 18px;
+                height: 18px;
             }
 
             .status-icon {
@@ -288,29 +225,295 @@
                 height: 20px;
             }
         }
+
+        /* Styles pour le podium élégant */
+        .podium-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        .step {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+            width: 130px;
+            transform: translateY(100vh);
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: visible;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .step.first {
+            height: 220px;
+            background: linear-gradient(150deg,
+                #FFE5B4 0%,
+                #FFD700 20%,
+                #FFC600 40%,
+                #FFD700 60%,
+                #FDB600 80%,
+                #FFD700 100%
+            );
+            order: 2;
+            animation-delay: 0.4s;
+            overflow: visible;
+        }
+
+        .step.second {
+            height: 180px;
+            background: linear-gradient(150deg,
+                #F5F5F5 0%,
+                #C0C0C0 20%,
+                #A8A8A8 40%,
+                #C0C0C0 60%,
+                #989898 80%,
+                #C0C0C0 100%
+            );
+            order: 1;
+            animation-delay: 0.2s;
+        }
+
+        .step.third {
+            height: 150px;
+            background: linear-gradient(150deg,
+                #DFA878 0%,
+                #CD7F32 20%,
+                #B87333 40%,
+                #CD7F32 60%,
+                #A66A2E 80%,
+                #CD7F32 100%
+            );
+            order: 3;
+            animation-delay: 0s;
+        }
+
+        .sparkles-container {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 100px);
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 2px;
+            animation: fall 3s linear infinite;
+        }
+
+        .sparkle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+        .sparkle:nth-child(3) { left: 30%; animation-delay: 1s; }
+        .sparkle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
+        .sparkle:nth-child(5) { left: 50%; animation-delay: 0.2s; }
+        .sparkle:nth-child(6) { left: 60%; animation-delay: 0.7s; }
+        .sparkle:nth-child(7) { left: 70%; animation-delay: 1.2s; }
+        .sparkle:nth-child(8) { left: 80%; animation-delay: 1.7s; }
+        .sparkle:nth-child(9) { left: 90%; animation-delay: 0.4s; }
+        .sparkle:nth-child(10) { left: 15%; animation-delay: 0.9s; }
+        .sparkle:nth-child(11) { left: 45%; animation-delay: 1.4s; }
+        .sparkle:nth-child(12) { left: 75%; animation-delay: 1.9s; }
+
+        .sparkle:nth-child(even) {
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(135deg, #FFD700, #FFF);
+            box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+        }
+
+        .sparkle:nth-child(3n) {
+            width: 3px;
+            height: 3px;
+            background: #FFF;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .status-icon-podium {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            animation: appearWithScale 0.5s ease-out forwards;
+            animation-delay: 2s;
+        }
+
+        .profile {
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            width: 100%;
+            padding: 0 8px;
+            z-index: 1;
+        }
+
+        .step.third .profile { animation-delay: 1s; }
+        .step.second .profile { animation-delay: 1.2s; }
+        .step.first .profile { animation-delay: 1.4s; }
+
+        .name {
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            margin: 8px 0 6px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .podium-meps {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            background: rgba(0,0,0,0.1);
+            padding: 4px 4px;
+            border-radius: 8px;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        .step.third .podium-meps { animation-delay: 1.5s; }
+        .step.second .podium-meps { animation-delay: 1.7s; }
+        .step.first .podium-meps { animation-delay: 1.9s; }
+
+        .podium-meps.first { font-size: 1.6rem; }
+        .podium-meps.second { font-size: 1.5rem; }
+        .podium-meps.third { font-size: 1.4rem; }
+
+        .meps-label {
+            font-size: 0.7em;
+            color: white;
+            opacity: 0.9;
+            letter-spacing: 2px;
+            margin-top: 4px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        .position {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            line-height: 0.72;
+            color: rgba(0, 0, 0, 0.01);
+        }
+
+        .step.first .position { font-size: 6rem; }
+        .step.second .position { font-size: 5rem; }
+        .step.third .position { font-size: 4rem; }
+
+        @keyframes slideUp {
+            from { transform: translateY(100vh); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes appearWithScale {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            20% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(300px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .step {
+                width: 150px;
+            }
+
+            .podium-meps.first { font-size: 1.8rem; }
+            .podium-meps.second { font-size: 1.6rem; }
+            .podium-meps.third { font-size: 1.5rem; }
+        }
+
+       
     </style>
 </head>
 <body>
-    <div id="loadingOverlay">
-        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Canal Forme Logo" class="loading-logo">
+    <div id="loadingOverlay" style="display: none;">
+        <div class="loading-logo">
+            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Logo du Club">
+        </div>
         <div id="loadingMessage">Chargement du leaderboard...</div>
-        <div class="loading-spinner"></div>
     </div>
     <div class="logo-container">
         <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Canal Forme Logo" class="logo">
     </div>
+
+    <!-- Podium élégant -->
+    <div class="podium-wrapper" id="podiumWrapper">
+        <!-- Le contenu du podium sera inséré dynamiquement par JavaScript -->
+    </div>
+
+    <!-- Titre du mois sous le podium -->
+    <div id="currentMonthTitle" class="month-title"></div>
+
     <div class="container">
         <div class="month-block current-month-block">
+            <!-- Compte à rebours à l'intérieur du bloc blanc -->
             <div id="countdown"></div>
             <div class="last-update hidden">Dernière mise à jour : <span id="lastUpdateTime"></span></div>
-            <div id="currentMonthTitle" class="month-title"></div>
-            <div id="currentMonthPodium"></div>
+            <!-- Le leaderboard s'affiche ici -->
             <div id="currentMonthLeaderboard"></div>
-        </div>
-        <div class="month-block previous-month-block" id="previousMonthBlock" style="display: none;">
-            <div id="previousMonthTitle" class="month-title"></div>
-            <div id="previousMonthPodium"></div>
-            <div id="previousMonthLeaderboard"></div>
         </div>
     </div>
 
@@ -327,10 +530,9 @@
 
         // Fonction pour cacher l'overlay de chargement
         function hideLoadingOverlay() {
-            if (isFirstLoad) {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                isFirstLoad = false;  // Désactive l'affichage de l'overlay pour les chargements suivants
-            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.querySelector('.container').style.display = 'flex'; // Affiche le contenu principal
+            isFirstLoad = false;
         }
 
         // Fonction pour charger le leaderboard
@@ -383,42 +585,99 @@
             var today = new Date();
             var dayOfMonth = today.getDate();
 
-            document.getElementById('currentMonthTitle').textContent = data.current.month;
-            document.getElementById('currentMonthPodium').innerHTML = createPodium(data.current.data.slice(0, 3));
-            document.getElementById('currentMonthLeaderboard').innerHTML = createLeaderboardTable(data.current.data.slice(3, dayOfMonth <= 7 ? 10 : 20));
+            // Mise à jour du titre du mois
+            var currentMonthName = data.current.month;
+            document.getElementById('currentMonthTitle').textContent = 'Leaderboard - ' + currentMonthName;
 
-            if (dayOfMonth <= 7 && data.previous) {
-                document.getElementById('previousMonthTitle').textContent = data.previous.month;
-                document.getElementById('previousMonthPodium').innerHTML = createPodium(data.previous.data.slice(0, 3));
-                document.getElementById('previousMonthLeaderboard').innerHTML = createLeaderboardTable(data.previous.data.slice(3, 10));
-                document.getElementById('previousMonthBlock').style.display = 'block';
-            } else {
-                document.getElementById('previousMonthBlock').style.display = 'none';
-            }
+            displayPodium(data.current.data.slice(0, 3));  // Affiche le podium élégant
+            document.getElementById('currentMonthLeaderboard').innerHTML = createLeaderboardTable(data.current.data.slice(3, dayOfMonth <= 7 ? 10 : 20));
 
             updateLastUpdateTime();  // Mise à jour de l'heure de dernière mise à jour
         }
 
-        function createPodium(topThree) {
-            // Génère le podium en HTML
-            const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd
-            let podiumHtml = '<div class="podium">';
-            podiumOrder.forEach((index, i) => {
-                const user = topThree[index];
-                const position = ['second', 'first', 'third'][i];
-                podiumHtml += `
-                    <div class="podium-step ${position}">
-                        <div class="podium-rank">${user.position}</div>
-                        <div class="podium-nickname">${user.nickname}</div>
-                        <div class="podium-meps">
-                            <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
-                            <span class="meps-value">${formatNumber(user.meps)}</span>
-                            <span class="meps-label">MEPs</span>
-                        </div>
-                    </div>`;
+        function displayPodium(topThree) {
+            const podiumWrapper = document.getElementById('podiumWrapper');
+            podiumWrapper.innerHTML = ''; // Réinitialise le contenu
+
+            const positions = ['second', 'first', 'third'];
+            const orders = [1, 0, 2]; // Pour afficher le podium dans le bon ordre
+
+            orders.forEach((order, index) => {
+                const user = topThree[order];
+                const positionClass = positions[index];
+                const stepDiv = document.createElement('div');
+                stepDiv.classList.add('step', positionClass);
+
+                // Création du profil
+                const profileDiv = document.createElement('div');
+                profileDiv.classList.add('profile');
+
+                // Nom de l'utilisateur
+                const nameDiv = document.createElement('div');
+                nameDiv.classList.add('name');
+                nameDiv.textContent = user.nickname;
+                profileDiv.appendChild(nameDiv);
+
+                // MEPs
+                const mepsDiv = document.createElement('div');
+                mepsDiv.classList.add('podium-meps', positionClass);
+                mepsDiv.textContent = formatNumber(user.meps);
+                profileDiv.appendChild(mepsDiv);
+
+                // Label MEPs
+                const mepsLabelDiv = document.createElement('div');
+                mepsLabelDiv.classList.add('meps-label');
+                mepsLabelDiv.textContent = 'MEPs';
+                profileDiv.appendChild(mepsLabelDiv);
+
+                stepDiv.appendChild(profileDiv);
+
+                // Position
+                const positionDiv = document.createElement('div');
+                positionDiv.classList.add('position');
+                positionDiv.textContent = user.position;
+                stepDiv.appendChild(positionDiv);
+
+                // Icône de statut (remplace le cercle)
+                const statusIconDiv = document.createElement('div');
+                statusIconDiv.classList.add('status-icon-podium');
+                statusIconDiv.style.backgroundImage = `url(${user.iconLink})`;
+                stepDiv.appendChild(statusIconDiv);
+
+                // Ajout des sparkles pour le premier
+                if (positionClass === 'first') {
+                    const sparklesContainer = document.createElement('div');
+                    sparklesContainer.classList.add('sparkles-container');
+
+                    for (let i = 0; i < 12; i++) {
+                        const sparkleDiv = document.createElement('div');
+                        sparkleDiv.classList.add('sparkle');
+                        sparklesContainer.appendChild(sparkleDiv);
+                    }
+
+                    stepDiv.appendChild(sparklesContainer);
+                }
+
+                podiumWrapper.appendChild(stepDiv);
             });
-            podiumHtml += '</div>';
-            return podiumHtml;
+
+            // Animation des sparkles après les animations initiales
+            const steps = document.querySelectorAll('.step');
+            const sparklesContainer = document.querySelector('.sparkles-container');
+            let animationsCompleted = 0;
+
+            steps.forEach(step => {
+                step.addEventListener("animationend", function(event) {
+                    if (event.animationName === 'slideUp') {
+                        animationsCompleted++;
+                        if (animationsCompleted === steps.length) {
+                            if (sparklesContainer) {
+                                sparklesContainer.style.opacity = 1; // Affiche les sparkles
+                            }
+                        }
+                    }
+                });
+            });
         }
 
         function createLeaderboardTable(leaderboardData) {
@@ -428,7 +687,7 @@
                     <div class="leaderboard-row">
                         <span class="rank">${user.position}</span>
                         <span class="nickname">${user.nickname}</span>
-                        <span class="meps">
+                        <span class="leaderboard-meps">
                             <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
                             <span class="meps-value">${formatNumber(user.meps)}</span>
                             <span class="meps-label">MEPs</span>
@@ -459,7 +718,10 @@
             document.getElementById('currentMonthLeaderboard').innerHTML = 'Erreur lors du chargement du leaderboard: ' + error.message;
         }
 
-        window.onload = loadLeaderboard;
+        window.onload = () => {
+            showLoadingOverlay(); // Affiche l'overlay dès le chargement de la page
+            loadLeaderboard();    // Charge les données du leaderboard
+        };
     </script>
 </body>
 </html>
