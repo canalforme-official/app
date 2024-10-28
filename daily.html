@@ -233,7 +233,7 @@
       top: 50%;
       left: 10px;
       right: 10px;
-      display: flex;
+      display: none;
       justify-content: space-between;
       pointer-events: none;
       z-index: 1000;
@@ -475,6 +475,9 @@
     /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
       @media screen and (max-width: 768px) {
         .weekly-view-button {
+          display: flex;
+        }
+        .navigation {
           display: flex;
         }
       }
@@ -975,15 +978,15 @@
 });
 
 
-    function updateCurrentYear() {
+    /*function updateCurrentYear() {
       const currentYear = new Date().getFullYear();
       const footer = document.querySelector('footer');
       if (footer) {
         footer.innerHTML = `<p>MARRAKECH CANAL FORME &copy; ${currentYear}</p>`;
       }
-    }
+    }*/
   </script>
 
-  <footer></footer>
+<footer></footer>
 </body>
 </html>
