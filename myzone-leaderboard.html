@@ -537,7 +537,7 @@
 
         // Fonction pour charger le leaderboard
         function loadLeaderboard() {
-            //fetch('./leaderboard.json')
+            //fetch('https://raw.githubusercontent.com/canalforme-official/app/main/leaderboard.json')
             fetch('https://www.googleapis.com/drive/v3/files/1JS3mDz1YPpQxFsTVwB_T-M3I-1q_tTN0?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
                 .then(response => response.json())
                 .then(data => {
