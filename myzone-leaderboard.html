@@ -1,748 +1,748 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Myzone Leaderboard - Canal Forme</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Myzone Leaderboard - Canal Forme</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* Réinitialisation des marges et des paddings */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+    /* Styles généraux */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      /* Masque la barre de défilement en vue desktop */
+      overflow-y: scroll;
+      scrollbar-width: none; /* Pour Firefox */
+    }
 
-        .container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+    /* Masque la barre de défilement en vue desktop pour les navigateurs Webkit */
+    body::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
 
-        .logo-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 20px 0;
-            background-color: #000000;
-        }
+    .container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-        .logo {
-            max-width: 200px;
-            height: auto;
-        }
+    .logo-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 20px 0;
+      background-color: #000000;
+    }
 
-        .month-block {
-            background-color: #ffffff;
-            color: #000000;
-            padding: 20px;
-            border-radius: 16px 16px 0 0;
-            width: 95%;
-            max-width: 600px;
-            box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
-            margin-top: 10px; /* Réduit la distance avec le titre */
-            position: relative;
-        }
+    .logo {
+      max-width: 200px;
+      height: auto;
+    }
 
-        .month-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ffffff;
-            margin-bottom: -30px;
-            text-align: center;
-        }
+    /* Titre du mois */
+    .month-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #ffffff;
+      margin: 10px 0;
+      text-align: center;
+    }
 
-        .last-update {
-            position: absolute;
-            top: -20px;
-            right: 0;
-            color: #ffffff;
-            font-size: 0.9em;
-            display: none;
-        }
+    /* Bloc du mois */
+    .month-block {
+      background-color: #ffffff;
+      color: #000000;
+      padding: 20px;
+      border-radius: 16px 16px 0 0;
+      width: 95%;
+      max-width: 600px;
+      box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
+      margin-top: -20px;
+      position: relative;
+    }
 
-        .leaderboard {
-            width: 100%;
-        }
+    .last-update {
+      position: absolute;
+      top: -20px;
+      right: 0;
+      color: #ffffff;
+      font-size: 0.9em;
+      display: none;
+    }
 
-        .leaderboard-row {
-            display: flex;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 16px;
-        }
+    /* Styles du leaderboard */
+    .leaderboard {
+      width: 100%;
+    }
 
-        .leaderboard-row:last-child {
-            border-bottom: none;
-        }
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 16px;
+    }
 
-        .rank {
-            font-weight: bold;
-            width: 30px;
-            text-align: left;
-            flex-shrink: 0;
-        }
+    .leaderboard-row:last-child {
+      border-bottom: none;
+    }
 
-        .nickname {
-            flex: 1;
-            text-align: left;
-            padding: 0 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .rank {
+      font-weight: bold;
+      width: 30px;
+      text-align: left;
+      flex-shrink: 0;
+    }
 
-        .leaderboard-meps {
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 4px;
-            min-width: 140px; /* Assure un espace pour l'icône et le texte */
-            max-width: 140px;
-            justify-content: space-between;
-        }
+    .nickname {
+      flex: 1;
+      text-align: left;
+      padding: 0 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-        .leaderboard-meps .status-icon {
-            width: 18px;
-            height: 18px;
-            margin-right: 5px; /* Marge entre l'icône et le texte */
-        }
+    .leaderboard-meps {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 4px;
+      min-width: 140px;
+      max-width: 140px;
+      justify-content: space-between;
+      transition: transform 0.3s ease;
+    }
 
-        .leaderboard-meps .meps-value {
-            margin-right: 5px; /* Ajuste l'espace entre les éléments */
-        }
+    .leaderboard-meps .status-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 5px;
+    }
 
-        .leaderboard-meps .meps-label {
-            font-size: 0.8em;
-            color: #888;
-            text-align: right;
-        }
+    .leaderboard-meps .meps-value {
+      margin-right: 5px;
+    }
 
+    .leaderboard-meps .meps-label {
+      font-size: 0.8em;
+      color: #888;
+      text-align: right;
+    }
 
-        #countdown {
-            font-size: 0.7em; /* Diminue la taille de la police */
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #797979;
-        }
+    #countdown {
+      font-size: 0.7em;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #797979;
+    }
 
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            flex-direction: column;
-        }
+    /* Overlay de chargement */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      flex-direction: column;
+    }
 
-        .loading-logo img {
-            width: 50px;
-            height: 50px;
-            animation: zoom-logo 1.5s ease-in-out infinite;
-        }
+    .loading-logo img {
+      width: 50px;
+      height: 50px;
+      animation: zoom-logo 1.5s ease-in-out infinite;
+    }
 
-        @keyframes zoom-logo {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.5); }
-            100% { transform: scale(1); }
-        }
+    @keyframes zoom-logo {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
 
-        #loadingMessage {
-            margin-top: 50px;
-            font-size: 1.5em;
-            color: #fff;
-            text-align: center;
-            width: 80%;
-            max-width: 600px;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-        }
+    #loadingMessage {
+      margin-top: 50px;
+      font-size: 1.5em;
+      color: #fff;
+      text-align: center;
+      width: 80%;
+      max-width: 600px;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+    }
 
-        .loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #ff0000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
-        }
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ff0000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        /* Styles pour les appareils mobiles */
-        @media (max-width: 600px) {
-            body {
-                font-size: 12px;
-            }
+    /* Styles pour les appareils mobiles */
+    @media (max-width: 600px) {
+      body {
+        font-size: 12px;
+        overflow-y: auto; /* Réactive la barre de défilement sur mobile */
+      }
 
-            .month-block {
-                padding: 15px;
-            }
+      .month-block {
+        padding: 15px;
+      }
 
-            .leaderboard-row {
-                font-size: 14px;
-                padding: 8px 0;
-            }
+      .leaderboard-row {
+        font-size: 14px;
+        padding: 8px 0;
+      }
 
-            .rank {
-                width: 25px;
-            }
+      .rank {
+        width: 25px;
+      }
 
-            .leaderboard-meps .status-icon {
-                width: 18px;
-                height: 18px;
-            }
+      .leaderboard-meps .status-icon {
+        width: 18px;
+        height: 18px;
+      }
 
-            .status-icon {
-                width: 20px;
-                height: 20px;
-            }
-        }
+      .status-icon {
+        width: 20px;
+        height: 20px;
+      }
+    }
 
-        /* Styles pour le podium élégant */
-        .podium-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            gap: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            margin-top: 20px;
-        }
+    /* Styles pour le podium */
+    .podium-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      margin-top: 20px;
+    }
 
-        .step {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-radius: 16px 16px 0 0;
-            text-align: center;
-            width: 130px;
-            transform: translateY(100vh);
-            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            overflow: visible;
-        }
+    .step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 16px 16px 0 0;
+      text-align: center;
+      width: 130px;
+      transform: translateY(100%);
+      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      overflow: visible;
+    }
 
-        .step::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 40%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
-            border-radius: 16px 16px 0 0;
-        }
+    .step.animate {
+      /* Classe pour contrôler l'animation */
+    }
 
-        .step.first {
-            height: 220px;
-            background: linear-gradient(150deg,
-                #FFE5B4 0%,
-                #FFD700 20%,
-                #FFC600 40%,
-                #FFD700 60%,
-                #FDB600 80%,
-                #FFD700 100%
-            );
-            order: 2;
-            animation-delay: 0.4s;
-            overflow: visible;
-        }
+    .step::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+      border-radius: 16px 16px 0 0;
+    }
 
-        .step.second {
-            height: 180px;
-            background: linear-gradient(150deg,
-                #F5F5F5 0%,
-                #C0C0C0 20%,
-                #A8A8A8 40%,
-                #C0C0C0 60%,
-                #989898 80%,
-                #C0C0C0 100%
-            );
-            order: 1;
-            animation-delay: 0.2s;
-        }
+    .step.first {
+      height: 220px;
+      background: linear-gradient(150deg,
+          #FFE5B4 0%,
+          #FFD700 20%,
+          #FFC600 40%,
+          #FFD700 60%,
+          #FDB600 80%,
+          #FFD700 100%
+      );
+      order: 2;
+      animation-delay: 0.4s;
+    }
 
-        .step.third {
-            height: 150px;
-            background: linear-gradient(150deg,
-                #DFA878 0%,
-                #CD7F32 20%,
-                #B87333 40%,
-                #CD7F32 60%,
-                #A66A2E 80%,
-                #CD7F32 100%
-            );
-            order: 3;
-            animation-delay: 0s;
-        }
+    .step.second {
+      height: 180px;
+      background: linear-gradient(150deg,
+          #F5F5F5 0%,
+          #C0C0C0 20%,
+          #A8A8A8 40%,
+          #C0C0C0 60%,
+          #989898 80%,
+          #C0C0C0 100%
+      );
+      order: 1;
+      animation-delay: 0.2s;
+    }
 
-        .sparkles-container {
-            position: absolute;
-            top: -100px;
-            left: 0;
-            width: 100%;
-            height: calc(100% + 100px);
-            pointer-events: none;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
-        }
+    .step.third {
+      height: 150px;
+      background: linear-gradient(150deg,
+          #DFA878 0%,
+          #CD7F32 20%,
+          #B87333 40%,
+          #CD7F32 60%,
+          #A66A2E 80%,
+          #CD7F32 100%
+      );
+      order: 3;
+      animation-delay: 0s;
+    }
 
-        .sparkle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #FFD700;
-            border-radius: 2px;
-            animation: fall 3s linear infinite;
-        }
+    .sparkles-container {
+      position: absolute;
+      top: -100px;
+      left: 0;
+      width: 100%;
+      height: calc(100% + 100px);
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
 
-        .sparkle:nth-child(1) { left: 10%; animation-delay: 0s; }
-        .sparkle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
-        .sparkle:nth-child(3) { left: 30%; animation-delay: 1s; }
-        .sparkle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
-        .sparkle:nth-child(5) { left: 50%; animation-delay: 0.2s; }
-        .sparkle:nth-child(6) { left: 60%; animation-delay: 0.7s; }
-        .sparkle:nth-child(7) { left: 70%; animation-delay: 1.2s; }
-        .sparkle:nth-child(8) { left: 80%; animation-delay: 1.7s; }
-        .sparkle:nth-child(9) { left: 90%; animation-delay: 0.4s; }
-        .sparkle:nth-child(10) { left: 15%; animation-delay: 0.9s; }
-        .sparkle:nth-child(11) { left: 45%; animation-delay: 1.4s; }
-        .sparkle:nth-child(12) { left: 75%; animation-delay: 1.9s; }
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #FFD700;
+      border-radius: 2px;
+      animation: fall 3s linear infinite;
+    }
 
-        .sparkle:nth-child(even) {
-            width: 6px;
-            height: 6px;
-            background: linear-gradient(135deg, #FFD700, #FFF);
-            box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
-        }
+    .sparkle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .sparkle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+    .sparkle:nth-child(3) { left: 30%; animation-delay: 1s; }
+    .sparkle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
+    .sparkle:nth-child(5) { left: 50%; animation-delay: 0.2s; }
+    .sparkle:nth-child(6) { left: 60%; animation-delay: 0.7s; }
+    .sparkle:nth-child(7) { left: 70%; animation-delay: 1.2s; }
+    .sparkle:nth-child(8) { left: 80%; animation-delay: 1.7s; }
+    .sparkle:nth-child(9) { left: 90%; animation-delay: 0.4s; }
+    .sparkle:nth-child(10) { left: 15%; animation-delay: 0.9s; }
+    .sparkle:nth-child(11) { left: 45%; animation-delay: 1.4s; }
+    .sparkle:nth-child(12) { left: 75%; animation-delay: 1.9s; }
 
-        .sparkle:nth-child(3n) {
-            width: 3px;
-            height: 3px;
-            background: #FFF;
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-        }
+    .sparkle:nth-child(even) {
+      width: 6px;
+      height: 6px;
+      background: linear-gradient(135deg, #FFD700, #FFF);
+      box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+    }
 
-        .status-icon-podium {
-            position: absolute;
-            bottom: -6px;
-            right: -6px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            animation: appearWithScale 0.5s ease-out forwards;
-            animation-delay: 2s;
-        }
+    .sparkle:nth-child(3n) {
+      width: 3px;
+      height: 3px;
+      background: #FFF;
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    }
 
-        .profile {
-            position: relative;
-            transform: translateY(20px);
-            opacity: 0;
-            animation: fadeIn 0.5s ease forwards;
-            width: 100%;
-            padding: 0 8px;
-            z-index: 1;
-        }
+    .status-icon {
+        width: 18px;
+        height: 18px;
+        margin-right: 5px;
+        background-size: cover;
+        background-position: center;
+        display: inline-block;
+        background-color: transparent; /* Assure un fond transparent */
+        border: none; /* Assure qu'il n'y a pas de bordure */
+        box-shadow: none; /* Assure qu'il n'y a pas d'ombre */
+    }
 
-        .step.third .profile { animation-delay: 1s; }
-        .step.second .profile { animation-delay: 1.2s; }
-        .step.first .profile { animation-delay: 1.4s; }
+    .status-icon-podium {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      animation: appearWithScale 0.5s ease-out forwards;
+      animation-delay: 2s;
+    }
 
-        .name {
-            font-weight: 600;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-size: 0.9rem;
-            margin: 8px 0 6px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
+    .profile {
+      position: relative;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
+      width: 100%;
+      padding: 0 8px;
+      z-index: 1;
+    }
 
-        .podium-meps {
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            font-weight: 700;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards;
-            background: rgba(0,0,0,0.1);
-            padding: 4px 4px;
-            border-radius: 8px;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: center;
-        }
+    .step.third .profile { animation-delay: 1s; }
+    .step.second .profile { animation-delay: 1.2s; }
+    .step.first .profile { animation-delay: 1.4s; }
 
-        .step.third .podium-meps { animation-delay: 1.5s; }
-        .step.second .podium-meps { animation-delay: 1.7s; }
-        .step.first .podium-meps { animation-delay: 1.9s; }
+    .name {
+      font-weight: 600;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      font-size: 0.9rem;
+      margin: 8px 0 6px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
 
-        .podium-meps.first { font-size: 1.6rem; }
-        .podium-meps.second { font-size: 1.5rem; }
-        .podium-meps.third { font-size: 1.4rem; }
+    .podium-meps {
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      font-weight: 700;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      background: rgba(0,0,0,0.1);
+      padding: 4px 4px;
+      border-radius: 8px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
 
-        .meps-label {
-            font-size: 0.7em;
-            color: white;
-            opacity: 0.9;
-            letter-spacing: 2px;
-            margin-top: 4px;
-            text-transform: uppercase;
-            font-weight: 300;
-        }
+    .step.third .podium-meps { animation-delay: 1.5s; }
+    .step.second .podium-meps { animation-delay: 1.7s; }
+    .step.first .podium-meps { animation-delay: 1.9s; }
 
-        .position {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            font-weight: bold;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            line-height: 0.72;
-            color: rgba(0, 0, 0, 0.01);
-        }
+    .podium-meps.first { font-size: 1.6rem; }
+    .podium-meps.second { font-size: 1.5rem; }
+    .podium-meps.third { font-size: 1.4rem; }
 
-        .step.first .position { font-size: 6rem; }
-        .step.second .position { font-size: 5rem; }
-        .step.third .position { font-size: 4rem; }
+    .meps-label {
+      font-size: 0.7em;
+      color: white;
+      opacity: 0.9;
+      letter-spacing: 2px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
 
-        @keyframes slideUp {
-            from { transform: translateY(100vh); }
-            to { transform: translateY(0); }
-        }
+    .position {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      font-weight: bold;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      line-height: 0.72;
+      color: rgba(0, 0, 0, 0.01);
+    }
 
-        @keyframes fadeIn {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+    .step.first .position { font-size: 6rem; }
+    .step.second .position { font-size: 5rem; }
+    .step.third .position { font-size: 4rem; }
 
-        @keyframes appearWithScale {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
 
-        @keyframes fall {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            20% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(300px) rotate(360deg);
-                opacity: 0;
-            }
-        }
+    @keyframes fadeIn {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
-        @media (min-width: 768px) {
-            .step {
-                width: 150px;
-            }
+    @keyframes appearWithScale {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
 
-            .podium-meps.first { font-size: 1.8rem; }
-            .podium-meps.second { font-size: 1.6rem; }
-            .podium-meps.third { font-size: 1.5rem; }
-        }
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      20% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(300px) rotate(360deg);
+        opacity: 0;
+      }
+    }
 
-        #totalMepsContainer {
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-       
-    </style>
+    @media (min-width: 768px) {
+      .step {
+        width: 150px;
+      }
+
+      .podium-meps.first { font-size: 1.8rem; }
+      .podium-meps.second { font-size: 1.6rem; }
+      .podium-meps.third { font-size: 1.5rem; }
+    }
+
+    #totalMepsContainer {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-    <div id="loadingOverlay" style="display: none;">
-        <div class="loading-logo">
-            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Logo du Club">
-        </div>
-        <div id="loadingMessage">Chargement du leaderboard...</div>
+  <!-- Overlay de chargement -->
+  <div id="loadingOverlay" style="display: none;">
+    <div class="loading-logo">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b2432ed3-7c9d-2bba-4c0b-ba72c2cab56a.png" alt="Logo du Club">
     </div>
-    <div class="logo-container">
-        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Canal Forme Logo" class="logo">
+    <div id="loadingMessage">Chargement du leaderboard...</div>
+  </div>
+
+  <!-- Logo principal -->
+  <div class="logo-container">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Canal Forme Logo" class="logo">
+  </div>
+
+  <!-- Podium du mois actuel -->
+  <div class="podium-wrapper" id="podiumWrapper"></div>
+
+  <!-- Titre du mois actuel -->
+  <div id="currentMonthTitle" class="month-title"></div>
+
+  <!-- Section du mois actuel -->
+  <div class="container" id="currentMonthContainer">
+    <div class="month-block current-month-block">
+      <!-- Compte à rebours -->
+      <div id="countdown" style="display: none;"></div> <!-- Placez le countdown à l'extérieur -->
+      <!-- Leaderboard du mois actuel -->
+      <div id="currentMonthLeaderboard"></div>
     </div>
+  </div>
 
-    <!-- Podium élégant -->
-    <div class="podium-wrapper" id="podiumWrapper">
-        <!-- Le contenu du podium sera inséré dynamiquement par JavaScript -->
+  <!-- Podium du mois précédent -->
+  <div class="podium-wrapper" id="previousPodiumWrapper"></div>
+
+  <!-- Titre du mois précédent -->
+  <div id="previousMonthTitle" class="month-title"></div>
+
+  <!-- Section du mois précédent -->
+  <div class="container" id="previousMonthContainer">
+    <div class="month-block">
+      <!-- Leaderboard du mois précédent -->
+      <div id="previousMonthLeaderboard"></div>
     </div>
+  </div>
 
-    <!--<div id="totalMepsContainer" style="text-align: center; font-weight: bold; font-size: 1.2em; margin: 10px 0;">
-        Total MEPs : <span id="totalMepsValue">0</span> MEPs
-    </div>-->
+  <script>
+    let isFirstLoad = true;
+    let countdownInterval;
+    let previousData = {};
+    let isInitialAnimationDone = false; // Pour contrôler l'animation du podium
 
-    <!-- Titre du mois sous le podium -->
-    <div id="currentMonthTitle" class="month-title"></div>
+    /**
+     * Affiche l'overlay de chargement lors du premier chargement
+     */
+    function showLoadingOverlay() {
+      if (isFirstLoad) {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+      }
+    }
 
+    /**
+     * Cache l'overlay de chargement et affiche le contenu principal
+     */
+    function hideLoadingOverlay() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+      const containers = document.querySelectorAll('.container');
+      containers.forEach(container => container.style.display = 'flex');
+      isFirstLoad = false;
+    }
 
-    <div class="container">
-        <div class="month-block current-month-block">
-            <!-- Compte à rebours à l'intérieur du bloc blanc -->
-            <div id="countdown"></div>
-            <div class="last-update hidden">Dernière mise à jour : <span id="lastUpdateTime"></span></div>
-            <!-- Le leaderboard s'affiche ici -->
-            <div id="currentMonthLeaderboard"></div>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Section pour le mois précédent -->
-        <div class="month-block">
-            <!-- Titre du mois précédent -->
-            <div id="previousMonthTitle" class="month-title"></div>
-            
-            <!-- Podium du mois précédent -->
-            <div class="podium-wrapper" id="previousPodiumWrapper"></div>
-            
-            <!-- Leaderboard des 7 suivants du mois précédent -->
-            <div id="previousLeaderboardWrapper" class="leaderboard">
-                <!-- Le contenu des 7 suivants sera inséré par JavaScript -->
-            </div>
-        </div>
-    </div>
-    
-
-    <script>
-        let isFirstLoad = true;  // Variable pour savoir si c'est le premier chargement
-        let countdownInterval;   // Variable globale pour stocker l'intervalle de compte à rebours
-
-        // Fonction pour afficher l'overlay de chargement uniquement lors du premier chargement
-        function showLoadingOverlay() {
-            if (isFirstLoad) {
-                document.getElementById('loadingOverlay').style.display = 'flex';
-            }
-        }
-
-        // Fonction pour cacher l'overlay de chargement
-        function hideLoadingOverlay() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-            document.querySelector('.container').style.display = 'flex'; // Affiche le contenu principal
-            isFirstLoad = false;
-        }
-
-
-        // Fonction pour vérifier si on est dans les 7 premiers jours du mois
-        function isWithinFirstSevenDays() {
-            const today = new Date();
-            return today.getDate() <= 7;
-        }
-
-
-        // Fonction principale pour charger le leaderboard avec vérification des données
-        function loadLeaderboard() {
-    fetch('./Leaderboard.json')
-    // fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+    /**
+     * Charge le leaderboard depuis le fichier JSON
+     */
+    function loadLeaderboard() {
+      //fetch('./leaderboard.json')
+      fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
         .then(response => response.json())
         .then(data => {
-            if (data.current && data.current.data) {
-                document.getElementById('currentMonthTitle').textContent = 'Leaderboard - ' + data.current.month;
-                displayLeaderboard(data.current.data); // Affiche le leaderboard du mois actuel
-                displayPodium(data.current.data.slice(0, 3)); // Podium du mois en cours
-            } else {
-                console.error("Données du mois actuel manquantes dans le JSON.");
-            }
-
-            // Vérification pour les données du mois précédent
-            if (data.previous && data.previous.data) {
-                document.getElementById('previousMonthTitle').textContent = 'Leaderboard - ' + data.previous.month;
-                displayPreviousPodium(data.previous.data.slice(0, 3)); // Podium du mois précédent
-                displayPreviousLeaderboardTop7(data.previous.data); // Top 7 suivant du mois précédent
-            } else {
-                console.error("Données du mois précédent manquantes ou incorrectes dans le JSON.");
-            }
-
-            if (isFirstLoad) {
-                hideLoadingOverlay();
-            }
-            startCountdown(60);
+          console.log('Données chargées:', data);
+          updateLeaderboard(data);
+          if (isFirstLoad) {
+            hideLoadingOverlay();
+          }
+          startCountdown(60);
         })
         .catch(error => {
-            console.error("Erreur lors du chargement du leaderboard:", error);
-            hideLoadingOverlay();
+          console.error("Erreur lors du chargement du leaderboard:", error);
+          hideLoadingOverlay();
         });
-}
+    }
 
+    /**
+     * Démarre le compte à rebours pour la mise à jour
+     * @param {number} duration Durée en secondes
+     */
+    function startCountdown(duration) {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
 
+      let timer = duration;
+      const countdownElement = document.getElementById('countdown');
 
+      function updateCountdown() {
+        let minutes = Math.floor(timer / 60);
+        let seconds = timer % 60;
 
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
 
+        countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
 
-
-        // Fonction pour afficher le podium du mois précédent
-        function displayPreviousPodium(data) {
-            const podiumWrapper = document.getElementById('previousPodiumWrapper');
-            podiumWrapper.innerHTML = ''; // Réinitialise le contenu
-
-            const positions = ['second', 'first', 'third'];
-            const orders = [1, 0, 2]; // Ordre du podium
-
-            orders.forEach((order, index) => {
-                const user = data[order];
-                const positionClass = positions[index];
-                const stepDiv = document.createElement('div');
-                stepDiv.classList.add('step', positionClass);
-
-                // Profil
-                const profileDiv = document.createElement('div');
-                profileDiv.classList.add('profile');
-
-                // Nom et MEPs
-                const nameDiv = document.createElement('div');
-                nameDiv.classList.add('name');
-                nameDiv.textContent = user.nickname;
-                profileDiv.appendChild(nameDiv);
-
-                const mepsDiv = document.createElement('div');
-                mepsDiv.classList.add('podium-meps', positionClass);
-                mepsDiv.textContent = formatNumber(user.meps);
-                profileDiv.appendChild(mepsDiv);
-
-                stepDiv.appendChild(profileDiv);
-                podiumWrapper.appendChild(stepDiv);
-            });
+        if (--timer < 0) {
+          clearInterval(countdownInterval);
+          loadLeaderboard();
         }
+      }
 
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
 
-        // Fonction pour démarrer le compte à rebours
-        function startCountdown(duration) {
-            // Annule l'intervalle existant si un compte à rebours est déjà en cours
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-
-            let timer = duration;
-            const countdownElement = document.getElementById('countdown');
-
-            function updateCountdown() {
-                let minutes = Math.floor(timer / 60);
-                let seconds = timer % 60;
-
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
-
-                if (--timer < 0) {
-                    clearInterval(countdownInterval);
-                    loadLeaderboard();  // Recharge le leaderboard à la fin du compte à rebours
-                }
-            }
-
-            updateCountdown();  // Mise à jour immédiate
-            countdownInterval = setInterval(updateCountdown, 1000);  // Met à jour chaque seconde
-        }
-
-        function calculateTotalMEPS(data) {
-            return formatNumber(data.reduce((total, user) => total + user.meps, 0));
-        }
-
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-        }
-
-        // Fonction pour afficher le leaderboard avec podium
-
-function displayLeaderboard(data) {
-    const leaderboardContainer = document.getElementById('currentMonthLeaderboard');
-
-    // Détermine le nombre de lignes à afficher en fonction du jour actuel
+    /**
+     * Met à jour le leaderboard avec les nouvelles données
+     * @param {Object} data Données du leaderboard
+     */
+     function updateLeaderboard(data) {
     const today = new Date();
     const dayOfMonth = today.getDate();
-    const topEntries = dayOfMonth <= 7 ? 10 : 20;
 
-    // Affiche uniquement les 10 ou 20 premiers, selon le jour du mois
-    leaderboardContainer.innerHTML = createLeaderboardTable(data.slice(0, topEntries));
+    // Vérifie si le mois actuel doit être affiché
+    if (data.current && data.current.data && !allMepsZero(data.current.data)) {
+        const currentMonthTitle = formatMonthTitle(data.current.month);
+        document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
+        
+        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
+        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current');
+        
+        document.getElementById('currentMonthContainer').style.display = 'flex';
+        document.getElementById('podiumWrapper').style.display = 'flex';
+        document.getElementById('currentMonthTitle').style.display = 'block';
+        
+        // Affiche le countdown uniquement si des MEPs existent
+        document.getElementById('countdown').style.display = 'block';
+    } else {
+        // Masque complètement le conteneur du mois actuel si les MEPs sont tous à zéro
+        document.getElementById('currentMonthContainer').style.display = 'none';
+        document.getElementById('currentMonthTitle').style.display = 'none';
+        document.getElementById('podiumWrapper').style.display = 'none';
+        
+        // Masque également le countdown
+        document.getElementById('countdown').style.display = 'none';
+    }
+
+    // Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
+    if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.previous.data)) {
+        const previousMonthTitle = formatMonthTitle(data.previous.month);
+        document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
+        
+        displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
+        displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+        
+        document.getElementById('previousMonthContainer').style.display = 'flex';
+        document.getElementById('previousPodiumWrapper').style.display = 'flex';
+        document.getElementById('previousMonthTitle').style.display = 'block';
+    } else {
+        document.getElementById('previousMonthContainer').style.display = 'none';
+        document.getElementById('previousMonthTitle').style.display = 'none';
+        document.getElementById('previousPodiumWrapper').style.display = 'none';
+    }
+
+    previousData = data;
 }
 
-function displayPreviousLeaderboardTop7(data) {
-    const leaderboardWrapper = document.getElementById('previousLeaderboardWrapper');
-    leaderboardWrapper.innerHTML = ''; // Réinitialise le contenu
 
-    data.slice(3, 10).forEach(user => {
-        const leaderboardRow = document.createElement('div');
-        leaderboardRow.classList.add('leaderboard-row'); // Assurez-vous que le style correspond à celui du mois en cours
+    /**
+     * Formate le titre du mois en fonction de la première lettre
+     * @param {string} month Nom du mois
+     * @returns {string} Titre formaté
+     */
+    function formatMonthTitle(month) {
+      const vowels = ['A', 'E', 'I', 'O', 'U', 'Y'];
+      const firstLetter = month.trim().charAt(0).toUpperCase();
+      const article = vowels.includes(firstLetter) ? "d'" : "de ";
+      return `Leaderboard du mois ${article}${month}`;
+    }
 
-        const rankSpan = document.createElement('span');
-        rankSpan.classList.add('rank');
-        rankSpan.textContent = `#${user.position}`;
-        leaderboardRow.appendChild(rankSpan);
+    /**
+     * Vérifie si tous les utilisateurs ont des MEPs nuls ou indéfinis
+     * @param {Array} data Données du leaderboard
+     * @returns {boolean}
+     */
+    function allMepsZero(data) {
+      return data.every(user => !user.meps || user.meps === 0);
+    }
 
-        const nameDiv = document.createElement('span');
-        nameDiv.classList.add('nickname');
-        nameDiv.textContent = user.nickname;
-        leaderboardRow.appendChild(nameDiv);
+    /**
+     * Affiche le podium
+     * @param {Array} topThree Les trois premiers utilisateurs
+     * @param {string} podiumWrapperId ID du conteneur du podium
+     * @param {string} period Période (current ou previous)
+     */
+    function displayPodium(topThree, podiumWrapperId, period) {
+      const podiumWrapper = document.getElementById(podiumWrapperId);
+      podiumWrapper.innerHTML = '';
 
-        const mepsDiv = document.createElement('span');
-        mepsDiv.classList.add('leaderboard-meps');
-        mepsDiv.innerHTML = `
-            <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
-            <span class="meps-value">${formatNumber(user.meps)}</span>
-            <span class="meps-label">MEPs</span>
-        `;
-        leaderboardRow.appendChild(mepsDiv);
+      const positions = ['second', 'first', 'third'];
+      const orders = [1, 0, 2];
 
-        leaderboardWrapper.appendChild(leaderboardRow);
-    });
-}
-
-
-
-
-function displayPodium(topThree) {
-    const podiumWrapper = document.getElementById('podiumWrapper');
-    podiumWrapper.innerHTML = ''; // Réinitialise le contenu
-
-    const positions = ['second', 'first', 'third'];
-    const orders = [1, 0, 2]; // Pour afficher le podium dans le bon ordre
-
-    orders.forEach((order, index) => {
+      orders.forEach((order, index) => {
         const user = topThree[order];
         const positionClass = positions[index];
         const stepDiv = document.createElement('div');
         stepDiv.classList.add('step', positionClass);
+
+        // Ajoute la classe 'animate' uniquement lors du premier chargement
+        if (isFirstLoad) {
+          stepDiv.classList.add('animate');
+        } else {
+          stepDiv.style.transform = 'translateY(0)';
+        }
 
         const profileDiv = document.createElement('div');
         profileDiv.classList.add('profile');
@@ -755,6 +755,7 @@ function displayPodium(topThree) {
         const mepsDiv = document.createElement('div');
         mepsDiv.classList.add('podium-meps', positionClass);
         mepsDiv.textContent = formatNumber(user.meps);
+        mepsDiv.setAttribute('data-meps', user.meps);
         profileDiv.appendChild(mepsDiv);
 
         const mepsLabelDiv = document.createElement('div');
@@ -769,84 +770,164 @@ function displayPodium(topThree) {
         positionDiv.textContent = user.position;
         stepDiv.appendChild(positionDiv);
 
-        const statusIconDiv = document.createElement('div');
-        statusIconDiv.classList.add('status-icon-podium');
-        statusIconDiv.style.backgroundImage = `url(${user.iconLink})`;
-        stepDiv.appendChild(statusIconDiv);
+        // Affiche l'icône de statut uniquement si elle est définie
+        if (user.iconLink) {
+          const statusIconDiv = document.createElement('div');
+          statusIconDiv.classList.add('status-icon-podium');
+          statusIconDiv.style.backgroundImage = `url(${user.iconLink})`;
+          stepDiv.appendChild(statusIconDiv);
+        }
 
+        // Toujours afficher les étincelles pour le premier
         if (positionClass === 'first') {
-            const sparklesContainer = document.createElement('div');
-            sparklesContainer.classList.add('sparkles-container');
-            for (let i = 0; i < 12; i++) {
-                const sparkleDiv = document.createElement('div');
-                sparkleDiv.classList.add('sparkle');
-                sparklesContainer.appendChild(sparkleDiv);
-            }
-            stepDiv.appendChild(sparklesContainer);
+          const sparklesContainer = document.createElement('div');
+          sparklesContainer.classList.add('sparkles-container');
+          sparklesContainer.style.opacity = '0'; // Commence invisible
+
+          for (let i = 0; i < 12; i++) {
+            const sparkleDiv = document.createElement('div');
+            sparkleDiv.classList.add('sparkle');
+            sparklesContainer.appendChild(sparkleDiv);
+          }
+          stepDiv.appendChild(sparklesContainer);
         }
 
         podiumWrapper.appendChild(stepDiv);
-    });
+      });
 
-    const steps = document.querySelectorAll('.step');
-    const sparklesContainer = document.querySelector('.sparkles-container');
-    let animationsCompleted = 0;
+      if (isFirstLoad) {
+        const steps = podiumWrapper.querySelectorAll('.step.animate');
+        const sparklesContainer = podiumWrapper.querySelector('.sparkles-container');
+        let animationsCompleted = 0;
 
-    steps.forEach(step => {
-        step.addEventListener("animationend", function(event) {
+        steps.forEach(step => {
+          step.addEventListener("animationend", function(event) {
             if (event.animationName === 'slideUp') {
-                animationsCompleted++;
-                if (animationsCompleted === steps.length && sparklesContainer) {
-                    sparklesContainer.style.opacity = 1;
-                }
+              animationsCompleted++;
+              if (animationsCompleted === steps.length && sparklesContainer) {
+                // Affiche les étincelles après l'animation du podium
+                sparklesContainer.style.opacity = '1';
+              }
             }
+          });
         });
-    });
-}
-
-
-        function createLeaderboardTable(leaderboardData) {
-            var tableHtml = '<div class="leaderboard">';
-            leaderboardData.forEach(function(user) {
-                tableHtml += `
-                    <div class="leaderboard-row">
-                        <span class="rank">${user.position}</span>
-                        <span class="nickname">${user.nickname}</span>
-                        <span class="leaderboard-meps">
-                            <img src="${user.iconLink}" alt="${user.status}" class="status-icon">
-                            <span class="meps-value">${formatNumber(user.meps)}</span>
-                            <span class="meps-label">MEPs</span>
-                        </span>
-                    </div>`;
-            });
-            tableHtml += '</div>';
-            return tableHtml;
+      } else {
+        // Affiche les étincelles immédiatement si ce n'est pas le premier chargement
+        const sparklesContainer = podiumWrapper.querySelector('.sparkles-container');
+        if (sparklesContainer) {
+          sparklesContainer.style.opacity = '1';
         }
+      }
 
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      // Animation des MEPs si les données ont changé
+      animateMepsChanges(topThree, period, true);
+    }
+
+    /**
+     * Affiche le leaderboard
+     * @param {Array} data Données du leaderboard
+     * @param {string} leaderboardId ID du conteneur du leaderboard
+     * @param {string} period Période (current ou previous)
+     */
+    function displayLeaderboard(data, leaderboardId, period) {
+      const leaderboardContainer = document.getElementById(leaderboardId);
+
+      const today = new Date();
+      const dayOfMonth = today.getDate();
+      const topEntries = dayOfMonth <= 7 ? 10 : 20;
+
+      const leaderboardData = data.slice(3, topEntries);
+
+      leaderboardContainer.innerHTML = createLeaderboardTable(leaderboardData, period);
+    }
+
+    /**
+     * Crée le tableau du leaderboard
+     * @param {Array} leaderboardData Données du leaderboard
+     * @param {string} period Période (current ou previous)
+     * @returns {string} HTML du tableau
+     */
+     function createLeaderboardTable(leaderboardData) {
+        var tableHtml = '<div class="leaderboard">';
+        leaderboardData.forEach(function(user) {
+            tableHtml += `
+                <div class="leaderboard-row">
+                    <span class="rank">${user.position}</span>
+                    <span class="nickname">${user.nickname}</span>
+                    <span class="leaderboard-meps">
+                        <span class="status-icon" style="background-image: url(${user.iconLink || ''});"></span>
+                        <span class="meps-value">${formatNumber(user.meps)}</span>
+                        <span class="meps-label">MEPs</span>
+                    </span>
+                </div>`;
+        });
+        tableHtml += '</div>';
+        return tableHtml;
+    }
+
+
+    /**
+     * Formate un nombre avec des espaces
+     * @param {number} num Nombre à formater
+     * @returns {string} Nombre formaté
+     */
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    /**
+     * Anime les changements de MEPs
+     * @param {Array} newData Nouvelles données
+     * @param {string} period Période (current ou previous)
+     * @param {boolean} isPodium Indique si c'est pour le podium
+     */
+    function animateMepsChanges(newData, period, isPodium = false) {
+      if (!previousData[period] || !previousData[period].data) return;
+
+      const oldData = previousData[period].data;
+
+      newData.forEach((user, index) => {
+        const oldUser = oldData.find(u => u.nickname === user.nickname);
+        if (oldUser && user.meps > oldUser.meps) {
+          const mepsElements = document.querySelectorAll(`[data-meps="${user.meps}"]`);
+
+          mepsElements.forEach(element => {
+            // Animation de l'incrémentation des chiffres
+            animateValue(element.querySelector('.meps-value'), oldUser.meps, user.meps, 1000);
+            // Zoom sur le bloc
+            element.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+              element.style.transform = 'scale(1)';
+            }, 1000);
+          });
         }
+      });
+    }
 
-        function updateLastUpdateTime() {
-            var now = new Date();
-            var formattedTime = now.toLocaleString('fr-FR', { 
-                year: 'numeric', 
-                month: 'numeric', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            document.getElementById('lastUpdateTime').textContent = formattedTime;
+    /**
+     * Anime la valeur numérique
+     * @param {HTMLElement} obj Élément DOM
+     * @param {number} start Valeur de départ
+     * @param {number} end Valeur de fin
+     * @param {number} duration Durée de l'animation
+     */
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.textContent = formatNumber(Math.floor(progress * (end - start) + start));
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
         }
+      };
+      window.requestAnimationFrame(step);
+    }
 
-        function handleError(error) {
-            document.getElementById('currentMonthLeaderboard').innerHTML = 'Erreur lors du chargement du leaderboard: ' + error.message;
-        }
-
-        window.onload = () => {
-            showLoadingOverlay(); // Affiche l'overlay dès le chargement de la page
-            loadLeaderboard();    // Charge les données du leaderboard
-        };
-    </script>
+    window.onload = () => {
+      showLoadingOverlay();
+      loadLeaderboard();
+    };
+  </script>
 </body>
 </html>
