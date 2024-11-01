@@ -513,9 +513,48 @@
       font-size: 1.2em;
       margin-bottom: 10px;
     }
+
+    .pull-to-refresh {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(0);
+  transform-origin: top;
+  transition: transform 0.3s ease-out;
+  z-index: 1000;
+}
+
+.pull-to-refresh.loading {
+  transform: scale(1);
+}
+
+.pull-to-refresh .loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #ff0000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
   </style>
 </head>
 <body>
+  <!-- pull to refresh -->
+  <div id="pullToRefresh" class="pull-to-refresh">
+    <div class="loading-spinner"></div>
+  </div>
+
   <!-- Overlay de chargement -->
   <div id="loadingOverlay" style="display: none;">
     <div class="loading-logo">
@@ -560,6 +599,44 @@
   </div>
 
   <script>
+
+    /* code pour mise à jour avec tirage*/
+
+    let startY = 0;
+    let isPulling = false;
+    const pullThreshold = 80;
+
+    document.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].pageY;
+    });
+
+    document.addEventListener("touchmove", (e) => {
+      const currentY = e.touches[0].pageY;
+      const pullDistance = currentY - startY;
+
+      if (pullDistance > pullThreshold) {
+        isPulling = true;
+        document.getElementById('pullToRefresh').style.transform = `scale(${Math.min(pullDistance / pullThreshold, 1)})`;
+      }
+    });
+
+    document.addEventListener("touchend", () => {
+      if (isPulling) {
+        document.getElementById('pullToRefresh').classList.add("loading");
+        loadLeaderboard(); // Appel de la fonction pour rafraîchir les données
+      }
+      isPulling = false;
+      setTimeout(() => {
+        document.getElementById('pullToRefresh').classList.remove("loading");
+        document.getElementById('pullToRefresh').style.transform = "scale(0)";
+      }, 1000); // Attendre la fin de l'animation de repli
+    });
+
+
+
+
+
+
     let isFirstLoad = true;
     let countdownInterval;
     let previousData = {};
