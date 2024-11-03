@@ -474,6 +474,9 @@
 
     /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
       @media screen and (max-width: 768px) {
+        .weekly-view-button {
+          display: flex;
+        }
         .navigation {
           display: flex;
         }
@@ -504,7 +507,8 @@
 .today-view-button {
   display:none;
   position: fixed;
-  bottom: 20px;
+  botton:20px;
+  /*top: 80px !important;*/
   right: 10px;
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.5); /* Bouton noir transparent */
@@ -742,9 +746,10 @@
         document.getElementById('loadingOverlay').style.display = 'none';
         
         // Vérifie si la largeur de l'écran est inférieure ou égale à 768px (mobile)
-        if (window.innerWidth <= 768) {
-            document.querySelector('.weekly-view-button').style.display = 'flex'; // Affiche le bouton
-        }
+        //if (window.innerWidth <= 768) {
+            //console.log('Affichage du bouton weekly-view pour mobile');
+            //document.querySelector('.weekly-view-button').style.display = 'flex'; // Affiche le bouton
+        //}
 
         // Activer les compte à rebours et le défilement pour le jour actuel
         if (isToday(currentDayIndex)) {
@@ -1023,7 +1028,7 @@
 
     function initializePage() {
       fetchAllData();
-      updateCurrentYear();
+      //updateCurrentYear();
     }
 
     /*document.addEventListener('DOMContentLoaded', function () {
