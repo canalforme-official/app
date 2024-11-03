@@ -132,7 +132,7 @@
   bottom: 20px;
   right: 10px;
   z-index: 1000;
-  background-color: rgba(255, 255, 255, 0.5); /* Bouton noir transparent */
+  background-color: rgba(0, 0, 0, 0.5); /* Bouton noir transparent */
   padding: 8px; /* Réduction de la zone cliquable */
   border-radius: 50%;
   display: flex;
@@ -142,7 +142,7 @@
   transition: background-color 0.3s ease-in-out;
   width: 50px; /* Réduction de la largeur du bouton */
   height: 50px; /* Réduction de la hauteur du bouton */
-  box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);
+  /*box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.5), 0 0 45px rgba(255, 0, 0, 0.3);*/
   animation: auraPulse 1.5s ease-in-out infinite; /* Effet de pulsation de l'aura rouge */
   display: none; /* Masque le bouton par défaut */
 }
@@ -154,7 +154,7 @@
   height: 35px;
   border-radius: 50%; /* Cercle parfait */
   position: absolute;
-  border: 3px solid rgba(255, 0, 0, 0.7); /* Bord rouge */
+  border: 3px solid rgba(255, 255, 255, 0.7); /* Bord rouge */
   box-sizing: border-box;
   top: 50%;
   left: 50%;
@@ -168,7 +168,7 @@
   content: '';
   width: 11px; /* Taille réduite du cercle intérieur */
   height: 11px;
-  background-color: rgba(255, 0, 0, 0.7); /* Cercle plein rouge */
+  background-color: rgba(255, 255, 255, 0.7); /* Cercle plein rouge */
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -181,13 +181,13 @@
 /* Animation pour l'aura */
 @keyframes auraPulse {
   0% {
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4), 0 0 45px rgba(255, 0, 0, 0.2);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.3), 0 0 45px rgba(0, 0, 0, 0.1);
   }
   50% {
-    box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.6), 0 0 55px rgba(255, 0, 0, 0.3);
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.4), 0 0 40px rgba(255, 0, 0, 0.2), 0 0 55px rgba(255, 0, 0, 0.1);
   }
   100% {
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4), 0 0 45px rgba(255, 0, 0, 0.2);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.3), 0 0 45px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -461,7 +461,7 @@
 
     .content-wrapper {
       flex: 1; /* Permet à .content-wrapper d'occuper tout l'espace vertical */
-      overflow-y: hidden;
+      overflow-y: auto;
       overflow-x: hidden;
       height: 80vh; /* Ajustez cette hauteur selon votre besoin */
       padding: 10px;
@@ -760,6 +760,7 @@
         }
 
         // Sinon, on fait un fetch pour obtenir les nouvelles données
+        //return fetch('testweeklydata.json')
         return fetch('https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
           .then(response => response.json())
           .then(data => {
