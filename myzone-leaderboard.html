@@ -627,12 +627,31 @@
     const loadingSpinner = pullToRefreshElement.querySelector('.loading-spinner');
     const refreshText = document.getElementById('refreshText');
 
-    // Fonction pour masquer et réinitialiser l'indicateur de tirage
+    // Fonction pour réinitialiser l'indicateur de tirage
     function resetPullToRefresh() {
       loadingSpinner.classList.remove("active");
-      pullToRefreshElement.classList.remove("show");
-      pullToRefreshElement.style.transform = "translateY(-80px)";
+      pullToRefreshElement.style.top = "-80px"; // Cache l’indicateur
       refreshText.textContent = "Tirez vers le bas pour mettre à jour";
+    }
+
+    // Fonction pour simuler la mise à jour des données
+    function performRefresh() {
+      loadLeaderboard(); // Recharge le fichier JSON et met à jour l'affichage
+      resetCountdown(); // Redémarre le compteur
+      resetPullToRefresh(); // Cache l'indicateur
+    }
+
+    // Fonction pour redémarrer le compteur de rafraîchissement automatique
+    function resetCountdown() {
+      clearInterval(countdownInterval); // Arrête le compteur existant
+      timer = 60; // Réinitialise le compteur à 60 secondes
+      countdownInterval = setInterval(() => {
+        timer--;
+        if (timer <= 0) {
+          loadLeaderboard(); // Recharge automatiquement après 60 secondes
+          timer = 60; // Réinitialise le compteur
+        }
+      }, 1000); // Décrémente chaque seconde
     }
 
     // Détecte le début du tirage
@@ -647,8 +666,7 @@
       const pullDistance = currentY - startY;
 
       if (pullDistance > 20) {
-        pullToRefreshElement.classList.add("show");
-        pullToRefreshElement.style.transform = `translateY(${Math.min(pullDistance - 20, pullThreshold)}px)`;
+        pullToRefreshElement.style.top = `${Math.min(pullDistance - 20, 80)}px`; // Fait glisser l’indicateur
       }
 
       if (pullDistance > pullThreshold) {
@@ -656,22 +674,22 @@
       }
     });
 
-    // Gère la fin du tirage et le rafraîchissement
+    // Gère la fin du tirage et lance la mise à jour
     document.addEventListener("touchend", () => {
       if (isPulling) {
-        loadingSpinner.classList.add("active");
         refreshText.textContent = "Mise à jour...";
+        loadingSpinner.classList.add("active");
+        pullToRefreshElement.style.top = "0"; // Fixe l’indicateur en haut
 
-        // Simule la mise à jour des données
-        setTimeout(() => {
-          resetPullToRefresh(); // Réinitialise après la mise à jour
-          console.log("Page mise à jour"); // Indicateur de mise à jour (à remplacer par un appel de rafraîchissement réel si nécessaire)
-        }, 1500);
+        // Exécute la fonction de rafraîchissement
+        performRefresh();
       } else {
         resetPullToRefresh();
       }
-      isPulling = false; // Réinitialise l'état du tirage
+      isPulling = false; // Réinitialise l’état du tirage
     });
+
+
 
 
 
@@ -1037,6 +1055,7 @@
     window.onload = () => {
       showLoadingOverlay();
       loadLeaderboard();
+      resetCountdown();
     };
   </script>
 </body>
