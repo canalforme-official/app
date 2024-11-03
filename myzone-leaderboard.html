@@ -569,7 +569,6 @@
 <body>
   <!-- pull to refresh -->
   <div id="pullToRefresh" class="pull-to-refresh">
-    Tirez vers le bas pour mettre à jour
     <div class="loading-spinner"></div>
   </div>
 
@@ -622,43 +621,48 @@
     // Variables pour le tirage et l'élément de rafraîchissement
     let startY = 0;
     let isPulling = false;
-    const pullThreshold = 120; // Distance de tirage nécessaire en pixels
+    const pullThreshold = 120; // Distance de tirage nécessaire
+    let timer = 60;
 
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Fonction pour redémarrer le compteur de rafraîchissement automatique
+    function resetCountdown() {
+      clearInterval(countdownInterval);
+      timer = 60;
+      countdownInterval = setInterval(() => {
+        timer--;
+        if (timer <= 0) {
+          loadLeaderboard(); // Recharge automatiquement après 60 secondes
+          timer = 60;
+        }
+      }, 1000);
+    }
+
+    // Détecte le début du tirage
     document.addEventListener("touchstart", (e) => {
       startY = e.touches[0].pageY;
-      isPulling = false; // Réinitialise l'état de tirage
+      isPulling = false;
     });
 
+    // Gère le tirage vers le bas
     document.addEventListener("touchmove", (e) => {
       const currentY = e.touches[0].pageY;
       const pullDistance = currentY - startY;
 
-      // Affiche un indicateur visuel si le tirage dépasse 20px
-      if (pullDistance > 20) {
-          document.getElementById('pullToRefresh').style.transform = `translateY(${Math.min(pullDistance - 20, pullThreshold)}px)`;
-      }
-
       // Marque pour le chargement lorsque le seuil est atteint
       if (pullDistance > pullThreshold) {
-          isPulling = true;
+        isPulling = true;
       }
     });
 
+    // Gère la fin du tirage et lance la mise à jour
     document.addEventListener("touchend", () => {
       if (isPulling) {
-          // Déclenche le chargement et le reset de l'indicateur
-          document.getElementById('pullToRefresh').classList.add("loading");
-          loadLeaderboard(); // Appelle votre fonction de chargement JSON ou mise à jour
+        loadLeaderboard(); // Rafraîchit le contenu
       }
-
-      // Réinitialise l'indicateur de tirage après un court délai
-      setTimeout(() => {
-          document.getElementById('pullToRefresh').classList.remove("loading");
-          document.getElementById('pullToRefresh').style.transform = "translateY(0)";
-      }, 1000);
+      isPulling = false;
     });
-
-
 
 
 
