@@ -514,44 +514,61 @@
       margin-bottom: 10px;
     }
 
+    /* Style pour l'indicateur de tirage vers le bas */
     .pull-to-refresh {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  background: rgba(0, 0, 0, 0.8);
-  transform: scale(0);
-  transform-origin: top;
-  transition: transform 0.3s ease-out;
-  z-index: 1000;
-}
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 14px;
+      transform: translateY(-60px);
+      transition: transform 0.3s ease-out;
+      z-index: 1000;
+    }
 
-.pull-to-refresh.loading {
-  transform: scale(1);
-}
+    .pull-to-refresh.show {
+      transform: translateY(0);
+    }
 
-.pull-to-refresh .loading-spinner {
-  width: 30px;
-  height: 30px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #ff0000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ff0000;
+      border-radius: 50%;
+      margin-left: 10px;
+      display: none;
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    .loading-spinner.active {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    * {
+      user-select: none;
+      -webkit-user-select: none; /* Chrome, Safari, Opera */
+      -moz-user-select: none;    /* Firefox */
+      -ms-user-select: none;     /* Internet Explorer/Edge */
+    }
 
   </style>
 </head>
 <body>
   <!-- pull to refresh -->
   <div id="pullToRefresh" class="pull-to-refresh">
+    Tirez vers le bas pour mettre à jour
     <div class="loading-spinner"></div>
   </div>
 
@@ -601,35 +618,54 @@
   <script>
 
     /* code pour mise à jour avec tirage*/
-
+    // Variables pour le tirage et l'élément de rafraîchissement
     let startY = 0;
     let isPulling = false;
-    const pullThreshold = 80;
+    const pullThreshold = 120; // Seuil de tirage requis en pixels
+    const pullToRefreshElement = document.getElementById('pullToRefresh');
+    const loadingSpinner = pullToRefreshElement.querySelector('.loading-spinner');
 
     document.addEventListener("touchstart", (e) => {
       startY = e.touches[0].pageY;
+      isPulling = false; // Reset du tirage
     });
 
     document.addEventListener("touchmove", (e) => {
       const currentY = e.touches[0].pageY;
       const pullDistance = currentY - startY;
 
+      // Affiche l'indicateur de tirage si on dépasse 20px
+      if (pullDistance > 20) {
+        pullToRefreshElement.classList.add("show");
+        pullToRefreshElement.style.transform = `translateY(${Math.min(pullDistance - 20, pullThreshold)}px)`;
+      }
+
+      // Si le seuil de tirage est atteint, marquer pour mise à jour
       if (pullDistance > pullThreshold) {
         isPulling = true;
-        document.getElementById('pullToRefresh').style.transform = `scale(${Math.min(pullDistance / pullThreshold, 1)})`;
       }
     });
 
     document.addEventListener("touchend", () => {
       if (isPulling) {
-        document.getElementById('pullToRefresh').classList.add("loading");
-        loadLeaderboard(); // Appel de la fonction pour rafraîchir les données
+        // Démarre le rafraîchissement une fois le seuil atteint
+        loadingSpinner.classList.add("active");
+        pullToRefreshElement.querySelector("span").textContent = "Mise à jour...";
+
+        // Fonction pour simuler le rafraîchissement des données
+        setTimeout(() => {
+          // Arrêter l'animation et réinitialiser
+          loadingSpinner.classList.remove("active");
+          pullToRefreshElement.classList.remove("show");
+          pullToRefreshElement.style.transform = "translateY(-60px)";
+          pullToRefreshElement.querySelector("span").textContent = "Tirez vers le bas pour mettre à jour";
+        }, 1500); // Délai de rafraîchissement
+      } else {
+        // Si le seuil n'est pas atteint, cacher l'indicateur de tirage
+        pullToRefreshElement.classList.remove("show");
+        pullToRefreshElement.style.transform = "translateY(-60px)";
       }
-      isPulling = false;
-      setTimeout(() => {
-        document.getElementById('pullToRefresh').classList.remove("loading");
-        document.getElementById('pullToRefresh').style.transform = "scale(0)";
-      }, 1000); // Attendre la fin de l'animation de repli
+      isPulling = false; // Réinitialise l'état du tirage
     });
 
 
