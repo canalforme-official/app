@@ -622,72 +622,44 @@
     // Variables pour le tirage et l'élément de rafraîchissement
     let startY = 0;
     let isPulling = false;
-    const pullThreshold = 120;
-    const pullToRefreshElement = document.getElementById('pullToRefresh');
-    const loadingSpinner = pullToRefreshElement.querySelector('.loading-spinner');
-    const refreshText = document.getElementById('refreshText');
+    const pullThreshold = 120; // Distance de tirage nécessaire en pixels
 
-    // Fonction pour réinitialiser l'indicateur de tirage
-    function resetPullToRefresh() {
-      loadingSpinner.classList.remove("active");
-      pullToRefreshElement.style.top = "-80px"; // Cache l’indicateur
-      refreshText.textContent = "Tirez vers le bas pour mettre à jour";
-    }
-
-    // Fonction pour simuler la mise à jour des données
-    function performRefresh() {
-      loadLeaderboard(); // Recharge le fichier JSON et met à jour l'affichage
-      resetCountdown(); // Redémarre le compteur
-      resetPullToRefresh(); // Cache l'indicateur
-    }
-
-    // Fonction pour redémarrer le compteur de rafraîchissement automatique
-    function resetCountdown() {
-      clearInterval(countdownInterval); // Arrête le compteur existant
-      timer = 60; // Réinitialise le compteur à 60 secondes
-      countdownInterval = setInterval(() => {
-        timer--;
-        if (timer <= 0) {
-          loadLeaderboard(); // Recharge automatiquement après 60 secondes
-          timer = 60; // Réinitialise le compteur
-        }
-      }, 1000); // Décrémente chaque seconde
-    }
-
-    // Détecte le début du tirage
     document.addEventListener("touchstart", (e) => {
       startY = e.touches[0].pageY;
-      isPulling = false; // Réinitialise le tirage
+      isPulling = false; // Réinitialise l'état de tirage
     });
 
-    // Gère le tirage vers le bas
     document.addEventListener("touchmove", (e) => {
       const currentY = e.touches[0].pageY;
       const pullDistance = currentY - startY;
 
+      // Affiche un indicateur visuel si le tirage dépasse 20px
       if (pullDistance > 20) {
-        pullToRefreshElement.style.top = `${Math.min(pullDistance - 20, 80)}px`; // Fait glisser l’indicateur
+          document.getElementById('pullToRefresh').style.transform = `translateY(${Math.min(pullDistance - 20, pullThreshold)}px)`;
       }
 
+      // Marque pour le chargement lorsque le seuil est atteint
       if (pullDistance > pullThreshold) {
-        isPulling = true;
+          isPulling = true;
       }
     });
 
-    // Gère la fin du tirage et lance la mise à jour
     document.addEventListener("touchend", () => {
       if (isPulling) {
-        refreshText.textContent = "Mise à jour...";
-        loadingSpinner.classList.add("active");
-        pullToRefreshElement.style.top = "0"; // Fixe l’indicateur en haut
-
-        // Exécute la fonction de rafraîchissement
-        performRefresh();
-      } else {
-        resetPullToRefresh();
+          // Déclenche le chargement et le reset de l'indicateur
+          document.getElementById('pullToRefresh').classList.add("loading");
+          loadLeaderboard(); // Appelle votre fonction de chargement JSON ou mise à jour
       }
-      isPulling = false; // Réinitialise l’état du tirage
+
+      // Réinitialise l'indicateur de tirage après un court délai
+      setTimeout(() => {
+          document.getElementById('pullToRefresh').classList.remove("loading");
+          document.getElementById('pullToRefresh').style.transform = "translateY(0)";
+      }, 1000);
     });
+
+
+
 
 
 
