@@ -521,33 +521,34 @@
       left: 0;
       width: 100%;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.8);
+      height: 80px;
+      background: rgba(0, 0, 0, 0.9);
       color: white;
       font-size: 14px;
-      transform: translateY(-60px);
+      transform: translateY(-80px); /* Cache initialement */
       transition: transform 0.3s ease-out;
       z-index: 1000;
     }
 
     .pull-to-refresh.show {
-      transform: translateY(0);
+      transform: translateY(0); /* Montre l’indicateur */
     }
 
     .loading-spinner {
-      width: 20px;
-      height: 20px;
+      width: 25px;
+      height: 25px;
       border: 3px solid #f3f3f3;
       border-top: 3px solid #ff0000;
       border-radius: 50%;
-      margin-left: 10px;
-      display: none;
+      margin-top: 5px;
+      display: none; /* Caché initialement */
     }
 
     .loading-spinner.active {
-      display: inline-block;
+      display: block;
       animation: spin 1s linear infinite;
     }
 
@@ -621,26 +622,24 @@
     // Variables pour le tirage et l'élément de rafraîchissement
     let startY = 0;
     let isPulling = false;
-    const pullThreshold = 120; // Seuil de tirage requis en pixels
+    const pullThreshold = 120;
     const pullToRefreshElement = document.getElementById('pullToRefresh');
     const loadingSpinner = pullToRefreshElement.querySelector('.loading-spinner');
 
     document.addEventListener("touchstart", (e) => {
       startY = e.touches[0].pageY;
-      isPulling = false; // Reset du tirage
+      isPulling = false; // Réinitialise le tirage
     });
 
     document.addEventListener("touchmove", (e) => {
       const currentY = e.touches[0].pageY;
       const pullDistance = currentY - startY;
 
-      // Affiche l'indicateur de tirage si on dépasse 20px
       if (pullDistance > 20) {
         pullToRefreshElement.classList.add("show");
         pullToRefreshElement.style.transform = `translateY(${Math.min(pullDistance - 20, pullThreshold)}px)`;
       }
 
-      // Si le seuil de tirage est atteint, marquer pour mise à jour
       if (pullDistance > pullThreshold) {
         isPulling = true;
       }
@@ -648,24 +647,20 @@
 
     document.addEventListener("touchend", () => {
       if (isPulling) {
-        // Démarre le rafraîchissement une fois le seuil atteint
         loadingSpinner.classList.add("active");
         pullToRefreshElement.querySelector("span").textContent = "Mise à jour...";
 
-        // Fonction pour simuler le rafraîchissement des données
         setTimeout(() => {
-          // Arrêter l'animation et réinitialiser
           loadingSpinner.classList.remove("active");
           pullToRefreshElement.classList.remove("show");
-          pullToRefreshElement.style.transform = "translateY(-60px)";
+          pullToRefreshElement.style.transform = "translateY(-80px)";
           pullToRefreshElement.querySelector("span").textContent = "Tirez vers le bas pour mettre à jour";
-        }, 1500); // Délai de rafraîchissement
+        }, 1500);
       } else {
-        // Si le seuil n'est pas atteint, cacher l'indicateur de tirage
         pullToRefreshElement.classList.remove("show");
-        pullToRefreshElement.style.transform = "translateY(-60px)";
+        pullToRefreshElement.style.transform = "translateY(-80px)";
       }
-      isPulling = false; // Réinitialise l'état du tirage
+      isPulling = false;
     });
 
 
