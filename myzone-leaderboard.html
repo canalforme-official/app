@@ -625,12 +625,23 @@
     const pullThreshold = 120;
     const pullToRefreshElement = document.getElementById('pullToRefresh');
     const loadingSpinner = pullToRefreshElement.querySelector('.loading-spinner');
+    const refreshText = document.getElementById('refreshText');
 
+    // Fonction pour masquer et réinitialiser l'indicateur de tirage
+    function resetPullToRefresh() {
+      loadingSpinner.classList.remove("active");
+      pullToRefreshElement.classList.remove("show");
+      pullToRefreshElement.style.transform = "translateY(-80px)";
+      refreshText.textContent = "Tirez vers le bas pour mettre à jour";
+    }
+
+    // Détecte le début du tirage
     document.addEventListener("touchstart", (e) => {
       startY = e.touches[0].pageY;
       isPulling = false; // Réinitialise le tirage
     });
 
+    // Gère le tirage vers le bas
     document.addEventListener("touchmove", (e) => {
       const currentY = e.touches[0].pageY;
       const pullDistance = currentY - startY;
@@ -645,22 +656,21 @@
       }
     });
 
+    // Gère la fin du tirage et le rafraîchissement
     document.addEventListener("touchend", () => {
       if (isPulling) {
         loadingSpinner.classList.add("active");
-        pullToRefreshElement.querySelector("span").textContent = "Mise à jour...";
+        refreshText.textContent = "Mise à jour...";
 
+        // Simule la mise à jour des données
         setTimeout(() => {
-          loadingSpinner.classList.remove("active");
-          pullToRefreshElement.classList.remove("show");
-          pullToRefreshElement.style.transform = "translateY(-80px)";
-          pullToRefreshElement.querySelector("span").textContent = "Tirez vers le bas pour mettre à jour";
+          resetPullToRefresh(); // Réinitialise après la mise à jour
+          console.log("Page mise à jour"); // Indicateur de mise à jour (à remplacer par un appel de rafraîchissement réel si nécessaire)
         }, 1500);
       } else {
-        pullToRefreshElement.classList.remove("show");
-        pullToRefreshElement.style.transform = "translateY(-80px)";
+        resetPullToRefresh();
       }
-      isPulling = false;
+      isPulling = false; // Réinitialise l'état du tirage
     });
 
 
