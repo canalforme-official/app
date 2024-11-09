@@ -564,6 +564,14 @@
       -ms-user-select: none;     /* Internet Explorer/Edge */
     }
 
+    .hidden {
+      display: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      height: 0 !important;
+    }
+
+
   </style>
 </head>
 <body>
@@ -780,22 +788,30 @@
         document.getElementById('countdown').style.display = 'none';
     }
 
-    // Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
-    if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.previous.data)) {
-        const previousMonthTitle = formatMonthTitle(data.previous.month);
-        document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
-        
-        displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
-        displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
-        
-        document.getElementById('previousMonthContainer').style.display = 'flex';
-        document.getElementById('previousPodiumWrapper').style.display = 'flex';
-        document.getElementById('previousMonthTitle').style.display = 'block';
-    } else {
-        document.getElementById('previousMonthContainer').style.display = 'none';
-        document.getElementById('previousMonthTitle').style.display = 'none';
-        document.getElementById('previousPodiumWrapper').style.display = 'none';
-    }
+// Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
+if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.previous.data)) {
+    const previousMonthTitle = formatMonthTitle(data.previous.month);
+    document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
+
+    displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
+    displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+
+    // Affiche les éléments du mois précédent
+    const previousMonthContainer = document.getElementById('previousMonthContainer');
+    previousMonthContainer.style.display = 'flex';
+    previousMonthContainer.style.marginTop = '-28px';
+    previousMonthContainer.classList.remove('hidden'); // Assure qu’il est visible
+
+    document.getElementById('previousPodiumWrapper').style.display = 'flex';
+    document.getElementById('previousMonthTitle').style.display = 'block';
+} else {
+    const previousMonthContainer = document.getElementById('previousMonthContainer');
+    previousMonthContainer.style.display = 'none';
+    previousMonthContainer.style.marginTop = '0';
+    previousMonthContainer.classList.add('hidden'); // Masque complètement le conteneur
+}
+
+
 
     previousData = data;
 }
