@@ -507,11 +507,11 @@
 .today-view-button {
   display:none;
   position: fixed;
-  botton:20px;
+  bottom:20px;
   /*top: 80px !important;*/
   right: 10px;
   z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.5); /* Bouton noir transparent */
+  background-color: rgba(0, 0, 0, 0.8); /* Bouton noir transparent */
   padding: 8px; /* Réduction de la zone cliquable */
   border-radius: 50%;
   align-items: center;
@@ -964,36 +964,37 @@
     ];
 
     function displayNoCourseMessage() {
-      const currentWeek = getWeekNumber(new Date());
-      const cachedWeek = localStorage.getItem('noCourseMessageWeek');
-      const cachedMessage = localStorage.getItem('noCourseMessage');
-      const cachedImage = localStorage.getItem('noCourseImage');
+    const today = new Date().toLocaleDateString('fr-FR'); // Format de date unique pour chaque jour
+    const cachedDate = localStorage.getItem('noCourseMessageDate');
+    const cachedMessage = localStorage.getItem('noCourseMessage');
+    const cachedImage = localStorage.getItem('noCourseImage');
 
-      let message, image;
+    let message, image;
 
-      // Si le message pour la semaine courante est déjà en cache, on le réutilise
-      if (cachedWeek == currentWeek && cachedMessage && cachedImage) {
-          message = cachedMessage;
-          image = cachedImage;
-      } else {
-          // Sélection aléatoire d'un nouveau message et image pour cette semaine
-          const randomIndex = Math.floor(Math.random() * noCourseMessages.length);
-          message = noCourseMessages[randomIndex];
-          image = noCourseImages[randomIndex];
+    // Si le message pour la date actuelle est déjà en cache, on le réutilise
+    if (cachedDate === today && cachedMessage && cachedImage) {
+        message = cachedMessage;
+        image = cachedImage;
+    } else {
+        // Sélection aléatoire d'un nouveau message et image pour aujourd'hui
+        const randomIndex = Math.floor(Math.random() * noCourseMessages.length);
+        message = noCourseMessages[randomIndex];
+        image = noCourseImages[randomIndex];
 
-          // Stockage des nouvelles valeurs dans localStorage
-          localStorage.setItem('noCourseMessageWeek', currentWeek);
-          localStorage.setItem('noCourseMessage', message);
-          localStorage.setItem('noCourseImage', image);
-      }
+        // Stockage des nouvelles valeurs dans localStorage pour la date actuelle
+        localStorage.setItem('noCourseMessageDate', today);
+        localStorage.setItem('noCourseMessage', message);
+        localStorage.setItem('noCourseImage', image);
+    }
 
-      return `
-          <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
-              <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
-              <p class="quote-text">« ${message} »</p>
-          </div>
-      `;
-  }
+    return `
+        <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
+            <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
+            <p class="quote-text">« ${message} »</p>
+        </div>
+    `;
+}
+
 
 
     function initializeCountdowns() {
