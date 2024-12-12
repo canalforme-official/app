@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, initial-scale=1.0, user-scalable=no">
   <title>Myzone Leaderboard - Canal Forme</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
@@ -25,6 +25,7 @@
       /* Masque la barre de défilement en vue desktop */
       overflow-y: scroll;
       scrollbar-width: none; /* Pour Firefox */
+      max-width: 100vw; /* Limite la largeur à la taille de l'écran */
     }
 
     /* Masque la barre de défilement en vue desktop pour les navigateurs Webkit */
@@ -97,6 +98,8 @@
       padding: 10px 0;
       border-bottom: 1px solid #e0e0e0;
       font-size: 16px;
+      height: 50px; /* Ajuste cette valeur selon la hauteur que tu préfères */
+      position: relative; /* Pour positionner les points par rapport à chaque ligne */
     }
 
     .leaderboard-row:last-child {
@@ -234,6 +237,46 @@
         width: 22px;
         height: 22px;
       }
+
+      .leaderboard-content {
+        padding-right: 30px;
+      }
+
+          /* Réduction de la largeur de la ligne de MEPs */
+      .meps-line {
+        right: -25px; /* Ajuste cette valeur selon l’affichage */
+        width: 1px;
+      }
+
+      /* Réduction de la taille des points pour mobile */
+      .meps-point {
+        right: -43px; /* Ajuste pour aligner avec la ligne de MEPs */
+        width: 5px;
+        height: 5px;
+      }
+
+      /* Ajustement de la taille de l’icône du coach */
+      .coach-icon {
+        width: 25px;
+        height: 25px;
+        right: -58px; 
+      }
+
+      /* Cercle de classement du coach plus petit */
+      .coach-rank-circle {
+        width: 14px;
+        height: 14px;
+        top: -5px;
+        right: -5px;
+        font-size: 0.6em;
+      }
+
+      /* Réduction de la taille de la pillule des MEPs */
+      .meps-pill {
+        font-size: 0.7em;
+        padding: 1px 2px;
+      }
+
     }
 
     /* Styles pour le podium */
@@ -502,6 +545,22 @@
         width: 150px;
       }
 
+      .meps-line {
+        right: -30px; /* Position correcte pour les écrans desktop */
+      }
+
+      .meps-point {
+        right: -53px; /* Assure l'alignement avec la ligne */
+      }
+
+      .coach-icon {
+        right: -68px; /* Positionnement pour rester visible */
+      }
+
+      .meps-pill {
+        font-size: 0.6em;
+      }
+
       .podium-meps.first { font-size: 1.8rem; }
       .podium-meps.second { font-size: 1.6rem; }
       .podium-meps.third { font-size: 1.5rem; }
@@ -572,6 +631,120 @@
     }
 
 
+#currentMonthLeaderboard,
+#previousMonthLeaderboard {
+  position: relative;
+}
+
+/* Conteneur principal */
+.leaderboard-container {
+    display: flex;
+    position: relative;
+}
+
+/* Conteneur du leaderboard (le contenu principal) */
+.leaderboard-content {
+    flex: 1;
+    position: relative;
+    padding-right: 60px; /* Crée un espace pour la ligne et les points */
+}
+
+/* Ligne de MEPs à droite */
+.meps-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: rgba(255, 255, 255, 0.5); /* Blanc avec transparence */
+}
+
+
+/* Style des points alignés exactement avec la ligne */
+.meps-point {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+
+/* Animation de flottement */
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px); /* Ajustez la hauteur du flottement */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Applique l'animation de flottement aux icônes des coachs */
+.coach-icon {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  border: 1px solid white;
+  transform: translateY(-50%);
+  z-index: 10;
+  animation: float 3s ease-in-out infinite; /* Animation continue */
+  display: flex;
+  align-items: flex-end; /* Aligne la pillule en bas de l'icône */
+  justify-content: center;
+}
+
+/* Applique l'animation de flottement aux pillules de MEPs */
+.meps-pill {
+  background-color: #ff0000;
+  color: white;
+  padding: 1px 3px;
+  border-radius: 12px;
+  top: 90%; /* Ajustez selon le positionnement souhaité */
+  left: 50%;
+  transform: translate(-50%);
+  white-space: nowrap;
+  position: absolute;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+}
+
+.meps-pill .meps-count {
+  font-weight: bold;
+  margin-right: 2px; /* Ajustez la valeur selon l'espacement souhaité */
+}
+
+.meps-pill .meps-text {
+  font-weight: normal; /* Assure que "MEPs" n'est pas en gras */
+}
+
+.coach-rank-circle {
+  position: absolute;
+  top: -7px; /* Ajustez pour le placer légèrement au-dessus de l'icône */
+  right: -7px; /* Ajustez pour le placer sur le côté droit */
+  width: 18px;
+  height: 18px;
+  background-color: white;
+  color: black;
+  font-size: 0.7em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 0; /* Supprime le padding interne */
+
+  /* animation: float 3s ease-in-out infinite; /* Assure que le cercle flotte avec l'icône */
+  z-index: 1; /* Pour qu’il apparaisse au-dessus */
+}
+
   </style>
 </head>
 <body>
@@ -606,6 +779,8 @@
       <div id="countdown" style="display: none;"></div> <!-- Placez le countdown à l'extérieur -->
       <!-- Leaderboard du mois actuel -->
       <div id="currentMonthLeaderboard"></div>
+        <!-- Ligne de MEPs à droite -->
+        <div class="meps-line"></div>
     </div>
   </div>
 
@@ -622,6 +797,9 @@
       <div id="previousMonthLeaderboard"></div>
     </div>
   </div>
+
+ 
+
 
   <script>
 
@@ -707,23 +885,52 @@
     /**
      * Charge le leaderboard depuis le fichier JSON
      */
-    function loadLeaderboard() {
-      //fetch('./leaderboard.json')
-      fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
-        .then(response => response.json())
-        .then(data => {
-          console.log('Données chargées:', data);
-          updateLeaderboard(data);
-          if (isFirstLoad) {
-            hideLoadingOverlay();
-          }
-          startCountdown(60);
-        })
-        .catch(error => {
-          console.error("Erreur lors du chargement du leaderboard:", error);
-          hideLoadingOverlay();
-        });
-    }
+
+     function loadLeaderboard() {
+      fetch('./leaderboard.json')
+      //fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+    .then(response => response.json())
+    .then(data => {
+      // Séparer les coachs et les utilisateurs
+      const coaches = data.current.data.filter(user => user.type === "Coach");
+      const users = data.current.data.filter(user => user.type !== "Coach");
+      
+      // Trier les utilisateurs par MEPs décroissants
+      users.sort((a, b) => b.meps - a.meps);
+      // Recalculer les positions des utilisateurs
+      users.forEach((user, index) => user.position = index + 1);
+      
+      // Affecter les données triées aux données actuelles
+      data.current.data = users;
+
+      // Stocker les coachs dans `data.current.coaches`
+      data.current.coaches = coaches;
+
+      // Faites de même pour le mois précédent si nécessaire
+      if (data.previous) {
+        const previousCoaches = data.previous.data.filter(user => user.type === "Coach");
+        const previousUsers = data.previous.data.filter(user => user.type !== "Coach");
+        previousUsers.sort((a, b) => b.meps - a.meps);
+        previousUsers.forEach((user, index) => user.position = index + 1);
+        data.previous.data = previousUsers;
+        data.previous.coaches = previousCoaches;
+      }
+
+      updateLeaderboard(data);
+      if (isFirstLoad) {
+        hideLoadingOverlay();
+      }
+      startCountdown(60);
+    })
+    .catch(error => {
+      console.error("Erreur lors du chargement du leaderboard:", error);
+      hideLoadingOverlay();
+    });
+}
+
+
+
+
 
     /**
      * Démarre le compte à rebours pour la mise à jour
@@ -761,60 +968,76 @@
      * @param {Object} data Données du leaderboard
      */
      function updateLeaderboard(data) {
-    const today = new Date();
-    const dayOfMonth = today.getDate();
+  const today = new Date();
+  const dayOfMonth = today.getDate();
 
-    // Vérifie si le mois actuel doit être affiché
-    if (data.current && data.current.data && !allMepsZero(data.current.data)) {
-        const currentMonthTitle = formatMonthTitle(data.current.month);
-        document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
-        
-        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
-        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current');
-        
-        document.getElementById('currentMonthContainer').style.display = 'flex';
-        document.getElementById('podiumWrapper').style.display = 'flex';
-        document.getElementById('currentMonthTitle').style.display = 'block';
-        
-        // Affiche le countdown uniquement si des MEPs existent
-        document.getElementById('countdown').style.display = 'block';
-    } else {
-        // Masque complètement le conteneur du mois actuel si les MEPs sont tous à zéro
-        document.getElementById('currentMonthContainer').style.display = 'none';
-        document.getElementById('currentMonthTitle').style.display = 'none';
-        document.getElementById('podiumWrapper').style.display = 'none';
-        
-        // Masque également le countdown
-        document.getElementById('countdown').style.display = 'none';
-    }
+  if (data.current && data.current.data && !allMepsZero(data.current.data)) {
+    const currentMonthTitle = formatMonthTitle(data.current.month);
+    document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
 
-// Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
-if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.previous.data)) {
+    displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
+    displayLeaderboard(data.current, 'currentMonthLeaderboard', 'current');
+
+    document.getElementById('currentMonthContainer').style.display = 'flex';
+    document.getElementById('podiumWrapper').style.display = 'flex';
+    document.getElementById('currentMonthTitle').style.display = 'block';
+
+    document.getElementById('countdown').style.display = 'block';
+  } else {
+    document.getElementById('currentMonthContainer').style.display = 'none';
+    document.getElementById('currentMonthTitle').style.display = 'none';
+    document.getElementById('podiumWrapper').style.display = 'none';
+    document.getElementById('countdown').style.display = 'none';
+  }
+
+  if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.previous.data)) {
     const previousMonthTitle = formatMonthTitle(data.previous.month);
     document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
 
     displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
-    displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+    displayLeaderboard(data.previous, 'previousMonthLeaderboard', 'previous');
 
-    // Affiche les éléments du mois précédent
     const previousMonthContainer = document.getElementById('previousMonthContainer');
     previousMonthContainer.style.display = 'flex';
     previousMonthContainer.style.marginTop = '-28px';
-    previousMonthContainer.classList.remove('hidden'); // Assure qu’il est visible
+    previousMonthContainer.classList.remove('hidden');
 
     document.getElementById('previousPodiumWrapper').style.display = 'flex';
     document.getElementById('previousMonthTitle').style.display = 'block';
-} else {
+
+    const previousMepsLine = previousMonthContainer.querySelector('.meps-line');
+    if (previousMepsLine) {
+      previousMepsLine.style.display = 'block';
+    }
+  } else {
     const previousMonthContainer = document.getElementById('previousMonthContainer');
     previousMonthContainer.style.display = 'none';
     previousMonthContainer.style.marginTop = '0';
-    previousMonthContainer.classList.add('hidden'); // Masque complètement le conteneur
+    previousMonthContainer.classList.add('hidden');
+
+    const previousMepsLine = previousMonthContainer.querySelector('.meps-line');
+    if (previousMepsLine) {
+      previousMepsLine.style.display = 'none';
+    }
+  }
+
+  const currentMonthContainer = document.getElementById('currentMonthContainer');
+  if (data.current && data.current.data && !allMepsZero(data.current.data)) {
+    currentMonthContainer.style.display = 'flex';
+    const currentMepsLine = currentMonthContainer.querySelector('.meps-line');
+    if (currentMepsLine) {
+      currentMepsLine.style.display = 'block';
+    }
+  } else {
+    const currentMepsLine = currentMonthContainer.querySelector('.meps-line');
+    if (currentMepsLine) {
+      currentMepsLine.style.display = 'none';
+    }
+  }
+
+  previousData = data;
 }
 
-
-
-    previousData = data;
-}
 
 
     /**
@@ -944,22 +1167,175 @@ if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.
     }
 
     /**
-     * Affiche le leaderboard
-     * @param {Array} data Données du leaderboard
-     * @param {string} leaderboardId ID du conteneur du leaderboard
-     * @param {string} period Période (current ou previous)
-     */
-    function displayLeaderboard(data, leaderboardId, period) {
-      const leaderboardContainer = document.getElementById(leaderboardId);
+ * Affiche le leaderboard
+ * @param {Array} data Données du leaderboard
+ * @param {string} leaderboardId ID du conteneur du leaderboard
+ * @param {string} period Période (current ou previous)
+ */
+ function displayLeaderboard(data, leaderboardId, period) {
+  const leaderboardContainer = document.getElementById(leaderboardId);
+  const today = new Date();
+  const dayOfMonth = today.getDate();
+  const topEntries = dayOfMonth <= 7 ? 10 : 20;
+  const leaderboardData = data && data.data ? data.data.slice(3, topEntries) : [];
 
-      const today = new Date();
-      const dayOfMonth = today.getDate();
-      const topEntries = dayOfMonth <= 7 ? 10 : 20;
+  leaderboardContainer.innerHTML = '';
 
-      const leaderboardData = data.slice(3, topEntries);
+  if (leaderboardData.length === 0) {
+    console.error("Aucune donnée de leaderboard disponible.");
+    return;
+  }
 
-      leaderboardContainer.innerHTML = createLeaderboardTable(leaderboardData, period);
+  const rows = [];
+
+  leaderboardData.forEach((user, index) => {
+    const row = document.createElement('div');
+    row.classList.add('leaderboard-row');
+
+    row.innerHTML = `
+      <span class="rank">${user.position}</span>
+      <span class="nickname">${user.nickname}</span>
+      <span class="leaderboard-meps">
+        <span class="status-icon" style="background-image: url(${user.iconLink || ''});"></span>
+        <span class="meps-value">${formatNumber(user.meps)}</span>
+        <span class="meps-label">MEPs</span>
+      </span>
+    `;
+
+    leaderboardContainer.appendChild(row);
+    rows.push(row);
+  });
+
+  // Positionner les points après que les éléments aient leurs dimensions
+  requestAnimationFrame(() => positionMepsPoints(rows, leaderboardContainer));
+
+  // Appelle displayCoachIcons après que le rendu initial est terminé
+  requestAnimationFrame(() => {
+    if (data.coaches && data.coaches.length > 0) {
+      // Supposons que data.coaches est trié par MEPs décroissants
+      data.coaches.forEach((coach, index) => {
+        displayCoachIcon(coach, leaderboardContainer, rows, leaderboardData, data.coaches, index);
+      });
     }
+  });
+}
+
+function positionMepsPoints(rows, container) {
+  rows.forEach((row) => {
+    const point = document.createElement('div');
+    point.classList.add('meps-point');
+    point.style.top = `${row.offsetTop + row.offsetHeight / 2}px`;
+    container.appendChild(point);
+  });
+}
+
+function displayCoachIcon(coach, container, rows, leaderboardData, coaches, coachIndex = 0) {
+    console.log(`Affichage du coach : ${coach.nickname} - MEPs : ${coach.meps}`);
+    
+    const coachIcon = document.createElement('div');
+    coachIcon.classList.add('coach-icon');
+    coachIcon.style.backgroundImage = `url(${coach.coachLink})`;
+
+    // Déterminer la limite pour le classement selon le jour du mois
+    const today = new Date();
+    const dayOfMonth = today.getDate();
+    const topEntriesLimit = dayOfMonth <= 7 ? 10 : 20;
+
+    // Log du jour actuel et de la limite de classement
+    console.log(`Jour actuel : ${dayOfMonth}, limite du classement : ${topEntriesLimit} positions`);
+    const lastPositionMEPs = leaderboardData.length >= topEntriesLimit
+        ? leaderboardData[topEntriesLimit - 1].meps
+        : leaderboardData[leaderboardData.length - 1]?.meps || 0;
+
+    console.log(`MEPs de la ${topEntriesLimit}ᵉ position : ${lastPositionMEPs}`);
+
+    let coachPositionSet = false;
+    const verticalOffset = 15 * coachIndex; // Décalage vertical
+
+    // **Case 1** : Le coach a des MEPs inférieurs à la dernière position de la limite actuelle
+    if (coach.meps < lastPositionMEPs) {
+        const lastRow = rows[rows.length - 1];
+        if (lastRow) {
+            coachIcon.style.top = `${lastRow.offsetTop + lastRow.offsetHeight + verticalOffset}px`;
+            coachPositionSet = true;
+            console.log(`Coach ${coach.nickname} est positionné sous la dernière position.`);
+        }
+    } 
+    // **Case 2** : Le coach a des MEPs supérieurs ou égaux au 4ème
+    else if (coach.meps >= leaderboardData[2].meps) {
+        const firstRow = rows[0];
+        if (firstRow) {
+            coachIcon.style.top = `${firstRow.offsetTop - firstRow.offsetHeight - verticalOffset}px`;
+            coachPositionSet = true;
+            console.log(`Coach ${coach.nickname} est positionné au-dessus de la 4ème position.`);
+        }
+    } 
+    // **Case 3** : Le coach a des MEPs entre le 4ème et le dernier
+    else {
+        const filteredLeaderboard = leaderboardData.filter(user => user.type !== "Coach");
+        let positionIndex = filteredLeaderboard.findIndex(user => coach.meps >= user.meps);
+        if (positionIndex === -1) {
+            positionIndex = filteredLeaderboard.length;
+        }
+
+        const targetRow = rows[positionIndex]; // Ligne de la personne située juste en dessous du coach
+
+        if (targetRow) {
+            coachIcon.style.top = `${targetRow.offsetTop + verticalOffset-20}px`;
+            coachPositionSet = true;
+            console.log(`Coach ${coach.nickname} est placé à la hauteur de ${filteredLeaderboard[positionIndex]?.nickname || 'N/A'}.`);
+        } else {
+            console.log(`Impossible de trouver une ligne pour placer le coach ${coach.nickname}.`);
+        }
+    }
+
+    // Fallback en cas d'échec du positionnement
+    if (!coachPositionSet) {
+        const lastRow = rows[rows.length - 1];
+        if (lastRow) {
+            coachIcon.style.top = `${lastRow.offsetTop + lastRow.offsetHeight + verticalOffset}px`;
+            console.log(`Fallback : Coach ${coach.nickname} positionné en bas par défaut.`);
+        } else {
+            coachIcon.style.top = '0px';
+            console.log(`Fallback : Coach ${coach.nickname} positionné au top par défaut.`);
+        }
+    }
+
+    // Classement du coach parmi les autres coachs
+    const sortedCoaches = coaches.slice().sort((a, b) => b.meps - a.meps);
+    const coachRank = sortedCoaches.findIndex(c => c.nickname === coach.nickname) + 1;
+    console.log(`Classement du coach ${coach.nickname} : #${coachRank}`);
+
+    // Création du cercle pour afficher le classement du coach
+    const rankCircle = document.createElement('div');
+    rankCircle.classList.add('coach-rank-circle');
+    rankCircle.textContent = `#${coachRank}`;
+    coachIcon.appendChild(rankCircle); // Ajoute le cercle comme enfant de coachIcon
+
+    // Création de la pillule pour afficher les MEPs du coach
+    const mepsPill = document.createElement('div');
+    mepsPill.classList.add('meps-pill');
+    mepsPill.innerHTML = `<span class="meps-count">${formatNumber(coach.meps)}</span> <span class="meps-text">MEPs</span>`;
+    mepsPill.style.top = '90%';
+    mepsPill.style.left = '50%';
+    mepsPill.style.transform = 'translate(-50%)';
+
+    coachIcon.appendChild(mepsPill);
+    container.appendChild(coachIcon);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Crée le tableau du leaderboard
@@ -1045,10 +1421,46 @@ if (dayOfMonth <= 7 && data.previous && data.previous.data && !allMepsZero(data.
     }
 
     window.onload = () => {
-      showLoadingOverlay();
-      loadLeaderboard();
-      resetCountdown();
-    };
+  // Appels existants
+  showLoadingOverlay();
+  loadLeaderboard();
+  resetCountdown();
+
+  // Attendre que tout le contenu soit rendu pour garantir la précision
+  setTimeout(() => {
+    // Récupère les dimensions du contenu et de la fenêtre
+    const contentWidth = document.body.scrollWidth;
+    const viewportWidth = window.innerWidth;
+
+    // Si le contenu est plus large que la fenêtre, ajuste le zoom
+    if (contentWidth > viewportWidth) {
+      const scale = viewportWidth / contentWidth;
+
+      // Applique le zoom en ajustant le style du body
+      document.body.style.transform = `scale(${scale})`;
+      document.body.style.transformOrigin = 'top left';
+
+      // Ajuste la hauteur pour éviter le décalage vertical
+      const scaledHeight = document.body.offsetHeight * scale;
+      document.body.style.height = `${scaledHeight}px`;
+    }
+
+    // Centre le contenu horizontalement
+    const scrollableWidth = document.body.scrollWidth - window.innerWidth;
+    if (scrollableWidth > 0) {
+      window.scrollTo({
+        left: scrollableWidth / 2, // Centrer horizontalement
+        top: 0,
+        behavior: 'instant' // Rend le centrage immédiat
+      });
+    }
+  }, 100); // Laisse 100 ms pour que tout le contenu soit chargé
+};
+
+
+
+    
+    
   </script>
 </body>
 </html>
