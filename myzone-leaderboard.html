@@ -887,8 +887,8 @@
      */
 
      function loadLeaderboard() {
-      fetch('./leaderboard.json')
-      //fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+      //fetch('./leaderboard.json')
+      fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
     .then(response => response.json())
     .then(data => {
       // Séparer les coachs et les utilisateurs
