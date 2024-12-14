@@ -890,8 +890,9 @@
      */
 
      function loadLeaderboard() {
-      //fetch('./leaderboard.json')
-      fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+  //fetch('./leaderboard.json')
+  fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+
     .then(response => response.json())
     .then(data => {
       // Séparer les coachs et les utilisateurs
@@ -919,7 +920,8 @@
         data.previous.coaches = previousCoaches;
       }
 
-      updateLeaderboard(data);
+      updateLeaderboard(data); // Met à jour les éléments affichés
+      adjustZoomAndCenter(); // Ajout : Réajuste le zoom et le focus après mise à jour du contenu
       if (isFirstLoad) {
         hideLoadingOverlay();
       }
@@ -1423,41 +1425,39 @@ function displayCoachIcon(coach, container, rows, leaderboardData, coaches, coac
       window.requestAnimationFrame(step);
     }
 
-    window.onload = () => {
-  // Appels existants
-  showLoadingOverlay();
-  loadLeaderboard();
-  resetCountdown();
-
-  // Attendre que tout le contenu soit rendu pour garantir la précision
+    function adjustZoomAndCenter() {
   setTimeout(() => {
-    // Récupère les dimensions du contenu et de la fenêtre
+    // Calcule la largeur totale du contenu
     const contentWidth = document.body.scrollWidth;
     const viewportWidth = window.innerWidth;
 
-    // Si le contenu est plus large que la fenêtre, ajuste le zoom
+    // Ajuste le zoom si le contenu dépasse la largeur de l'écran
     if (contentWidth > viewportWidth) {
       const scale = viewportWidth / contentWidth;
-
-      // Applique le zoom en ajustant le style du body
       document.body.style.transform = `scale(${scale})`;
       document.body.style.transformOrigin = 'top left';
-
-      // Ajuste la hauteur pour éviter le décalage vertical
       const scaledHeight = document.body.offsetHeight * scale;
       document.body.style.height = `${scaledHeight}px`;
     }
 
-    // Centre le contenu horizontalement
+    // Centre horizontalement le contenu si nécessaire
     const scrollableWidth = document.body.scrollWidth - window.innerWidth;
     if (scrollableWidth > 0) {
       window.scrollTo({
-        left: scrollableWidth / 2, // Centrer horizontalement
+        left: scrollableWidth / 2,
         top: 0,
-        behavior: 'instant' // Rend le centrage immédiat
+        behavior: 'instant'
       });
     }
-  }, 100); // Laisse 100 ms pour que tout le contenu soit chargé
+  }, 100); // Petit délai pour garantir le rendu complet
+}
+
+// Ajoute un écouteur pour exécuter la fonction au chargement complet
+window.onload = function () {
+  showLoadingOverlay();
+  loadLeaderboard();
+  resetCountdown();
+  adjustZoomAndCenter(); // Appel de la fonction d'ajustement
 };
 
 
