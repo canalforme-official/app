@@ -143,7 +143,7 @@
     </div>
 
     <div class="page-title">
-        <h1>Status Myzone</h1>
+        <h1>Statuts Myzone</h1>
     </div>
 
     <div class="countdown" id="countdown">Prochaine mise à jour dans : 05:00</div>
@@ -174,8 +174,13 @@
 
                 // Ajoute le titre avec l'icône
                 const title = document.createElement('h3');
-                title.innerHTML = `<img src="${iconLink}" alt="${status}"> ${status}`;
+                if (iconLink) {
+                    title.innerHTML = `<img src="${iconLink}" alt="${status}"> ${status}`;
+                } else {
+                    title.textContent = status; // Si aucun lien d'icône, affiche seulement le texte
+                }
                 tableContainer.appendChild(title);
+
 
                 // Ajoute la description
                 const description = document.createElement('p');
