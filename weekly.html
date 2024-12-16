@@ -154,7 +154,7 @@
   height: 35px;
   border-radius: 50%; /* Cercle parfait */
   position: absolute;
-  border: 3px solid rgba(255, 255, 255, 0.9); /* Bord blanc */
+  border: 3px solid rgba(255, 255, 255, 0.9);
   box-sizing: border-box;
   top: 50%;
   left: 50%;
@@ -168,7 +168,7 @@
   content: '';
   width: 11px; /* Taille réduite du cercle intérieur */
   height: 11px;
-  background-color: rgba(255, 255, 255, 0.9); /* Cercle plein blanc */
+  background-color: rgba(255, 255, 255, 0.9); /* Cercle plein rouge */
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -444,12 +444,12 @@
     .multiple-coaches {
       display: flex;
       justify-content: center;
-      gap: 10px; /* Espacement entre les images */
+      gap: 5px; /* Espacement entre les images */
     }
 
     .coach-image {
-      width: 20px; /* Largeur de l'image */
-      height: 20px; /* Hauteur de l'image */
+      width: 30px; /* Largeur de l'image */
+      height: 30px; /* Hauteur de l'image */
       border-radius: 50%; /* Pour que l'image soit ronde */
     }
 
@@ -760,7 +760,7 @@
         }
 
         // Sinon, on fait un fetch pour obtenir les nouvelles données
-        //return fetch('testweeklydata.json')
+        //return fetch('testweeklydata1.json')
         return fetch('https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
           .then(response => response.json())
           .then(data => {
@@ -891,12 +891,12 @@
                                   '<span>' + course.coach[0] + '</span></div>';
               } else if (course.coach.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
-                course.coach.forEach(function(coachName) {
-                  var coachImageUrl = course.coachImage || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';  // URL par défaut si pas d'image
+                var coachImages = course.coachImage.split(';').map(img => img.trim()); // Séparer les images avec ";"
+                coachImages.forEach(function(coachImageUrl, index) {
                   coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
                 });
                 coachImagesHtml += '</div>';
-}
+              }
 
               var courseClasses = 'course-block';
               if (course.type === '100% Femmes') {
