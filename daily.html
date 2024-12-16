@@ -435,13 +435,21 @@
 
     .coach-images {
       display: flex;
-      gap: 0px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .coach-item {
+      display: flex;
+      align-items: center;
+      margin-right: 10px;
     }
 
     .coach-photo {
       width: 30px;
       height: 30px;
       border-radius: 50%;
+      margin-right: 5px;
     }
 
     .course-coach img {
@@ -458,7 +466,7 @@
       top: 10px;
       right: 10px;
       z-index: 1000;
-      background-color: rgba(255, 0, 0, 0.7);
+      background-color: rgba(255, 0, 0, 0.5);
       padding: 8px;
       border-radius: 50%;
       width: 50px;
@@ -492,7 +500,7 @@
     /* Styles :hover pour le bouton weekly-view */
     @media (hover: hover) {
       .weekly-view-button:hover {
-        background-color: rgba(255, 0, 0, 0.9);
+        background-color: rgba(255, 0, 0, 0.7);
         box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
         transform: scale(1.05);
       }
@@ -507,7 +515,7 @@
 .today-view-button {
   display:none;
   position: fixed;
-  botton:20px;
+  bottom:20px;
   /*top: 80px !important;*/
   right: 10px;
   z-index: 1000;
@@ -705,7 +713,7 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-    //const apiUrl = 'testweeklydata.json';
+    //const apiUrl = 'testweeklydata1.json';
     const apiUrl = 'https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA';
     let allData = [];
 
@@ -835,12 +843,24 @@
                   ? `<img src="${course.logo}" alt="${course.name}" style="max-width: 180px; max-height: 70px;" />`
                   : course.name}
               </div>
-              <div class="course-coach"><img src="${course.coachImage}" alt="Coach" /> ${course.coach}</div>
+              <div class="course-coach">
+                <div class="coach-images">
+                  ${course.coach.split(',').map((coachName, index) => {
+                    const coachImages = course.coachImage.split(';').map(image => image.trim());
+                    return `
+                      <div class="coach-item">
+                        <img class="coach-photo" src="${coachImages[index] || 'default-image.png'}" alt="${coachName.trim()}">
+                        <span>${coachName.trim()}</span>
+                      </div>`;
+                  }).join('')}
+                </div>
+              </div>
               <div class="course-studio">${course.studio}</div>
               ${countdownHTML}
             </div>
           </div>`;
-          html += courseDiv;
+        html += courseDiv;
+
         });
         scheduleDiv.innerHTML = html;
       } else {
@@ -964,36 +984,37 @@
     ];
 
     function displayNoCourseMessage() {
-      const currentWeek = getWeekNumber(new Date());
-      const cachedWeek = localStorage.getItem('noCourseMessageWeek');
-      const cachedMessage = localStorage.getItem('noCourseMessage');
-      const cachedImage = localStorage.getItem('noCourseImage');
+    const today = new Date().toLocaleDateString('fr-FR'); // Format de date unique pour chaque jour
+    const cachedDate = localStorage.getItem('noCourseMessageDate');
+    const cachedMessage = localStorage.getItem('noCourseMessage');
+    const cachedImage = localStorage.getItem('noCourseImage');
 
-      let message, image;
+    let message, image;
 
-      // Si le message pour la semaine courante est déjà en cache, on le réutilise
-      if (cachedWeek == currentWeek && cachedMessage && cachedImage) {
-          message = cachedMessage;
-          image = cachedImage;
-      } else {
-          // Sélection aléatoire d'un nouveau message et image pour cette semaine
-          const randomIndex = Math.floor(Math.random() * noCourseMessages.length);
-          message = noCourseMessages[randomIndex];
-          image = noCourseImages[randomIndex];
+    // Si le message pour la date actuelle est déjà en cache, on le réutilise
+    if (cachedDate === today && cachedMessage && cachedImage) {
+        message = cachedMessage;
+        image = cachedImage;
+    } else {
+        // Sélection aléatoire d'un nouveau message et image pour aujourd'hui
+        const randomIndex = Math.floor(Math.random() * noCourseMessages.length);
+        message = noCourseMessages[randomIndex];
+        image = noCourseImages[randomIndex];
 
-          // Stockage des nouvelles valeurs dans localStorage
-          localStorage.setItem('noCourseMessageWeek', currentWeek);
-          localStorage.setItem('noCourseMessage', message);
-          localStorage.setItem('noCourseImage', image);
-      }
+        // Stockage des nouvelles valeurs dans localStorage pour la date actuelle
+        localStorage.setItem('noCourseMessageDate', today);
+        localStorage.setItem('noCourseMessage', message);
+        localStorage.setItem('noCourseImage', image);
+    }
 
-      return `
-          <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
-              <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
-              <p class="quote-text">« ${message} »</p>
-          </div>
-      `;
-  }
+    return `
+        <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
+            <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
+            <p class="quote-text">« ${message} »</p>
+        </div>
+    `;
+}
+
 
 
     function initializeCountdowns() {
