@@ -868,13 +868,27 @@
       }
 
       toggleTodayButton(dayIndex);
-      if (isToday(dayIndex)) {
-        scrollToNextUpcomingCourse();
-        initializeCountdowns();
+
+
+        if (isToday(dayIndex)) {
+          // Vérifie si tous les cours sont terminés
+          if (areAllCoursesInThePast(dayData)) {
+              // Défilement vers le bas de la page si tous les cours sont passés
+              window.scrollTo({
+                  top: document.body.scrollHeight, // Définit la position en bas de la page
+                  behavior: 'smooth' // Animation fluide
+              });
+          } else {
+              // Sinon, défile vers le prochain cours
+              scrollToNextUpcomingCourse();
+          }
+          initializeCountdowns();
       } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+
     }
+
 
     function isToday(dayIndex) {
       return dayIndex === new Date().getDay();
@@ -927,6 +941,19 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }, 500);  // Ajout d'un délai de 500ms pour simuler le chargement
     }
+
+    function areAllCoursesInThePast(dayData) {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    // Vérifie si tous les cours du jour sont terminés
+    return dayData.every(course => {
+        const [endHour, endMinute] = course.endTime.split(':').map(Number);
+        const courseEndTime = endHour * 60 + endMinute;
+        return courseEndTime < currentTime; // Tous les cours ont terminé avant l'heure actuelle
+    });
+}
+
 
     function scrollToNextUpcomingCourse() {
         const now = new Date();
