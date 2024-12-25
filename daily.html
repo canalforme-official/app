@@ -436,7 +436,7 @@
     .coach-images {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 0px;
     }
 
     .coach-item {
@@ -843,18 +843,18 @@
                   ? `<img src="${course.logo}" alt="${course.name}" style="max-width: 180px; max-height: 70px;" />`
                   : course.name}
               </div>
-              <div class="course-coach">
-                <div class="coach-images">
-                  ${course.coach.split(',').map((coachName, index) => {
-                    const coachImages = course.coachImage.split(';').map(image => image.trim());
-                    return `
-                      <div class="coach-item">
-                        <img class="coach-photo" src="${coachImages[index] || 'default-image.png'}" alt="${coachName.trim()}">
-                        <span>${coachName.trim()}</span>
-                      </div>`;
-                  }).join('')}
-                </div>
-              </div>
+<div class="course-coach">
+    <div class="coach-images">
+        ${course.coach.split(',').map((coachName, index) => {
+            const coachImages = course.coachImage.split(';').map(image => image.trim());
+            return `
+                <div class="coach-item">
+                    <img class="coach-photo" src="${coachImages[index] || 'default-image.png'}" alt="${coachName.trim()}">
+                    ${course.coach.split(',').length > 1 ? '' : `<span>${coachName.trim()}</span>`}
+                </div>`;
+        }).join('')}
+    </div>
+</div>
               <div class="course-studio">${course.studio}</div>
               ${countdownHTML}
             </div>
