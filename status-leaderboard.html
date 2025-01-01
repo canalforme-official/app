@@ -59,6 +59,8 @@
             max-height: 400px;
             overflow-y: auto;
             position: relative;
+            -webkit-overflow-scrolling: touch; 
+            overscroll-behavior: contain;   /* Évite de “bloquer” le scroll global */
         }
 
         .table::-webkit-scrollbar {
