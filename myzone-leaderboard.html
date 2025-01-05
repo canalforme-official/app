@@ -33,7 +33,7 @@
     }
 
     .container {
-      display: none;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
@@ -615,6 +615,115 @@
 
 
 
+.competition-container {
+  position: relative;  /* Pour que .labels-container puisse s'y référer */
+  margin: 0 auto;      /* Centre horizontalement */
+  width: 90%;
+  max-width: 600px;
+  padding: 5px 15px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* On place .labels-container ABSOLUMENT dans .competition-container */
+.labels-container {
+  position: absolute;
+  top: 0px; /* Ajuste pour remonter/descendre au-dessus de la barre */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;  /* Men(...) à gauche, Women(...) à droite */
+  align-items: center;
+  padding: 0 10px;                 /* Petite marge horizontale */
+}
+
+.men-label, .women-label {
+  font-size: 0.6rem;    /* Réduit la taille, ajuste selon tes besoins */
+  font-weight: normal;
+  opacity: 0.9;
+  /* tu peux ajouter un margin si besoin, ex: margin-top: 4px; */
+}
+
+
+.men-label {
+  left: 0px;
+  margin-left: 18px;
+}
+.women-label {
+  right: 0;
+  margin-right: 5px; 
+}
+
+/* Barre de progression */
+.progress-bar {
+  position: relative;
+  display: flex;
+  height: 27px;              /* Hauteur de la barre */
+  background-color: #333333; /* Couleur de fond */
+  border-radius: 15px;       /* Bords arrondis globaux */
+  overflow: visible;         /* Pour que les angles intérieurs et l'icône puissent déborder si besoin */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  margin-top: 6px; /* On laisse un peu de place au-dessus 
+                       pour que les labels ne se chevauchent pas */
+  /* plus besoin d’un margin-bottom: 5px dans .labels-container */
+}
+
+/* Segments Homme/Femme avec arrondis personnalisés */
+.progress-bar .male {
+  border-radius: 15px 0 0 5px; /* Arrondi à gauche */
+  background: linear-gradient(to right, #0000FF, #1E90FF);
+  transition: width 1.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: normal; 
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+.progress-bar .female {
+  border-radius: 0 5px 15px 0; /* Arrondi à droite */
+  background: linear-gradient(to left, #FF69B4, #FF1493);
+  transition: width 1.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: normal; 
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+/* Icône (éclair) */
+.icon-container {
+  position: absolute;
+  top: 50%;            /* Placé au milieu vertical */
+  left: 50%;           /* Ajusté par JS, ici juste la base */
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  z-index: 2; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-container img {
+  width: 90%;
+  height: auto;
+  transform: rotate(-10deg);
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Légende (active members) */
+.active-info {
+  width: 100%;
+  text-align: right;
+  font-size: 0.6em;
+  color: #ffffff;
+  opacity: 0.8;
+  display: none;
+}
 
 
   </style>
@@ -642,6 +751,23 @@
 <div class="podium-wrapper" id="podiumWrapper">
   <!-- Photo du coach en haut à gauche pour les podiums -->
   <img class="coach-podium-photo" id="currentCoachPodiumPhoto" style="display: none;" alt="Photo du coach podium actuel">
+</div>
+
+
+
+<div class="competition-container">
+  <div class="labels-container">
+    <div id="menLabel" class="men-label"></div>
+    <div id="womenLabel" class="women-label"></div>
+  </div>
+  <div id="genderProgressBar" class="progress-bar">
+    <div id="maleBar" class="male"></div>
+    <div id="femaleBar" class="female"></div>
+    <div id="dynamicIcon" class="icon-container"></div>
+  </div>
+  <div class="active-info">
+    * active members only
+  </div>
 </div>
 
 <!-- Titre du mois actuel -->
@@ -766,6 +892,7 @@
         .then(data => {
           console.log('Données chargées:', data);
           updateLeaderboard(data);
+          updateMenWomenBar(data);  // <---- on appelle la barre ici
           if (isFirstLoad) {
             hideLoadingOverlay();
           }
@@ -775,6 +902,44 @@
           console.error("Erreur lors du chargement du leaderboard:", error);
           hideLoadingOverlay();
         });
+    }
+
+    // Dans ton script principal (celui où tu as déjà loadLeaderboard() etc.)
+    function updateMenWomenBar(data) {
+      const totalMEPs = data.current.total_meps_by_gender.male + data.current.total_meps_by_gender.female;
+      const maleMEPs  = data.current.total_meps_by_gender.male;
+      const femaleMEPs = data.current.total_meps_by_gender.female;
+      const maleUsers = data.current.active_users.male;
+      const femaleUsers = data.current.active_users.female;
+
+      const malePercentage = (maleMEPs / totalMEPs) * 100 || 50;
+
+      // Largeur des barres
+      document.getElementById('maleBar').style.width   = `${malePercentage}%`;
+      document.getElementById('femaleBar').style.width = `${100 - malePercentage}%`;
+
+       // Labels au-dessus (Men(...), Women(...))
+       document.getElementById('menLabel').textContent    = `Garçons - ${maleUsers} actif(s)`;
+        document.getElementById('womenLabel').textContent  = `Filles - ${femaleUsers} active(s)`;
+
+        // Affiche uniquement le nombre de MEPs dans la barre
+        document.getElementById('maleBar').innerHTML   = `<strong>${maleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
+        document.getElementById('femaleBar').innerHTML = `<strong>${femaleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
+
+      // Choix icône
+      let iconUrl = '';
+      if (maleMEPs > femaleMEPs) {
+        iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/851e5185-0160-776f-b434-f53d347ed959.png';
+      } else if (femaleMEPs > maleMEPs) {
+        iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8205d97a-64d2-5e9b-dadd-0fde4ccdac1a.png';
+      } else {
+        iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/b07454d8-644c-2b5b-bf26-ec61ea53d152.png';
+      }
+
+      // Insérer l'icône
+      const dynamicIcon = document.getElementById('dynamicIcon');
+      dynamicIcon.innerHTML = `<img src="${iconUrl}" alt="Dynamic Icon">`;
+      dynamicIcon.style.left = `calc(${malePercentage}% + 3px)`;
     }
 
     /**
