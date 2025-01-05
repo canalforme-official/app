@@ -911,6 +911,12 @@
       const femaleMEPs = data.current.total_meps_by_gender.female;
       const maleUsers = data.current.active_users.male;
       const femaleUsers = data.current.active_users.female;
+      const maleInactiveUsers = data.current.inactive_users.male;
+      const femaleInactiveUsers = data.current.inactive_users.female; 
+
+      // Calcul des totaux (actifs + inactifs)
+      const maleTotalUsers = maleUsers + maleInactiveUsers;
+      const femaleTotalUsers = femaleUsers + femaleInactiveUsers;
 
       const malePercentage = (maleMEPs / totalMEPs) * 100 || 50;
 
@@ -919,9 +925,9 @@
       document.getElementById('femaleBar').style.width = `${100 - malePercentage}%`;
 
        // Labels au-dessus (Men(...), Women(...))
-       document.getElementById('menLabel').textContent    = `Garçons - ${maleUsers} actif(s)`;
-        document.getElementById('womenLabel').textContent  = `Filles - ${femaleUsers} active(s)`;
-
+       document.getElementById('menLabel').innerHTML    = `<strong>Garçons</strong> ${maleUsers} Actifs / ${maleTotalUsers}`;
+       document.getElementById('womenLabel').innerHTML  = `<strong>Filles</strong> ${femaleUsers} Inactives / ${femaleTotalUsers}`;
+       
         // Affiche uniquement le nombre de MEPs dans la barre
         document.getElementById('maleBar').innerHTML   = `<strong>${maleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
         document.getElementById('femaleBar').innerHTML = `<strong>${femaleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
