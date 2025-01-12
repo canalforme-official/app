@@ -32,6 +32,14 @@
       background: transparent;
     }
 
+    /* Tout en haut de ton style */
+    .month-block, 
+    #currentMonthContainer, 
+    #previousMonthContainer, 
+    .podium-wrapper {
+      display: none;
+    }
+
     .container {
       display: flex;
       flex-direction: column;
@@ -875,10 +883,21 @@
     /**
      * Cache l'overlay de chargement et affiche le contenu principal
      */
-    function hideLoadingOverlay() {
+     function hideLoadingOverlay() {
       document.getElementById('loadingOverlay').style.display = 'none';
-      const containers = document.querySelectorAll('.container');
-      containers.forEach(container => container.style.display = 'flex');
+
+      // Rétablir .container
+      document.querySelectorAll('.container')
+        .forEach(el => el.style.display = 'flex');
+
+      // Rétablir .month-block
+      document.querySelectorAll('.month-block')
+        .forEach(el => el.style.display = 'block');
+
+      // Rétablir .podium-wrapper
+      document.querySelectorAll('.podium-wrapper')
+        .forEach(el => el.style.display = 'flex');
+
       isFirstLoad = false;
     }
 
