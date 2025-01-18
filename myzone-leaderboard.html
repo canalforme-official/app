@@ -925,9 +925,12 @@
 
     // Dans ton script principal (celui où tu as déjà loadLeaderboard() etc.)
     function updateMenWomenBar(data) {
-      const totalMEPs = data.current.total_meps_by_gender.male + data.current.total_meps_by_gender.female;
-      const maleMEPs  = data.current.total_meps_by_gender.male;
-      const femaleMEPs = data.current.total_meps_by_gender.female;
+      //const totalMEPs = data.current.total_meps_by_gender.male + data.current.total_meps_by_gender.female;
+      //const maleMEPs  = data.current.total_meps_by_gender.male;
+      //const femaleMEPs = data.current.total_meps_by_gender.female;
+      const maleMEPs = parseFloat(data.current.meps_averages.male);
+      const femaleMEPs = parseFloat(data.current.meps_averages.female);
+      const totalMEPs = maleMEPs + femaleMEPs; // La somme des moyennes pour le calcul des pourcentages
       const maleUsers = data.current.active_users.male;
       const femaleUsers = data.current.active_users.female;
       const maleInactiveUsers = data.current.inactive_users.male;
@@ -948,8 +951,12 @@
        document.getElementById('womenLabel').innerHTML  = `<strong>Filles</strong> ${femaleUsers} Actives / ${femaleTotalUsers}`;
        
         // Affiche uniquement le nombre de MEPs dans la barre
-        document.getElementById('maleBar').innerHTML   = `<strong>${maleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
-        document.getElementById('femaleBar').innerHTML = `<strong>${femaleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
+        //document.getElementById('maleBar').innerHTML   = `<strong>${maleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
+        //document.getElementById('femaleBar').innerHTML = `<strong>${femaleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
+
+        // Affiche uniquement la moyenne de MEPs dans la barre
+        document.getElementById('maleBar').innerHTML = `<strong>${Math.round(maleMEPs).toLocaleString('fr-FR')} MEPs </strong> (Moyenne)`;
+        document.getElementById('femaleBar').innerHTML = `<strong>${Math.round(femaleMEPs).toLocaleString('fr-FR')} MEPs</strong> (Moyenne)`;
 
       // Choix icône
       let iconUrl = '';
