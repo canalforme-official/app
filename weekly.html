@@ -766,7 +766,7 @@
 
         // Sinon, on fait un fetch pour obtenir les nouvelles données
         //return fetch('testweeklydata1.json')
-        return fetch('https://www.googleapis.com/drive/v3/files/1Gx8yDF2DaKIEmnQHouXxe0XJ6F7KfUJu?alt=media&key=AIzaSyD_euw_yW9Yr_-xG78rcNrRnAs7YZVpnUA')
+        return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning.json')
           .then(response => response.json())
           .then(data => {
             // Stocke les données dans le cache avec une expiration de 60 minutes
