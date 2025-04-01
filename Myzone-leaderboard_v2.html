@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Myzone Leaderboard - Canal Forme</title>
-  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png">
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
@@ -259,7 +259,12 @@
       }
 
       .logo-container {
-        display: none; /* Masque complètement le conteneur */
+        display: none !important; /* Forcer le masquage sur mobile */
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
 
       .month-block {
@@ -292,8 +297,28 @@
       max-width: 600px;
       margin: 0 auto;
       margin-top: 20px;
+      margin-bottom: 10px; /* Ajout d'une marge en bas */
       position: relative;
       z-index: 1; /* S'assurer que le podium est en dessous */
+    }
+
+    /* Réduire l'espacement entre les podiums */
+    #previousPodiumWrapper {
+      margin-top: 10px; /* Réduit l'espacement entre les podiums */
+    }
+
+    /* Ajuster l'espacement du conteneur de compétition */
+    .competition-container {
+      position: relative;
+      margin: 0 auto;
+      width: 90%;
+      max-width: 600px;
+      padding: 5px 15px;
+      border-radius: 16px;
+      background-color: transparent;
+      box-shadow: none;
+      display: none;
+      margin-top: 20px; /* Ajout d'une marge en haut */
     }
 
     .step {
@@ -660,18 +685,6 @@
   z-index: 2; /* S'assurer qu'elle est au-dessus des autres éléments */
 }
 
-.competition-container {
-  position: relative;
-  margin: 0 auto;
-  width: 90%;
-  max-width: 600px;
-  padding: 5px 15px;
-  border-radius: 16px;
-  background-color: transparent;
-  box-shadow: none; /* Suppression de l'ombre */
-  display: none;
-}
-
 /* On place .labels-container ABSOLUMENT dans .competition-container */
 .labels-container {
   position: absolute;
@@ -954,7 +967,12 @@
      */
      function hideLoadingOverlay() {
       document.getElementById('loadingOverlay').style.display = 'none';
-      document.querySelector('.logo-container').style.display = 'flex'; // Affiche le logo container
+      
+      // Vérifier si on est sur mobile avant d'afficher le logo
+      const isMobile = window.innerWidth <= 600;
+      if (!isMobile) {
+        document.querySelector('.logo-container').style.display = 'flex';
+      }
 
       // Rétablir .container
       document.querySelectorAll('.container')
@@ -1027,9 +1045,14 @@
         womenLabel.classList.add('winner');
       }
 
+      // Gestion du pluriel/singulier pour les hommes
+      const maleLabel = maleUsers === 1 ? 'Actif' : 'Actifs';
+      // Gestion du pluriel/singulier pour les femmes
+      const femaleLabel = femaleUsers === 1 ? 'Active' : 'Actives';
+
       // Mise à jour des labels avec les nouvelles icônes
-      menLabel.innerHTML = `👨 ${maleUsers} Actifs / ${maleTotalUsers}`;
-      womenLabel.innerHTML = `👩 ${femaleUsers} Actives / ${femaleTotalUsers}`;
+      menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}`;
+      womenLabel.innerHTML = `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
 
       // Affiche les MEPs dans la barre
       document.getElementById('maleBar').innerHTML = `<strong>${Math.round(maleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
@@ -1405,6 +1428,12 @@
     function initializePage() {
       // Ajouter la classe loading au body
       document.body.classList.add('loading');
+      
+      // Vérifier si on est sur mobile
+      const isMobile = window.innerWidth <= 600;
+      if (isMobile) {
+        document.querySelector('.logo-container').style.display = 'none';
+      }
       
       // Afficher l'overlay de chargement
       const loadingOverlay = document.getElementById('loadingOverlay');
