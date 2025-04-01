@@ -11,16 +11,58 @@
 
   <style>
     /* Styles généraux */
-    body, button, a, img {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
-    touch-action: manipulation; /* Améliore la réactivité sur mobile */
+    :root {
+      /* Couleurs principales */
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      
+      /* Couleurs spécifiques */
+      --women-color: #E4A672;
+      --pool-color: #78D1B6;
+      
+      /* Couleurs de fond */
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      
+      /* Couleurs de texte */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-tertiary: #555555;
+      --text-light: #FFFFFF;
+      
+      /* Transparences primary */
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
+      --primary-lighter: rgba(72, 6, 7, 0.5);
+      
+      /* Transparences secondary */
+      --secondary-light: rgba(255, 166, 48, 0.75);
+      --secondary-lighter: rgba(255, 166, 48, 0.7);
+      
+      /* Transparences spécifiques */
+      --women-color-light: rgba(228, 166, 114, 0.3);
+      --pool-color-light: rgba(120, 209, 182, 0.3);
+      
+      /* Ombres */
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      
+      /* États */
+      --state-past: #aaaaaa;
+      --overlay-light: rgba(255, 255, 255, 0.3);
+      --overlay-lighter: rgba(255, 255, 255, 0.2);
     }
 
-  /* Assurer que html et body occupent toute la hauteur et ajouter les styles de body */
+    body, button, a, img {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
     html, body {
       height: 100%;
       margin: 0;
@@ -29,8 +71,8 @@
       position: fixed;
       width: 100%;
       font-family: Arial, sans-serif;
-      background-color: #F5F5F5;
-      color: #480607;
+      background-color: var(--background-main);
+      color: var(--primary-color);
     }
 
     body {
@@ -67,7 +109,7 @@
     }
 
     .header-wrapper h1 {
-      color: #480607;
+      color: var(--primary-color);
       font-size: 1.8em;
       margin: 0;
     }
@@ -84,12 +126,12 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      color: #480607;
+      color: var(--primary-color);
     }
 
     .filters input[type="checkbox"] {
       margin-right: 5px;
-      accent-color: #ffa630;
+      accent-color: var(--secondary-color);
     }
 
     /* Style personnalisé pour les checkboxes */
@@ -98,7 +140,7 @@
       -webkit-appearance: none;
       width: 16px;
       height: 16px;
-      border: 2px solid #ffa630;
+      border: 2px solid var(--secondary-color);
       border-radius: 3px;
       margin-right: 5px;
       position: relative;
@@ -106,13 +148,13 @@
     }
 
     .filters input[type="checkbox"]:checked {
-      background-color: #ffa630;
+      background-color: var(--secondary-color);
     }
 
     .filters input[type="checkbox"]:checked::after {
       content: '✓';
       position: absolute;
-      color: #480607;
+      color: var(--primary-color);
       font-size: 12px;
       top: 50%;
       left: 50%;
@@ -128,11 +170,11 @@
     #loadingMessage {
       margin-top: 50px;
       font-size: 1.5em;
-      color: #fff;
+      color: var(--text-light);
       text-align: center;
       width: 80%;
       max-width: 600px;
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: var(--overlay-light);
       padding: 10px;
       border-radius: 10px;
       z-index: 1000000;
@@ -306,11 +348,11 @@
 
     /* Ligne des titres avec fond rouge moins transparent et texte blanc */
     .weekly-schedule thead th {
-      background-color: #ffa630;
-      color: #480607;
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
       text-align: center;
-      font-size: 1.5em; /* Augmentation de 25% de la taille du texte */
-      border-bottom: 2px solid #ccc;
+      font-size: 1.5em;
+      border-bottom: 2px solid var(--shadow-light);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -319,11 +361,11 @@
 
     /* Animation améliorée pour le jour actuel */
     .weekly-schedule thead th.today {
-      background-color: #ffa630;
+      background-color: var(--secondary-color);
       position: sticky;
       top: 0;
       z-index: 10;
-      color: #480607;
+      color: var(--primary-color);
       overflow: hidden;
       pointer-events: none;
     }
@@ -360,19 +402,19 @@
       text-align: center;
       padding: 5px;
       font-weight: bold;
-      color: #480607;
+      color: var(--primary-color);
     }
 
     /* Alternance de couleurs pour les time-cell */
     .weekly-schedule td.time-cell-white {
-      background-color: #ffffff;
-      color: #480607;
+      background-color: var(--background-card);
+      color: var(--primary-color);
       text-align: center;
     }
 
     .weekly-schedule td.time-cell-grey {
-      background-color: #f0f0f0;
-      color: #480607;
+      background-color: var(--background-main);
+      color: var(--primary-color);
       text-align: center;
     }
 
@@ -380,42 +422,90 @@
     .course-cell {
       min-width: 100px;
       text-align: center;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid var(--shadow-light);
       position: relative;
       padding: 5px;
     }
 
     /* Styles pour les lignes blanches et grises */
     .course-row-white .course-cell {
-      background-color: #ffffff;
-      color: #480607;
+      background-color: var(--background-card);
+      color: var(--text-primary);
     }
 
     .course-row-grey .course-cell {
-      background-color: #f0f0f0;
-      color: #480607;
+      background-color: var(--background-main);
+      color: var(--text-primary);
     }
 
     /* Ajustement des blocs de cours */
     .course-block {
-      margin-bottom: 5px; /* Réduction de l'espace entre les blocs */
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      background-color: #ffffff; /* Fond blanc pour les cours mixtes */
-      position: relative;
-      overflow: visible;
-      transition: transform 0.3s;
-      z-index: 1; /* Assure que le bloc est sous le cercle de compte à rebours */
+      background-color: var(--background-card);
+      border: 1px solid var(--shadow-light);
+      border-radius: 5px;
+      padding: 5px;
+      margin: 2px;
+      font-size: 0.9em;
     }
 
-    /* Effet de rebond pour les cours commençant dans moins de 15 minutes */
+    /* Styles pour les cours mixtes */
+    .course-block.mixte {
+      border: 1px solid var(--text-secondary);
+    }
+
+    /* Styles pour les cours femmes */
+    .course-block.women-only {
+      border: 1px solid var(--women-color);
+      background-color: var(--women-color-light);
+    }
+
+    /* Styles pour les cours piscine */
+    .course-block.piscine {
+      border: 1px solid var(--pool-color);
+      background-color: var(--pool-color-light);
+    }
+
+    /* Styles pour les cours en cours */
+    .course-block.current {
+      border: 2px solid var(--primary-color);
+      font-weight: bold;
+    }
+
+    /* Styles pour les cours qui vont bientôt démarrer */
     .course-block.starting-soon {
-      animation: heartbeat 1.5s ease-in-out infinite;
+      border: 2px solid var(--secondary-color);
+      animation: pulse 1.5s infinite;
     }
 
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
+    /* Styles pour les cours passés */
+    .course-block.past {
+      opacity: 0.5;
+      color: var(--state-past);
+    }
+
+    /* Style pour le titre du cours */
+    .course-title {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    /* Style pour le nom du coach */
+    .coach-name {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    /* Style pour le studio */
+    .studio-name {
+      font-size: 0.7em;
+      color: var(--text-tertiary);
+    }
+
+    /* Animation de pulsation */
+    @keyframes pulse {
+      0% { transform: scale(1); }
       50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
 
 /* Styles pour la pilule de compte à rebours */
@@ -426,8 +516,8 @@
     transform: translateX(-50%);
     width: 40px;
     height: 14px;
-    background-color: #ffa630; /* Même couleur que les titres des jours */
-    color: #480607; /* Couleur du texte en contraste */
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
     border-radius: 7px;
     display: flex;
     align-items: center;
@@ -435,21 +525,21 @@
     font-size: 0.75em;
     font-weight: bold;
     padding: 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px var(--shadow-medium);
     z-index: 5;
 }
 
 
     /* Styles pour les cours "100% Femmes" */
     .course-block.women-only {
-      background-color: #FFF0F5;
-      border: 1px solid #FF69B4;
+      background-color: var(--women-color-light);
+      border: 1px solid var(--women-color);
     }
 
     /* Styles pour les cours "Piscine" */
     .course-block.piscine {
-      background-color: #E0F7FF;
-      border: 1px solid #1E90FF;
+      background-color: var(--pool-color-light);
+      border: 1px solid var(--pool-color);
     }
 
     /* Styles spécifiques pour les logos de cours */
@@ -465,7 +555,7 @@
     .course-info {
       font-size: 1em;
       font-weight: bold;
-      color: #000;
+      color: var(--text-primary);
       margin-bottom: 4px;
     }
 
@@ -475,11 +565,11 @@
       align-items: center;
       justify-content: flex-start;
       margin-top: 1px;
-      color: #480607;
+      color: var(--primary-color);
     }
 
     .single-coach span {
-      color: #480607;
+      color: var(--primary-color);
     }
 
     .single-coach img {
