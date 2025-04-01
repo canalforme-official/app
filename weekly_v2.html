@@ -230,76 +230,89 @@
       }
     }
 
-/* Style du bouton de retour à aujourd'hui */
+/* Style pour le bouton today-view */
 .today-view-button {
+  display: flex;
   position: fixed;
   bottom: 20px;
   right: 10px;
   z-index: 1000;
-  background-color: rgba(72,6,7, 0.8);
+  background-color: var(--primary-light);
   padding: 8px;
   border-radius: 50%;
-  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
   width: 50px;
   height: 50px;
   animation: auraPulse 1.5s ease-in-out infinite;
-  pointer-events: auto !important;
+}
+
+.today-view-button button {
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+  padding: 0;
 }
 
 /* Ajustement de la taille du cercle extérieur */
 .today-view-button::before {
   content: '';
-  width: 35px; /* Taille réduite du cercle extérieur */
+  width: 35px;
   height: 35px;
-  border-radius: 50%; /* Cercle parfait */
+  border-radius: 50%;
   position: absolute;
-  border: 3px solid rgba(255, 255, 255, 0.9);
+  border: 3px solid var(--text-light);
   box-sizing: border-box;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Centrement parfait */
-  z-index: 1; /* S'assurer que le cercle est cliquable */
+  transform: translate(-50%, -50%);
+  z-index: 1;
   animation: zoomPulse 1.5s ease-in-out infinite;
 }
 
 /* Ajustement de la taille du cercle intérieur */
 .today-view-button::after {
   content: '';
-  width: 11px; /* Taille réduite du cercle intérieur */
+  width: 11px;
   height: 11px;
-  background-color: rgba(255, 255, 255, 0.9); /* Cercle plein rouge */
+  background-color: var(--text-light);
   border-radius: 50%;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Centrement parfait */
-  z-index: 2; /* Assure que ce disque est au-dessus et cliquable */
+  transform: translate(-50%, -50%);
+  z-index: 2;
   animation: zoomPulse 1.5s ease-in-out infinite;
 }
 
-/* Animation pour l'aura */
+/* Nouvelle animation pour l'aura rouge */
 @keyframes auraPulse {
   0% {
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3), 0 0 45px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
   }
   50% {
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.2), 0 0 55px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
   }
   100% {
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3), 0 0 45px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
   }
 }
-
 
 /* Styles :hover pour le bouton today-view */
 @media (hover: hover) {
   .today-view-button:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+    background-color: var(--primary-lighter);
+    box-shadow: 0px 6px 12px var(--shadow-dark);
     transform: scale(1.05);
   }
 }
@@ -309,204 +322,181 @@
   transform: scale(1.05);
 }
 
-
-
-/* Le lien doit occuper toute la zone du bouton */
-.today-view-button a {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* Styles pour le tableau du planning hebdomadaire */
+.weekly-schedule {
   width: 100%;
-  height: 100%;
-  z-index: 3; /* S'assurer que l'élément est cliquable */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  pointer-events: auto !important;
+  border-collapse: collapse;
+  margin: 0 auto;
+  table-layout: fixed; /* Assure une largeur égale des colonnes */
 }
 
-    .today-view-button img {
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-    }
+.weekly-schedule th, .weekly-schedule td {
+  padding: 5px; /* Réduction du padding */
+  vertical-align: top;
+  border: none;
+}
 
-    /* Styles pour le tableau du planning hebdomadaire */
-    .weekly-schedule {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0 auto;
-      table-layout: fixed; /* Assure une largeur égale des colonnes */
-    }
+/* Ligne des titres avec fond rouge moins transparent et texte blanc */
+.weekly-schedule thead th {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  text-align: center;
+  font-size: 1.5em;
+  border-bottom: 2px solid var(--shadow-light);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  pointer-events: none;
+}
 
-    .weekly-schedule th, .weekly-schedule td {
-      padding: 5px; /* Réduction du padding */
-      vertical-align: top;
-      border: none;
-    }
+/* Animation améliorée pour le jour actuel */
+.weekly-schedule thead th.today {
+  background-color: var(--secondary-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  color: var(--primary-color);
+  overflow: hidden;
+  pointer-events: none;
+}
 
-    /* Ligne des titres avec fond rouge moins transparent et texte blanc */
-    .weekly-schedule thead th {
-      background-color: var(--secondary-color);
-      color: var(--primary-color);
-      text-align: center;
-      font-size: 1.5em;
-      border-bottom: 2px solid var(--shadow-light);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      pointer-events: none;
-    }
+/* Superposition pour l'effet de lumière */
+.weekly-schedule thead th.today::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%; /* Commence bien en dehors du texte */
+  width: 300%; /* Plus large que le conteneur pour simuler un balayage net */
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 55%, rgba(255,255,255,0) 100%);
+  animation: lightSweep 3s infinite ease-in-out; /* Animation plus lente et fluide */
+}
 
-    /* Animation améliorée pour le jour actuel */
-    .weekly-schedule thead th.today {
-      background-color: var(--secondary-color);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      color: var(--primary-color);
-      overflow: hidden;
-      pointer-events: none;
-    }
+/* Animation de balayage de lumière */
+@keyframes lightSweep {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
 
-  /* Superposition pour l'effet de lumière */
-  .weekly-schedule thead th.today::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%; /* Commence bien en dehors du texte */
-    width: 300%; /* Plus large que le conteneur pour simuler un balayage net */
-    height: 100%;
-    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 55%, rgba(255,255,255,0) 100%);
-    animation: lightSweep 3s infinite ease-in-out; /* Animation plus lente et fluide */
+
+  /* Styles pour la cellule des heures */
+  .weekly-schedule th:first-child,
+  .weekly-schedule td.time-cell {
+    width: 50px;
+    min-width: 20px;
+    max-width: 60px;
+    text-align: center;
+    padding: 5px;
+    font-weight: bold;
+    color: var(--primary-color);
   }
 
-  /* Animation de balayage de lumière */
-  @keyframes lightSweep {
-    0% {
-      left: -150%;
-    }
-    100% {
-      left: 150%;
-    }
+  /* Alternance de couleurs pour les time-cell */
+  .weekly-schedule td.time-cell-white {
+    background-color: var(--background-card);
+    color: var(--primary-color);
+    text-align: center;
   }
 
+  .weekly-schedule td.time-cell-grey {
+    background-color: var(--background-main);
+    color: var(--primary-color);
+    text-align: center;
+  }
 
-    /* Styles pour la cellule des heures */
-    .weekly-schedule th:first-child,
-    .weekly-schedule td.time-cell {
-      width: 50px;
-      min-width: 20px;
-      max-width: 60px;
-      text-align: center;
-      padding: 5px;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
+  /* Ajustement des cellules des cours */
+  .course-cell {
+    min-width: 100px;
+    text-align: center;
+    border-bottom: 1px solid var(--shadow-light);
+    position: relative;
+    padding: 5px;
+  }
 
-    /* Alternance de couleurs pour les time-cell */
-    .weekly-schedule td.time-cell-white {
-      background-color: var(--background-card);
-      color: var(--primary-color);
-      text-align: center;
-    }
+  /* Styles pour les lignes blanches et grises */
+  .course-row-white .course-cell {
+    background-color: var(--background-card);
+    color: var(--text-primary);
+  }
 
-    .weekly-schedule td.time-cell-grey {
-      background-color: var(--background-main);
-      color: var(--primary-color);
-      text-align: center;
-    }
+  .course-row-grey .course-cell {
+    background-color: var(--background-main);
+    color: var(--text-primary);
+  }
 
-    /* Ajustement des cellules des cours */
-    .course-cell {
-      min-width: 100px;
-      text-align: center;
-      border-bottom: 1px solid var(--shadow-light);
-      position: relative;
-      padding: 5px;
-    }
+  /* Ajustement des blocs de cours */
+  .course-block {
+    background-color: var(--background-card);
+    border: 1px solid var(--shadow-light);
+    border-radius: 5px;
+    padding: 5px;
+    margin: 2px;
+    font-size: 0.9em;
+  }
 
-    /* Styles pour les lignes blanches et grises */
-    .course-row-white .course-cell {
-      background-color: var(--background-card);
-      color: var(--text-primary);
-    }
+  /* Styles pour les cours mixtes */
+  .course-block.mixte {
+    border: 1px solid var(--text-secondary);
+  }
 
-    .course-row-grey .course-cell {
-      background-color: var(--background-main);
-      color: var(--text-primary);
-    }
+  /* Styles pour les cours femmes */
+  .course-block.women-only {
+    border: 1px solid var(--women-color);
+    background-color: var(--women-color-light);
+  }
 
-    /* Ajustement des blocs de cours */
-    .course-block {
-      background-color: var(--background-card);
-      border: 1px solid var(--shadow-light);
-      border-radius: 5px;
-      padding: 5px;
-      margin: 2px;
-      font-size: 0.9em;
-    }
+  /* Styles pour les cours piscine */
+  .course-block.piscine {
+    border: 1px solid var(--pool-color);
+    background-color: var(--pool-color-light);
+  }
 
-    /* Styles pour les cours mixtes */
-    .course-block.mixte {
-      border: 1px solid var(--text-secondary);
-    }
+  /* Styles pour les cours en cours */
+  .course-block.current {
+    border: 2px solid var(--primary-color);
+    font-weight: bold;
+  }
 
-    /* Styles pour les cours femmes */
-    .course-block.women-only {
-      border: 1px solid var(--women-color);
-      background-color: var(--women-color-light);
-    }
+  /* Styles pour les cours qui vont bientôt démarrer */
+  .course-block.starting-soon {
+    border: 2px solid var(--secondary-color);
+    animation: pulse 1.5s infinite;
+  }
 
-    /* Styles pour les cours piscine */
-    .course-block.piscine {
-      border: 1px solid var(--pool-color);
-      background-color: var(--pool-color-light);
-    }
+  /* Styles pour les cours passés */
+  .course-block.past {
+    opacity: 0.5;
+    color: var(--state-past);
+  }
 
-    /* Styles pour les cours en cours */
-    .course-block.current {
-      border: 2px solid var(--primary-color);
-      font-weight: bold;
-    }
+  /* Style pour le titre du cours */
+  .course-title {
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
 
-    /* Styles pour les cours qui vont bientôt démarrer */
-    .course-block.starting-soon {
-      border: 2px solid var(--secondary-color);
-      animation: pulse 1.5s infinite;
-    }
+  /* Style pour le nom du coach */
+  .coach-name {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+  }
 
-    /* Styles pour les cours passés */
-    .course-block.past {
-      opacity: 0.5;
-      color: var(--state-past);
-    }
+  /* Style pour le studio */
+  .studio-name {
+    font-size: 0.7em;
+    color: var(--text-tertiary);
+  }
 
-    /* Style pour le titre du cours */
-    .course-title {
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-
-    /* Style pour le nom du coach */
-    .coach-name {
-      font-size: 0.8em;
-      color: var(--text-secondary);
-    }
-
-    /* Style pour le studio */
-    .studio-name {
-      font-size: 0.7em;
-      color: var(--text-tertiary);
-    }
-
-    /* Animation de pulsation */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
+  /* Animation de pulsation */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
 
 /* Styles pour la pilule de compte à rebours */
 .countdown-pill {
@@ -530,302 +520,379 @@
 }
 
 
-    /* Styles pour les cours "100% Femmes" */
-    .course-block.women-only {
-      background-color: var(--women-color-light);
-      border: 1px solid var(--women-color);
+  /* Styles pour les cours "100% Femmes" */
+  .course-block.women-only {
+    background-color: var(--women-color-light);
+    border: 1px solid var(--women-color);
+  }
+
+  /* Styles pour les cours "Piscine" */
+  .course-block.piscine {
+    background-color: var(--pool-color-light);
+    border: 1px solid var(--pool-color);
+  }
+
+  /* Styles spécifiques pour les logos de cours */
+  .logo-cours {
+    max-width: 90%;
+    max-height: 35px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Styles pour les cours */
+  .course-info {
+    font-size: 1em;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .single-coach {
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 1px;
+    color: var(--primary-color);
+  }
+
+  .single-coach span {
+    color: var(--primary-color);
+  }
+
+  .single-coach img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-left: 10px; /* Ajoute de l'espace à gauche de l'image */
+    margin-bottom: 2px;
+  }
+
+  /* Styles pour les coachs multiples avec uniquement les images */
+  .multiple-coaches {
+    display: flex;
+    justify-content: center;
+    gap: 1px; /* Espacement entre les images */
+  }
+
+  .coach-image {
+    width: 30px; /* Largeur de l'image */
+    height: 30px; /* Hauteur de l'image */
+    border-radius: 50%; /* Pour que l'image soit ronde */
+  }
+
+  /* Cacher les coachs si le filtre est décoché */
+  .hide-coaches .single-coach,
+  .hide-coaches .multiple-coaches {
+    display: none;
+  }
+
+  #weeklySchedule {
+    height: 100%;
+  }
+
+  /* Styles spécifiques pour les appareils mobiles avec rotation */
+  @media screen and (max-width: 767px) {
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: fixed;
     }
 
-    /* Styles pour les cours "Piscine" */
-    .course-block.piscine {
-      background-color: var(--pool-color-light);
-      border: 1px solid var(--pool-color);
+    body {
+      transform: rotate(90deg);
+      transform-origin: bottom left;
+      position: fixed;
+      top: -100vw;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
     }
 
-    /* Styles spécifiques pour les logos de cours */
-    .logo-cours {
-      max-width: 90%;
-      max-height: 35px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-    }
-
-    /* Styles pour les cours */
-    .course-info {
-      font-size: 1em;
-      font-weight: bold;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-
-    .single-coach {
-      font-size: 1em;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      margin-top: 1px;
-      color: var(--primary-color);
-    }
-
-    .single-coach span {
-      color: var(--primary-color);
-    }
-
-    .single-coach img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      margin-right: 10px;
-      margin-left: 10px; /* Ajoute de l'espace à gauche de l'image */
-      margin-bottom: 2px;
-    }
-
-    /* Styles pour les coachs multiples avec uniquement les images */
-    .multiple-coaches {
-      display: flex;
-      justify-content: center;
-      gap: 1px; /* Espacement entre les images */
-    }
-
-    .coach-image {
-      width: 30px; /* Largeur de l'image */
-      height: 30px; /* Hauteur de l'image */
-      border-radius: 50%; /* Pour que l'image soit ronde */
-    }
-
-    /* Cacher les coachs si le filtre est décoché */
-    .hide-coaches .single-coach,
-    .hide-coaches .multiple-coaches {
-      display: none;
+    .content-wrapper {
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
     }
 
     #weeklySchedule {
-      height: 100%;
+      width: 100%;
+      height: auto;
+      transform: none !important;
+      touch-action: pan-y;
     }
 
-    /* Styles spécifiques pour les appareils mobiles avec rotation */
-    @media screen and (max-width: 767px) {
-      html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        position: fixed;
-      }
+    .weekly-schedule {
+      width: 100%;
+      font-size: 0.7em;
+      table-layout: fixed;
+      transform: none !important;
+      touch-action: pan-y;
+    }
 
-      body {
-        transform: rotate(90deg);
-        transform-origin: bottom left;
-        position: fixed;
-        top: -100vw;
-        left: 0;
-        width: 100vh;
-        height: 100vw;
-      }
+    .weekly-schedule th,
+    .weekly-schedule td {
+      padding: 5px 2px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      border: none;
+      margin: 0;
+      touch-action: pan-y;
+    }
 
-      .content-wrapper {
-        width: 100%;
-        height: 100vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 10px;
-        box-sizing: border-box;
-        -webkit-overflow-scrolling: touch;
-        position: relative;
-      }
+      /* Ajout de styles pour le first-child (colonne des heures) dans la ligne des titres */
+    .weekly-schedule th:first-child {
+      width: 40px;
+      min-width: 30px;
+      max-width: 50px;
+      text-align: center;
+      writing-mode: vertical-rl;
+      white-space: nowrap;
+      padding: 2px;
+      transform: none;
+      font-size: 1.2em;
+    }
 
-      #weeklySchedule {
-        width: 100%;
-        height: auto;
-        transform: none !important;
-        touch-action: pan-y;
-      }
+      /* Ajustement des autres colonnes dans la ligne */
+      .weekly-schedule th:not(:first-child) {
+      width: calc((100% - 40px) / 7); /* Les autres colonnes se partagent l'espace restant */
+      padding: 2px;
+    }
 
-      .weekly-schedule {
-        width: 100%;
-        font-size: 0.7em;
-        table-layout: fixed;
-        transform: none !important;
-        touch-action: pan-y;
-      }
+    /* Ajustement des largeurs de colonnes */
+    .weekly-schedule .time-cell {
+      width: 40px;
+      writing-mode: unset;
+      font-size: 1.2em;
+      white-space: nowrap;
+      padding: 2px;
+      text-align: center;
+      transform: none;
+    }
 
-      .weekly-schedule th,
-      .weekly-schedule td {
-        padding: 5px 2px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
-        border: none;
-        margin: 0;
-        touch-action: pan-y;
-      }
+    .weekly-schedule .course-cell {
+      width: calc((100% - 30px) / 7);
+      padding: 2px;
+    }
 
-        /* Ajout de styles pour le first-child (colonne des heures) dans la ligne des titres */
-      .weekly-schedule th:first-child {
-        width: 40px;
-        min-width: 30px;
-        max-width: 50px;
-        text-align: center;
-        writing-mode: vertical-rl;
-        white-space: nowrap;
-        padding: 2px;
-        transform: none;
-        font-size: 1.2em;
-      }
+    /* Réduction des paddings et marges */
+    .weekly-schedule .course-block {
+      padding: 2px;
+      margin-bottom: 2px;
+    }
 
-        /* Ajustement des autres colonnes dans la ligne */
-        .weekly-schedule th:not(:first-child) {
-        width: calc((100% - 40px) / 7); /* Les autres colonnes se partagent l'espace restant */
-        padding: 2px;
-      }
+    .weekly-schedule .course-info {
+      margin-bottom: 2px;
+    }
 
-      /* Ajustement des largeurs de colonnes */
-      .weekly-schedule .time-cell {
-        width: 40px;
-        writing-mode: unset;
-        font-size: 1.2em;
-        white-space: nowrap;
-        padding: 2px;
-        text-align: center;
-        transform: none;
-      }
+    /* Ajustement des polices */
+    .weekly-schedule .course-info {
+      font-size: 0.8em !important;
+      white-space: normal !important;
+    }
 
-      .weekly-schedule .course-cell {
-        width: calc((100% - 30px) / 7);
-        padding: 2px;
-      }
+    .single-coach,
+    .multiple-coaches {
+      font-size: 0.7em !important;
+      white-space: normal !important;
+    }
 
-      /* Réduction des paddings et marges */
-      .weekly-schedule .course-block {
-        padding: 2px;
-        margin-bottom: 2px;
-      }
+    .single-coach img {
+      width: 20px;
+      height: 20px;
+      margin-left: 0px; /* Ajoute de l'espace à gauche de l'image */
+      margin-bottom: 0px;
+    }
 
-      .weekly-schedule .course-info {
-        margin-bottom: 2px;
-      }
+    .multiple-coaches .coach-image {
+      width: 15px; /* Réduire la largeur à 20px */
+      height: 15px; /* Réduire la hauteur à 20px */
+    }
 
-      /* Ajustement des polices */
-      .weekly-schedule .course-info {
-        font-size: 0.8em !important;
-        white-space: normal !important;
-      }
+    /* Ajustement de la taille du cercle de compte à rebours en rotation */
+    .countdown-circle {
+      width: 15px;
+      height: 15px;
+      font-size: 0.5em;
+      top: -8px;
+      right: -8px;
+    }
 
-      .single-coach,
-      .multiple-coaches {
-        font-size: 0.7em !important;
-        white-space: normal !important;
-      }
+    /* Placer le bouton de retour à la vue quotidienne en bas à droite */
+    .today-view-button {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 10px !important;
+      right: 10px !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      pointer-events: auto !important;
+    }
 
-      .single-coach img {
-        width: 20px;
-        height: 20px;
-        margin-left: 0px; /* Ajoute de l'espace à gauche de l'image */
-        margin-bottom: 0px;
-      }
+    /* Styles pour les filtres en vue mobile */
+    .header-wrapper {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
 
-      .multiple-coaches .coach-image {
-        width: 15px; /* Réduire la largeur à 20px */
-        height: 15px; /* Réduire la hauteur à 20px */
-      }
+    .header-wrapper h1 {
+      font-size: 1.5em;
+      margin: 0;
+      flex-shrink: 1;
+    }
 
-      /* Ajustement de la taille du cercle de compte à rebours en rotation */
-      .countdown-circle {
-        width: 15px;
-        height: 15px;
-        font-size: 0.5em;
-        top: -8px;
-        right: -8px;
-      }
+    .filters {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 5px;
+    }
 
-      /* Placer le bouton de retour à la vue quotidienne en bas à droite */
-      .today-view-button {
-        display: flex !important;
-        position: fixed !important;
-        bottom: 10px !important;
-        right: 10px !important;
-        left: auto !important;
-        top: auto !important;
-        transform: none !important;
-        pointer-events: auto !important;
-      }
-
-      /* Styles pour les filtres en vue mobile */
-      .header-wrapper {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        flex-wrap: nowrap;
-      }
-
-      .header-wrapper h1 {
-        font-size: 1.5em;
-        margin: 0;
-        flex-shrink: 1;
-      }
-
-      .filters {
-        justify-content: center;
-        flex-wrap: nowrap;
-        gap: 5px;
-      }
-
-      .filters label {
-        font-size: 0.8em;
-      }
+    .filters label {
+      font-size: 0.8em;
+    }
 /* Masquer la liste déroulante de coachs uniquement en mode paysage sur mobile */
-      #coachFilter {
-        display: none;
-      }
-
+    #coachFilter {
+      display: none;
     }
 
-    /* Masquer tous les éléments pendant le chargement */
-    body.loading .content-wrapper,
-    body.loading .header-wrapper,
-    body.loading .today-view-button,
-    body.loading .filters,
-    body.loading h1,
-    body.loading #weeklySchedule {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
+  }
+
+  /* Masquer tous les éléments pendant le chargement */
+  body.loading .content-wrapper,
+  body.loading .header-wrapper,
+  body.loading .today-view-button,
+  body.loading .filters,
+  body.loading h1,
+  body.loading #weeklySchedule {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Nouveau système de modal */
+  .modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(72,6,7, 0.95) !important;
+    z-index: 999999 !important;
+    display: none;
+    overflow: hidden !important;
+    pointer-events: all !important;
+    opacity: 1 !important;
+  }
+
+  .modal-content {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1000000 !important;
+    display: none;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    background-color: transparent !important;
+  }
+
+  .modal-center-container {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    height: auto !important;
+    pointer-events: none !important;
+    gap: 50px !important;
+    background-color: transparent !important;
+  }
+
+  .modal-center-container img {
+    width: 80px !important;
+    height: auto !important;
+    animation: pulse 2s infinite !important;
+    pointer-events: none !important;
+  }
+
+  .modal-center-container #loadingMessage {
+    font-size: 1.2em !important;
+    color: #fff !important;
+    text-align: center !important;
+    width: 80% !important;
+    max-width: 600px !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    padding: 10px !important;
+    border-radius: 10px !important;
+    pointer-events: none !important;
+    margin-top: -15px !important;
+  }
+
+  /* Ajustement du modal pour la rotation */
+  @media screen and (max-width: 767px) {
+    body {
+      transform: rotate(90deg);
+      transform-origin: bottom left;
+      position: fixed;
+      top: -100vw;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
     }
 
-    /* Nouveau système de modal */
     .modal-backdrop {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
+      width: 100vh !important;
+      height: 100vw !important;
       background-color: rgba(72,6,7, 0.95) !important;
       z-index: 999999 !important;
       display: none;
       overflow: hidden !important;
       pointer-events: all !important;
       opacity: 1 !important;
+      transform: none !important;
     }
 
     .modal-content {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
+      width: 100vh !important;
+      height: 100vw !important;
       z-index: 1000000 !important;
       display: none;
       overflow: hidden !important;
       pointer-events: none !important;
       background-color: transparent !important;
+      transform: none !important;
     }
 
     .modal-center-container {
@@ -843,86 +910,9 @@
       gap: 50px !important;
       background-color: transparent !important;
     }
+  }
 
-    .modal-center-container img {
-      width: 80px !important;
-      height: auto !important;
-      animation: pulse 2s infinite !important;
-      pointer-events: none !important;
-    }
-
-    .modal-center-container #loadingMessage {
-      font-size: 1.2em !important;
-      color: #fff !important;
-      text-align: center !important;
-      width: 80% !important;
-      max-width: 600px !important;
-      background-color: rgba(255, 255, 255, 0.2) !important;
-      padding: 10px !important;
-      border-radius: 10px !important;
-      pointer-events: none !important;
-      margin-top: -15px !important;
-    }
-
-    /* Ajustement du modal pour la rotation */
-    @media screen and (max-width: 767px) {
-      body {
-        transform: rotate(90deg);
-        transform-origin: bottom left;
-        position: fixed;
-        top: -100vw;
-        left: 0;
-        width: 100vh;
-        height: 100vw;
-      }
-
-      .modal-backdrop {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vh !important;
-        height: 100vw !important;
-        background-color: rgba(72,6,7, 0.95) !important;
-        z-index: 999999 !important;
-        display: none;
-        overflow: hidden !important;
-        pointer-events: all !important;
-        opacity: 1 !important;
-        transform: none !important;
-      }
-
-      .modal-content {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vh !important;
-        height: 100vw !important;
-        z-index: 1000000 !important;
-        display: none;
-        overflow: hidden !important;
-        pointer-events: none !important;
-        background-color: transparent !important;
-        transform: none !important;
-      }
-
-      .modal-center-container {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: auto !important;
-        height: auto !important;
-        pointer-events: none !important;
-        gap: 50px !important;
-        background-color: transparent !important;
-      }
-    }
-
-  </style>
+</style>
 </head>
 <body onload="initializeWeeklyPage();">
   <!-- Nouveau système de modal -->
@@ -936,10 +926,10 @@
 
   <div class="content-wrapper">
 
-    <!-- Bouton pour revenir à la vue quotidienne -->
+    <!-- Bouton pour revenir à aujourd'hui -->
     <div class="today-view-button">
-      <a href="./daily_v2.html">
-      </a>
+      <button onclick="window.location.href='./daily_v2.html'">
+      </button>
     </div>
 
     <!-- En-tête avec le titre et les filtres -->
