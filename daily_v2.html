@@ -10,28 +10,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <style>
-    /* Désactivation de la sélection de texte */
-    body, button, a, img {
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        -webkit-tap-highlight-color: transparent; /* Supprime l'effet de surbrillance au clic sur mobile */
-        touch-action: manipulation; /* Améliore la réactivité sur mobile */
+    /* Styles généraux */
+    :root {
+      /* Couleurs principales */
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      
+      /* Couleurs spécifiques */
+      --women-color: #E4A672;
+      --pool-color: #78D1B6;
+      
+      /* Couleurs de fond */
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      
+      /* Couleurs de texte */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-tertiary: #555555;
+      --text-light: #FFFFFF;
+      
+      /* Transparences primary */
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
+      --primary-lighter: rgba(72, 6, 7, 0.5);
+      
+      /* Transparences secondary */
+      --secondary-light: rgba(255, 166, 48, 0.75);
+      --secondary-lighter: rgba(255, 166, 48, 0.7);
+      
+      /* Transparences spécifiques */
+      --women-color-light: rgba(228, 166, 114, 0.3);
+      --pool-color-light: rgba(120, 209, 182, 0.3);
+      
+      /* Ombres */
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      
+      /* États */
+      --state-past: #aaaaaa;
+      --overlay-light: rgba(255, 255, 255, 0.3);
+      --overlay-lighter: rgba(255, 255, 255, 0.2);
     }
 
-    /* Styles généraux */
     body {
       font-family: Arial, sans-serif;
-      background-color: #F5F5F5;
-      color: #333;
+      background-color: var(--background-main);
+      color: var(--text-primary);
       margin: 0;
       padding: 20px;
       scroll-behavior: smooth;
     }
 
     h1 {
-      color: #480607;
+      color: var(--primary-color);
       font-size: 2.5em;
       margin: 0;
       padding: 20px 0 10px 0;
@@ -43,7 +76,7 @@
       top: 20px;
       right: 20px;
       font-size: 1.4em;
-      color: #480607;
+      color: var(--primary-color);
     }
 
     /* Styles pour la timeline */
@@ -52,7 +85,7 @@
       width: 100%;
       max-width: 1000px;
       margin: 0 auto;
-      border-left: 2px solid #480607;
+      border-left: 2px solid var(--primary-color);
     }
 
     .timeline-block {
@@ -70,12 +103,12 @@
       width: 15px;
       height: 15px;
       border-radius: 50%;
-      background-color: #480607;
+      background-color: var(--primary-color);
     }
 
     .time {
       font-size: 1.4em;
-      color: #480607;
+      color: var(--primary-color);
       position: relative;
       top: -5px;
     }
@@ -83,10 +116,10 @@
     /* Styles pour les blocs de cours */
     .course-block {
       position: relative;
-      background-color: #f9f9f9;
+      background-color: var(--background-card);
       padding: 20px 25px;
       border-radius: 15px;
-      box-shadow: 0px 4px 15px rgba(200, 200, 200, 0.3);
+      box-shadow: 0px 4px 15px var(--shadow-light);
       transition: all 0.3s ease;
       width: 80%;
       max-width: 800px;
@@ -104,31 +137,31 @@
 
     /* Couleurs pour les cours "100% Femmes" */
     .course-block.women-only:not(.current):not(.starting-soon) .course-type {
-      color: #FF69B4;
+      color: var(--women-color);
     }
 
     .course-block.women-only {
-      border: 2px solid #FF69B4;
-      background-color: #FFF0F5;
-      box-shadow: 0px 0px 15px 5px rgba(255, 105, 180, 0.5);
+      border: 2px solid var(--women-color);
+      background-color: var(--women-color-light);
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
     }
 
     /* Couleurs pour les cours mixtes */
     .course-block.mixte:not(.current):not(.starting-soon) .course-type {
-      color: #808080;
+      color: var(--text-secondary);
     }
 
     /* Cours passés */
     .course-block.past {
-      border: 2px solid #aaa;
+      border: 2px solid var(--state-past);
       opacity: 0.5;
-      box-shadow: 0px 3px 10px rgba(150, 150, 150, 0.2);
-      color: #aaa;
+      box-shadow: 0px 3px 10px var(--shadow-light);
+      color: var(--state-past);
     }
 
     /* Cours à venir */
     .course-block.upcoming {
-      box-shadow: 0px 6px 15px rgba(150, 150, 150, 0.5);
+      box-shadow: 0px 6px 15px var(--shadow-medium);
     }
 
     /* Cours qui vont bientôt démarrer */
@@ -136,38 +169,38 @@
       font-size: 1.3em;
       padding: 20px 30px;
       animation: heartbeat-blink 1.5s ease-in-out infinite;
-      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0px 6px 20px var(--shadow-dark);
     }
 
     .course-block.starting-soon.mixte {
-      border: 2px solid #808080;
+      border: 2px solid var(--text-secondary);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-mixte 1.5s ease-in-out infinite;
     }
 
     .course-block.starting-soon.women-only {
-      border: 2px solid #FF69B4;
+      border: 2px solid var(--women-color);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-femmes 1.5s ease-in-out infinite;
-      box-shadow: 0px 0px 15px 5px rgba(255, 105, 180, 0.5);
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
     }
 
     /* Cours en cours */
     .course-block.current {
       font-size: 1.3em;
       padding: 20px 30px;
-      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0px 6px 20px var(--shadow-dark);
     }
 
     .course-block.current.mixte {
-      border: 2px solid #808080;
-      background-color: #D3D3D3;
-      color: #FFF;
+      border: 2px solid var(--text-secondary);
+      background-color: var(--background-card);
+      color: var(--text-primary);
     }
 
     .course-block.current.women-only {
-      border: 2px solid #FF69B4;
-      background-color: #FF69B4;
-      color: #FFF;
-      box-shadow: 0px 0px 15px 5px rgba(255, 105, 180, 0.5);
+      border: 2px solid var(--women-color);
+      background-color: var(--women-color);
+      color: var(--text-primary);
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
     }
 
     /* Animation pour le rebond */
@@ -178,14 +211,14 @@
 
     /* Clignotement pour les cours mixtes */
     @keyframes blink-mixte {
-      0%, 100% { background-color: #f9f9f9; color: #000; }
-      50% { background-color: #D3D3D3; color: #FFF; }
+      0%, 100% { background-color: var(--background-card); color: var(--text-primary); }
+      50% { background-color: var(--background-card); color: var(--text-primary); }
     }
 
     /* Clignotement pour les cours "100% Femmes" */
     @keyframes blink-femmes {
-      0%, 100% { background-color: #FFF0F5; color: #000; }
-      50% { background-color: #FF69B4; color: #FFF; }
+      0%, 100% { background-color: var(--background-card); color: var(--text-primary); }
+      50% { background-color: var(--women-color); color: var(--text-primary); }
     }
 
     /* Style pour le titre du cours */
@@ -197,13 +230,13 @@
 
     .course-coach {
       font-size: 1em;
-      color: #666;
+      color: var(--text-secondary);
       margin-bottom: 5px;
     }
 
     .course-studio {
       font-size: 0.9em;
-      color: #555;
+      color: var(--text-tertiary);
     }
 
     .countdown {
@@ -237,10 +270,16 @@
       justify-content: space-between;
       pointer-events: none;
       z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .navigation.loaded {
+      opacity: 1;
     }
 
     .navigation button {
-      background: rgba(72,6,7, 0.8);
+      background: var(--primary-light);
       border: none;
       font-size: 2em;
       padding: 10px;
@@ -249,7 +288,7 @@
       outline: none;
       border-radius: 50%;
       transition: all 0.3s ease;
-      color: black;
+      color: var(--text-primary);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       width: 60px;
@@ -270,8 +309,8 @@
     /* Styles pour les états :hover uniquement sur les appareils avec support du survol */
     @media (hover: hover) {
       .navigation button:hover {
-        background-color: rgba(72,6,7, 0.5);
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+        background-color: var(--primary-lighter);
+        box-shadow: 0px 6px 12px var(--shadow-dark);
         transform: scale(1.1);
       }
     }
@@ -298,7 +337,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(72,6,7, 0.95);
+      background-color: var(--primary-overlay);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -310,17 +349,13 @@
     #loadingMessage {
       margin-top: 30px;
       font-size: 1.2em;
-      color: #fff;
+      color: var(--text-light);
       text-align: center;
       width: 80%;
       max-width: 600px;
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: var(--overlay-lighter);
       padding: 10px;
       border-radius: 10px;
-    }
-
-    #loadingMessage strong {
-      font-weight: bold;
     }
 
     /* Logo animé lors du chargement */
@@ -359,29 +394,29 @@
 
     /* Styles spécifiques aux cours du studio "Piscine" */
     .course-block.piscine {
-      border: 2px solid #1E90FF;
-      background-color: #E0F7FF;
-      box-shadow: 0px 0px 15px 5px rgba(30, 144, 255, 0.5);
+      border: 2px solid var(--pool-color);
+      background-color: var(--pool-color-light);
+      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
     /* Styles pour les cours en cours ou démarrant bientôt dans "Piscine" */
     .course-block.piscine.current {
-      border: 2px solid #1E90FF;
-      background-color: #1E90FF;
-      color: #FFF;
-      box-shadow: 0px 0px 15px 5px rgba(30, 144, 255, 0.5);
+      border: 2px solid var(--pool-color);
+      background-color: var(--pool-color);
+      color: var(--text-primary);
+      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
     .course-block.piscine.starting-soon {
-      border: 2px solid #1E90FF;
+      border: 2px solid var(--pool-color);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-piscine 1.5s ease-in-out infinite;
-      box-shadow: 0px 0px 15px 5px rgba(30, 144, 255, 0.5);
+      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
     /* Animation pour le clignotement des cours "Piscine" */
     @keyframes blink-piscine {
-      0%, 100% { background-color: #E0F7FF; color: #000; }
-      50% { background-color: #1E90FF; color: #FFF; }
+      0%, 100% { background-color: var(--pool-color-light); color: var(--text-primary); }
+      50% { background-color: var(--pool-color); color: var(--text-primary); }
     }
 
     /* Styles pour les appareils mobiles */
@@ -469,26 +504,31 @@
       top: 50px;
       right: 10px;
       z-index: 1000;
-      background-color: rgba(255, 166, 48, 0.75);
+      background-color: var(--secondary-light);
       padding: 8px;
       border-radius: 50%;
       width: 50px;
       height: 50px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0px 4px 10px var(--shadow-dark);
       display: none;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease;
+      transition: all 0.3s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+    }
+
+    .weekly-view-button.loaded {
+      opacity: 1;
     }
 
     /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
     @media screen and (max-width: 768px) {
-      .weekly-view-button {
+      .weekly-view-button.loaded {
         display: flex;
       }
-      .navigation {
+      .navigation.loaded {
         display: flex;
       }
     }
@@ -503,8 +543,8 @@
     /* Styles :hover pour le bouton weekly-view */
     @media (hover: hover) {
       .weekly-view-button:hover {
-        background-color: rgba(255, 166, 48, 0.7);
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+        background-color: var(--secondary-lighter);
+        box-shadow: 0px 6px 12px var(--shadow-dark);
         transform: scale(1.05);
       }
     }
@@ -520,7 +560,7 @@
       position: fixed;
       right: 10px;
       z-index: 1000;
-      background-color: rgba(72,6,7, 0.8);
+      background-color: var(--primary-light);
       padding: 8px;
       border-radius: 50%;
       align-items: center;
@@ -539,7 +579,7 @@
       height: 35px;
       border-radius: 50%;
       position: absolute;
-      border: 3px solid rgba(255, 255, 255, 0.9);
+      border: 3px solid var(--overlay-light);
       box-sizing: border-box;
       top: 50%;
       left: 50%;
@@ -553,7 +593,7 @@
       content: '';
       width: 11px;
       height: 11px;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: var(--overlay-light);
       border-radius: 50%;
       position: absolute;
       top: 50%;
@@ -566,13 +606,13 @@
     /* Nouvelle animation pour l'aura rouge */
     @keyframes auraPulse {
       0% {
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3), 0 0 45px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
       }
       50% {
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.2), 0 0 55px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
       }
       100% {
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3), 0 0 45px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
       }
     }
 
@@ -599,8 +639,8 @@
     /* Styles :hover pour le bouton today-view */
     @media (hover: hover) {
       .today-view-button:hover {
-        background-color: rgba(72,6,7, 0.5);
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+        background-color: var(--primary-lighter);
+        box-shadow: 0px 6px 12px var(--shadow-dark);
         transform: scale(1.05);
       }
     }
@@ -619,14 +659,14 @@
       width: 80%;
       max-width:200px;
       padding: 10px;
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: var(--overlay-light);
       backdrop-filter: blur(5px);
       border-radius: 10px;
       text-align: center;
       font-size: 1.7em;
       font-weight: bold;
-      color: #333;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      color: var(--text-primary);
+      box-shadow: 0 2px 5px var(--shadow-light);
       z-index: 1000;
       opacity: 0;
       transform: translateY(-100%);
@@ -636,7 +676,7 @@
     /* Style pour le texte en tant que citation */
     .quote-text {
       font-size: 1.4em;
-      color: #ffffff;
+      color: var(--text-light);
       font-family: Georgia, serif;
       line-height: 1.6em;
       position: relative;
@@ -648,7 +688,7 @@
     .quote-text::after {
       content: "«";
       font-size: 2em;
-      color: #ffffff;
+      color: var(--text-light);
       position: absolute;
     }
 
@@ -671,7 +711,7 @@
       bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      background-color: #480607 !important;
+      background-color: var(--primary-overlay) !important;
       z-index: 999999 !important;
       display: none;
       overflow: hidden !important;
@@ -690,7 +730,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background-color: #480607;
+      background-color: var(--primary-color);
       transform: translateX(-50%);
     }
 
@@ -698,7 +738,7 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      color: #480607;
+      color: var(--primary-color);
       font-weight: bold;
     }
 
@@ -1123,12 +1163,16 @@
         }
         document.body.classList.remove('loading');
 
+        // Afficher les boutons de navigation et weekly view
+        document.querySelector('.navigation').classList.add('loaded');
+        document.querySelector('.weekly-view-button').classList.add('loaded');
+
         // Mettre à jour la position du bouton today-view
         updateTodayButtonPosition();
 
         // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
         window.addEventListener('resize', handleResize);
-      }, 2000); // Délai de 2 secondes
+      }, 2000);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
