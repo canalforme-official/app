@@ -38,7 +38,8 @@
     .month-block, 
     #currentMonthContainer, 
     #previousMonthContainer, 
-    .podium-wrapper {
+    .podium-wrapper,
+    .competition-container {
       display: none;
     }
 
@@ -53,10 +54,10 @@
 
     .logo-container {
       width: 100%;
-      display: flex;
+      display: none; /* Caché par défaut */
       justify-content: center;
       padding: 20px 0;
-      background-color: #480607;
+      background-color: #f8f9fa; /* Fond blanc cassé */
     }
 
     /* Contrôle direct sur l'image du logo */
@@ -84,15 +85,17 @@
 
     /* Bloc du mois */
     .month-block {
-      background-color: #480607; /* Bordeaux foncé */
-      color: #ffffff; /* Texte blanc */
+      background-color: #480607;
+      color: #ffffff;
       padding: 20px;
       border-radius: 16px 16px 0 0;
       width: 95%;
       max-width: 600px;
-      box-shadow: 0 5px 10px rgba(72, 6, 7, 0.4); /* Halo marron foncé */
+      box-shadow: 0 5px 10px rgba(72, 6, 7, 0.4);
       margin-top: -28px;
       position: relative;
+      z-index: 3;
+      margin-bottom: 35px; /* Augmenté de 5 pixels (était 30px) */
     }
 
     .last-update {
@@ -289,6 +292,8 @@
       max-width: 600px;
       margin: 0 auto;
       margin-top: 20px;
+      position: relative;
+      z-index: 1; /* S'assurer que le podium est en dessous */
     }
 
     .step {
@@ -300,13 +305,13 @@
       text-align: center;
       width: 130px;
       transform: translateY(100%);
-      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       overflow: visible;
+      z-index: 2; /* Ajout d'un z-index pour s'assurer que les podiums sont au-dessus */
     }
 
     .step.animate {
-      /* Classe pour contrôler l'animation */
+      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     .step::after {
@@ -655,38 +660,65 @@
   z-index: 2; /* S'assurer qu'elle est au-dessus des autres éléments */
 }
 
-
-
 .competition-container {
-  position: relative;  /* Pour que .labels-container puisse s'y référer */
-  margin: 0 auto;      /* Centre horizontalement */
+  position: relative;
+  margin: 0 auto;
   width: 90%;
   max-width: 600px;
   padding: 5px 15px;
   border-radius: 16px;
-  background-color: rgba(255, 255, 255, 0);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); /* Ombre plus transparente */
+  background-color: transparent;
+  box-shadow: none; /* Suppression de l'ombre */
+  display: none;
 }
 
 /* On place .labels-container ABSOLUMENT dans .competition-container */
 .labels-container {
   position: absolute;
-  top: 0px; /* Ajuste pour remonter/descendre au-dessus de la barre */
+  top: -8px; /* Rapproché encore plus du bloc */
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;  /* Men(...) à gauche, Women(...) à droite */
+  justify-content: space-between;
   align-items: center;
-  padding: 0 10px;                 /* Petite marge horizontale */
+  padding: 0 10px;
 }
 
 .men-label, .women-label {
-  font-size: 0.5rem;    /* Réduit la taille, ajuste selon tes besoins */
+  font-size: 0.6rem;
   font-weight: normal;
   opacity: 0.9;
-  /* tu peux ajouter un margin si besoin, ex: margin-top: 4px; */
+  color: #480607;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
+.men-label.winner, .women-label.winner {
+  font-weight: bold;
+}
+
+.men-label.winner::after, .women-label.winner::after {
+  content: '🏆';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+
+/* Suppression des styles de tooltip et hover */
+.men-label::before, .women-label::before {
+  display: none;
+}
+
+.men-label:hover::before, .women-label:hover::before {
+  display: none;
+}
 
 .men-label {
   left: 0px;
@@ -701,41 +733,43 @@
 .progress-bar {
   position: relative;
   display: flex;
-  height: 27px;              /* Hauteur de la barre */
-  background-color: #333333; /* Couleur de fond */
-  border-radius: 15px;       /* Bords arrondis globaux */
-  overflow: visible;         /* Pour que les angles intérieurs et l'icône puissent déborder si besoin */
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  height: 27px;
+  background-color: #333333;
+  border-radius: 15px;
+  overflow: visible;
+  box-shadow: none; /* Suppression de l'ombre interne */
   margin-top: 4px;
 }
 
 /* Segments Homme/Femme avec arrondis personnalisés */
 .progress-bar .male {
-  border-radius: 15px 0 0 5px; /* Arrondi à gauche */
-  background: linear-gradient(to right, #822026, #B23A48); /* Rouge-brun contrastant */
+  border-radius: 15px 0 0 5px;
+  background: linear-gradient(to right, #822026, #B23A48);
   transition: width 1.5s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: normal; 
   font-size: clamp(0.8rem, 1.6vw, 1rem);
-  color: #ffffff; /* Texte blanc */
+  color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
+  box-shadow: none; /* Suppression de l'ombre */
 }
 
 .progress-bar .female {
-  border-radius: 0 5px 15px 0; /* Arrondi à droite */
-  background: linear-gradient(to left, #E4A672, #CCA27E); /* Beige-orange plus vif */
+  border-radius: 0 5px 15px 0;
+  background: linear-gradient(to left, #E4A672, #CCA27E);
   transition: width 1.5s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: normal; 
   font-size: clamp(0.8rem, 1.6vw, 1rem);
-  color: #ffffff; /* Texte blanc */
+  color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
+  box-shadow: none; /* Suppression de l'ombre */
 }
 
 /* Icône (éclair) */
@@ -769,6 +803,16 @@
   display: none;
 }
 
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.step.update {
+  animation: pulse 1s ease-in-out;
+  transform: translateY(0);
+}
 
   </style>
 </head>
@@ -788,7 +832,7 @@
 
   <!-- Logo principal -->
   <div class="logo-container">
-    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Canal Forme Logo" class="logo">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/6dd4e171-247a-454f-1d79-8a84922e5e25.png" alt="Canal Forme Logo" class="logo">
   </div>
 
 <!-- Podium du mois actuel -->
@@ -796,8 +840,6 @@
   <!-- Photo du coach en haut à gauche pour les podiums -->
   <img class="coach-podium-photo" id="currentCoachPodiumPhoto" style="display: none;" alt="Photo du coach podium actuel">
 </div>
-
-
 
 <div class="competition-container">
   <div class="labels-container">
@@ -843,7 +885,6 @@
     <div id="previousMonthLeaderboard"></div>
   </div>
 </div>
-
 
   <script>
 
@@ -894,14 +935,6 @@
       isPulling = false;
     });
 
-
-
-
-
-
-
-
-
     let isFirstLoad = true;
     let countdownInterval;
     let previousData = {};
@@ -921,6 +954,7 @@
      */
      function hideLoadingOverlay() {
       document.getElementById('loadingOverlay').style.display = 'none';
+      document.querySelector('.logo-container').style.display = 'flex'; // Affiche le logo container
 
       // Rétablir .container
       document.querySelectorAll('.container')
@@ -928,7 +962,7 @@
 
       // Rétablir .month-block
       document.querySelectorAll('.month-block')
-        .forEach(el => el.style.display = 'block'); // Changé de 'none' à 'block'
+        .forEach(el => el.style.display = 'block');
 
       // Rétablir .podium-wrapper
       document.querySelectorAll('.podium-wrapper')
@@ -961,38 +995,45 @@
 
     // Dans ton script principal (celui où tu as déjà loadLeaderboard() etc.)
     function updateMenWomenBar(data) {
-      //const totalMEPs = data.current.total_meps_by_gender.male + data.current.total_meps_by_gender.female;
-      //const maleMEPs  = data.current.total_meps_by_gender.male;
-      //const femaleMEPs = data.current.total_meps_by_gender.female;
       const maleMEPs = parseFloat(data.current.meps_averages.male);
       const femaleMEPs = parseFloat(data.current.meps_averages.female);
-      const totalMEPs = maleMEPs + femaleMEPs; // La somme des moyennes pour le calcul des pourcentages
+      const totalMEPs = maleMEPs + femaleMEPs;
       const maleUsers = data.current.active_users.male;
       const femaleUsers = data.current.active_users.female;
       const maleInactiveUsers = data.current.inactive_users.male;
       const femaleInactiveUsers = data.current.inactive_users.female; 
 
-      // Calcul des totaux (actifs + inactifs)
       const maleTotalUsers = maleUsers + maleInactiveUsers;
       const femaleTotalUsers = femaleUsers + femaleInactiveUsers;
 
       const malePercentage = (maleMEPs / totalMEPs) * 100 || 50;
 
       // Largeur des barres
-      document.getElementById('maleBar').style.width   = `${malePercentage}%`;
+      document.getElementById('maleBar').style.width = `${malePercentage}%`;
       document.getElementById('femaleBar').style.width = `${100 - malePercentage}%`;
 
-       // Labels au-dessus (Men(...), Women(...))
-       document.getElementById('menLabel').innerHTML    = `<strong>Garçons</strong> ${maleUsers} Actifs / ${maleTotalUsers}`;
-       document.getElementById('womenLabel').innerHTML  = `<strong>Filles</strong> ${femaleUsers} Actives / ${femaleTotalUsers}`;
-       
-        // Affiche uniquement le nombre de MEPs dans la barre
-        //document.getElementById('maleBar').innerHTML   = `<strong>${maleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
-        //document.getElementById('femaleBar').innerHTML = `<strong>${femaleMEPs.toLocaleString('fr-FR')} MEPs</strong>`;
+      // Mise à jour des labels avec les classes de victoire
+      const menLabel = document.getElementById('menLabel');
+      const womenLabel = document.getElementById('womenLabel');
 
-        // Affiche uniquement la moyenne de MEPs dans la barre
-        document.getElementById('maleBar').innerHTML = `<strong>${Math.round(maleMEPs).toLocaleString('fr-FR')} MEPs </strong>`;
-        document.getElementById('femaleBar').innerHTML = `<strong>${Math.round(femaleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
+      // Suppression des classes précédentes
+      menLabel.classList.remove('winner');
+      womenLabel.classList.remove('winner');
+
+      // Ajout des classes de victoire
+      if (maleMEPs > femaleMEPs) {
+        menLabel.classList.add('winner');
+      } else if (femaleMEPs > maleMEPs) {
+        womenLabel.classList.add('winner');
+      }
+
+      // Mise à jour des labels avec les nouvelles icônes
+      menLabel.innerHTML = `👨 ${maleUsers} Actifs / ${maleTotalUsers}`;
+      womenLabel.innerHTML = `👩 ${femaleUsers} Actives / ${femaleTotalUsers}`;
+
+      // Affiche les MEPs dans la barre
+      document.getElementById('maleBar').innerHTML = `<strong>${Math.round(maleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
+      document.getElementById('femaleBar').innerHTML = `<strong>${Math.round(femaleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
 
       // Choix icône
       let iconUrl = '';
@@ -1050,6 +1091,9 @@
         const today = new Date();
         const dayOfMonth = today.getDate();
 
+        // Afficher le competition-container en premier
+        document.querySelector('.competition-container').style.display = 'block';
+
         // Vérifie si le mois actuel doit être affiché
         if (data.current && data.current.data) {
             console.log('Données du mois actuel:', data.current.data);
@@ -1094,7 +1138,6 @@
         previousData = data;
     }
 
-
     /**
      * Formate le titre du mois en fonction de la première lettre
      * @param {string} month Nom du mois
@@ -1135,11 +1178,31 @@
         const stepDiv = document.createElement('div');
         stepDiv.classList.add('step', positionClass);
 
-        // Ajoute la classe 'animate' uniquement lors du premier chargement
+        // Gestion différente des animations selon le contexte
         if (isFirstLoad) {
             stepDiv.classList.add('animate');
+            // Supprimer la classe animate après l'animation d'entrée
+            stepDiv.addEventListener('animationend', function(event) {
+                if (event.animationName === 'slideUp') {
+                    stepDiv.classList.remove('animate');
+                    // On force la position finale
+                    stepDiv.style.transform = 'translateY(0)';
+                }
+            });
         } else {
+            // Pour les mises à jour, on place directement en position finale
             stepDiv.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                stepDiv.classList.add('update');
+                // Retirer la classe update après l'animation
+                stepDiv.addEventListener('animationend', function(event) {
+                    if (event.animationName === 'pulse') {
+                        stepDiv.classList.remove('update');
+                        // On s'assure que la position finale est maintenue
+                        stepDiv.style.transform = 'translateY(0)';
+                    }
+                }, { once: true });
+            }, 100);
         }
 
         const profileDiv = document.createElement('div');
@@ -1189,7 +1252,7 @@
         if (positionClass === 'first') {
             const sparklesContainer = document.createElement('div');
             sparklesContainer.classList.add('sparkles-container');
-            sparklesContainer.style.opacity = '0'; // Commence invisible
+            sparklesContainer.style.opacity = '0';
 
             for (let i = 0; i < 12; i++) {
                 const sparkleDiv = document.createElement('div');
@@ -1212,14 +1275,12 @@
                 if (event.animationName === 'slideUp') {
                     animationsCompleted++;
                     if (animationsCompleted === steps.length && sparklesContainer) {
-                        // Affiche les étincelles après l'animation du podium
                         sparklesContainer.style.opacity = '1';
                     }
                 }
             });
         });
     } else {
-        // Affiche les étincelles immédiatement si ce n'est pas le premier chargement
         const sparklesContainer = podiumWrapper.querySelector('.sparkles-container');
         if (sparklesContainer) {
             sparklesContainer.style.opacity = '1';
@@ -1282,12 +1343,6 @@
     tableHtml += '</div>';
     return tableHtml;
 }
-
-
-
-
-
-
 
     /**
      * Formate un nombre avec des espaces
