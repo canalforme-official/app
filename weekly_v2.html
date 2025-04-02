@@ -201,7 +201,7 @@
     }
 
     .loading-logo img {
-      width: 80px;
+      width: 60px;
       height: auto;
       animation: pulse 2s infinite;
       position: relative;
@@ -837,9 +837,9 @@
   }
 
   .modal-center-container img {
-    width: 80px !important;
+    width: 60px !important;
     height: auto !important;
-    animation: pulse 2s infinite !important;
+    animation: zoom-logo 2s infinite !important;
     pointer-events: none !important;
   }
 
@@ -925,6 +925,21 @@
       100% {
         transform: rotate(0deg);
       }
+    }
+  }
+
+  @keyframes zoom-logo {
+    0% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
     }
   }
 
