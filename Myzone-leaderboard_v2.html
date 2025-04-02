@@ -24,12 +24,12 @@
       padding: 0;
       overflow-y: auto; /* Permet le défilement vertical */
       overflow-x: hidden; /* Empêche le défilement horizontal */
-      /* Masque la barre de défilement en vue desktop */
+      /* Masque la barre de défilement dans tous les navigateurs */
       scrollbar-width: none; /* Pour Firefox */
       -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
     }
 
-    /* Masque la barre de défilement en vue desktop pour les navigateurs Webkit */
+    /* Masque la barre de défilement pour tous les navigateurs Webkit */
     body::-webkit-scrollbar {
       display: none; /* Pour Chrome, Safari et Opera */
     }
@@ -54,10 +54,12 @@
 
     .logo-container {
       width: 100%;
-      display: none; /* Caché par défaut */
-      justify-content: center;
-      padding: 20px 0;
-      background-color: #f8f9fa; /* Fond blanc cassé */
+      display: none !important; /* Forcer le masquage dans toutes les versions */
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
 
     /* Contrôle direct sur l'image du logo */
@@ -330,9 +332,9 @@
       text-align: center;
       width: 130px;
       transform: translateY(100%);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: -5px 5px 8px rgba(0, 0, 0, 0.3);
       overflow: visible;
-      z-index: 2; /* Ajout d'un z-index pour s'assurer que les podiums sont au-dessus */
+      z-index: 2;
     }
 
     .step.animate {
@@ -392,53 +394,12 @@
       animation-delay: 0s;
     }
 
-    .sparkles-container {
-      display:none;
-      position: absolute;
-      top: -100px;
-      left: 0;
-      width: 100%;
-      height: calc(100% + 100px);
-      pointer-events: none;
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity 0.5s ease-in;
-    }
-
-    .sparkle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #FFD700;
-      border-radius: 2px;
-      animation: fall 3s linear infinite;
-    }
-
-    .sparkle:nth-child(1) { left: 10%; animation-delay: 0s; }
-    .sparkle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
-    .sparkle:nth-child(3) { left: 30%; animation-delay: 1s; }
-    .sparkle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
-    .sparkle:nth-child(5) { left: 50%; animation-delay: 0.2s; }
-    .sparkle:nth-child(6) { left: 60%; animation-delay: 0.7s; }
-    .sparkle:nth-child(7) { left: 70%; animation-delay: 1.2s; }
-    .sparkle:nth-child(8) { left: 80%; animation-delay: 1.7s; }
-    .sparkle:nth-child(9) { left: 90%; animation-delay: 0.4s; }
-    .sparkle:nth-child(10) { left: 15%; animation-delay: 0.9s; }
-    .sparkle:nth-child(11) { left: 45%; animation-delay: 1.4s; }
-    .sparkle:nth-child(12) { left: 75%; animation-delay: 1.9s; }
-
-    .sparkle:nth-child(even) {
-      width: 6px;
-      height: 6px;
-      background: linear-gradient(135deg, #FFD700, #FFF);
-      box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
-    }
-
+    /* Suppression des styles des étincelles */
+    .sparkles-container,
+    .sparkle,
+    .sparkle:nth-child(even),
     .sparkle:nth-child(3n) {
-      width: 3px;
-      height: 3px;
-      background: #FFF;
-      box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+      display: none;
     }
 
     .status-icon {
@@ -556,20 +517,7 @@
     }
 
     @keyframes fall {
-      0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-      }
-      20% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(300px) rotate(360deg);
-        opacity: 0;
-      }
+      /* Suppression de l'animation fall */
     }
 
     @media (min-width: 768px) {
@@ -582,20 +530,8 @@
       .podium-meps.third { font-size: 1.5rem; }
       
       body {
-            overflow: hidden; 
-        }
-
-        /* Masque les ascenseurs sur les navigateurs WebKit (Chrome, Safari) */
-        body::-webkit-scrollbar {
-            width: 0px;
-            height: 0px;
-            background: transparent;
-        }
-
-        /* Masque les ascenseurs dans Firefox */
-        body {
-            scrollbar-width: none;
-        }
+        overflow-y: auto; /* Permet le défilement vertical */
+      }
     }
 
     #totalMepsContainer {
@@ -757,7 +693,7 @@
 /* Segments Homme/Femme avec arrondis personnalisés */
 .progress-bar .male {
   border-radius: 15px 0 0 5px;
-  background: linear-gradient(to right, #822026, #B23A48);
+  background: linear-gradient(to right, #480607, #5a0a0a);
   transition: width 1.5s ease-in-out;
   display: flex;
   align-items: center;
@@ -767,12 +703,12 @@
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
-  box-shadow: none; /* Suppression de l'ombre */
+  box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
 }
 
 .progress-bar .female {
   border-radius: 0 5px 15px 0;
-  background: linear-gradient(to left, #E4A672, #CCA27E);
+  background: linear-gradient(to left, #CD7F32, #B87333);
   transition: width 1.5s ease-in-out;
   display: flex;
   align-items: center;
@@ -782,7 +718,6 @@
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
-  box-shadow: none; /* Suppression de l'ombre */
 }
 
 /* Icône (éclair) */
@@ -968,12 +903,6 @@
      function hideLoadingOverlay() {
       document.getElementById('loadingOverlay').style.display = 'none';
       
-      // Vérifier si on est sur mobile avant d'afficher le logo
-      const isMobile = window.innerWidth <= 600;
-      if (!isMobile) {
-        document.querySelector('.logo-container').style.display = 'flex';
-      }
-
       // Rétablir .container
       document.querySelectorAll('.container')
         .forEach(el => el.style.display = 'flex');
@@ -1271,43 +1200,20 @@
             stepDiv.appendChild(coachPhoto);
         }
 
-        // Toujours afficher les étincelles pour le premier
-        if (positionClass === 'first') {
-            const sparklesContainer = document.createElement('div');
-            sparklesContainer.classList.add('sparkles-container');
-            sparklesContainer.style.opacity = '0';
-
-            for (let i = 0; i < 12; i++) {
-                const sparkleDiv = document.createElement('div');
-                sparkleDiv.classList.add('sparkle');
-                sparklesContainer.appendChild(sparkleDiv);
-            }
-            stepDiv.appendChild(sparklesContainer);
-        }
-
         podiumWrapper.appendChild(stepDiv);
     });
 
     if (isFirstLoad) {
         const steps = podiumWrapper.querySelectorAll('.step.animate');
-        const sparklesContainer = podiumWrapper.querySelector('.sparkles-container');
         let animationsCompleted = 0;
 
         steps.forEach(step => {
             step.addEventListener("animationend", function(event) {
                 if (event.animationName === 'slideUp') {
                     animationsCompleted++;
-                    if (animationsCompleted === steps.length && sparklesContainer) {
-                        sparklesContainer.style.opacity = '1';
-                    }
                 }
             });
         });
-    } else {
-        const sparklesContainer = podiumWrapper.querySelector('.sparkles-container');
-        if (sparklesContainer) {
-            sparklesContainer.style.opacity = '1';
-        }
     }
 
     // Animation des MEPs si les données ont changé
