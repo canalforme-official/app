@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Myzone Leaderboard - Canal Forme</title>
-  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+  <link rel="icon" type="image/png"
+    href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
@@ -22,22 +24,27 @@
       color: #000000;
       margin: 0;
       padding: 0;
-      overflow-y: auto; /* Permet le défilement vertical */
-      overflow-x: hidden; /* Empêche le défilement horizontal */
+      overflow-y: auto;
+      /* Permet le défilement vertical */
+      overflow-x: hidden;
+      /* Empêche le défilement horizontal */
       /* Masque la barre de défilement dans tous les navigateurs */
-      scrollbar-width: none; /* Pour Firefox */
-      -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
+      scrollbar-width: none;
+      /* Pour Firefox */
+      -ms-overflow-style: none;
+      /* Pour Internet Explorer et Edge */
     }
 
     /* Masque la barre de défilement pour tous les navigateurs Webkit */
     body::-webkit-scrollbar {
-      display: none; /* Pour Chrome, Safari et Opera */
+      display: none;
+      /* Pour Chrome, Safari et Opera */
     }
 
     /* Tout en haut de ton style */
-    .month-block, 
-    #currentMonthContainer, 
-    #previousMonthContainer, 
+    .month-block,
+    #currentMonthContainer,
+    #previousMonthContainer,
     .podium-wrapper,
     .competition-container {
       display: none;
@@ -54,7 +61,8 @@
 
     .logo-container {
       width: 100%;
-      display: none !important; /* Forcer le masquage dans toutes les versions */
+      display: none !important;
+      /* Forcer le masquage dans toutes les versions */
       visibility: hidden !important;
       opacity: 0 !important;
       height: 0 !important;
@@ -64,11 +72,16 @@
 
     /* Contrôle direct sur l'image du logo */
     .logo-container img {
-      margin-top: 15px;   /* espace augmenté en haut */
-      margin-bottom: -15px; /* espace réduit en bas */
-      width: 80px; /* largeur fixe (à ajuster selon besoin) */
-      height: auto; /* garde les proportions de l'image */
-      max-width: 100%; /* empêche l'image de dépasser la largeur du conteneur */
+      margin-top: 15px;
+      /* espace augmenté en haut */
+      margin-bottom: -15px;
+      /* espace réduit en bas */
+      width: 80px;
+      /* largeur fixe (à ajuster selon besoin) */
+      height: auto;
+      /* garde les proportions de l'image */
+      max-width: 100%;
+      /* empêche l'image de dépasser la largeur du conteneur */
     }
 
     .logo {
@@ -80,7 +93,8 @@
     .month-title {
       font-size: 1.2em;
       font-weight: bold;
-      color: #480607; /* Bordeaux foncé */
+      color: #480607;
+      /* Bordeaux foncé */
       margin: 10px 0;
       text-align: center;
     }
@@ -97,7 +111,8 @@
       margin-top: -28px;
       position: relative;
       z-index: 3;
-      margin-bottom: 35px; /* Augmenté de 5 pixels (était 30px) */
+      margin-bottom: 35px;
+      /* Augmenté de 5 pixels (était 30px) */
     }
 
     .last-update {
@@ -118,7 +133,8 @@
       display: flex;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Ligne de séparation plus subtile */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      /* Ligne de séparation plus subtile */
       font-size: 16px;
     }
 
@@ -131,7 +147,8 @@
       width: 30px;
       text-align: left;
       flex-shrink: 0;
-      color: #ffffff; /* Texte blanc */
+      color: #ffffff;
+      /* Texte blanc */
     }
 
     .nickname {
@@ -141,14 +158,16 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #ffffff; /* Texte blanc */
+      color: #ffffff;
+      /* Texte blanc */
     }
 
     .leaderboard-meps {
       display: flex;
       align-items: center;
       font-weight: bold;
-      background-color: rgba(255, 255, 255, 0.2); /* Fond plus opaque */
+      background-color: rgba(255, 255, 255, 0.2);
+      /* Fond plus opaque */
       border-radius: 8px;
       padding: 4px;
       min-width: 140px;
@@ -165,12 +184,14 @@
 
     .leaderboard-meps .meps-value {
       margin-right: 5px;
-      color: #ffffff; /* Texte blanc */
+      color: #ffffff;
+      /* Texte blanc */
     }
 
     .leaderboard-meps .meps-label {
       font-size: 0.8em;
-      color: rgba(255, 255, 255, 0.7); /* Texte blanc avec transparence */
+      color: rgba(255, 255, 255, 0.7);
+      /* Texte blanc avec transparence */
       text-align: right;
     }
 
@@ -224,10 +245,12 @@
         transform: scale(1);
         opacity: 0.9;
       }
+
       50% {
         transform: scale(1.05);
         opacity: 1;
       }
+
       100% {
         transform: scale(1);
         opacity: 0.9;
@@ -245,18 +268,25 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     /* Styles pour les appareils mobiles */
     @media (max-width: 600px) {
       body {
-        overflow-y: auto; /* Assure que le défilement est possible sur mobile */
+        overflow-y: auto;
+        /* Assure que le défilement est possible sur mobile */
       }
 
       .logo-container {
-        display: none !important; /* Forcer le masquage sur mobile */
+        display: none !important;
+        /* Forcer le masquage sur mobile */
         visibility: hidden !important;
         opacity: 0 !important;
         height: 0 !important;
@@ -294,14 +324,17 @@
       max-width: 600px;
       margin: 0 auto;
       margin-top: 20px;
-      margin-bottom: 10px; /* Ajout d'une marge en bas */
+      margin-bottom: 10px;
+      /* Ajout d'une marge en bas */
       position: relative;
-      z-index: 1; /* S'assurer que le podium est en dessous */
+      z-index: 1;
+      /* S'assurer que le podium est en dessous */
     }
 
     /* Réduire l'espacement entre les podiums */
     #previousPodiumWrapper {
-      margin-top: 10px; /* Réduit l'espacement entre les podiums */
+      margin-top: 10px;
+      /* Réduit l'espacement entre les podiums */
     }
 
     /* Ajuster l'espacement du conteneur de compétition */
@@ -315,7 +348,8 @@
       background-color: transparent;
       box-shadow: none;
       display: none;
-      margin-top: 20px; /* Ajout d'une marge en haut */
+      margin-top: 20px;
+      /* Ajout d'une marge en haut */
     }
 
     .step {
@@ -343,7 +377,7 @@
       left: 0;
       right: 0;
       height: 40%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
       border-radius: 16px 16px 0 0;
     }
 
@@ -355,8 +389,7 @@
           #FFB700 40%,
           #FFC600 60%,
           #FFA700 80%,
-          #FFC600 100%
-      );
+          #FFC600 100%);
       order: 2;
       animation-delay: 0.4s;
     }
@@ -369,8 +402,7 @@
           #A0A0A0 40%,
           #B0B0B0 60%,
           #909090 80%,
-          #B0B0B0 100%
-      );
+          #B0B0B0 100%);
       order: 1;
       animation-delay: 0.2s;
     }
@@ -383,8 +415,7 @@
           #A66A2E 40%,
           #B87333 60%,
           #965A2B 80%,
-          #B87333 100%
-      );
+          #B87333 100%);
       order: 3;
       animation-delay: 0s;
     }
@@ -398,12 +429,15 @@
     }
 
     .status-icon {
-        background-size: cover;
-        background-position: center;
-        display: inline-block;
-        background-color: transparent; /* Assure un fond transparent */
-        border: none; /* Assure qu'il n'y a pas de bordure */
-        box-shadow: none; /* Assure qu'il n'y a pas d'ombre */
+      background-size: cover;
+      background-position: center;
+      display: inline-block;
+      background-color: transparent;
+      /* Assure un fond transparent */
+      border: none;
+      /* Assure qu'il n'y a pas de bordure */
+      box-shadow: none;
+      /* Assure qu'il n'y a pas d'ombre */
     }
 
     .status-icon-podium {
@@ -429,9 +463,17 @@
       z-index: 1;
     }
 
-    .step.third .profile { animation-delay: 1s; }
-    .step.second .profile { animation-delay: 1.2s; }
-    .step.first .profile { animation-delay: 1.4s; }
+    .step.third .profile {
+      animation-delay: 1s;
+    }
+
+    .step.second .profile {
+      animation-delay: 1.2s;
+    }
+
+    .step.first .profile {
+      animation-delay: 1.4s;
+    }
 
     .name {
       font-weight: 600;
@@ -452,7 +494,7 @@
       font-weight: 700;
       opacity: 0;
       animation: fadeIn 1s ease forwards;
-      background: rgba(72,6,7,0.1);
+      background: rgba(72, 6, 7, 0.1);
       padding: 4px 4px;
       border-radius: 8px;
       width: 100%;
@@ -462,13 +504,29 @@
       text-align: center;
     }
 
-    .step.third .podium-meps { animation-delay: 1.5s; }
-    .step.second .podium-meps { animation-delay: 1.7s; }
-    .step.first .podium-meps { animation-delay: 1.9s; }
+    .step.third .podium-meps {
+      animation-delay: 1.5s;
+    }
 
-    .podium-meps.first { font-size: 1.6rem; }
-    .podium-meps.second { font-size: 1.5rem; }
-    .podium-meps.third { font-size: 1.4rem; }
+    .step.second .podium-meps {
+      animation-delay: 1.7s;
+    }
+
+    .step.first .podium-meps {
+      animation-delay: 1.9s;
+    }
+
+    .podium-meps.first {
+      font-size: 1.6rem;
+    }
+
+    .podium-meps.second {
+      font-size: 1.5rem;
+    }
+
+    .podium-meps.third {
+      font-size: 1.4rem;
+    }
 
     .meps-label {
       font-size: 0.7em;
@@ -487,28 +545,56 @@
       font-weight: bold;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       line-height: 0.72;
-      color: rgba(72, 6, 7, 0.3); /* Changé en marron foncé avec transparence */
+      color: rgba(72, 6, 7, 0.3);
+      /* Changé en marron foncé avec transparence */
       width: 100%;
       text-align: center;
     }
 
-    .step.first .position { font-size: 6rem; }
-    .step.second .position { font-size: 5rem; }
-    .step.third .position { font-size: 4rem; }
+    .step.first .position {
+      font-size: 6rem;
+    }
+
+    .step.second .position {
+      font-size: 5rem;
+    }
+
+    .step.third .position {
+      font-size: 4rem;
+    }
 
     @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
     }
 
     @keyframes fadeIn {
-      from { transform: translateY(10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     @keyframes appearWithScale {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     @keyframes fall {
@@ -520,12 +606,21 @@
         width: 150px;
       }
 
-      .podium-meps.first { font-size: 1.8rem; }
-      .podium-meps.second { font-size: 1.6rem; }
-      .podium-meps.third { font-size: 1.5rem; }
-      
+      .podium-meps.first {
+        font-size: 1.8rem;
+      }
+
+      .podium-meps.second {
+        font-size: 1.6rem;
+      }
+
+      .podium-meps.third {
+        font-size: 1.5rem;
+      }
+
       body {
-        overflow-y: auto; /* Permet le défilement vertical */
+        overflow-y: auto;
+        /* Permet le défilement vertical */
       }
     }
 
@@ -550,13 +645,15 @@
       background: rgba(0, 0, 0, 0.9);
       color: white;
       font-size: 14px;
-      transform: translateY(-80px); /* Cache initialement */
+      transform: translateY(-80px);
+      /* Cache initialement */
       transition: transform 0.3s ease-out;
       z-index: 1000;
     }
 
     .pull-to-refresh.show {
-      transform: translateY(0); /* Montre l'indicateur */
+      transform: translateY(0);
+      /* Montre l'indicateur */
     }
 
     .loading-spinner {
@@ -566,7 +663,8 @@
       border-top: 3px solid #ff0000;
       border-radius: 50%;
       margin-top: 5px;
-      display: none; /* Caché initialement */
+      display: none;
+      /* Caché initialement */
     }
 
     .loading-spinner.active {
@@ -575,15 +673,23 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     * {
       user-select: none;
-      -webkit-user-select: none; /* Chrome, Safari, Opera */
-      -moz-user-select: none;    /* Firefox */
-      -ms-user-select: none;     /* Internet Explorer/Edge */
+      -webkit-user-select: none;
+      /* Chrome, Safari, Opera */
+      -moz-user-select: none;
+      /* Firefox */
+      -ms-user-select: none;
+      /* Internet Explorer/Edge */
     }
 
     .hidden {
@@ -594,171 +700,193 @@
     }
 
     /* Photo des coachs dans le tableau */
-.coach-photo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-    object-fit: cover;
-    vertical-align: middle;
-}
+    .coach-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+      vertical-align: middle;
+    }
 
-/* Photo des coachs sur le podium */
-.coach-podium-photo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  position: absolute;
-  top: -15px; /* Ajuster pour le débordement */
-  left: -15px; /* Ajuster pour le débordement */
-  border: 1px solid white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 2; /* S'assurer qu'elle est au-dessus des autres éléments */
-}
+    /* Photo des coachs sur le podium */
+    .coach-podium-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+      top: -15px;
+      /* Ajuster pour le débordement */
+      left: -15px;
+      /* Ajuster pour le débordement */
+      border: 1px solid white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+      /* S'assurer qu'elle est au-dessus des autres éléments */
+    }
 
-/* On place .labels-container ABSOLUMENT dans .competition-container */
-.labels-container {
-  position: absolute;
-  top: -8px; /* Rapproché encore plus du bloc */
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10px;
-}
+    /* On place .labels-container ABSOLUMENT dans .competition-container */
+    .labels-container {
+      position: absolute;
+      top: -8px;
+      /* Rapproché encore plus du bloc */
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+    }
 
-.men-label, .women-label {
-  font-size: 0.6rem;
-  font-weight: normal;
-  opacity: 0.9;
-  color: #480607;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background-color: #f8f9fa;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
+    .men-label,
+    .women-label {
+      font-size: 0.6rem;
+      font-weight: normal;
+      opacity: 0.9;
+      color: #480607;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
 
-.men-label.winner, .women-label.winner {
-  font-weight: bold;
-}
+    .men-label.winner,
+    .women-label.winner {
+      font-weight: bold;
+    }
 
-.men-label.winner::after, .women-label.winner::after {
-  content: '🏆';
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-}
+    .men-label.winner::after,
+    .women-label.winner::after {
+      content: '🏆';
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+    }
 
-/* Suppression des styles de tooltip et hover */
-.men-label::before, .women-label::before {
-  display: none;
-}
+    /* Suppression des styles de tooltip et hover */
+    .men-label::before,
+    .women-label::before {
+      display: none;
+    }
 
-.men-label:hover::before, .women-label:hover::before {
-  display: none;
-}
+    .men-label:hover::before,
+    .women-label:hover::before {
+      display: none;
+    }
 
-.men-label {
-  left: 0px;
-  margin-left: 18px;
-}
-.women-label {
-  right: 0;
-  margin-right: 5px; 
-}
+    .men-label {
+      left: 0px;
+      margin-left: 18px;
+    }
 
-/* Barre de progression */
-.progress-bar {
-  position: relative;
-  display: flex;
-  height: 27px;
-  background-color: #333333;
-  border-radius: 15px;
-  overflow: visible;
-  box-shadow: none; /* Suppression de l'ombre interne */
-  margin-top: 4px;
-}
+    .women-label {
+      right: 0;
+      margin-right: 5px;
+    }
 
-/* Segments Homme/Femme avec arrondis personnalisés */
-.progress-bar .male {
-  border-radius: 15px 0 0 5px;
-  background: linear-gradient(to right, #480607, #5a0a0a);
-  transition: width 1.5s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: normal; 
-  font-size: clamp(0.8rem, 1.6vw, 1rem);
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
-  box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
-}
+    /* Barre de progression */
+    .progress-bar {
+      position: relative;
+      display: flex;
+      height: 27px;
+      background-color: #333333;
+      border-radius: 15px;
+      overflow: visible;
+      box-shadow: none;
+      /* Suppression de l'ombre interne */
+      margin-top: 4px;
+    }
 
-.progress-bar .female {
-  border-radius: 0 5px 15px 0;
-  background: linear-gradient(to left, #CD7F32, #B87333);
-  transition: width 1.5s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: normal; 
-  font-size: clamp(0.8rem, 1.6vw, 1rem);
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
-}
+    /* Segments Homme/Femme avec arrondis personnalisés */
+    .progress-bar .male {
+      border-radius: 15px 0 0 5px;
+      background: linear-gradient(to right, #480607, #5a0a0a);
+      transition: width 1.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: normal;
+      font-size: clamp(0.8rem, 1.6vw, 1rem);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
+    }
 
-/* Icône (éclair) */
-.icon-container {
-  position: absolute;
-  top: 50%;            /* Placé au milieu vertical */
-  left: 50%;           /* Ajusté par JS, ici juste la base */
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  z-index: 2; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.icon-container img {
-  display: none;
-  width: 90%;
-  height: auto;
-  transform: rotate(-10deg);
-  transition: transform 0.3s ease-in-out;
-}
+    .progress-bar .female {
+      border-radius: 0 5px 15px 0;
+      background: linear-gradient(to left, #CD7F32, #B87333);
+      transition: width 1.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: normal;
+      font-size: clamp(0.8rem, 1.6vw, 1rem);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+    }
 
-/* Légende (active members) */
-.active-info {
-  width: 100%;
-  text-align: right;
-  font-size: 0.6em;
-  color: #ffffff;
-  opacity: 0.8;
-  display: none;
-}
+    /* Icône (éclair) */
+    .icon-container {
+      position: absolute;
+      top: 50%;
+      /* Placé au milieu vertical */
+      left: 50%;
+      /* Ajusté par JS, ici juste la base */
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
+    .icon-container img {
+      display: none;
+      width: 90%;
+      height: auto;
+      transform: rotate(-10deg);
+      transition: transform 0.3s ease-in-out;
+    }
 
-.step.update {
-  animation: pulse 1s ease-in-out;
-  transform: translateY(0);
-}
+    /* Légende (active members) */
+    .active-info {
+      width: 100%;
+      text-align: right;
+      font-size: 0.6em;
+      color: #ffffff;
+      opacity: 0.8;
+      display: none;
+    }
 
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.02);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .step.update {
+      animation: pulse 1s ease-in-out;
+      transform: translateY(0);
+    }
   </style>
 </head>
+
 <body>
   <!-- pull to refresh -->
   <div id="pullToRefresh" class="pull-to-refresh">
@@ -768,66 +896,70 @@
   <!-- Overlay de chargement -->
   <div id="loadingOverlay" style="display: none;">
     <div class="loading-logo">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png"
+        alt="Logo du Club">
     </div>
     <div id="loadingMessage">Chargement du classement Myzone</div>
   </div>
 
   <!-- Logo principal -->
   <div class="logo-container">
-    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/6dd4e171-247a-454f-1d79-8a84922e5e25.png" alt="Canal Forme Logo" class="logo">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/6dd4e171-247a-454f-1d79-8a84922e5e25.png"
+      alt="Canal Forme Logo" class="logo">
   </div>
 
-<!-- Podium du mois actuel -->
-<div class="podium-wrapper" id="podiumWrapper">
-  <!-- Photo du coach en haut à gauche pour les podiums -->
-  <img class="coach-podium-photo" id="currentCoachPodiumPhoto" style="display: none;" alt="Photo du coach podium actuel">
-</div>
-
-<div class="competition-container">
-  <div class="labels-container">
-    <div id="menLabel" class="men-label"></div>
-    <div id="womenLabel" class="women-label"></div>
+  <!-- Podium du mois actuel -->
+  <div class="podium-wrapper" id="podiumWrapper">
+    <!-- Photo du coach en haut à gauche pour les podiums -->
+    <img class="coach-podium-photo" id="currentCoachPodiumPhoto" style="display: none;"
+      alt="Photo du coach podium actuel">
   </div>
-  <div id="genderProgressBar" class="progress-bar">
-    <div id="maleBar" class="male"></div>
-    <div id="femaleBar" class="female"></div>
-    <div id="dynamicIcon" class="icon-container"></div>
+
+  <div class="competition-container">
+    <div class="labels-container">
+      <div id="menLabel" class="men-label"></div>
+      <div id="womenLabel" class="women-label"></div>
+    </div>
+    <div id="genderProgressBar" class="progress-bar">
+      <div id="maleBar" class="male"></div>
+      <div id="femaleBar" class="female"></div>
+      <div id="dynamicIcon" class="icon-container"></div>
+    </div>
+    <div class="active-info">
+      * active members only
+    </div>
   </div>
-  <div class="active-info">
-    * active members only
+
+  <!-- Titre du mois actuel -->
+  <div id="currentMonthTitle" class="month-title"></div>
+
+  <!-- Section du mois actuel -->
+  <div class="container" id="currentMonthContainer">
+    <div class="month-block current-month-block">
+      <!-- Compte à rebours -->
+      <div id="countdown" style="display: none;"></div> <!-- Placez le countdown à l'extérieur -->
+      <!-- Leaderboard du mois actuel -->
+      <div id="currentMonthLeaderboard"></div>
+    </div>
   </div>
-</div>
 
-<!-- Titre du mois actuel -->
-<div id="currentMonthTitle" class="month-title"></div>
-
-<!-- Section du mois actuel -->
-<div class="container" id="currentMonthContainer">
-  <div class="month-block current-month-block">
-    <!-- Compte à rebours -->
-    <div id="countdown" style="display: none;"></div> <!-- Placez le countdown à l'extérieur -->
-    <!-- Leaderboard du mois actuel -->
-    <div id="currentMonthLeaderboard"></div>
+  <!-- Podium du mois précédent -->
+  <div class="podium-wrapper" id="previousPodiumWrapper">
+    <!-- Photo du coach en haut à gauche pour les podiums -->
+    <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;"
+      alt="Photo du coach podium précédent">
   </div>
-</div>
 
-<!-- Podium du mois précédent -->
-<div class="podium-wrapper" id="previousPodiumWrapper">
-  <!-- Photo du coach en haut à gauche pour les podiums -->
-  <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;" alt="Photo du coach podium précédent">
-</div>
+  <!-- Titre du mois précédent -->
+  <div id="previousMonthTitle" class="month-title"></div>
 
-<!-- Titre du mois précédent -->
-<div id="previousMonthTitle" class="month-title"></div>
-
-<!-- Section du mois précédent -->
-<div class="container" id="previousMonthContainer">
-  <div class="month-block">
-    <!-- Leaderboard du mois précédent -->
-    <div id="previousMonthLeaderboard"></div>
+  <!-- Section du mois précédent -->
+  <div class="container" id="previousMonthContainer">
+    <div class="month-block">
+      <!-- Leaderboard du mois précédent -->
+      <div id="previousMonthLeaderboard"></div>
+    </div>
   </div>
-</div>
 
   <script>
 
@@ -895,9 +1027,9 @@
     /**
      * Cache l'overlay de chargement et affiche le contenu principal
      */
-     function hideLoadingOverlay() {
+    function hideLoadingOverlay() {
       document.getElementById('loadingOverlay').style.display = 'none';
-      
+
       // Rétablir .container
       document.querySelectorAll('.container')
         .forEach(el => el.style.display = 'flex');
@@ -943,7 +1075,7 @@
       const maleUsers = data.current.active_users.male;
       const femaleUsers = data.current.active_users.female;
       const maleInactiveUsers = data.current.inactive_users.male;
-      const femaleInactiveUsers = data.current.inactive_users.female; 
+      const femaleInactiveUsers = data.current.inactive_users.female;
 
       const maleTotalUsers = maleUsers + maleInactiveUsers;
       const femaleTotalUsers = femaleUsers + femaleInactiveUsers;
@@ -1033,56 +1165,56 @@
      * Met à jour le leaderboard avec les nouvelles données
      * @param {Object} data Données du leaderboard
      */
-     function updateLeaderboard(data) {
-        console.log('Données reçues:', data);
-        const today = new Date();
-        const dayOfMonth = today.getDate();
+    function updateLeaderboard(data) {
+      console.log('Données reçues:', data);
+      const today = new Date();
+      const dayOfMonth = today.getDate();
 
-        // Afficher le competition-container en premier
-        document.querySelector('.competition-container').style.display = 'block';
+      // Afficher le competition-container en premier
+      document.querySelector('.competition-container').style.display = 'block';
 
-        // Vérifie si le mois actuel doit être affiché
-        if (data.current && data.current.data) {
-            console.log('Données du mois actuel:', data.current.data);
-            const currentMonthTitle = formatMonthTitle(data.current.month);
-            document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
-            
-            displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
-            displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current');
-            
-            // Affiche toujours le conteneur du mois actuel
-            document.getElementById('currentMonthContainer').style.display = 'flex';
-            document.getElementById('podiumWrapper').style.display = 'flex';
-            document.getElementById('currentMonthTitle').style.display = 'block';
-            document.getElementById('countdown').style.display = 'block';
-            
-            // S'assurer que le month-block est visible
-            document.querySelector('.current-month-block').style.display = 'block';
-        } else {
-            console.log('Pas de données pour le mois actuel');
-        }
+      // Vérifie si le mois actuel doit être affiché
+      if (data.current && data.current.data) {
+        console.log('Données du mois actuel:', data.current.data);
+        const currentMonthTitle = formatMonthTitle(data.current.month);
+        document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
 
-        // Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
-        if (dayOfMonth <= 7 && data.previous && data.previous.data) {
-            console.log('Données du mois précédent:', data.previous.data);
-            const previousMonthTitle = formatMonthTitle(data.previous.month);
-            document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
+        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
+        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current');
 
-            displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
-            displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+        // Affiche toujours le conteneur du mois actuel
+        document.getElementById('currentMonthContainer').style.display = 'flex';
+        document.getElementById('podiumWrapper').style.display = 'flex';
+        document.getElementById('currentMonthTitle').style.display = 'block';
+        document.getElementById('countdown').style.display = 'block';
 
-            document.getElementById('previousMonthContainer').style.display = 'flex';
-            document.getElementById('previousPodiumWrapper').style.display = 'flex';
-            document.getElementById('previousMonthTitle').style.display = 'block';
-            
-            // S'assurer que le month-block est visible
-            document.querySelector('#previousMonthContainer .month-block').style.display = 'block';
-        } else {
-            document.getElementById('previousMonthContainer').style.display = 'none';
-            document.getElementById('previousMonthTitle').style.display = 'none';
-        }
+        // S'assurer que le month-block est visible
+        document.querySelector('.current-month-block').style.display = 'block';
+      } else {
+        console.log('Pas de données pour le mois actuel');
+      }
 
-        previousData = data;
+      // Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
+      if (dayOfMonth <= 7 && data.previous && data.previous.data) {
+        console.log('Données du mois précédent:', data.previous.data);
+        const previousMonthTitle = formatMonthTitle(data.previous.month);
+        document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
+
+        displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
+        displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+
+        document.getElementById('previousMonthContainer').style.display = 'flex';
+        document.getElementById('previousPodiumWrapper').style.display = 'flex';
+        document.getElementById('previousMonthTitle').style.display = 'block';
+
+        // S'assurer que le month-block est visible
+        document.querySelector('#previousMonthContainer .month-block').style.display = 'block';
+      } else {
+        document.getElementById('previousMonthContainer').style.display = 'none';
+        document.getElementById('previousMonthTitle').style.display = 'none';
+      }
+
+      previousData = data;
     }
 
     /**
@@ -1112,14 +1244,14 @@
      * @param {string} podiumWrapperId ID du conteneur du podium
      * @param {string} period Période (current ou previous)
      */
-     function displayPodium(topThree, podiumWrapperId, period) {
-    const podiumWrapper = document.getElementById(podiumWrapperId);
-    podiumWrapper.innerHTML = '';
+    function displayPodium(topThree, podiumWrapperId, period) {
+      const podiumWrapper = document.getElementById(podiumWrapperId);
+      podiumWrapper.innerHTML = '';
 
-    const positions = ['second', 'first', 'third'];
-    const orders = [1, 0, 2];
+      const positions = ['second', 'first', 'third'];
+      const orders = [1, 0, 2];
 
-    orders.forEach((order, index) => {
+      orders.forEach((order, index) => {
         const user = topThree[order];
         const positionClass = positions[index];
         const stepDiv = document.createElement('div');
@@ -1127,29 +1259,29 @@
 
         // Gestion différente des animations selon le contexte
         if (isFirstLoad) {
-            stepDiv.classList.add('animate');
-            // Supprimer la classe animate après l'animation d'entrée
-            stepDiv.addEventListener('animationend', function(event) {
-                if (event.animationName === 'slideUp') {
-                    stepDiv.classList.remove('animate');
-                    // On force la position finale
-                    stepDiv.style.transform = 'translateY(0)';
-                }
-            });
+          stepDiv.classList.add('animate');
+          // Supprimer la classe animate après l'animation d'entrée
+          stepDiv.addEventListener('animationend', function (event) {
+            if (event.animationName === 'slideUp') {
+              stepDiv.classList.remove('animate');
+              // On force la position finale
+              stepDiv.style.transform = 'translateY(0)';
+            }
+          });
         } else {
-            // Pour les mises à jour, on place directement en position finale
-            stepDiv.style.transform = 'translateY(0)';
-            setTimeout(() => {
-                stepDiv.classList.add('update');
-                // Retirer la classe update après l'animation
-                stepDiv.addEventListener('animationend', function(event) {
-                    if (event.animationName === 'pulse') {
-                        stepDiv.classList.remove('update');
-                        // On s'assure que la position finale est maintenue
-                        stepDiv.style.transform = 'translateY(0)';
-                    }
-                }, { once: true });
-            }, 100);
+          // Pour les mises à jour, on place directement en position finale
+          stepDiv.style.transform = 'translateY(0)';
+          setTimeout(() => {
+            stepDiv.classList.add('update');
+            // Retirer la classe update après l'animation
+            stepDiv.addEventListener('animationend', function (event) {
+              if (event.animationName === 'pulse') {
+                stepDiv.classList.remove('update');
+                // On s'assure que la position finale est maintenue
+                stepDiv.style.transform = 'translateY(0)';
+              }
+            }, { once: true });
+          }, 100);
         }
 
         const profileDiv = document.createElement('div');
@@ -1180,40 +1312,40 @@
 
         // Affiche l'icône de statut uniquement si elle est définie
         if (user.iconLink) {
-            const statusIconDiv = document.createElement('div');
-            statusIconDiv.classList.add('status-icon-podium');
-            statusIconDiv.style.backgroundImage = `url(${user.iconLink})`;
-            stepDiv.appendChild(statusIconDiv);
+          const statusIconDiv = document.createElement('div');
+          statusIconDiv.classList.add('status-icon-podium');
+          statusIconDiv.style.backgroundImage = `url(${user.iconLink})`;
+          stepDiv.appendChild(statusIconDiv);
         }
 
         // Ajoute la photo du coach si l'utilisateur est un coach
         if (user.type === 'Coach' && user.coachLink) {
-            const coachPhoto = document.createElement('img');
-            coachPhoto.classList.add('coach-podium-photo');
-            coachPhoto.src = user.coachLink;
-            coachPhoto.alt = `Photo du coach ${user.nickname}`;
-            stepDiv.appendChild(coachPhoto);
+          const coachPhoto = document.createElement('img');
+          coachPhoto.classList.add('coach-podium-photo');
+          coachPhoto.src = user.coachLink;
+          coachPhoto.alt = `Photo du coach ${user.nickname}`;
+          stepDiv.appendChild(coachPhoto);
         }
 
         podiumWrapper.appendChild(stepDiv);
-    });
+      });
 
-    if (isFirstLoad) {
+      if (isFirstLoad) {
         const steps = podiumWrapper.querySelectorAll('.step.animate');
         let animationsCompleted = 0;
 
         steps.forEach(step => {
-            step.addEventListener("animationend", function(event) {
-                if (event.animationName === 'slideUp') {
-                    animationsCompleted++;
-                }
-            });
+          step.addEventListener("animationend", function (event) {
+            if (event.animationName === 'slideUp') {
+              animationsCompleted++;
+            }
+          });
         });
-    }
+      }
 
-    // Animation des MEPs si les données ont changé
-    animateMepsChanges(topThree, period, true);
-}
+      // Animation des MEPs si les données ont changé
+      animateMepsChanges(topThree, period, true);
+    }
 
     /**
      * Affiche le leaderboard
@@ -1239,9 +1371,9 @@
      * @param {string} period Période (current ou previous)
      * @returns {string} HTML du tableau
      */
-     function createLeaderboardTable(leaderboardData) {
-    var tableHtml = '<div class="leaderboard">';
-    leaderboardData.forEach(function(user) {
+    function createLeaderboardTable(leaderboardData) {
+      var tableHtml = '<div class="leaderboard">';
+      leaderboardData.forEach(function (user) {
         const isPodium = user.position === 1 || user.position === 2 || user.position === 3;
 
         tableHtml += `
@@ -1263,10 +1395,10 @@
                     <img class="coach-podium-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo podium de ${user.nickname}" />
                 ` : ''}
             </div>`;
-    });
-    tableHtml += '</div>';
-    return tableHtml;
-}
+      });
+      tableHtml += '</div>';
+      return tableHtml;
+    }
 
     /**
      * Formate un nombre avec des espaces
@@ -1329,13 +1461,13 @@
     function initializePage() {
       // Ajouter la classe loading au body
       document.body.classList.add('loading');
-      
+
       // Vérifier si on est sur mobile
       const isMobile = window.innerWidth <= 600;
       if (isMobile) {
         document.querySelector('.logo-container').style.display = 'none';
       }
-      
+
       // Afficher l'overlay de chargement
       const loadingOverlay = document.getElementById('loadingOverlay');
       if (loadingOverlay) {
@@ -1346,7 +1478,7 @@
       // Ajouter un délai artificiel de 2 secondes
       setTimeout(() => {
         loadLeaderboard();
-        
+
         // Cacher l'overlay de chargement et retirer la classe loading après le délai
         if (loadingOverlay) {
           loadingOverlay.style.display = 'none';
@@ -1359,4 +1491,5 @@
     document.addEventListener('DOMContentLoaded', initializePage);
   </script>
 </body>
+
 </html>
