@@ -912,6 +912,20 @@
       gap: 50px !important;
       background-color: transparent !important;
     }
+
+    /* Ajout de l'animation de rotation pour mobile */
+    .modal-center-container img {
+      animation: rotateAndPulse 1.5s ease-in-out forwards !important;
+    }
+
+    @keyframes rotateAndPulse {
+      0% {
+        transform: rotate(-90deg);
+      }
+      100% {
+        transform: rotate(0deg);
+      }
+    }
   }
 
 </style>
