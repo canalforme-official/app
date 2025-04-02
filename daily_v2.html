@@ -271,11 +271,14 @@
       pointer-events: none;
       z-index: 1000;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
     .navigation.loaded {
       opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
     }
 
     .navigation button {
@@ -343,6 +346,12 @@
       align-items: center;
       z-index: 2000;
       flex-direction: column;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0;
     }
 
     /* Style du message de chargement */
@@ -356,6 +365,12 @@
       background-color: var(--overlay-lighter);
       padding: 10px;
       border-radius: 10px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    #loadingMessage.fade-out {
+      opacity: 0;
     }
 
     /* Logo animé lors du chargement */
@@ -363,10 +378,16 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-logo.fade-out {
+      opacity: 0;
     }
 
     .loading-logo img {
-      width: 80px;
+      width: 60px;
       height: auto;
       animation: zoom-logo 1.5s ease-in-out infinite;
     }
@@ -517,10 +538,12 @@
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       opacity: 0;
+      transform: translateY(-20px);
     }
 
     .weekly-view-button.loaded {
       opacity: 1;
+      transform: translateY(0);
     }
 
     /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
@@ -676,7 +699,7 @@
     /* Style pour le texte en tant que citation */
     .quote-text {
       font-size: 1.4em;
-      color: var(--text-light);
+      color: var(--primary-color);
       font-family: Georgia, serif;
       line-height: 1.6em;
       position: relative;
@@ -688,7 +711,7 @@
     .quote-text::after {
       content: "«";
       font-size: 2em;
-      color: var(--text-light);
+      color: var(--primary-color);
       position: absolute;
     }
 
@@ -750,9 +773,116 @@
       bottom: 0;
     }
 
+    /* Styles pour l'overlay de chargement */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--primary-overlay);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      flex-direction: column;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0;
+    }
+
+    /* Style du message de chargement */
+    #loadingMessage {
+      margin-top: 30px;
+      font-size: 1.2em;
+      color: var(--text-light);
+      text-align: center;
+      width: 80%;
+      max-width: 600px;
+      background-color: var(--overlay-lighter);
+      padding: 10px;
+      border-radius: 10px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    #loadingMessage.fade-out {
+      opacity: 0;
+    }
+
+    /* Logo animé lors du chargement */
+    .loading-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-logo.fade-out {
+      opacity: 0;
+    }
+
+    .loading-logo img {
+      width: 60px;
+      height: auto;
+      animation: zoom-logo 1.5s ease-in-out infinite;
+    }
+
+    @keyframes zoom-logo {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Styles pour les boutons de navigation */
+    .navigation {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .navigation.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Styles pour le bouton weekly-view */
+    .weekly-view-button {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .weekly-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animation d'apparition du contenu */
+    .content-wrapper {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    body:not(.loading) .content-wrapper {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
   </style>
 </head>
-<body onload="initializePage();">
+<body onload="initializePage();" class="loading">
   <!-- Bloc de texte collant pour le nom du jour -->
   <div id="stickyDayName" class="sticky-day-name"></div>
 
@@ -786,11 +916,11 @@
   </div>
 
   <!-- Overlay de chargement -->
-  <div id="loadingOverlay" style="display: none;">
+  <div id="loadingOverlay">
     <div class="loading-logo">
       <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
     </div>
-    <div id="loadingMessage">Chargement du planning</div>
+    <div id="loadingMessage">Chargement du planning quotidien</div>
   </div>
 
   <script>
@@ -819,6 +949,7 @@
     function fetchAllData() {
       const now = new Date();
       const cacheExpiration = 60 * 60 * 1000; // 1 heure en millisecondes
+      const minimumLoadingTime = 2000; // 2 secondes minimum
 
       // Vérifier si le cache existe et s'il est toujours valide
       const cachedData = localStorage.getItem('scheduleData');
@@ -835,10 +966,17 @@
           scrollToNextUpcomingCourse();
           setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
         }
+
+        // Attendre le temps minimum avant de cacher l'overlay
+        setTimeout(() => {
+          hideLoadingOverlay();
+        }, minimumLoadingTime);
       } else {
         // Pas de cache ou cache expiré, récupérer les données depuis l'API
         document.getElementById('loadingOverlay').style.display = 'flex';
         document.getElementById('loadingMessage').innerHTML = 'Chargement du planning...';
+
+        const startTime = Date.now();
 
         fetch(apiUrl)
           .then(response => response.json())
@@ -850,7 +988,14 @@
             localStorage.setItem('scheduleData', JSON.stringify(allData));
             localStorage.setItem('scheduleTimestamp', now.toISOString());
 
-            document.getElementById('loadingOverlay').style.display = 'none';
+            // Calculer le temps restant pour atteindre le minimum de 2 secondes
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, minimumLoadingTime - elapsedTime);
+
+            // Attendre le temps restant avant de cacher l'overlay
+            setTimeout(() => {
+              hideLoadingOverlay();
+            }, remainingTime);
             
             // Activer les compte à rebours et le défilement pour le jour actuel
             if (isToday(currentDayIndex)) {
@@ -861,9 +1006,36 @@
           })
           .catch(error => {
             console.error('Erreur lors de la récupération des données :', error);
-            document.getElementById('loadingOverlay').style.display = 'none';
+            hideLoadingOverlay();
           });
       }
+    }
+
+    function hideLoadingOverlay() {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const loadingMessage = document.getElementById('loadingMessage');
+      const loadingLogo = document.querySelector('.loading-logo');
+
+      // Ajouter la classe fade-out aux éléments
+      loadingMessage.classList.add('fade-out');
+      loadingLogo.classList.add('fade-out');
+
+      // Attendre que les animations de fade-out soient terminées
+      setTimeout(() => {
+        loadingOverlay.classList.add('fade-out');
+
+        // Attendre que l'overlay soit complètement transparent
+        setTimeout(() => {
+          loadingOverlay.style.display = 'none';
+          
+          // Afficher les boutons de navigation et weekly view avec animation
+          document.querySelector('.navigation').classList.add('loaded');
+          document.querySelector('.weekly-view-button').classList.add('loaded');
+
+          // Mettre à jour la position du bouton today-view
+          updateTodayButtonPosition();
+        }, 500);
+      }, 300);
     }
 
     function displaySchedule(dayIndex) {
@@ -1012,15 +1184,7 @@
       const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
       
       currentDayIndex = (currentDayIndex + direction + 7) % 7;
-      const nextDay = weekDays[currentDayIndex];
-
-      document.getElementById('loadingOverlay').style.display = 'flex';
-      document.getElementById('loadingMessage').innerHTML = 'Chargement du planning du <strong>' + nextDay + '</strong>';
-
-      setTimeout(() => {
-        displaySchedule(currentDayIndex);
-        document.getElementById('loadingOverlay').style.display = 'none';
-      }, 500);
+      displaySchedule(currentDayIndex);
     }
 
     function areAllCoursesInThePast(dayData) {
@@ -1153,26 +1317,11 @@
         document.getElementById('loadingMessage').innerHTML = 'Chargement du planning quotidien';
       }
 
-      // Ajouter un délai artificiel de 2 secondes
-      setTimeout(() => {
-        fetchAllData();
-        
-        // Cacher l'overlay de chargement et retirer la classe loading après le délai
-        if (loadingOverlay) {
-          loadingOverlay.style.display = 'none';
-        }
-        document.body.classList.remove('loading');
+      // Démarrer le chargement des données
+      fetchAllData();
 
-        // Afficher les boutons de navigation et weekly view
-        document.querySelector('.navigation').classList.add('loaded');
-        document.querySelector('.weekly-view-button').classList.add('loaded');
-
-        // Mettre à jour la position du bouton today-view
-        updateTodayButtonPosition();
-
-        // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
-        window.addEventListener('resize', handleResize);
-      }, 2000);
+      // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
+      window.addEventListener('resize', handleResize);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
