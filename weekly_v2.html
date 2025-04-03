@@ -119,6 +119,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      pointer-events: auto; /* Permettre les interactions avec les filtres */
     }
 
     .filters label {
@@ -127,11 +128,13 @@
       display: flex;
       align-items: center;
       color: var(--primary-color);
+      pointer-events: auto; /* Permettre les interactions avec les labels */
     }
 
     .filters input[type="checkbox"] {
       margin-right: 5px;
       accent-color: var(--secondary-color);
+      pointer-events: auto; /* Permettre les interactions avec les checkboxes */
     }
 
     /* Style personnalisé pour les checkboxes */
@@ -234,7 +237,7 @@
 
 /* Style pour le bouton today-view */
 .today-view-button {
-  display: flex;
+  display: none; /* Masquer par défaut */
   position: fixed;
   bottom: 20px;
   right: 10px;
@@ -340,15 +343,28 @@
 
 /* Ligne des titres avec fond rouge moins transparent et texte blanc */
 .weekly-schedule thead th {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--text-light);
   text-align: center;
-  font-size: 1.5em;
+  font-size: 1.2em;
   border-bottom: 2px solid var(--shadow-light);
   position: sticky;
   top: 0;
   z-index: 10;
   pointer-events: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+/* Arrondir uniquement les extrémités de la barre de titres */
+.weekly-schedule thead th:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.weekly-schedule thead th:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 /* Animation améliorée pour le jour actuel */
@@ -360,18 +376,13 @@
   color: var(--primary-color);
   overflow: hidden;
   pointer-events: none;
+  border-radius: 0;
+  margin: 0;
 }
 
-/* Superposition pour l'effet de lumière */
+/* Suppression de l'animation de balayage */
 .weekly-schedule thead th.today::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%; /* Commence bien en dehors du texte */
-  width: 300%; /* Plus large que le conteneur pour simuler un balayage net */
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 55%, rgba(255,255,255,0) 100%);
-  animation: lightSweep 3s infinite ease-in-out; /* Animation plus lente et fluide */
+  display: none;
 }
 
 /* Animation de balayage de lumière */
@@ -383,7 +394,6 @@
     left: 150%;
   }
 }
-
 
   /* Styles pour la cellule des heures */
   .weekly-schedule th:first-child,
@@ -837,7 +847,7 @@
   }
 
   .modal-center-container img {
-    width: 60px !important;
+    width: 70px !important;
     height: auto !important;
     animation: zoom-logo 2s infinite !important;
     pointer-events: none !important;
@@ -1032,9 +1042,19 @@
           document.body.classList.remove('loading');
 
           // Récupérer la liste unique de coachs et les ajouter dans le select
-          let uniqueCoaches = [...new Set(scheduleData.map(course => course.coach).flat())];
+          let uniqueCoaches = new Set();
+          scheduleData.forEach(course => {
+            if (course.coach) {
+              // Diviser la chaîne des coachs en coachs individuels
+              const coaches = course.coach.split(',').map(coach => coach.trim());
+              // Ajouter chaque coach individuellement à l'ensemble
+              coaches.forEach(coach => uniqueCoaches.add(coach));
+            }
+          });
+
           let coachFilterSelect = document.getElementById('coachFilter');
-          uniqueCoaches.forEach(coach => {
+          // Convertir l'ensemble en tableau et trier alphabétiquement
+          Array.from(uniqueCoaches).sort().forEach(coach => {
             let option = document.createElement('option');
             option.value = coach;
             option.textContent = coach;
