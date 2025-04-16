@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Myzone Leaderboard - Canal Forme</title>
+  <link rel="icon" type="image/png"
+    href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+    /* Réinitialisation des marges et des paddings */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Styles généraux */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f8f9fa;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      /* Ajout de règles supplémentaires pour tous les conteneurs */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Masque la barre de défilement pour tous les navigateurs Webkit */
+    body::-webkit-scrollbar,
+    .container::-webkit-scrollbar,
+    .month-block::-webkit-scrollbar,
+    .leaderboard::-webkit-scrollbar,
+    .podium-wrapper::-webkit-scrollbar,
+    .competition-container::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    /* Règles supplémentaires pour tous les conteneurs */
+    .container,
+    .month-block,
+    .leaderboard,
+    .podium-wrapper,
+    .competition-container {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Règles spécifiques pour les appareils mobiles et les résolutions 9/16 */
+    @media screen and (max-aspect-ratio: 16/9) {
+      body {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: none;
+      }
+      
+      .container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: none;
+      }
+    }
+
+    /* Tout en haut de ton style */
+    .month-block,
+    #currentMonthContainer,
+    #previousMonthContainer,
+    .podium-wrapper,
+    .competition-container {
+      display: none;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .logo-container {
+      width: 100%;
+      display: none !important;
+      /* Forcer le masquage dans toutes les versions */
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Contrôle direct sur l'image du logo */
+    .logo-container img {
+      margin-top: 15px;
+      /* espace augmenté en haut */
+      margin-bottom: -15px;
+      /* espace réduit en bas */
+      width: 80px;
+      /* largeur fixe (à ajuster selon besoin) */
+      height: auto;
+      /* garde les proportions de l'image */
+      max-width: 100%;
+      /* empêche l'image de dépasser la largeur du conteneur */
+    }
+
+    .logo {
+      max-width: 200px;
+      height: auto;
+    }
+
+    /* Titre du mois */
+    .month-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #480607;
+      margin: 10px 0;
+      text-align: center;
+      background-color: transparent;
+      /* Ajout d'un fond transparent */
+      position: relative;
+      z-index: 4;
+      /* Augmentation du z-index pour s'assurer qu'il est au-dessus du bloc */
+    }
+
+    /* Bloc du mois */
+    .month-block {
+      background-color: #480607;
+      color: #ffffff;
+      padding: 20px;
+      border-radius: 16px 16px 0 0;
+      width: 95%;
+      max-width: 600px;
+      box-shadow: 0 5px 10px rgba(72, 6, 7, 0.4);
+      margin-top: -20px;
+      /* Réduction de la marge négative de 5px */
+      position: relative;
+      z-index: 3;
+      margin-bottom: 30px;
+    }
+
+    .last-update {
+      position: absolute;
+      top: -20px;
+      right: 0;
+      color: #ffffff;
+      font-size: 0.9em;
+      display: none;
+    }
+
+    /* Styles du leaderboard */
+    .leaderboard {
+      width: 100%;
+    }
+
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      /* Ligne de séparation plus subtile */
+      font-size: 16px;
+    }
+
+    .leaderboard-row:last-child {
+      border-bottom: none;
+    }
+
+    .rank {
+      font-weight: bold;
+      width: 30px;
+      text-align: left;
+      flex-shrink: 0;
+      color: #ffffff;
+      /* Texte blanc */
+    }
+
+    .nickname {
+      flex: 1;
+      text-align: left;
+      padding: 0 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #ffffff;
+      /* Texte blanc */
+    }
+
+    .leaderboard-meps {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      background-color: rgba(255, 255, 255, 0.2);
+      /* Fond plus opaque */
+      border-radius: 8px;
+      padding: 4px;
+      min-width: 140px;
+      max-width: 140px;
+      justify-content: space-between;
+      transition: transform 0.3s ease;
+    }
+
+    .leaderboard-meps .status-icon {
+      width: 22px;
+      height: 22px;
+      margin-right: 5px;
+    }
+
+    .leaderboard-meps .meps-value {
+      margin-right: 5px;
+      color: #ffffff;
+      /* Texte blanc */
+    }
+
+    .leaderboard-meps .meps-label {
+      font-size: 0.8em;
+      color: rgba(255, 255, 255, 0.7);
+      /* Texte blanc avec transparence */
+      text-align: right;
+    }
+
+    #countdown {
+      font-size: 0.7em;
+      position: absolute;
+      top: 5px;
+      /* Remonté de 5px */
+      right: 10px;
+      color: #ffffff;
+    }
+
+    /* Overlay de chargement */
+    #loadingOverlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(72,6,7, 1) !important;
+      z-index: 999999 !important;
+      display: flex;
+      overflow: hidden !important;
+      pointer-events: all !important;
+      opacity: 1 !important;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0 !important;
+    }
+
+    /* Style du message de chargement */
+    #loadingMessage {
+      display: none;
+    }
+
+    /* Logo animé lors du chargement */
+    .loading-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .loading-logo img {
+      width: 80px;
+      height: auto;
+      animation: zoom-logo 2s ease-in-out infinite;
+    }
+
+    @keyframes zoom-logo {
+      0% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+
+      50% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+    }
+
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ff0000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Styles pour les appareils mobiles */
+    @media (max-width: 600px) {
+      body {
+        overflow-y: auto;
+        /* Assure que le défilement est possible sur mobile */
+      }
+
+      .logo-container {
+        display: none !important;
+        /* Forcer le masquage sur mobile */
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .month-block {
+        padding: 15px;
+      }
+
+      .leaderboard-row {
+        font-size: 14px;
+        padding: 8px 0;
+      }
+
+      .rank {
+        width: 25px;
+      }
+
+      .leaderboard-meps .status-icon {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    /* Styles pour le podium */
+    .podium-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      margin-top: 20px;
+      margin-bottom: 0;
+      /* Suppression de la marge en bas */
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Réduire l'espacement entre les podiums */
+    #previousPodiumWrapper {
+      margin-top: 20px;
+      /* Restauré à 20px */
+    }
+
+    /* Ajuster l'espacement du conteneur de compétition */
+    .competition-container {
+      position: relative;
+      margin: 0 auto;
+      width: 90%;
+      max-width: 600px;
+      padding: 15px;
+      border-radius: 16px;
+      background-color: transparent;
+      box-shadow: none;
+      display: none;
+      margin-top: 10px;
+      /* Réduction de la marge en haut */
+    }
+
+    .step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 16px 16px 0 0;
+      text-align: center;
+      width: 130px;
+      transform: translateY(100%);
+      box-shadow: -5px 5px 8px rgba(0, 0, 0, 0.3);
+      overflow: visible;
+      z-index: 2;
+    }
+
+    .step.animate {
+      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .step::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
+      border-radius: 16px 16px 0 0;
+    }
+
+    .step.first {
+      height: 220px;
+      background: linear-gradient(150deg,
+          #FFD700 0%,
+          #FFC600 20%,
+          #FFB700 40%,
+          #FFC600 60%,
+          #FFA700 80%,
+          #FFC600 100%);
+      order: 2;
+      animation-delay: 0.4s;
+    }
+
+    .step.second {
+      height: 180px;
+      background: linear-gradient(150deg,
+          #C0C0C0 0%,
+          #B0B0B0 20%,
+          #A0A0A0 40%,
+          #B0B0B0 60%,
+          #909090 80%,
+          #B0B0B0 100%);
+      order: 1;
+      animation-delay: 0.2s;
+    }
+
+    .step.third {
+      height: 150px;
+      background: linear-gradient(150deg,
+          #CD7F32 0%,
+          #B87333 20%,
+          #A66A2E 40%,
+          #B87333 60%,
+          #965A2B 80%,
+          #B87333 100%);
+      order: 3;
+      animation-delay: 0s;
+    }
+
+    /* Suppression des styles des étincelles */
+    .sparkles-container,
+    .sparkle,
+    .sparkle:nth-child(even),
+    .sparkle:nth-child(3n) {
+      display: none;
+    }
+
+    .status-icon {
+      background-size: cover;
+      background-position: center;
+      display: inline-block;
+      background-color: transparent;
+      /* Assure un fond transparent */
+      border: none;
+      /* Assure qu'il n'y a pas de bordure */
+      box-shadow: none;
+      /* Assure qu'il n'y a pas d'ombre */
+    }
+
+    .status-icon-podium {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      animation: appearWithScale 0.5s ease-out forwards;
+      animation-delay: 2s;
+    }
+
+    .profile {
+      position: relative;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
+      width: 100%;
+      padding: 0 8px;
+      z-index: 1;
+    }
+
+    .step.third .profile {
+      animation-delay: 1s;
+    }
+
+    .step.second .profile {
+      animation-delay: 1.2s;
+    }
+
+    .step.first .profile {
+      animation-delay: 1.4s;
+    }
+
+    .name {
+      font-weight: 600;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      font-size: 0.9rem;
+      margin: 8px 0 6px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .podium-meps {
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      font-weight: 700;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      background: rgba(72, 6, 7, 0.1);
+      padding: 4px 4px;
+      border-radius: 8px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    .step.third .podium-meps {
+      animation-delay: 1.5s;
+    }
+
+    .step.second .podium-meps {
+      animation-delay: 1.7s;
+    }
+
+    .step.first .podium-meps {
+      animation-delay: 1.9s;
+    }
+
+    .podium-meps.first {
+      font-size: 1.6rem;
+    }
+
+    .podium-meps.second {
+      font-size: 1.5rem;
+    }
+
+    .podium-meps.third {
+      font-size: 1.4rem;
+    }
+
+    .meps-label {
+      font-size: 0.7em;
+      color: white;
+      opacity: 0.9;
+      letter-spacing: 2px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
+
+    .position {
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      line-height: 0.72;
+      color: rgba(72, 6, 7, 0.3);
+      /* Changé en marron foncé avec transparence */
+      width: 100%;
+      text-align: center;
+    }
+
+    .step.first .position {
+      font-size: 6rem;
+    }
+
+    .step.second .position {
+      font-size: 5rem;
+    }
+
+    .step.third .position {
+      font-size: 4rem;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes appearWithScale {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fall {
+      /* Suppression de l'animation fall */
+    }
+
+    @media (min-width: 768px) {
+      .step {
+        width: 150px;
+      }
+
+      .podium-meps.first {
+        font-size: 1.8rem;
+      }
+
+      .podium-meps.second {
+        font-size: 1.6rem;
+      }
+
+      .podium-meps.third {
+        font-size: 1.5rem;
+      }
+
+      body {
+        overflow-y: auto;
+        /* Permet le défilement vertical */
+      }
+
+      .loading-logo img {
+        width: 100px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .loading-logo img {
+        width: 140px;
+      }
+    }
+
+    #totalMepsContainer {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    /* Style pour l'indicateur de tirage vers le bas */
+    .pull-to-refresh {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 80px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      font-size: 14px;
+      transform: translateY(-80px);
+      /* Cache initialement */
+      transition: transform 0.3s ease-out;
+      z-index: 1000;
+    }
+
+    .pull-to-refresh.show {
+      transform: translateY(0);
+      /* Montre l'indicateur */
+    }
+
+    .loading-spinner {
+      width: 25px;
+      height: 25px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ff0000;
+      border-radius: 50%;
+      margin-top: 5px;
+      display: none;
+      /* Caché initialement */
+    }
+
+    .loading-spinner.active {
+      display: block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      /* Chrome, Safari, Opera */
+      -moz-user-select: none;
+      /* Firefox */
+      -ms-user-select: none;
+      /* Internet Explorer/Edge */
+    }
+
+    .hidden {
+      display: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      height: 0 !important;
+    }
+
+    /* Photo des coachs dans le tableau */
+    .coach-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+      vertical-align: middle;
+    }
+
+    /* Photo des coachs sur le podium */
+    .coach-podium-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+      top: -15px;
+      /* Ajuster pour le débordement */
+      left: -15px;
+      /* Ajuster pour le débordement */
+      border: 1px solid white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+      /* S'assurer qu'elle est au-dessus des autres éléments */
+    }
+
+    /* On place .labels-container ABSOLUMENT dans .competition-container */
+    .labels-container {
+      position: absolute;
+      top: 0;
+      /* Retour à la position d'origine */
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 15px;
+    }
+
+    .men-label,
+    .women-label {
+      font-size: 0.6rem;
+      font-weight: normal;
+      opacity: 0.9;
+      color: #480607;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .men-label.winner,
+    .women-label.winner {
+      font-weight: bold;
+    }
+
+    .men-label.winner::after,
+    .women-label.winner::after {
+      content: '🏆';
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+    }
+
+    /* Suppression des styles de tooltip et hover */
+    .men-label::before,
+    .women-label::before {
+      display: none;
+    }
+
+    .men-label:hover::before,
+    .women-label:hover::before {
+      display: none;
+    }
+
+    .men-label {
+      left: 0px;
+      margin-left: 18px;
+    }
+
+    .women-label {
+      right: 0;
+      margin-right: 5px;
+    }
+
+    /* Barre de progression */
+    .progress-bar {
+      position: relative;
+      display: flex;
+      height: 27px;
+      background-color: #333333;
+      border-radius: 15px;
+      overflow: visible;
+      box-shadow: none;
+      margin-top: 5px;
+      /* Augmentation de la marge pour plus d'espace */
+    }
+
+    /* Segments Homme/Femme avec arrondis personnalisés */
+    .progress-bar .male {
+      border-radius: 15px 0 0 5px;
+      background: linear-gradient(to right, #480607, #5a0a0a);
+      transition: width 1.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: normal;
+      font-size: clamp(0.8rem, 1.6vw, 1rem);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar .female {
+      border-radius: 0 5px 15px 0;
+      background: linear-gradient(to left, #CD7F32, #B87333);
+      transition: width 1.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: normal;
+      font-size: clamp(0.8rem, 1.6vw, 1rem);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+    }
+
+    /* Icône (éclair) */
+    .icon-container {
+      position: absolute;
+      top: 50%;
+      /* Placé au milieu vertical */
+      left: 50%;
+      /* Ajusté par JS, ici juste la base */
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-container img {
+      display: none;
+      width: 90%;
+      height: auto;
+      transform: rotate(-10deg);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    /* Légende (active members) */
+    .active-info {
+      width: 100%;
+      text-align: right;
+      font-size: 0.6em;
+      color: #ffffff;
+      opacity: 0.8;
+      display: none;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.02);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .step.update {
+      animation: pulse 1s ease-in-out;
+      transform: translateY(0);
+    }
+
+    /* Style par défaut pour mobile */
+    .modal-center-container img {
+      width: 70px !important;
+      height: auto !important;
+      animation: zoom-logo 2s infinite !important;
+      pointer-events: none !important;
+    }
+
+    /* Style pour tablettes */
+    @media screen and (min-width: 768px) {
+      .modal-center-container img {
+        width: 100px !important;
+      }
+    }
+
+    /* Style pour desktop */
+    @media screen and (min-width: 1024px) {
+      .modal-center-container img {
+        width: 140px !important;
+      }
+    }
+
+    /* Styles pour l'overlay de chargement */
+    #loadingOverlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(72,6,7, 1) !important;
+      z-index: 999999 !important;
+      display: flex;
+      overflow: hidden !important;
+      pointer-events: all !important;
+      opacity: 1 !important;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0 !important;
+    }
+
+    .modal-center-container {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      height: auto !important;
+      pointer-events: none !important;
+      gap: 50px !important;
+      background-color: transparent !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- pull to refresh -->
+  <div id="pullToRefresh" class="pull-to-refresh">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Overlay de chargement -->
+  <div id="loadingOverlay">
+    <div class="modal-center-container">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
+    </div>
+  </div>
+
+  <!-- Logo principal -->
+  <div class="logo-container">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/6dd4e171-247a-454f-1d79-8a84922e5e25.png"
+      alt="Canal Forme Logo" class="logo">
+  </div>
+
+  <!-- Podium du mois actuel -->
+  <div class="podium-wrapper" id="podiumWrapper">
+    <!-- Photo du coach en haut à gauche pour les podiums -->
+    <img class="coach-podium-photo" id="currentCoachPodiumPhoto" style="display: none;"
+      alt="Photo du coach podium actuel">
+  </div>
+
+  <div class="competition-container">
+    <div class="labels-container">
+      <div id="menLabel" class="men-label"></div>
+      <div id="womenLabel" class="women-label"></div>
+    </div>
+    <div id="genderProgressBar" class="progress-bar">
+      <div id="maleBar" class="male"></div>
+      <div id="femaleBar" class="female"></div>
+      <div id="dynamicIcon" class="icon-container"></div>
+    </div>
+    <div class="active-info">
+      * active members only
+    </div>
+  </div>
+
+  <!-- Titre du mois actuel -->
+  <div id="currentMonthTitle" class="month-title"></div>
+
+  <!-- Section du mois actuel -->
+  <div class="container" id="currentMonthContainer">
+    <div class="month-block current-month-block">
+      <!-- Compte à rebours -->
+      <div id="countdown" style="display: none;"></div> <!-- Placez le countdown à l'extérieur -->
+      <!-- Leaderboard du mois actuel -->
+      <div id="currentMonthLeaderboard"></div>
+    </div>
+  </div>
+
+  <!-- Podium du mois précédent -->
+  <div class="podium-wrapper" id="previousPodiumWrapper">
+    <!-- Photo du coach en haut à gauche pour les podiums -->
+    <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;"
+      alt="Photo du coach podium précédent">
+  </div>
+
+  <!-- Titre du mois précédent -->
+  <div id="previousMonthTitle" class="month-title"></div>
+
+  <!-- Section du mois précédent -->
+  <div class="container" id="previousMonthContainer">
+    <div class="month-block">
+      <!-- Leaderboard du mois précédent -->
+      <div id="previousMonthLeaderboard"></div>
+    </div>
+  </div>
+
+  <script>
+
+    /* code pour mise à jour avec tirage*/
+    // Variables pour le tirage et l'élément de rafraîchissement
+    let startY = 0;
+    let isPulling = false;
+    const pullThreshold = 120; // Distance de tirage nécessaire
+    let timer = 60;
+
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Fonction pour redémarrer le compteur de rafraîchissement automatique
+    function resetCountdown() {
+      clearInterval(countdownInterval);
+      timer = 60;
+      countdownInterval = setInterval(() => {
+        timer--;
+        if (timer <= 0) {
+          refreshLeaderboard(); // Utilise refreshLeaderboard au lieu de loadLeaderboard
+          timer = 60;
+        }
+      }, 1000);
+    }
+
+    // Détecte le début du tirage
+    document.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].pageY;
+      isPulling = false;
+    });
+
+    // Gère le tirage vers le bas
+    document.addEventListener("touchmove", (e) => {
+      const currentY = e.touches[0].pageY;
+      const pullDistance = currentY - startY;
+
+      // Marque pour le chargement lorsque le seuil est atteint
+      if (pullDistance > pullThreshold) {
+        isPulling = true;
+      }
+    });
+
+    // Gère la fin du tirage et lance la mise à jour
+    document.addEventListener("touchend", () => {
+      if (isPulling) {
+        loadLeaderboard(); // Rafraîchit le contenu
+      }
+      isPulling = false;
+    });
+
+    let isFirstLoad = true;
+    let countdownInterval;
+    let previousData = {};
+    let isInitialAnimationDone = false; // Pour contrôler l'animation du podium
+
+    /**
+     * Affiche l'overlay de chargement lors du premier chargement
+     */
+    function showLoadingOverlay() {
+      if (isFirstLoad) {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+      }
+    }
+
+    /**
+     * Cache l'overlay de chargement et affiche le contenu principal
+     */
+    function hideLoadingOverlay() {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      
+      // Ajouter la classe fade-out à l'overlay
+      loadingOverlay.classList.add('fade-out');
+
+      // Attendre que l'animation de fade-out soit terminée
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+        document.body.classList.remove('loading');
+
+        // Rétablir l'affichage des conteneurs
+        document.querySelectorAll('.container').forEach(el => el.style.display = 'flex');
+        document.querySelectorAll('.month-block').forEach(el => el.style.display = 'block');
+        document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'flex');
+        document.querySelector('.competition-container').style.display = 'block';
+
+        isFirstLoad = false;
+      }, 500);
+    }
+
+    /**
+     * Charge le leaderboard depuis le fichier JSON
+     */
+    function loadLeaderboard() {
+      if (isFirstLoad) {
+        showLoadingOverlay();
+      }
+
+      fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Données chargées:', data);
+          updateLeaderboard(data);
+          updateMenWomenBar(data);
+          if (isFirstLoad) {
+            setTimeout(hideLoadingOverlay, 2000); // Délai minimum de 2 secondes pour le premier chargement
+            isFirstLoad = false;
+          }
+          startCountdown(60);
+        })
+        .catch(error => {
+          console.error("Erreur lors du chargement du leaderboard:", error);
+          if (isFirstLoad) {
+            hideLoadingOverlay();
+          }
+        });
+    }
+
+    function refreshLeaderboard() {
+      fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?cache_bust=${timestamp}')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Données rafraîchies:', data);
+          updateLeaderboard(data);
+          updateMenWomenBar(data);
+        })
+        .catch(error => {
+          console.error("Erreur lors du rafraîchissement du leaderboard:", error);
+        });
+    }
+
+    // Dans ton script principal (celui où tu as déjà loadLeaderboard() etc.)
+    function updateMenWomenBar(data) {
+      const maleMEPs = parseFloat(data.current.meps_averages.male);
+      const femaleMEPs = parseFloat(data.current.meps_averages.female);
+      const totalMEPs = maleMEPs + femaleMEPs;
+      const maleUsers = data.current.active_users.male;
+      const femaleUsers = data.current.active_users.female;
+      const maleInactiveUsers = data.current.inactive_users.male;
+      const femaleInactiveUsers = data.current.inactive_users.female;
+
+      const maleTotalUsers = maleUsers + maleInactiveUsers;
+      const femaleTotalUsers = femaleUsers + femaleInactiveUsers;
+
+      const malePercentage = (maleMEPs / totalMEPs) * 100 || 50;
+
+      // Largeur des barres
+      document.getElementById('maleBar').style.width = `${malePercentage}%`;
+      document.getElementById('femaleBar').style.width = `${100 - malePercentage}%`;
+
+      // Mise à jour des labels avec les classes de victoire
+      const menLabel = document.getElementById('menLabel');
+      const womenLabel = document.getElementById('womenLabel');
+
+      // Suppression des classes précédentes
+      menLabel.classList.remove('winner');
+      womenLabel.classList.remove('winner');
+
+      // Ajout des classes de victoire
+      if (maleMEPs > femaleMEPs) {
+        menLabel.classList.add('winner');
+      } else if (femaleMEPs > maleMEPs) {
+        womenLabel.classList.add('winner');
+      }
+
+      // Gestion du pluriel/singulier pour les hommes
+      const maleLabel = maleUsers === 1 ? 'Actif' : 'Actifs';
+      // Gestion du pluriel/singulier pour les femmes
+      const femaleLabel = femaleUsers === 1 ? 'Active' : 'Actives';
+
+      // Mise à jour des labels avec les nouvelles icônes
+      menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}`;
+      womenLabel.innerHTML = `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+
+      // Affiche les MEPs dans la barre
+      document.getElementById('maleBar').innerHTML = `<strong>${Math.round(maleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
+      document.getElementById('femaleBar').innerHTML = `<strong>${Math.round(femaleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
+
+      // Choix icône
+      let iconUrl = '';
+      if (maleMEPs > femaleMEPs) {
+        iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/851e5185-0160-776f-b434-f53d347ed959.png';
+      } else if (femaleMEPs > maleMEPs) {
+        iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/4119f047-9d31-2644-8a66-907481726761.png';
+      } else {
+        iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/d45bac30-41fd-6f61-ce4b-8f65a4f76fd2.png';
+      }
+
+      // Insérer l'icône
+      const dynamicIcon = document.getElementById('dynamicIcon');
+      dynamicIcon.innerHTML = `<img src="${iconUrl}" alt="Dynamic Icon">`;
+      dynamicIcon.style.left = `calc(${malePercentage}% + 3px)`;
+    }
+
+    /**
+     * Démarre le compte à rebours pour la mise à jour
+     * @param {number} duration Durée en secondes
+     */
+    function startCountdown(duration) {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+
+      let timer = duration;
+      const countdownElement = document.getElementById('countdown');
+
+      function updateCountdown() {
+        let minutes = Math.floor(timer / 60);
+        let seconds = timer % 60;
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
+
+        if (--timer < 0) {
+          clearInterval(countdownInterval);
+          loadLeaderboard();
+        }
+      }
+
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    /**
+     * Met à jour le leaderboard avec les nouvelles données
+     * @param {Object} data Données du leaderboard
+     */
+    function updateLeaderboard(data) {
+      console.log('Données reçues:', data);
+      const today = new Date();
+      const dayOfMonth = today.getDate();
+
+      // Afficher le competition-container en premier
+      document.querySelector('.competition-container').style.display = 'block';
+
+      // Vérifie si le mois actuel doit être affiché
+      if (data.current && data.current.data) {
+        console.log('Données du mois actuel:', data.current.data);
+        const currentMonthTitle = formatMonthTitle(data.current.month);
+        document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
+
+        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
+        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current');
+
+        // Affiche toujours le conteneur du mois actuel
+        document.getElementById('currentMonthContainer').style.display = 'flex';
+        document.getElementById('podiumWrapper').style.display = 'flex';
+        document.getElementById('currentMonthTitle').style.display = 'block';
+        document.getElementById('countdown').style.display = 'block';
+
+        // S'assurer que le month-block est visible
+        document.querySelector('.current-month-block').style.display = 'block';
+      } else {
+        console.log('Pas de données pour le mois actuel');
+      }
+
+      // Affiche le mois précédent uniquement jusqu'au 7 du mois actuel
+      if (dayOfMonth <= 7 && data.previous && data.previous.data) {
+        console.log('Données du mois précédent:', data.previous.data);
+        const previousMonthTitle = formatMonthTitle(data.previous.month);
+        document.getElementById('previousMonthTitle').textContent = previousMonthTitle;
+
+        displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
+        displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+
+        // Restaurer les éléments du mois précédent
+        const previousElements = [
+          document.getElementById('previousMonthContainer'),
+          document.getElementById('previousPodiumWrapper'),
+          document.getElementById('previousMonthTitle')
+        ];
+
+        previousElements.forEach(element => {
+          if (element) {
+            element.style.display = '';
+            element.style.visibility = '';
+            element.style.opacity = '';
+            element.style.height = '';
+            element.style.padding = '';
+            element.style.margin = '';
+            element.style.position = '';
+          }
+        });
+
+        // S'assurer que le month-block est visible
+        const previousMonthBlock = document.querySelector('#previousMonthContainer .month-block');
+        if (previousMonthBlock) {
+          previousMonthBlock.style.display = 'block';
+        }
+      } else {
+        // Masquer complètement le mois précédent après le 7
+        const previousElements = [
+          document.getElementById('previousMonthContainer'),
+          document.getElementById('previousPodiumWrapper'),
+          document.getElementById('previousMonthTitle')
+        ];
+
+        previousElements.forEach(element => {
+          if (element) {
+            element.style.display = 'none';
+            element.style.visibility = 'hidden';
+            element.style.opacity = '0';
+            element.style.height = '0';
+            element.style.padding = '0';
+            element.style.margin = '0';
+            element.style.position = 'absolute';
+          }
+        });
+        
+        // Masquer explicitement le month-block du mois précédent
+        const previousMonthBlock = document.querySelector('#previousMonthContainer .month-block');
+        if (previousMonthBlock) {
+          previousMonthBlock.style.display = 'none';
+          previousMonthBlock.style.visibility = 'hidden';
+          previousMonthBlock.style.opacity = '0';
+          previousMonthBlock.style.height = '0';
+          previousMonthBlock.style.padding = '0';
+          previousMonthBlock.style.margin = '0';
+        }
+      }
+
+      previousData = data;
+    }
+
+    /**
+     * Formate le titre du mois en fonction de la première lettre
+     * @param {string} month Nom du mois
+     * @returns {string} Titre formaté
+     */
+    function formatMonthTitle(month) {
+      const vowels = ['A', 'E', 'I', 'O', 'U', 'Y'];
+      const firstLetter = month.trim().charAt(0).toUpperCase();
+      const article = vowels.includes(firstLetter) ? "d'" : "de ";
+      return `Leaderboard du mois ${article}${month}`;
+    }
+
+    /**
+     * Vérifie si tous les utilisateurs ont des MEPs nuls ou indéfinis
+     * @param {Array} data Données du leaderboard
+     * @returns {boolean}
+     */
+    function allMepsZero(data) {
+      return data.every(user => !user.meps || user.meps === 0);
+    }
+
+    /**
+     * Affiche le podium
+     * @param {Array} topThree Les trois premiers utilisateurs
+     * @param {string} podiumWrapperId ID du conteneur du podium
+     * @param {string} period Période (current ou previous)
+     */
+    function displayPodium(topThree, podiumWrapperId, period) {
+      const podiumWrapper = document.getElementById(podiumWrapperId);
+      podiumWrapper.innerHTML = '';
+
+      const positions = ['second', 'first', 'third'];
+      const orders = [1, 0, 2];
+
+      orders.forEach((order, index) => {
+        const user = topThree[order];
+        const positionClass = positions[index];
+        const stepDiv = document.createElement('div');
+        stepDiv.classList.add('step', positionClass);
+
+        // Gestion différente des animations selon le contexte
+        if (isFirstLoad) {
+          stepDiv.classList.add('animate');
+          // Supprimer la classe animate après l'animation d'entrée
+          stepDiv.addEventListener('animationend', function (event) {
+            if (event.animationName === 'slideUp') {
+              stepDiv.classList.remove('animate');
+              // On force la position finale
+              stepDiv.style.transform = 'translateY(0)';
+            }
+          });
+        } else {
+          // Pour les mises à jour, on place directement en position finale
+          stepDiv.style.transform = 'translateY(0)';
+          setTimeout(() => {
+            stepDiv.classList.add('update');
+            // Retirer la classe update après l'animation
+            stepDiv.addEventListener('animationend', function (event) {
+              if (event.animationName === 'pulse') {
+                stepDiv.classList.remove('update');
+                // On s'assure que la position finale est maintenue
+                stepDiv.style.transform = 'translateY(0)';
+              }
+            }, { once: true });
+          }, 100);
+        }
+
+        const profileDiv = document.createElement('div');
+        profileDiv.classList.add('profile');
+
+        const nameDiv = document.createElement('div');
+        nameDiv.classList.add('name');
+        nameDiv.textContent = user.nickname;
+        profileDiv.appendChild(nameDiv);
+
+        const mepsDiv = document.createElement('div');
+        mepsDiv.classList.add('podium-meps', positionClass);
+        mepsDiv.textContent = formatNumber(user.meps);
+        mepsDiv.setAttribute('data-meps', user.meps);
+        profileDiv.appendChild(mepsDiv);
+
+        const mepsLabelDiv = document.createElement('div');
+        mepsLabelDiv.classList.add('meps-label');
+        mepsLabelDiv.textContent = 'MEPs';
+        profileDiv.appendChild(mepsLabelDiv);
+
+        stepDiv.appendChild(profileDiv);
+
+        const positionDiv = document.createElement('div');
+        positionDiv.classList.add('position');
+        positionDiv.textContent = user.position;
+        stepDiv.appendChild(positionDiv);
+
+        // Affiche l'icône de statut uniquement si elle est définie
+        if (user.iconLink) {
+          const statusIconDiv = document.createElement('div');
+          statusIconDiv.classList.add('status-icon-podium');
+          statusIconDiv.style.backgroundImage = `url(${user.iconLink})`;
+          stepDiv.appendChild(statusIconDiv);
+        }
+
+        // Ajoute la photo du coach si l'utilisateur est un coach
+        if (user.type === 'Coach' && user.coachLink) {
+          const coachPhoto = document.createElement('img');
+          coachPhoto.classList.add('coach-podium-photo');
+          coachPhoto.src = user.coachLink;
+          coachPhoto.alt = `Photo du coach ${user.nickname}`;
+          stepDiv.appendChild(coachPhoto);
+        }
+
+        podiumWrapper.appendChild(stepDiv);
+      });
+
+      if (isFirstLoad) {
+        const steps = podiumWrapper.querySelectorAll('.step.animate');
+        let animationsCompleted = 0;
+
+        steps.forEach(step => {
+          step.addEventListener("animationend", function (event) {
+            if (event.animationName === 'slideUp') {
+              animationsCompleted++;
+            }
+          });
+        });
+      }
+
+      // Animation des MEPs si les données ont changé
+      animateMepsChanges(topThree, period, true);
+    }
+
+    /**
+     * Affiche le leaderboard
+     * @param {Array} data Données du leaderboard
+     * @param {string} leaderboardId ID du conteneur du leaderboard
+     * @param {string} period Période (current ou previous)
+     */
+    function displayLeaderboard(data, leaderboardId, period) {
+      const leaderboardContainer = document.getElementById(leaderboardId);
+
+      const today = new Date();
+      const dayOfMonth = today.getDate();
+      const topEntries = dayOfMonth <= 7 ? 10 : 20;
+
+      const leaderboardData = data.slice(3, topEntries);
+
+      leaderboardContainer.innerHTML = createLeaderboardTable(leaderboardData, period);
+    }
+
+    /**
+     * Crée le tableau du leaderboard
+     * @param {Array} leaderboardData Données du leaderboard
+     * @param {string} period Période (current ou previous)
+     * @returns {string} HTML du tableau
+     */
+    function createLeaderboardTable(leaderboardData) {
+      var tableHtml = '<div class="leaderboard">';
+      leaderboardData.forEach(function (user) {
+        const isPodium = user.position === 1 || user.position === 2 || user.position === 3;
+
+        tableHtml += `
+            <div class="leaderboard-row">
+                <span class="rank">${user.position}</span>
+
+                <!-- Photo du coach si le type est Coach -->
+                ${user.type === 'Coach' ? `<img class="coach-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo de ${user.nickname}" />` : ''}
+                
+                <span class="nickname">${user.nickname}</span>
+                <span class="leaderboard-meps">
+                    <span class="status-icon" style="background-image: url(${user.iconLink || ''});"></span>
+                    <span class="meps-value">${formatNumber(user.meps)}</span>
+                    <span class="meps-label">MEPs</span>
+                </span>
+
+                <!-- Ajout de la photo du coach sur le podium -->
+                ${isPodium && user.type === 'Coach' ? `
+                    <img class="coach-podium-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo podium de ${user.nickname}" />
+                ` : ''}
+            </div>`;
+      });
+      tableHtml += '</div>';
+      return tableHtml;
+    }
+
+    /**
+     * Formate un nombre avec des espaces
+     * @param {number} num Nombre à formater
+     * @returns {string} Nombre formaté
+     */
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    /**
+     * Anime les changements de MEPs
+     * @param {Array} newData Nouvelles données
+     * @param {string} period Période (current ou previous)
+     * @param {boolean} isPodium Indique si c'est pour le podium
+     */
+    function animateMepsChanges(newData, period, isPodium = false) {
+      if (!previousData[period] || !previousData[period].data) return;
+
+      const oldData = previousData[period].data;
+
+      newData.forEach((user, index) => {
+        const oldUser = oldData.find(u => u.nickname === user.nickname);
+        if (oldUser && user.meps > oldUser.meps) {
+          const mepsElements = document.querySelectorAll(`[data-meps="${user.meps}"]`);
+
+          mepsElements.forEach(element => {
+            // Animation de l'incrémentation des chiffres
+            animateValue(element.querySelector('.meps-value'), oldUser.meps, user.meps, 1000);
+            // Zoom sur le bloc
+            element.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+              element.style.transform = 'scale(1)';
+            }, 1000);
+          });
+        }
+      });
+    }
+
+    /**
+     * Anime la valeur numérique
+     * @param {HTMLElement} obj Élément DOM
+     * @param {number} start Valeur de départ
+     * @param {number} end Valeur de fin
+     * @param {number} duration Durée de l'animation
+     */
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.textContent = formatNumber(Math.floor(progress * (end - start) + start));
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function initializePage() {
+      // Ajouter la classe loading au body
+      document.body.classList.add('loading');
+
+      // Vérifier si on est sur mobile
+      const isMobile = window.innerWidth <= 600;
+      if (isMobile) {
+        document.querySelector('.logo-container').style.display = 'none';
+      }
+
+      // Masquer les conteneurs pendant le chargement
+      document.querySelectorAll('.container').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.month-block').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'none');
+      document.querySelector('.competition-container').style.display = 'none';
+
+      // S'assurer que l'overlay est visible
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      loadingOverlay.style.display = 'flex';
+      loadingOverlay.classList.remove('fade-out');
+
+      // Charger les données après un court délai
+      setTimeout(() => {
+        loadLeaderboard();
+      }, 500);
+    }
+
+    // Appeler initializePage au chargement
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+</body>
+
+</html>

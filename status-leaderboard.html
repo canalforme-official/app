@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+    <title>Status Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #480607;
+            color: #333;
+            z-index: 0;
+            transition: background 0.5s ease;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body.loaded {
+            background: linear-gradient(145deg, #480607, #822026);
+        }
+
+        .header {
+            display: none;
+        }
+
+        .medal-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Empêche l'interaction avec les éléments */
+            overflow: hidden;
+            z-index: 1; /* En arrière-plan */
+            background: transparent;
+        }
+
+        .medal {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            animation: floatDown 8s ease-in-out forwards;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+            will-change: transform, opacity;
+        }
+
+        @keyframes floatDown {
+            0% {
+                transform: translateY(-100%) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            20% {
+                transform: translateY(0) rotate(180deg) scale(1);
+                opacity: 0.8;
+            }
+            80% {
+                transform: translateY(80vh) rotate(360deg) scale(0.8);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) rotate(540deg) scale(0.6);
+                opacity: 0;
+            }
+        }
+
+        /* Animation pour les changements de données */
+        @keyframes highlightChange {
+            0% {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        .highlight {
+            animation: highlightChange 1s ease-out;
+        }
+
+        /* Amélioration de la visibilité des tableaux */
+        .table {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .table::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .table::before {
+            display: none;
+        }
+
+        .table::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05));
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .table h3 {
+            display: flex;
+            align-items: center;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            position: absolute;
+            top: -35px;
+            left: 20px;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(72, 6, 7, 0.9);
+            border: none;
+            height: 60px;
+            width: calc(100% - 40px);
+            padding: 0 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .table h3 img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .table:hover h3 img {
+            transform: scale(1.1);
+        }
+
+        .table h3 span {
+            margin-top: 10px;
+        }
+
+        table td {
+            position: relative;
+            padding: 16px 8px;
+            transition: all 0.3s ease;
+        }
+
+        table td:first-child {
+            font-weight: 700;
+            color: #480607;
+            width: 40px;
+        }
+
+        table td:nth-child(2) {
+            font-weight: 500;
+        }
+
+        table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        table td span.meps {
+            background: rgba(72, 6, 7, 0.05);
+            border: 1px solid rgba(72, 6, 7, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        table td span.meps strong {
+            font-weight: 700;
+            color: #480607;
+            font-family: 'Montserrat', sans-serif;
+            opacity: 1 !important;
+        }
+
+        table td span.meps::after {
+            content: "MEPS";
+            opacity: 0.5;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+            color: #480607;
+            margin-left: 4px;
+        }
+
+        /* Style pour les positions spéciales avec icônes */
+        tr[data-position="1"] td:first-child::before {
+            content: '👑';
+            margin-right: 8px;
+            font-size: 1.2em;
+            vertical-align: middle;
+            display: inline-block;
+            animation: crownShine 2s infinite;
+        }
+        tr[data-position="2"] td:first-child::before {
+            content: '🥈';
+            margin-right: 8px;
+            font-size: 1.2em;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        tr[data-position="3"] td:first-child::before {
+            content: '🥉';
+            margin-right: 8px;
+            font-size: 1.2em;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        tr[data-position="1"] td:first-child,
+        tr[data-position="2"] td:first-child,
+        tr[data-position="3"] td:first-child {
+            font-size: inherit;
+            color: #480607;
+        }
+
+        @keyframes crownShine {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Amélioration du compte à rebours */
+        .countdown {
+            background: #ffffff;
+            border: 1px solid rgba(72, 6, 7, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 300px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #480607;
+        }
+
+        .countdown:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 6, 7, 0.15);
+        }
+
+        /* Animation pour les nouvelles données */
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .new-data {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .page-title {
+            text-align: center;
+            background-color: transparent;
+            color: #ffffff;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .page-title h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #480607, #822026);
+            border-radius: 2px;
+        }
+
+        .container {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 1;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform: none;
+            -webkit-transform: none;
+        }
+
+        .table:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(72, 6, 7, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .description {
+            font-size: 0.9em;
+            color: #666;
+            margin: 15px 0 45px 0;
+            font-weight: 500;
+            text-align: center;
+            padding: 0 10px;
+            white-space: normal;
+            word-wrap: break-word;
+            position: relative;
+            top: 10px;
+        }
+
+        .status-count {
+            font-size: 0.8em;
+            color: #666;
+            font-weight: 600;
+            margin: 15px 0;
+            text-align: center;
+            background-color: rgba(72, 6, 7, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 2px;
+        }
+
+        table th, table td {
+            text-align: left;
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(72, 6, 7, 0.1);
+            color: #333;
+            transition: background-color 0.2s ease;
+        }
+
+        table tr:hover td {
+            background-color: rgba(72, 6, 7, 0.05);
+        }
+
+        table tr {
+            transition: transform 0.2s ease;
+        }
+
+        table tr:hover {
+            transform: translateX(5px);
+        }
+
+        .status-icon {
+            width: 22px;
+            height: 22px;
+            margin-right: 5px;
+            background-size: cover;
+            background-position: center;
+            display: inline-block;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+                gap: 45px;
+            }
+
+            .header {
+                display: none;
+            }
+
+            .table {
+                max-height: none;
+                margin: 25px 5px;
+                padding: 15px;
+                border-radius: 12px;
+                touch-action: manipulation;
+            }
+
+            .page-title h1 {
+                font-size: 1.5em;
+            }
+
+            table th, table td {
+                padding: 12px 8px;
+                font-size: 0.95em;
+                position: relative;
+            }
+
+            table td:first-child {
+                width: 40px;
+            }
+
+            table td:nth-child(2) {
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            table td:last-child {
+                text-align: right;
+                padding-right: 12px;
+            }
+
+            /* Style pour le swipe */
+            .swipe-indicator {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                color: rgba(255, 255, 255, 0.5);
+                font-size: 1.2em;
+                pointer-events: none;
+            }
+
+            /* Animation de swipe */
+            @keyframes swipeRight {
+                from { transform: translateX(0); }
+                to { transform: translateX(100%); }
+            }
+
+            .swipe-right {
+                animation: swipeRight 0.3s ease-out forwards;
+            }
+
+            /* Style pour le mode plein écran */
+            .table.fullscreen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                margin: 0;
+                border-radius: 0;
+                max-height: 100vh;
+                overflow-y: auto;
+            }
+
+            .fullscreen-close {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.5);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+                z-index: 1001;
+            }
+
+            .table.fullscreen + .fullscreen-close {
+                display: block;
+            }
+        }
+
+        /* Animation de chargement */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .loading {
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.05) 25%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Style pour le mode étendu */
+        .table.expanded {
+            animation: none;
+            max-height: none;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .table.expanded tbody {
+            display: table-row-group;
+        }
+
+        .button-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .expand-button, .collapse-button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(72, 6, 7, 0.05);
+            border: 1px solid rgba(72, 6, 7, 0.1);
+            color: #480607;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        .expand-button:hover, .collapse-button:hover {
+            background: rgba(72, 6, 7, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .table.expanded .expand-button {
+            display: none;
+        }
+
+        .table.expanded .collapse-button {
+            display: block;
+        }
+
+        /* Animation pour l'expansion et la réduction */
+        @keyframes expandTable {
+            from {
+                max-height: 400px;
+                opacity: 0.8;
+            }
+            to {
+                max-height: 2000px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes collapseTable {
+            from {
+                max-height: 2000px;
+                opacity: 1;
+            }
+            to {
+                max-height: 400px;
+                opacity: 0.8;
+            }
+        }
+
+        .table.expanded {
+            animation: expandTable 0.5s ease-out forwards;
+        }
+
+        .table.collapsing {
+            animation: collapseTable 0.5s ease-out forwards;
+        }
+
+        /* Animation pour les nouvelles lignes */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .new-row {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+
+        /* Amélioration du chargement initial */
+        .container {
+            opacity: 1;
+            will-change: auto;
+            backface-visibility: visible;
+            transform: none;
+            -webkit-transform: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .table:nth-child(1) { animation-delay: 0s; }
+        .table:nth-child(2) { animation-delay: 0s; }
+        .table:nth-child(3) { animation-delay: 0s; }
+        .table:nth-child(4) { animation-delay: 0s; }
+        .table:nth-child(5) { animation-delay: 0s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style pour le mode étendu */
+        .table.expanded {
+            animation: none;
+            max-height: none;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .table.expanded tbody {
+            display: table-row-group;
+        }
+
+        .expand-button, .collapse-button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(72, 6, 7, 0.05);
+            border: 1px solid rgba(72, 6, 7, 0.1);
+            color: #480607;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        .expand-button {
+            display: block;
+        }
+
+        .collapse-button {
+            display: none;
+        }
+
+        .table.expanded .expand-button {
+            display: none;
+        }
+
+        .table.expanded .collapse-button {
+            display: block;
+        }
+
+        .expand-button:hover, .collapse-button:hover {
+            background: rgba(72, 6, 7, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation pour l'expansion et la réduction */
+        @keyframes expandTable {
+            from {
+                max-height: 400px;
+                opacity: 0.8;
+            }
+            to {
+                max-height: 2000px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes collapseTable {
+            from {
+                max-height: 2000px;
+                opacity: 1;
+            }
+            to {
+                max-height: 400px;
+                opacity: 0.8;
+            }
+        }
+
+        .table.expanded {
+            animation: expandTable 0.5s ease-out forwards;
+        }
+
+        .table.collapsing {
+            animation: collapseTable 0.5s ease-out forwards;
+        }
+
+        /* Animation pour les nouvelles lignes */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .new-row {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="medal-background"></div>
+    <div class="page-title">
+        <h1>Statuts Myzone</h1>
+    </div>
+
+    <div class="countdown" id="countdown">Prochaine mise à jour dans : 05:00</div>
+
+    <div class="container" id="status-tables">
+        <!-- Les tableaux seront générés dynamiquement ici -->
+    </div>
+
+    <script>
+        const jsonUrl = `https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=${Date.now()}`;
+        //const jsonUrl = `./Leaderboard.json?timestamp=${Date.now()}`;
+
+        let medalAnimationInterval = null;
+        let medalUrls = [];
+
+        async function fetchLeaderboard() {
+            const response = await fetch(jsonUrl);
+            const data = await response.json();
+            console.log('Données reçues:', data.current.data[0]); // Afficher la structure d'un utilisateur
+            return data.current.data;
+        }
+
+        function generateTable(status, rank, iconLink, users) {
+            const container = document.getElementById('status-tables');
+            let existingTable = Array.from(container.children).find(table => table.dataset.status === status);
+
+            if (!existingTable) {
+                // Crée le conteneur pour le tableau
+                const tableContainer = document.createElement('div');
+                tableContainer.classList.add('table');
+                tableContainer.dataset.status = status;
+
+                // Crée un conteneur pour aligner les éléments
+                const headerContainer = document.createElement('div');
+                headerContainer.style.display = 'flex';
+                headerContainer.style.alignItems = 'center';
+                headerContainer.style.justifyContent = 'space-between';
+                headerContainer.style.gap = '10px';
+
+                // Ajoute le titre avec l'icône
+                const title = document.createElement('h3');
+                if (iconLink) {
+                    title.innerHTML = `<img src="${iconLink}" alt="${status}"> ${status}`;
+                } else {
+                    title.textContent = status;
+                }
+                title.style.margin = '0';
+                headerContainer.appendChild(title);
+
+                // Ajoute la description
+                const description = document.createElement('p');
+                description.classList.add('description');
+                description.style.margin = '0';
+                description.textContent = rank > 0 
+                    ? `${rank} mois à 1300 MEPs`
+                    : ``;
+                headerContainer.appendChild(description);
+
+                // Ajoute le nombre de personnes
+                const count = document.createElement('p');
+                count.classList.add('status-count');
+                count.style.margin = '0';
+                count.textContent = `${users.length} users`;
+                headerContainer.appendChild(count);
+
+                tableContainer.appendChild(headerContainer);
+
+                // Crée le tableau
+                const table = document.createElement('table');
+                const tbody = document.createElement('tbody');
+                table.appendChild(tbody);
+
+                tableContainer.appendChild(table);
+                container.appendChild(tableContainer);
+                existingTable = tableContainer;
+            }
+
+            // Ajouter une classe de chargement pendant la mise à jour
+            const tableContainer = existingTable;
+            tableContainer.classList.add('loading');
+            
+            // Simuler un délai de chargement pour une meilleure expérience utilisateur
+            setTimeout(() => {
+                tableContainer.classList.remove('loading');
+                // Met à jour le contenu du tableau
+                const tbody = existingTable.querySelector('tbody');
+                const oldRows = Array.from(tbody.querySelectorAll('tr'));
+                tbody.innerHTML = '';
+                
+                // Limite le nombre d'utilisateurs affichés à 5
+                const displayUsers = users.slice(0, 5);
+                displayUsers.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-position', user.position);
+                    row.classList.add('new-data');
+                    
+                    // Vérifie si les données ont changé
+                    const oldRow = oldRows[index];
+                    const oldMeps = oldRow ? parseInt(oldRow.querySelector('td:last-child strong').textContent.replace(/\s/g, '')) : null;
+                    const hasChanged = oldMeps !== null && oldMeps !== user.meps;
+                    
+                    row.innerHTML = `
+                        <td style="font-weight: bold;">${user.position}</td>
+                        <td style="padding-left: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
+                                ${user.nickname}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="meps">
+                                <strong class="${hasChanged ? 'highlight' : ''}">${formatNumber(user.meps)}</strong>
+                            </span>
+                        </td>
+                    `;
+                    
+                    if (hasChanged) {
+                        row.querySelector('td:last-child').classList.add('highlight');
+                    }
+                    
+                    tbody.appendChild(row);
+                });
+
+                // Dans la partie où on ajoute la ligne "autres"
+                if (users.length > 5) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="3" style="text-align: center;">
+                            <button class="expand-button">
+                                Voir les ${users.length - 5} autres membres
+                            </button>
+                            <button class="collapse-button">
+                                Voir moins
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+
+                    // Gérer le clic sur le bouton d'expansion
+                    const expandButton = row.querySelector('.expand-button');
+                    const collapseButton = row.querySelector('.collapse-button');
+                    
+                    expandButton.addEventListener('click', () => {
+                        console.log('Clic sur le bouton expand');
+                        const table = expandButton.closest('.table');
+                        const tbody = table.querySelector('tbody');
+                        
+                        // Ajouter les lignes supplémentaires avec animation
+                        const additionalUsers = users.slice(5);
+                        const fragment = document.createDocumentFragment();
+                        
+                        additionalUsers.forEach((user, index) => {
+                            const newRow = document.createElement('tr');
+                            newRow.classList.add('new-row');
+                            newRow.style.animationDelay = `${index * 0.05}s`;
+                            newRow.setAttribute('data-position', user.position);
+                            
+                            newRow.innerHTML = `
+                                <td style="font-weight: bold;">${user.position}</td>
+                                <td style="padding-left: 15px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
+                                        ${user.nickname}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="meps">
+                                        <strong>${formatNumber(user.meps)}</strong>
+                                    </span>
+                                </td>
+                            `;
+                            
+                            fragment.appendChild(newRow);
+                        });
+                        
+                        tbody.insertBefore(fragment, row);
+                        table.classList.add('expanded');
+                        console.log('Table étendue, classes actuelles:', table.classList.toString());
+                    });
+
+                    // Gérer le clic sur le bouton de réduction
+                    collapseButton.addEventListener('click', () => {
+                        console.log('Clic sur le bouton collapse');
+                        const table = collapseButton.closest('.table');
+                        table.classList.add('collapsing');
+                        console.log('Table en cours de collapse, classes actuelles:', table.classList.toString());
+                        
+                        // Sauvegarder la ligne des boutons avant la suppression
+                        const buttonRow = table.querySelector('tr:last-child');
+                        console.log('Ligne des boutons avant suppression:', buttonRow ? buttonRow.innerHTML : 'Non trouvée');
+                        
+                        // Supprimer les lignes supplémentaires immédiatement
+                        const rows = table.querySelectorAll('tr');
+                        console.log('Nombre total de lignes avant suppression:', rows.length);
+                        
+                        // Supprimer toutes les lignes sauf les 5 premières et la ligne des boutons
+                        rows.forEach((row, index) => {
+                            if (index > 5 && row !== buttonRow) {
+                                console.log('Suppression de la ligne:', index, row.innerHTML);
+                                row.remove();
+                            }
+                        });
+                        
+                        // Retirer les classes après un court délai pour l'animation
+                        setTimeout(() => {
+                            table.classList.remove('expanded', 'collapsing');
+                            console.log('Classes après suppression:', table.classList.toString());
+                            
+                            // Vérifier si la ligne des boutons existe toujours
+                            const currentButtonRow = table.querySelector('tr:last-child');
+                            console.log('Ligne des boutons après suppression:', currentButtonRow ? currentButtonRow.innerHTML : 'Non trouvée');
+                            
+                            if (currentButtonRow) {
+                                const expandButton = currentButtonRow.querySelector('.expand-button');
+                                const collapseButton = currentButtonRow.querySelector('.collapse-button');
+                                console.log('Boutons trouvés:', {
+                                    expandButton: !!expandButton,
+                                    collapseButton: !!collapseButton
+                                });
+                                
+                                if (expandButton && collapseButton) {
+                                    console.log('État des boutons avant modification:', {
+                                        expandDisplay: expandButton.style.display,
+                                        collapseDisplay: collapseButton.style.display
+                                    });
+                                    expandButton.style.display = 'block';
+                                    collapseButton.style.display = 'none';
+                                    console.log('État des boutons après modification:', {
+                                        expandDisplay: expandButton.style.display,
+                                        collapseDisplay: collapseButton.style.display
+                                    });
+                                } else {
+                                    console.error('Un ou les deux boutons n\'ont pas été trouvés dans la ligne des boutons');
+                                    console.log('Contenu complet de la dernière ligne:', currentButtonRow.innerHTML);
+                                }
+                            } else {
+                                console.error('Ligne des boutons non trouvée');
+                                console.log('Nombre de lignes restantes:', table.querySelectorAll('tr').length);
+                                console.log('Contenu du tbody:', table.querySelector('tbody').innerHTML);
+                            }
+                        }, 500);
+                    });
+                }
+            }, 300);
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        async function fetchMedals() {
+            try {
+                const response = await fetch(jsonUrl);
+                const data = await response.json();
+                medalUrls = [...new Set(data.current.data.map(user => user.iconLink))];
+                return medalUrls;
+            } catch (error) {
+                console.error('Erreur lors du chargement des médailles:', error);
+                return [];
+            }
+        }
+
+        function createMedalAnimation() {
+            if (!medalUrls.length) return;
+            
+            const background = document.querySelector('.medal-background');
+            if (!background) return;
+
+            const currentMedals = background.querySelectorAll('.medal').length;
+            const isMobile = window.innerWidth <= 768;
+            const maxMedals = isMobile ? 2 : 3;
+            
+            if (currentMedals >= maxMedals) return;
+
+            const medal = document.createElement('img');
+            medal.classList.add('medal');
+            medal.src = medalUrls[Math.floor(Math.random() * medalUrls.length)];
+            
+            const leftPosition = 20 + (Math.random() * 60);
+            medal.style.left = `${leftPosition}%`;
+            medal.style.width = `${isMobile ? 30 : 40}px`;
+            
+            background.appendChild(medal);
+
+            // Nettoyer la médaille après l'animation
+            medal.addEventListener('animationend', () => {
+                if (medal.parentNode) {
+                    background.removeChild(medal);
+                }
+            });
+        }
+
+        function startMedalAnimation() {
+            // Arrêter l'animation existante si elle existe
+            if (medalAnimationInterval) {
+                clearInterval(medalAnimationInterval);
+            }
+
+            const isMobile = window.innerWidth <= 768;
+            const interval = isMobile ? 10000 : 8000; // Plus long intervalle pour éviter la surcharge
+            
+            // Démarrer une nouvelle animation
+            medalAnimationInterval = setInterval(createMedalAnimation, interval);
+        }
+
+        async function init() {
+            try {
+                const data = await fetchLeaderboard();
+                
+                if (!data || data.length === 0) {
+                    console.error('Aucune donnée disponible');
+                    return;
+                }
+
+                const groupedByStatus = data.reduce((acc, user) => {
+                    if (!acc[user.status]) {
+                        acc[user.status] = [];
+                    }
+                    acc[user.status].push(user);
+                    return acc;
+                }, {});
+
+                const statuses = Object.keys(groupedByStatus).sort((a, b) => {
+                    const maxRankA = Math.max(...groupedByStatus[a].map(u => u.rank));
+                    const maxRankB = Math.max(...groupedByStatus[b].map(u => u.rank));
+                    return maxRankB - maxRankA;
+                });
+
+                // Créer les tableaux
+                statuses.forEach((status, index) => {
+                    setTimeout(() => {
+                        const users = groupedByStatus[status]
+                            .sort((a, b) => b.rank - a.rank);
+
+                        const iconLink = users[0]?.iconLink || '';
+                        const rank = users[0]?.rank || 0;
+                        generateTable(status, rank, iconLink, users);
+                    }, index * 50);
+                });
+
+                // Initialiser les interactions mobiles
+                initMobileInteractions();
+                
+                // Charger les médailles et démarrer l'animation
+                await fetchMedals();
+                setTimeout(startMedalAnimation, 2000);
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation:', error);
+            }
+        }
+
+        function startCountdown(duration) {
+            const countdownElement = document.getElementById('countdown');
+            let timer = duration;
+
+            async function updateCountdown() {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+                countdownElement.textContent = `Prochaine mise à jour dans : ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (--timer < 0) {
+                    timer = duration;
+                    await init();
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        // Initialiser l'application
+        document.addEventListener('DOMContentLoaded', () => {
+            init().then(() => {
+                startCountdown(300);
+            }).catch(error => {
+                console.error('Erreur lors du démarrage:', error);
+            });
+        });
+    </script>
+
+    <script>
+        // Gestion des interactions mobiles
+        function initMobileInteractions() {
+            const tables = document.querySelectorAll('.table');
+            
+            tables.forEach(table => {
+                const header = table.querySelector('h3');
+                let touchStartX = 0;
+                let touchEndX = 0;
+                let isSwiping = false;
+
+                // Gestion du collapse/expand
+                header.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        table.classList.toggle('collapsed');
+                    }
+                });
+
+                // Gestion du swipe avec option passive
+                table.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    isSwiping = true;
+                }, { passive: true });
+
+                table.addEventListener('touchmove', (e) => {
+                    if (!isSwiping) return;
+                    touchEndX = e.touches[0].clientX;
+                }, { passive: true });
+
+                table.addEventListener('touchend', () => {
+                    if (!isSwiping) return;
+                    isSwiping = false;
+                }, { passive: true });
+            });
+        }
+
+        // Initialiser les interactions mobiles après le chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            initMobileInteractions();
+        });
+
+        // Mettre à jour les interactions mobiles après chaque mise à jour des données
+        const originalInit = init;
+        init = async function() {
+            await originalInit();
+            initMobileInteractions();
+        };
+    </script>
+
+    <script>
+        // Ajouter une animation de transition pour les changements de données
+        function animateValueChange(element, oldValue, newValue) {
+            const duration = 1000;
+            const start = Date.now();
+            
+            function update() {
+                const elapsed = Date.now() - start;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Fonction d'easing
+                const easeOut = t => 1 - Math.pow(1 - t, 3);
+                const currentValue = Math.round(oldValue + (newValue - oldValue) * easeOut(progress));
+                
+                element.textContent = formatNumber(currentValue);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajouter la classe loaded au body une fois que tout est chargé
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

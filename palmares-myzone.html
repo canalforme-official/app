@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palmarès Myzone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #000;
+
+        }
+
+        .header img {
+            max-width: 200px;
+            height: auto;
+        }
+
+        .title {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        #year-selector {
+            margin: 10px 0;
+            padding-right: 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        #year-selector label {
+            margin-right: 10px;
+        }
+
+        #year-selector select {
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        table th, table td {
+            text-align: center;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            font-weight: 600;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: rgba(255, 0, 0, 0.03);
+        }
+
+        table tbody tr:nth-child(odd) {
+            background-color: rgba(255, 0, 0, 0.07);
+        }
+
+        table img {
+            height: auto;
+            max-height: 35px;
+        }
+
+        table th img[alt="MEPS"] {
+            max-height: 25px; /* Ajustez cette hauteur selon vos besoins */
+            width: auto; /* Conserve les proportions */
+            vertical-align: middle; /* Aligne bien avec le texte */
+        }
+
+        table td:nth-child(3),
+        table td:nth-child(4),
+        table td:nth-child(5) {
+            background: linear-gradient(to bottom, rgba(255, 0, 0, 0.1), rgba(255, 255, 255, 0));
+            color: #000;
+            width: 50px;
+            max-width: 50px;
+        }
+
+        table td:nth-child(6) {
+            background: linear-gradient(to bottom, rgba(255, 0, 0, 0.1), rgba(255, 255, 255, 0));
+            color: #000;
+            font-weight: bold;
+            width: 50px;
+            max-width: 50px;
+            white-space: nowrap;
+        }
+
+        table td:nth-child(6)::after {
+            content: ' pts';
+            font-weight: normal;
+        }
+
+        table td:first-child {
+            color: #000;
+            width: 30px;
+        }
+
+        table td:nth-child(2) {
+            text-align: left;
+            font-weight: bold;
+            color: #000;
+            width: auto;
+        }
+
+        table th:nth-child(7), /* Cacher l'en-tête MEPS */
+        table td:nth-child(7) { /* Cacher les données MEPS */
+            display: none;
+        }
+
+        table td:nth-child(7) {
+            background: linear-gradient(to bottom, rgba(0, 0, 255, 0.1), rgba(255, 255, 255, 0));
+            color: #000;
+            font-weight: bold;
+            width: 70px;
+            max-width: 70px;
+            text-align: right;
+            vertical-align: middle; /* Centre les données verticalement */
+            white-space: nowrap; /* Empêche les retours à la ligne */
+
+        }
+
+        table td:nth-child(7)::after {
+            content: ' Meps';
+            font-weight: normal; /* Peut différencier de la valeur */
+            font-size:0.8em;
+            color: #555; /* Couleur légèrement différente */
+        }
+
+
+        .legend {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .legend img {
+            vertical-align: middle;
+            max-height: 29px;
+            margin-right: 5px;
+        }
+
+        .legend p {
+            display: flex;
+            align-items: center;
+            color: #000;
+            margin: 0;
+        }
+
+        .legend p span {
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 600px) {
+            table td, table th {
+                font-size: 0.8rem;
+            }
+        
+            .header {
+                display: none;
+            }
+    
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Logo">
+    </div>
+
+    <h2 class="title" id="page-title">Palmarès Myzone 2024</h2>
+
+    <div id="year-selector">
+        <label for="year">Sélectionnez l'année :</label>
+        <select id="year" onchange="updateLeaderboard()">
+            <option value="2024" selected>2024</option>
+        </select>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30px;">Rang</th>
+                    <th></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/5eb2294d-4d88-587d-12fe-b6f2ef6b64d6.png" alt="Or"></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/721a5a8c-7411-63f4-437f-b64f61153d32.png" alt="Argent"></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b8f46427-82e4-7bdb-cb95-74cc34e7e31b.png" alt="Bronze"></th>
+                    <th>Points</th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/d315c5ca-2944-43c2-0ebb-3e34c70b586d.png" alt="MEPS"></th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- Les lignes seront générées dynamiquement -->
+            </tbody>
+        </table>
+
+        <div class="legend">
+            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/5eb2294d-4d88-587d-12fe-b6f2ef6b64d6.png" alt="Or"> Or : <span>12 pts</span></p>
+            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/721a5a8c-7411-63f4-437f-b64f61153d32.png" alt="Argent"> Argent : <span>6 pts</span></p>
+            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b8f46427-82e4-7bdb-cb95-74cc34e7e31b.png" alt="Bronze"> Bronze : <span>3 pts</span></p>
+        </div>
+    </div>
+
+    <script>
+        //const jsonUrl = './alltime-leaderboard.json?timestamp=' + Date.now();
+
+        const jsonUrl = `https://raw.githubusercontent.com/canalforme-official/app-data/main/alltime-leaderboard.json?timestamp=${Date.now()}`;
+
+
+        async function fetchLeaderboard(year) {
+            const response = await fetch(jsonUrl);
+            const data = await response.json();
+            return data.years[year] ? data.years[year].user_medal_rankings : [];
+        }
+
+        async function updateLeaderboard() {
+            const year = document.getElementById('year').value;
+            const title = document.getElementById('page-title');
+            title.textContent = `Palmarès Myzone ${year}`;
+
+            const leaderboardData = await fetchLeaderboard(year);
+            populateTable(leaderboardData);
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+
+        function populateTable(data) {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            data.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${user.nickname}</td>
+                    <td>${user.gold}</td>
+                    <td>${user.silver}</td>
+                    <td>${user.bronze}</td>
+                    <td>${user.total_points}</td>
+                    <td>${formatNumber(user.total_meps)}</td>
+
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function init() {
+            await updateLeaderboard();
+        }
+
+        init();
+    </script>
+</body>
+</html>

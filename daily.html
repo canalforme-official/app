@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning du jour</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Meta viewport to prevent zooming -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <style>
+    /* Styles généraux */
+    :root {
+      /* Polices */
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      
+      /* Couleurs principales */
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      
+      /* Couleurs spécifiques */
+      --women-color: #E4A672;
+      --pool-color: #78D1B6;
+      
+      /* Couleurs de fond */
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      
+      /* Couleurs de texte */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-tertiary: #555555;
+      --text-light: #FFFFFF;
+      
+      /* Transparences primary */
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
+      --primary-lighter: rgba(72, 6, 7, 0.5);
+      
+      /* Transparences secondary */
+      --secondary-light: rgba(255, 166, 48, 0.75);
+      --secondary-lighter: rgba(255, 166, 48, 0.7);
+      
+      /* Transparences spécifiques */
+      --women-color-light: rgba(228, 166, 114, 0.3);
+      --pool-color-light: rgba(120, 209, 182, 0.3);
+      
+      /* Ombres */
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      
+      /* États */
+      --state-past: #aaaaaa;
+      --overlay-light: rgba(255, 255, 255, 0.3);
+      --overlay-lighter: rgba(255, 255, 255, 0.2);
+    }
+
+    body {
+      font-family: var(--font-text);
+      background-color: var(--background-main);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 20px;
+      scroll-behavior: smooth;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
+    /* Exception pour les champs de texte et les zones éditables */
+    input, textarea, [contenteditable] {
+      user-select: text;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+    }
+
+    h1 {
+      font-family: var(--font-title);
+      color: var(--primary-color);
+      font-size: 2.5em;
+      margin: 0;
+      padding: 20px 0 10px 0;
+      position: relative;
+      font-weight: 600;
+    }
+
+    .date {
+      font-family: var(--font-title);
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 1.4em;
+      color: var(--primary-color);
+      font-weight: 400;
+    }
+
+    /* Styles pour la timeline */
+    .timeline {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 0 0 20px;
+      border-left: none;
+      padding-left: 0;
+    }
+
+    .timeline.has-courses {
+      border-left: 2px solid rgba(72, 6, 7, 0.15);
+    }
+
+    .timeline:empty {
+      border-left: none;
+    }
+
+    .timeline.has-courses {
+      display: block; /* Affiche la timeline seulement quand il y a des cours */
+    }
+
+    .timeline-block {
+      margin-bottom: 20px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .timeline-block::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Ajustement pour centrer l'icône par rapport au course-block */
+    .timeline-block .time {
+      position: relative;
+      top: -3px; /* Ajustement pour rapprocher l'heure */
+      margin-left: 20px;
+    }
+
+    .timeline-block::before {
+      top: calc(50% + 15px); /* Ajustement pour centrer l'icône */
+    }
+
+    /* Correction de la transparence pour l'icône des cours passés */
+    .timeline-block.past::before {
+      opacity: 0.5;
+    }
+
+    /* Animation pour les cours en cours */
+    .timeline-block.current::before {
+      animation: rotate-icon 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      opacity: 1;
+      transform-origin: center;
+    }
+
+    @keyframes rotate-icon {
+      0% {
+        transform: translateY(-50%) rotate(0deg) scale(1);
+      }
+      50% {
+        transform: translateY(-50%) rotate(180deg) scale(1.1);
+      }
+      100% {
+        transform: translateY(-50%) rotate(360deg) scale(1);
+      }
+    }
+
+    .time {
+      font-family: var(--font-title);
+      font-size: 1.4em;
+      color: var(--primary-color);
+      position: relative;
+      top: -5px;
+      font-weight: 400;
+      margin-left: 20px;
+    }
+
+    /* Styles pour les blocs de cours */
+    .course-block {
+      position: relative;
+      background-color: var(--background-card);
+      padding: 20px 25px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 15px var(--shadow-light);
+      transition: all 0.3s ease;
+      width: 80%;
+      max-width: 800px;
+      margin: 0 0 0 20px;
+    }
+
+    /* Styles pour le type de cours */
+    .course-type {
+      font-family: var(--font-title);
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+
+    /* Couleurs pour les cours "100% Femmes" */
+    .course-block.women-only:not(.current):not(.starting-soon) .course-type {
+      color: var(--women-color);
+    }
+
+    .course-block.women-only {
+      border: 2px solid var(--women-color);
+      background-color: var(--women-color-light);
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    /* Couleurs pour les cours mixtes */
+    .course-block.mixte:not(.current):not(.starting-soon) .course-type {
+      color: var(--text-secondary);
+    }
+
+    /* Cours passés */
+    .course-block.past {
+      border: 2px solid var(--state-past);
+      opacity: 0.5;
+      box-shadow: 0px 3px 10px var(--shadow-light);
+      color: var(--state-past);
+    }
+
+    /* Cours à venir */
+    .course-block.upcoming {
+      box-shadow: 0px 6px 15px var(--shadow-medium);
+    }
+
+    /* Cours qui vont bientôt démarrer */
+    .course-block.starting-soon {
+      font-size: 1.3em;
+      padding: 20px 30px;
+      animation: heartbeat-blink 1.5s ease-in-out infinite;
+      box-shadow: 0px 6px 20px var(--shadow-dark);
+    }
+
+    .course-block.starting-soon.mixte {
+      border: 2px solid var(--text-secondary);
+      animation: heartbeat-blink 1.5s ease-in-out infinite, blink-mixte 1.5s ease-in-out infinite;
+    }
+
+    .course-block.starting-soon.women-only {
+      border: 2px solid var(--women-color);
+      animation: heartbeat-blink 1.5s ease-in-out infinite, blink-femmes 1.5s ease-in-out infinite;
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    /* Cours en cours */
+    .course-block.current {
+      font-size: 1.3em;
+      padding: 20px 30px;
+      box-shadow: 0px 6px 20px var(--shadow-dark);
+    }
+
+    .course-block.current.mixte {
+      border: 2px solid var(--text-secondary);
+      background-color: var(--background-card);
+      color: var(--text-primary);
+    }
+
+    .course-block.current.women-only {
+      border: 2px solid var(--women-color);
+      background-color: var(--women-color);
+      color: var(--text-primary);
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    /* Animation pour le rebond */
+    @keyframes heartbeat-blink {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    /* Clignotement pour les cours mixtes */
+    @keyframes blink-mixte {
+      0%, 100% { background-color: var(--background-card); }
+      50% { background-color: rgba(255, 255, 255, 0.9); }
+    }
+
+    /* Clignotement pour les cours "100% Femmes" */
+    @keyframes blink-femmes {
+      0%, 100% { background-color: var(--background-card); }
+      50% { background-color: rgba(228, 166, 114, 0.2); }
+    }
+
+    /* Style pour le titre du cours */
+    .course-title {
+      font-family: var(--font-title);
+      font-size: 1.5em;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .course-coach {
+      font-size: 1em;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .course-studio {
+      font-size: 0.9em;
+      color: var(--text-tertiary);
+    }
+
+    .countdown {
+      font-family: var(--font-title);
+      position: absolute;
+      bottom: 2px;
+      right: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+
+    .focus {
+      scroll-margin-top: 50px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .logo img {
+      width: 25%;
+    }
+
+    /* Styles pour les boutons de navigation */
+    .navigation {
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      right: 10px;
+      display: none;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .navigation.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .navigation button {
+      background: var(--primary-light);
+      border: none;
+      font-size: 2em;
+      padding: 10px;
+      cursor: pointer;
+      pointer-events: all;
+      outline: none;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      color: var(--text-primary);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: auraPulse 1.5s ease-in-out infinite;
+    }
+
+    .navigation button img {
+      width: 26px;
+      height: 26px;
+      pointer-events: none;
+      filter: brightness(0) invert(1);
+    }
+
+    /* Styles pour les états :hover uniquement sur les appareils avec support du survol */
+    @media (hover: hover) {
+      .navigation button:hover {
+        background-color: var(--primary-lighter);
+        box-shadow: 0px 6px 12px var(--shadow-dark);
+        transform: scale(1.1);
+      }
+    }
+
+    /* Styles pour l'état :active */
+    .navigation button:active {
+      transform: scale(1.05);
+    }
+
+    .navigation button:disabled {
+      visibility: hidden;
+    }
+
+    @media screen and (min-width: 1025px) {
+      .navigation {
+        display: none;
+      }
+    }
+
+    /* Overlay de chargement */
+    #loadingOverlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(72,6,7, 1) !important;
+      z-index: 999999 !important;
+      display: flex;
+      overflow: hidden !important;
+      pointer-events: all !important;
+      opacity: 1 !important;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0 !important;
+    }
+
+    /* Style du message de chargement */
+    #loadingMessage {
+      font-size: 1.2em !important;
+      color: #fff !important;
+      text-align: center !important;
+      width: 80% !important;
+      max-width: 600px !important;
+      background-color: rgba(255, 255, 255, 0.2) !important;
+      padding: 10px !important;
+      border-radius: 10px !important;
+      pointer-events: none !important;
+      margin-top: -15px !important;
+    }
+
+    /* Logo animé lors du chargement */
+    .loading-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .loading-logo img {
+      width: 80px;
+      height: auto;
+      animation: zoom-logo 2s ease-in-out infinite;
+    }
+
+    @keyframes zoom-logo {
+      0% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+    }
+
+    @keyframes zoomPulse {
+      0%, 80% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+    }
+
+    /* Styles spécifiques aux cours du studio "Piscine" */
+    .course-block.piscine {
+      border: 2px solid var(--pool-color);
+      background-color: var(--pool-color-light);
+      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
+    }
+
+    /* Styles pour les cours en cours ou démarrant bientôt dans "Piscine" */
+    .course-block.piscine.current {
+      border: 2px solid var(--pool-color);
+      background-color: var(--pool-color);
+      color: var(--text-primary);
+      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
+    }
+
+    .course-block.piscine.starting-soon {
+      border: 2px solid var(--pool-color);
+      animation: heartbeat-blink 1.5s ease-in-out infinite, blink-piscine 1.5s ease-in-out infinite;
+      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
+    }
+
+    /* Animation pour le clignotement des cours "Piscine" */
+    @keyframes blink-piscine {
+      0%, 100% { background-color: var(--pool-color-light); }
+      50% { background-color: rgba(120, 209, 182, 0.2); }
+    }
+
+    /* Styles pour les appareils mobiles */
+    @media screen and (max-width: 1024px) {
+      body {
+        padding: 10px 15px;
+      }
+
+      .timeline {
+        margin-left: 20px;
+        padding-left: 0;
+      }
+
+      .course-block {
+        padding-top: 15px;
+        padding-bottom: 15px;
+      }
+
+      .course-block.past .course-title,
+      .course-block.upcoming .course-title {
+        font-size: 1.2em;
+      }
+
+      .course-block.current .course-title,
+      .course-block.starting-soon .course-title {
+        font-size: 1.3em;
+      }
+
+      .course-coach {
+        font-size: 0.9em;
+      }
+
+      .course-studio {
+        font-size: 0.7em;
+      }
+
+      .time {
+        font-size: 1.2em;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .date {
+        font-size: 1em;
+      }
+
+      .logo img {
+        width: 50%;
+        max-height: 80px;
+        height: auto;
+      }
+    }
+
+    .coach-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0px;
+    }
+
+    .coach-item {
+      display: flex;
+      align-items: center;
+      margin-right: 10px;
+    }
+
+    .coach-photo {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    .course-coach img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    /* Style pour le bouton de la vue hebdomadaire */
+    .weekly-view-button {
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+      background-color: var(--secondary-light);
+      padding: 8px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      box-shadow: 0px 4px 10px var(--shadow-dark);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .weekly-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
+    @media screen and (max-width: 768px) {
+      .weekly-view-button.loaded {
+        display: flex;
+      }
+      .navigation.loaded {
+        display: flex;
+      }
+    }
+
+    .weekly-view-button img {
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      filter: brightness(0) invert(1);
+    }
+
+    /* Styles :hover pour le bouton weekly-view */
+    @media (hover: hover) {
+      .weekly-view-button:hover {
+        background-color: var(--secondary-lighter);
+        box-shadow: 0px 6px 12px var(--shadow-dark);
+        transform: scale(1.05);
+      }
+    }
+
+    /* État :active pour le bouton weekly-view */
+    .weekly-view-button:active {
+      transform: scale(1.05);
+    }
+
+    /* Style pour le bouton today-view */
+    .today-view-button {
+      display: none;
+      position: fixed;
+      right: 10px;
+      z-index: 1000;
+      background-color: var(--primary-light);
+      padding: 8px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      width: 50px;
+      height: 50px;
+      animation: auraPulse 1.5s ease-in-out infinite;
+    }
+
+    /* Ajustement de la taille du cercle extérieur */
+    .today-view-button::before {
+      content: '';
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      position: absolute;
+      border: 3px solid var(--text-light);
+      box-sizing: border-box;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      animation: zoomPulse 1.5s ease-in-out infinite;
+    }
+
+    /* Ajustement de la taille du cercle intérieur */
+    .today-view-button::after {
+      content: '';
+      width: 11px;
+      height: 11px;
+      background-color: var(--text-light);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      animation: zoomPulse 1.5s ease-in-out infinite;
+    }
+
+    /* Nouvelle animation pour l'aura rouge */
+    @keyframes auraPulse {
+      0% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+      50% {
+        box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+      }
+      100% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+    }
+
+    .today-view-button button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      position: relative; 
+    }
+
+    .today-view-button img {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+
+    /* Styles :hover pour le bouton today-view */
+    @media (hover: hover) {
+      .today-view-button:hover {
+        background-color: var(--primary-lighter);
+        box-shadow: 0px 6px 12px var(--shadow-dark);
+        transform: scale(1.05);
+      }
+    }
+
+    /* État :active pour le bouton today-view */
+    .today-view-button:active {
+      transform: scale(1.05);
+    }
+
+    .sticky-day-name {
+      font-family: var(--font-title);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 80%;
+      max-width:200px;
+      padding: 10px;
+      background-color: var(--overlay-light);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.7em;
+      font-weight: 500;
+      color: var(--text-primary);
+      box-shadow: 0 2px 5px var(--shadow-light);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Style pour le texte en tant que citation */
+    .quote-text {
+      font-family: var(--font-text);
+      font-size: 1.4em;
+      color: var(--primary-color);
+      line-height: 1.6em;
+      position: relative;
+      padding: 20px;
+      display: inline-block;
+      font-style: italic;
+    }
+
+    .quote-text::before,
+    .quote-text::after {
+      content: "«";
+      font-size: 2em;
+      color: var(--primary-color);
+      position: absolute;
+    }
+
+    .quote-text::before {
+      left: -10px;
+      top: -10px;
+    }
+
+    .quote-text::after {
+      content: "»";
+      right: -10px;
+      bottom: -10px;
+    }
+
+    .modal-backdrop {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: var(--primary-overlay) !important;
+      z-index: 999999 !important;
+      display: none;
+      overflow: hidden !important;
+      pointer-events: all !important;
+    }
+
+    .timeline-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--primary-color);
+      transform: translateX(-50%);
+    }
+
+    .time-marker {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .time-marker.start {
+      top: 0;
+    }
+
+    .time-marker.end {
+      bottom: 0;
+    }
+
+    /* Style par défaut pour mobile */
+    .modal-center-container img {
+      width: 70px !important;
+      height: auto !important;
+      animation: zoom-logo 2s infinite !important;
+      pointer-events: none !important;
+    }
+
+    /* Style pour tablettes */
+    @media screen and (min-width: 768px) {
+      .modal-center-container img {
+        width: 100px !important;
+      }
+    }
+
+    /* Style pour desktop */
+    @media screen and (min-width: 1024px) {
+      .modal-center-container img {
+        width: 140px !important;
+      }
+    }
+
+    /* Styles pour le bouton weekly-view */
+    .weekly-view-button {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .weekly-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animation d'apparition du contenu */
+    .content-wrapper {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    body:not(.loading) .content-wrapper {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Styles pour l'overlay de chargement */
+    #loadingOverlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(72,6,7, 1) !important;
+      z-index: 999999 !important;
+      display: flex;
+      overflow: hidden !important;
+      pointer-events: all !important;
+      opacity: 1 !important;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0 !important;
+    }
+
+    .modal-center-container {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      height: auto !important;
+      pointer-events: none !important;
+      gap: 50px !important;
+      background-color: transparent !important;
+    }
+
+    .upcoming-class {
+      position: relative;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      animation: subtlePulse 5s ease-in-out infinite;
+    }
+
+    @keyframes subtlePulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0.03);
+      }
+      50% {
+        transform: scale(1.001);
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.05);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0.03);
+      }
+    }
+
+    /* Désactivation temporaire de l'overlay de chargement pour mobile uniquement */
+    @media screen and (max-width: 768px) {
+      #loadingOverlay {
+        display: none !important;
+      }
+      
+      body.loading {
+        opacity: 1 !important;
+      }
+      
+      .modal-center-container {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .loading-logo img {
+        width: 100px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .loading-logo img {
+        width: 140px;
+      }
+    }
+
+  </style>
+</head>
+<body onload="initializePage();" class="loading">
+  <!-- Bloc de texte collant pour le nom du jour -->
+  <div id="stickyDayName" class="sticky-day-name"></div>
+
+  <!-- Bouton Weekly view -->
+  <div class="weekly-view-button">
+    <a href="./weekly.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8f9d5808-3db0-84ba-a4c9-24d99ec7043b.png" alt="Vue Hebdomadaire">
+    </a>
+  </div>
+
+  <!-- Bouton pour revenir à aujourd'hui -->
+  <div class="today-view-button" id="todayViewButton">
+    <button onclick="returnToToday()">
+    </button>
+  </div>
+
+  <!-- Boutons de navigation -->
+  <div class="navigation">
+    <button id="prevDay" onclick="changeDay(-1)">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/78d64276-8c3e-a386-2885-2bbe34c80319.png" alt="Previous Day">
+    </button>
+    <button id="nextDay" onclick="changeDay(1)">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8ad9de66-44fa-f41e-9b4a-1ab563f063a3.png" alt="Next Day">
+    </button>
+  </div>
+
+  <h1 id="dayOfWeek"></h1>
+  <div class="date" id="dateStr"></div>
+  <div class="timeline" id="timeline">
+    <!-- Les cours seront injectés ici -->
+  </div>
+
+  <!-- Overlay de chargement -->
+  <div id="loadingOverlay">
+    <div class="modal-center-container">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
+    </div>
+  </div>
+
+  <script>
+    let currentDayIndex = new Date().getDay();
+    const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning.json';
+    //const apiUrl = './planning.json';
+    let allData = [];
+
+    // Fonction pour mettre à jour la position du bouton today-view
+    function updateTodayButtonPosition() {
+      const weeklyButton = document.querySelector('.weekly-view-button');
+      const todayButton = document.querySelector('.today-view-button');
+      
+      if (weeklyButton && todayButton) {
+        const weeklyButtonRect = weeklyButton.getBoundingClientRect();
+        const spacing = 10; // Espacement réduit entre les boutons
+        const newTop = weeklyButtonRect.bottom + spacing;
+        todayButton.style.top = `${newTop}px`;
+      }
+    }
+
+    // Fonction pour gérer le redimensionnement de la fenêtre
+    function handleResize() {
+      updateTodayButtonPosition();
+    }
+
+    function hideLoadingOverlay() {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const modalContainer = document.querySelector('.modal-center-container');
+
+      // Masquer le conteneur modal immédiatement
+      if (modalContainer) {
+        modalContainer.style.display = 'none';
+      }
+
+      // Ajouter la classe fade-out à l'overlay
+      loadingOverlay.classList.add('fade-out');
+
+      // Attendre que l'animation de fade-out soit terminée
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+        
+        // Afficher les boutons de navigation et weekly view avec animation
+        const navigation = document.querySelector('.navigation');
+        const weeklyButton = document.querySelector('.weekly-view-button');
+        
+        if (navigation) navigation.classList.add('loaded');
+        if (weeklyButton) weeklyButton.classList.add('loaded');
+
+        // Retirer la classe loading du body
+        document.body.classList.remove('loading');
+
+        // Mettre à jour la position du bouton today-view
+        updateTodayButtonPosition();
+      }, 500);
+    }
+
+    function fetchAllData() {
+      const now = new Date();
+      const cacheExpiration = 60 * 60 * 1000; // 1 heure en millisecondes
+      const minimumLoadingTime = 2000; // 2 secondes minimum de chargement
+
+      // Vérifier si le cache existe et s'il est toujours valide
+      const cachedData = localStorage.getItem('scheduleData');
+      const cachedTime = localStorage.getItem('scheduleTimestamp');
+
+      if (cachedData && cachedTime && now - new Date(cachedTime) < cacheExpiration) {
+        // Utiliser les données du cache
+        allData = JSON.parse(cachedData);
+        displaySchedule(currentDayIndex);
+
+        // Attendre que le DOM soit complètement chargé avant de scroller
+        setTimeout(() => {
+          if (isToday(currentDayIndex)) {
+            initializeCountdowns();
+            scrollToNextUpcomingCourse();
+            setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
+          }
+        }, 100);
+
+        // Attendre le temps minimum avant de cacher l'overlay
+        setTimeout(hideLoadingOverlay, minimumLoadingTime);
+      } else {
+        // Pas de cache ou cache expiré, récupérer les données depuis l'API
+        const startTime = Date.now();
+
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            allData = data.slice(1); // Ignorer la première ligne (titres)
+            displaySchedule(currentDayIndex);
+
+            // Stocker les données dans le cache
+            localStorage.setItem('scheduleData', JSON.stringify(allData));
+            localStorage.setItem('scheduleTimestamp', now.toISOString());
+
+            // Attendre que le DOM soit complètement chargé avant de scroller
+            setTimeout(() => {
+              if (isToday(currentDayIndex)) {
+                initializeCountdowns();
+                scrollToNextUpcomingCourse();
+                setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
+              }
+            }, 100);
+
+            // Calculer le temps restant pour atteindre le minimum de 2 secondes
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(minimumLoadingTime - elapsedTime, 0);
+
+            // Attendre le temps minimum avant de cacher l'overlay
+            setTimeout(hideLoadingOverlay, remainingTime);
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération des données :', error);
+            // En cas d'erreur, cacher l'overlay après le temps minimum
+            setTimeout(hideLoadingOverlay, minimumLoadingTime);
+          });
+      }
+    }
+
+    function displaySchedule(dayIndex) {
+      const scheduleDiv = document.getElementById('timeline');
+      const dayOfWeek = getDayName(dayIndex);
+      const today = new Date();
+      today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
+      const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+
+      document.getElementById('dayOfWeek').innerText = dayOfWeek;
+      document.getElementById('dateStr').innerText = dateStr;
+
+      // Ligne ajoutée pour mettre à jour le sticky
+      document.getElementById('stickyDayName').innerText = dayOfWeek;
+
+      const dayData = allData.filter(course => course.day === dayOfWeek);
+
+      // Ajouter ou retirer la classe has-courses en fonction de la présence de cours
+      scheduleDiv.classList.toggle('has-courses', dayData.length > 0);
+
+      if (dayData.length > 0) {
+        let html = '';
+        dayData.forEach((course, index) => {
+          let courseTypeClass = '';
+          if (course.type === '100% Femmes') {
+            courseTypeClass = 'women-only';
+          } else if (course.type === 'Mixte') {
+            courseTypeClass = 'mixte';
+          }
+
+          // Studio "Piscine"
+          if (course.studio === 'Piscine') {
+            courseTypeClass += ' piscine';
+          }
+
+          // Determine course status
+          let courseStatusClass = '';
+          const now = new Date();
+          const currentTime = now.getHours() * 60 + now.getMinutes();
+          const [startHour, startMinute] = course.startTime.split(':').map(Number);
+          const [endHour, endMinute] = course.endTime.split(':').map(Number);
+          const courseStartTime = startHour * 60 + startMinute;
+          const courseEndTime = endHour * 60 + endMinute;
+
+          let countdownHTML = '';
+
+          if (isToday(dayIndex)) {
+            if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+              courseStatusClass = 'current focus';
+            } else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15) {
+              courseStatusClass = 'starting-soon focus';
+              countdownHTML = `<div class="countdown" data-start-time="${course.startTime}"></div>`;
+            } else if (currentTime < courseStartTime) {
+              courseStatusClass = 'upcoming';
+            } else {
+              courseStatusClass = 'past';
+            }
+          } else {
+            courseStatusClass = 'upcoming';
+          }
+
+          // Course type display
+          const courseTypeDisplay = `<div class="course-type">${course.type}</div>`;
+
+          const courseDiv = `
+          <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}">
+            <div class="time">${course.startTime} - ${course.endTime}</div>
+            <div class="course-block ${courseTypeClass} ${courseStatusClass}" id="${courseStatusClass.includes('focus') ? 'focus-course' : ''}">
+              ${courseTypeDisplay}
+              <div class="course-title">
+                ${course.logo && course.logo !== 'default-logo.png'
+                  ? `<img src="${course.logo}" alt="${course.name}" style="max-width: 180px; max-height: 70px;" />`
+                  : course.name}
+              </div>
+              <div class="course-coach">
+                <div class="coach-images">
+                  ${course.coach.split(',').map((coachName, index) => {
+                    const coachImages = course.coachImage.split(';').map(image => image.trim());
+                    return `
+                      <div class="coach-item">
+                        <img class="coach-photo" src="${coachImages[index] || 'default-image.png'}" alt="${coachName.trim()}">
+                        ${course.coach.split(',').length > 1 ? '' : `<span>${coachName.trim()}</span>`}
+                      </div>`;
+                  }).join('')}
+                </div>
+              </div>
+              <div class="course-studio">${course.studio}</div>
+              ${countdownHTML}
+            </div>
+          </div>`;
+          html += courseDiv;
+        });
+        scheduleDiv.innerHTML = html;
+      } else {
+        scheduleDiv.innerHTML = displayNoCourseMessage();
+      }
+
+      toggleTodayButton(dayIndex);
+
+      if (isToday(dayIndex)) {
+        // Vérifie si tous les cours sont terminés
+        if (areAllCoursesInThePast(dayData)) {
+          // Défilement vers le bas de la page si tous les cours sont passés
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+          });
+        } else {
+          // Sinon, défile vers le prochain cours
+          scrollToNextUpcomingCourse();
+        }
+        initializeCountdowns();
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function isToday(dayIndex) {
+      return dayIndex === new Date().getDay();
+    }
+
+    function getDayName(dayIndex) {
+      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      return days[dayIndex];
+    }
+
+    function returnToToday() {
+      const todayIndex = new Date().getDay();
+
+      if (currentDayIndex !== todayIndex) {
+        currentDayIndex = todayIndex;
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        setTimeout(() => {
+          displaySchedule(currentDayIndex);
+          document.getElementById('loadingOverlay').style.display = 'none';
+        }, 500);
+      }
+    }
+
+    function toggleTodayButton(dayIndex) {
+      const todayIndex = new Date().getDay();
+      document.getElementById('todayViewButton').style.display = dayIndex === todayIndex ? 'none' : 'block';
+    }
+
+    function changeDay(direction) {
+      const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      
+      currentDayIndex = (currentDayIndex + direction + 7) % 7;
+      displaySchedule(currentDayIndex);
+    }
+
+    function areAllCoursesInThePast(dayData) {
+      const now = new Date();
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+
+      return dayData.every(course => {
+        const [endHour, endMinute] = course.endTime.split(':').map(Number);
+        const courseEndTime = endHour * 60 + endMinute;
+        return courseEndTime < currentTime;
+      });
+    }
+
+    function scrollToNextUpcomingCourse() {
+      const now = new Date();
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+      let firstCurrentCourse = null;
+      let nextUpcomingCourse = null;
+      let allPast = true;
+      let earliestStartTime = Infinity;
+
+      const courseBlocks = document.querySelectorAll('.timeline-block');
+
+      courseBlocks.forEach((block) => {
+        const timeElement = block.querySelector('.time');
+        const [startTime, endTime] = timeElement.innerText.split(" - ");
+        const [startHour, startMin] = startTime.split(":").map(Number);
+        const [endHour, endMin] = endTime.split(":").map(Number);
+        const courseStartTime = startHour * 60 + startMin;
+        const courseEndTime = endHour * 60 + endMin;
+
+        // Vérifier si c'est un cours en cours
+        if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+          // Si c'est le premier cours en cours trouvé ou si c'est plus ancien que le cours actuel
+          if (!firstCurrentCourse || courseStartTime < earliestStartTime) {
+            firstCurrentCourse = block;
+            earliestStartTime = courseStartTime;
+          }
+          allPast = false;
+        }
+        // Vérifier si c'est un cours à venir
+        else if (currentTime < courseStartTime) {
+          // Si c'est le premier cours à venir trouvé ou si c'est plus proche que le cours actuel
+          if (!nextUpcomingCourse || courseStartTime < earliestStartTime) {
+            nextUpcomingCourse = block;
+            earliestStartTime = courseStartTime;
+          }
+          allPast = false;
+        }
+      });
+
+      if (firstCurrentCourse) {
+        // Scroll vers le premier cours en cours
+        firstCurrentCourse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (nextUpcomingCourse) {
+        // Scroll vers le prochain cours à venir
+        nextUpcomingCourse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (allPast) {
+        // Scroll vers le bas si tous les cours sont passés
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    }
+
+    function getWeekNumber(date) {
+      const firstJan = new Date(date.getFullYear(), 0, 1);
+      const days = Math.floor((date - firstJan) / (24 * 60 * 60 * 1000));
+      return Math.ceil((days + firstJan.getDay() + 1) / 7);
+    }
+
+    const noCourseMessages = [
+      "Profitez de cette journée pour vous reposer et reprendre des forces ! Nous vous attendons demain pour un entraînement intense. 💪",
+      "Prenez soin de vous aujourd'hui, et retrouvez-nous dès demain pour continuer vos objectifs !",
+      "Conseil du jour : Hydratez-vous bien et pensez à inclure des protéines et des légumes dans vos repas ! 🌱🥤",
+      "Le saviez-vous ? Dormir au moins 7 heures améliore la récupération et les performances sportives ! 😴",
+      "Suggestions pour aujourd'hui : ✨ Méditation guidée, 🚶 Promenade en plein air, 🧘 Étirements et relaxation"
+    ];
+
+    const noCourseImages = [
+      "https://mcusercontent.com/74abea872abd45d46efed5d41/images/70a8506a-23ce-3fc3-0e6d-2bc78a5b13d6.png",
+      "https://mcusercontent.com/74abea872abd45d46efed5d41/images/fc0db061-f08d-2db2-ab2e-341f4d9a067d.png",
+      "https://mcusercontent.com/74abea872abd45d46efed5d41/images/54cf9bc8-ad8e-2aef-1c5a-ae060b1f6d9b.png",
+      "https://mcusercontent.com/74abea872abd45d46efed5d41/images/2e02ff47-a45e-f793-0166-8a61a5c3cb1d.png",
+      "https://mcusercontent.com/74abea872abd45d46efed5d41/images/5a6492bf-169c-0807-fa9b-fbc2cc5bfaa8.png"
+    ];
+
+    function displayNoCourseMessage() {
+      const today = new Date().toLocaleDateString('fr-FR');
+      const cachedDate = localStorage.getItem('noCourseMessageDate');
+      const cachedMessage = localStorage.getItem('noCourseMessage');
+      const cachedImage = localStorage.getItem('noCourseImage');
+
+      let message, image;
+
+      if (cachedDate === today && cachedMessage && cachedImage) {
+        message = cachedMessage;
+        image = cachedImage;
+      } else {
+        const randomIndex = Math.floor(Math.random() * noCourseMessages.length);
+        message = noCourseMessages[randomIndex];
+        image = noCourseImages[randomIndex];
+
+        localStorage.setItem('noCourseMessageDate', today);
+        localStorage.setItem('noCourseMessage', message);
+        localStorage.setItem('noCourseImage', image);
+      }
+
+      return `
+        <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
+          <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
+          <p class="quote-text">« ${message} »</p>
+        </div>
+      `;
+    }
+
+    function initializeCountdowns() {
+      updateCountdowns();
+      setInterval(updateCountdowns, 1000);
+    }
+
+    function updateCountdowns() {
+      const countdownElements = document.querySelectorAll('.countdown');
+      const now = new Date();
+      
+      countdownElements.forEach(el => {
+        const startTimeStr = el.getAttribute('data-start-time');
+        const [startHour, startMinute] = startTimeStr.split(':').map(Number);
+        const startTime = new Date();
+        startTime.setHours(startHour, startMinute, 0, 0);
+        const diff = startTime - now;
+        
+        // Récupérer le bloc parent du cours
+        const courseBlock = el.closest('.timeline-block');
+        
+        if (diff > 0) {
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
+          el.innerHTML = `Démarrage dans&nbsp;<span style="display: inline-block; min-width: 45px; text-align: center;">${minutes}:${seconds.toString().padStart(2, '0')}</span>`;
+        } else if (diff > -60 * 1000) {
+          el.innerHTML = 'Démarrage imminent';
+        } else {
+          el.remove();
+          if (!courseBlock.classList.contains('current')) {
+            courseBlock.classList.add('current', 'focus');
+            courseBlock.classList.remove('starting-soon');
+            // Retirer la classe starting-soon du course-block aussi
+            const courseBlockElement = courseBlock.querySelector('.course-block');
+            if (courseBlockElement) {
+              courseBlockElement.classList.remove('starting-soon');
+            }
+          }
+        }
+      });
+    }
+
+    // Fonction pour vérifier l'état des cours
+    function checkCourseStates() {
+      const currentTime = new Date();
+      const timelineBlocks = document.querySelectorAll('.timeline-block');
+      
+      timelineBlocks.forEach(block => {
+        const courseStartTime = new Date(block.dataset.startTime);
+        const courseEndTime = new Date(block.dataset.endTime);
+        
+        // Vérifier si le cours est en cours
+        if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+          if (!block.classList.contains('current')) {
+            block.classList.add('current', 'focus');
+            block.classList.remove('starting-soon', 'past');
+          }
+        }
+        // Vérifier si le cours est à venir dans 15 minutes
+        else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15 * 60 * 1000) {
+          if (!block.classList.contains('starting-soon')) {
+            block.classList.add('starting-soon', 'focus');
+            block.classList.remove('current', 'past');
+          }
+        }
+        // Vérifier si le cours est passé
+        else if (currentTime > courseEndTime) {
+          if (!block.classList.contains('past')) {
+            block.classList.add('past');
+            block.classList.remove('current', 'starting-soon', 'focus');
+          }
+        }
+      });
+    }
+
+    // Fonction pour rafraîchir l'affichage
+    function refreshSchedule() {
+      const today = new Date();
+      const currentDay = today.getDay();
+      const currentDate = today.getDate();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      // Vérifier si c'est aujourd'hui
+      if (currentDay === currentDayIndex) {
+        // Mettre à jour la date
+        const dateElement = document.querySelector('.date');
+        if (dateElement) {
+          dateElement.textContent = formatDate(today);
+        }
+        
+        // Vérifier les états des cours
+        checkCourseStates();
+      }
+    }
+
+    // Rafraîchir toutes les minutes
+    setInterval(refreshSchedule, 60000);
+
+    function initializePage() {
+      // Ajouter la classe loading au body
+      document.body.classList.add('loading');
+      
+      // Afficher l'overlay de chargement
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+      }
+
+      // Démarrer le chargement des données
+      fetchAllData();
+
+      // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
+      window.addEventListener('resize', handleResize);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Observer pour le titre sticky
+      const dayOfWeekElement = document.getElementById('dayOfWeek');
+      const stickyDayNameElement = document.getElementById('stickyDayName');
+
+      const observerOptions = {
+        root: null,
+        threshold: 0,
+      };
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) {
+            stickyDayNameElement.style.opacity = '1';
+            stickyDayNameElement.style.transform = 'translateY(0)';
+          } else {
+            stickyDayNameElement.style.opacity = '0';
+            stickyDayNameElement.style.transform = 'translateY(-100%)';
+          }
+        });
+      }, observerOptions);
+
+      observer.observe(dayOfWeekElement);
+    });
+  </script>
+
+  <footer></footer>
+</body>
+</html> 
