@@ -74,9 +74,10 @@
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
-      overflow-x: hidden; /* Empêche le défilement horizontal */
+      overflow-x: hidden;
       width: 100%;
-      max-width: 100vw; /* Limite la largeur à la largeur de la fenêtre */
+      max-width: 100vw;
+      box-sizing: border-box;
     }
 
     /* Exception pour les champs de texte et les zones éditables */
@@ -117,6 +118,7 @@
       border-left: none;
       padding-left: 0;
       box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     .timeline.has-courses {
@@ -210,6 +212,7 @@
       max-width: 800px;
       margin: 0 0 0 18px;
       box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     /* Styles pour le type de cours */
@@ -537,6 +540,7 @@
         margin-left: 18px;
         padding-left: 0;
         width: calc(100% - 18px);
+        overflow-x: hidden;
       }
 
       .course-block {
@@ -544,6 +548,7 @@
         width: calc(100% - 44px);
         margin: 0 0 0 18px;
         box-sizing: border-box;
+        overflow-x: hidden;
       }
 
       .timeline-block::before {
@@ -1296,6 +1301,13 @@
         setTimeout(() => {
           displaySchedule(currentDayIndex);
           document.getElementById('loadingOverlay').style.display = 'none';
+          
+          // S'assurer qu'il n'y a pas de défilement horizontal
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
         }, 500);
       }
     }
@@ -1310,6 +1322,13 @@
       
       currentDayIndex = (currentDayIndex + direction + 7) % 7;
       displaySchedule(currentDayIndex);
+      
+      // S'assurer qu'il n'y a pas de défilement horizontal
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
     }
 
     function areAllCoursesInThePast(dayData) {
@@ -1341,18 +1360,14 @@
         const courseStartTime = startHour * 60 + startMin;
         const courseEndTime = endHour * 60 + endMin;
 
-        // Vérifier si c'est un cours en cours
         if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
-          // Si c'est le premier cours en cours trouvé ou si c'est plus ancien que le cours actuel
           if (!firstCurrentCourse || courseStartTime < earliestStartTime) {
             firstCurrentCourse = block;
             earliestStartTime = courseStartTime;
           }
           allPast = false;
         }
-        // Vérifier si c'est un cours à venir
         else if (currentTime < courseStartTime) {
-          // Si c'est le premier cours à venir trouvé ou si c'est plus proche que le cours actuel
           if (!nextUpcomingCourse || courseStartTime < earliestStartTime) {
             nextUpcomingCourse = block;
             earliestStartTime = courseStartTime;
@@ -1362,14 +1377,23 @@
       });
 
       if (firstCurrentCourse) {
-        // Scroll vers le premier cours en cours
-        firstCurrentCourse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        firstCurrentCourse.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
       } else if (nextUpcomingCourse) {
-        // Scroll vers le prochain cours à venir
-        nextUpcomingCourse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        nextUpcomingCourse.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
       } else if (allPast) {
-        // Scroll vers le bas si tous les cours sont passés
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        window.scrollTo({ 
+          top: document.body.scrollHeight, 
+          behavior: 'smooth',
+          left: 0
+        });
       }
     }
 
@@ -1568,6 +1592,23 @@
       }, observerOptions);
 
       observer.observe(dayOfWeekElement);
+    });
+
+    // Ajout d'un gestionnaire d'événements pour empêcher le défilement horizontal
+    document.addEventListener('DOMContentLoaded', function() {
+      // Empêcher le défilement horizontal
+      window.addEventListener('scroll', function() {
+        if (window.scrollX !== 0) {
+          window.scrollTo(0, window.scrollY);
+        }
+      });
+
+      // Empêcher le défilement horizontal lors du redimensionnement
+      window.addEventListener('resize', function() {
+        if (window.scrollX !== 0) {
+          window.scrollTo(0, window.scrollY);
+        }
+      });
     });
   </script>
 
