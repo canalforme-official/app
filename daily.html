@@ -74,7 +74,7 @@
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
-      overflow-x: hidden;
+      overflow-x: visible;
       width: 100%;
       max-width: 100vw;
       box-sizing: border-box;
@@ -114,15 +114,15 @@
       position: relative;
       width: 100%;
       max-width: 1000px;
-      margin: 0 0 0 18px;
-      border-left: none;
-      padding-left: 0;
+      margin: 0;
+      padding-left: 35px;
       box-sizing: border-box;
-      overflow-x: hidden;
+      overflow: visible;
     }
 
     .timeline.has-courses {
       border-left: 2px solid rgba(72, 6, 7, 0.15);
+      margin-left: 15px;
     }
 
     .timeline:empty {
@@ -136,14 +136,14 @@
     .timeline-block {
       margin-bottom: 20px;
       position: relative;
-      padding-left: 18px;
+      overflow: visible;
     }
 
     .timeline-block::before {
       content: '';
       position: absolute;
-      left: -16px;
-      top: 50%;
+      left: -45px;
+      top: calc(50% + 15px);
       transform: translateY(-50%);
       width: 30px;
       height: 30px;
@@ -153,17 +153,29 @@
       background-position: center;
       opacity: 1;
       transition: opacity 0.3s ease;
+      pointer-events: none;
     }
 
-    /* Ajustement pour centrer l'icône par rapport au course-block */
+    /* Ajustement pour les appareils mobiles */
+    @media screen and (max-width: 1024px) {
+      .timeline {
+        padding-left: 35px;
+      }
+
+      .timeline-block::before {
+        left: -50px;
+      }
+
+      .course-block {
+        width: calc(100% - 20px);
+        margin: 0;
+      }
+    }
+
     .timeline-block .time {
       position: relative;
-      top: -3px; /* Ajustement pour rapprocher l'heure */
+      top: -3px;
       margin-left: 18px;
-    }
-
-    .timeline-block::before {
-      top: calc(50% + 15px); /* Ajustement pour centrer l'icône */
     }
 
     /* Correction de la transparence pour l'icône des cours passés */
@@ -208,11 +220,11 @@
       border-radius: 15px;
       box-shadow: 0px 4px 15px var(--shadow-light);
       transition: all 0.3s ease;
-      width: calc(100% - 44px);
-      max-width: 800px;
-      margin: 0 0 0 18px;
+      width: calc(100% - 20px);
+      max-width: 950px;
       box-sizing: border-box;
-      overflow-x: hidden;
+      overflow: visible;
+      margin: 0;
     }
 
     /* Styles pour le type de cours */
@@ -537,22 +549,15 @@
       }
 
       .timeline {
-        margin-left: 18px;
-        padding-left: 0;
-        width: calc(100% - 18px);
-        overflow-x: hidden;
+        padding-left: 35px;
       }
 
-      .course-block {
-        padding: 15px;
-        width: calc(100% - 44px);
-        margin: 0 0 0 18px;
-        box-sizing: border-box;
-        overflow-x: hidden;
+      .timeline.has-courses {
+        margin-left: 15px;
       }
 
       .timeline-block::before {
-        left: -16px;
+        left: -50px;
       }
 
       .time {
@@ -561,6 +566,11 @@
 
       .timeline-block .time {
         margin-left: 18px;
+      }
+
+      .course-block {
+        width: calc(100% - 20px);
+        margin: 0;
       }
 
       .course-block.past .course-title,
@@ -621,7 +631,7 @@
       top: 50px;
       right: 10px;
       z-index: 1000;
-      background-color: var(--secondary-light);
+      background-color: var(--secondary-color);
       padding: 8px;
       border-radius: 50%;
       width: 50px;
@@ -662,7 +672,7 @@
     /* Styles :hover pour le bouton weekly-view */
     @media (hover: hover) {
       .weekly-view-button:hover {
-        background-color: var(--secondary-lighter);
+        background-color: var(--secondary-color);
         box-shadow: 0px 6px 12px var(--shadow-dark);
         transform: scale(1.05);
       }
