@@ -216,64 +216,55 @@
       }
     }
 
-/* Style pour le bouton today-view */
+/* Style pour le bouton de retour à la vue quotidienne */
 .today-view-button {
   display: none;
   position: fixed;
   right: 10px;
   z-index: 1000;
-  background-color: var(--primary-light);
-  padding: 8px;
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
-  width: 50px;
-  height: 50px;
-  animation: auraPulse 1.5s ease-in-out infinite;
+  background: none;
+  padding: 0;
+  width: 55px;
+  height: 55px;
+  animation: auraPulse 8s ease-in-out infinite;
 }
 
-/* Ajustement de la taille du cercle extérieur */
 .today-view-button::before {
   content: '';
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
   position: absolute;
-  border: 3px solid var(--text-light);
-  box-sizing: border-box;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  animation: zoomPulse 1.5s ease-in-out infinite;
+  width: 55px;
+  height: 55px;
+  background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center;
 }
 
-/* Ajustement de la taille du cercle intérieur */
-.today-view-button::after {
-  content: '';
-  width: 11px;
-  height: 11px;
-  background-color: var(--text-light);
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  animation: zoomPulse 1.5s ease-in-out infinite;
-}
-
-/* Nouvelle animation pour l'aura rouge */
-@keyframes auraPulse {
+@keyframes rotate-icon {
   0% {
-    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+    transform: rotate(0deg);
   }
   50% {
-    box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+    transform: rotate(180deg);
   }
   100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes auraPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+  }
+  5% {
+    box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+  }
+  10% {
+    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+  }
+  15%, 100% {
     box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
   }
 }
@@ -288,28 +279,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  position: relative; 
+  position: relative;
 }
 
-.today-view-button img {
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
+/* Suppression des styles hover qui créent l'effet de sélection */
+.today-view-button:hover {
+  transform: none;
+  background: none;
+  box-shadow: none;
 }
 
-/* Styles :hover pour le bouton today-view */
-@media (hover: hover) {
-  .today-view-button:hover {
-    background-color: var(--primary-lighter);
-    box-shadow: 0px 6px 12px var(--shadow-dark);
-    transform: scale(1.05);
+/* Animation de zoom au clic */
+.today-view-button:active::before {
+  animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes click-zoom {
+  0% {
+    transform: scale(1);
   }
-}
-
-/* État :active pour le bouton today-view */
-.today-view-button:active {
-  transform: scale(1.05);
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Styles pour le tableau du planning hebdomadaire */

@@ -1,0 +1,30 @@
+# Images à importer sur GitHub
+# Format : nom_fichier.png | URL d'origine
+
+# Logo et favicon
+logo_club.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png
+logo_loading.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png
+
+# Icônes de cours et boutons
+icon_course.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png
+icon_weekly_view.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/eb3b6e4d-5f0f-8674-90ee-871bf873cc0e.png
+icon_today_view.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png
+
+# Boutons de navigation
+icon_prev_day.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/78d64276-8c3e-a386-2885-2bbe34c80319.png
+icon_next_day.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/8ad9de66-44fa-f41e-9b4a-1ab563f063a3.png
+
+# Images pour les messages "pas de cours"
+no_course_1.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/70a8506a-23ce-3fc3-0e6d-2bc78a5b13d6.png
+no_course_2.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/fc0db061-f08d-2db2-ab2e-341f4d9a067d.png
+no_course_3.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/54cf9bc8-ad8e-2aef-1c5a-ae060b1f6d9b.png
+no_course_4.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/2e02ff47-a45e-f793-0166-8a61a5c3cb1d.png
+no_course_5.png | https://mcusercontent.com/74abea872abd45d46efed5d41/images/5a6492bf-169c-0807-fa9b-fbc2cc5bfaa8.png
+
+# Instructions :
+# 1. Créer un dossier 'images' dans votre dépôt GitHub
+# 2. Télécharger chaque image depuis son URL
+# 3. Renommer l'image selon le nom indiqué à gauche
+# 4. Uploader les images dans le dossier 'images'
+# 5. Les URLs dans le code devront être modifiées pour pointer vers :
+#    https://raw.githubusercontent.com/votre-username/votre-repo/main/images/nom_image.png 

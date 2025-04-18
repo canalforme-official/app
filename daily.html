@@ -142,7 +142,7 @@
     .timeline-block::before {
       content: '';
       position: absolute;
-      left: -46px;
+      left: -47px;
       top: calc(50% + 15px);
       transform: translateY(-50%);
       width: 30px;
@@ -370,13 +370,13 @@
       top: 50%;
       left: 10px;
       right: 10px;
-      display: none;
+      display: flex;
       justify-content: space-between;
       pointer-events: none;
       z-index: 1000;
       opacity: 0;
       transform: translateY(20px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .navigation.loaded {
@@ -482,6 +482,12 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    .loading-logo img {
+      width: 80px;
+      height: auto;
+      animation: zoom-logo 2s ease-in-out infinite;
     }
 
     .loading-logo img {
@@ -631,56 +637,60 @@
       top: 50px;
       right: 10px;
       z-index: 1000;
-      background-color: var(--secondary-color);
-      padding: 8px;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      box-shadow: 0px 4px 10px var(--shadow-dark);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      animation: subtle-zoom 6s ease-in-out infinite;
       opacity: 0;
       transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .weekly-view-button.loaded {
-      opacity: 1;
-      transform: translateY(0);
+    .weekly-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/eb3b6e4d-5f0f-8674-90ee-871bf873cc0e.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
     }
 
-    /* Affiche le bouton uniquement sur les écrans de moins de 768px de large */
-    @media screen and (max-width: 768px) {
-      .weekly-view-button.loaded {
-        display: flex;
+    @keyframes subtle-zoom {
+      0% {
+        transform: scale(1);
       }
-      .navigation.loaded {
-        display: flex;
+      20% {
+        transform: scale(1.15);
       }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .weekly-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Animation de zoom au clic */
+    .weekly-view-button:active::before {
+      animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .weekly-view-button img {
-      width: 35px;
-      height: 35px;
-      cursor: pointer;
-      filter: brightness(0) invert(1);
-    }
-
-    /* Styles :hover pour le bouton weekly-view */
-    @media (hover: hover) {
-      .weekly-view-button:hover {
-        background-color: var(--secondary-color);
-        box-shadow: 0px 6px 12px var(--shadow-dark);
-        transform: scale(1.05);
-      }
-    }
-
-    /* État :active pour le bouton weekly-view */
-    .weekly-view-button:active {
-      transform: scale(1.05);
+      display: none;
     }
 
     /* Style pour le bouton today-view */
@@ -689,58 +699,49 @@
       position: fixed;
       right: 10px;
       z-index: 1000;
-      background-color: var(--primary-light);
-      padding: 8px;
-      border-radius: 50%;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.3s ease-in-out;
-      width: 50px;
-      height: 50px;
-      animation: auraPulse 1.5s ease-in-out infinite;
+      background: none;
+      padding: 0;
+      width: 55px;
+      height: 55px;
+      animation: auraPulse 8s ease-in-out infinite;
     }
 
-    /* Ajustement de la taille du cercle extérieur */
     .today-view-button::before {
       content: '';
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
       position: absolute;
-      border: 3px solid var(--text-light);
-      box-sizing: border-box;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1;
-      animation: zoomPulse 1.5s ease-in-out infinite;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
     }
 
-    /* Ajustement de la taille du cercle intérieur */
-    .today-view-button::after {
-      content: '';
-      width: 11px;
-      height: 11px;
-      background-color: var(--text-light);
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-      animation: zoomPulse 1.5s ease-in-out infinite;
-    }
-
-    /* Nouvelle animation pour l'aura rouge */
-    @keyframes auraPulse {
+    @keyframes rotate-icon {
       0% {
-        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+        transform: rotate(0deg);
       }
       50% {
-        box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+        transform: rotate(180deg);
       }
       100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes auraPulse {
+      0%, 100% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+      5% {
+        box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+      }
+      10% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+      15%, 100% {
         box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
       }
     }
@@ -755,28 +756,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      position: relative; 
+      position: relative;
     }
 
-    .today-view-button img {
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
+    /* Suppression des styles hover qui créent l'effet de sélection */
+    .today-view-button:hover {
+      transform: none;
+      background: none;
+      box-shadow: none;
     }
 
-    /* Styles :hover pour le bouton today-view */
-    @media (hover: hover) {
-      .today-view-button:hover {
-        background-color: var(--primary-lighter);
-        box-shadow: 0px 6px 12px var(--shadow-dark);
-        transform: scale(1.05);
-      }
-    }
-
-    /* État :active pour le bouton today-view */
-    .today-view-button:active {
-      transform: scale(1.05);
+    /* Animation de zoom au clic */
+    .today-view-button:active::before {
+      animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .sticky-day-name {
@@ -1064,20 +1056,18 @@
     //const apiUrl = './planning.json';
     let allData = [];
 
-    // Fonction pour mettre à jour la position du bouton today-view
     function updateTodayButtonPosition() {
       const weeklyButton = document.querySelector('.weekly-view-button');
       const todayButton = document.querySelector('.today-view-button');
       
       if (weeklyButton && todayButton) {
         const weeklyButtonRect = weeklyButton.getBoundingClientRect();
-        const spacing = 10; // Espacement réduit entre les boutons
+        const spacing = 15;
         const newTop = weeklyButtonRect.bottom + spacing;
         todayButton.style.top = `${newTop}px`;
       }
     }
 
-    // Fonction pour gérer le redimensionnement de la fenêtre
     function handleResize() {
       updateTodayButtonPosition();
     }
@@ -1094,23 +1084,23 @@
       // Ajouter la classe fade-out à l'overlay
       loadingOverlay.classList.add('fade-out');
 
-      // Attendre que l'animation de fade-out soit terminée
+      // Afficher les boutons de navigation et weekly view immédiatement
+      const navigation = document.querySelector('.navigation');
+      const weeklyButton = document.querySelector('.weekly-view-button');
+      
+      if (navigation) navigation.classList.add('loaded');
+      if (weeklyButton) weeklyButton.classList.add('loaded');
+
+      // Retirer la classe loading du body immédiatement
+      document.body.classList.remove('loading');
+
+      // Mettre à jour la position du bouton today-view
+      updateTodayButtonPosition();
+
+      // Masquer l'overlay après une courte transition
       setTimeout(() => {
         loadingOverlay.style.display = 'none';
-        
-        // Afficher les boutons de navigation et weekly view avec animation
-        const navigation = document.querySelector('.navigation');
-        const weeklyButton = document.querySelector('.weekly-view-button');
-        
-        if (navigation) navigation.classList.add('loaded');
-        if (weeklyButton) weeklyButton.classList.add('loaded');
-
-        // Retirer la classe loading du body
-        document.body.classList.remove('loading');
-
-        // Mettre à jour la position du bouton today-view
-        updateTodayButtonPosition();
-      }, 500);
+      }, 300);
     }
 
     function fetchAllData() {
@@ -1276,19 +1266,20 @@
       if (isToday(dayIndex)) {
         // Vérifie si tous les cours sont terminés
         if (areAllCoursesInThePast(dayData)) {
-          // Défilement vers le bas de la page si tous les cours sont passés
           window.scrollTo({
             top: document.body.scrollHeight,
             behavior: 'smooth'
           });
         } else {
-          // Sinon, défile vers le prochain cours
           scrollToNextUpcomingCourse();
         }
         initializeCountdowns();
       } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+
+      // Mettre à jour la position du bouton today-view après l'affichage du planning
+      updateTodayButtonPosition();
     }
 
     function isToday(dayIndex) {
@@ -1318,6 +1309,14 @@
             left: 0,
             behavior: 'smooth'
           });
+
+          // Mettre à jour la position du bouton today-view après le retour à aujourd'hui
+          updateTodayButtonPosition();
+
+          // Ajouter un délai pour s'assurer que le DOM est complètement chargé
+          setTimeout(() => {
+            scrollToNextUpcomingCourse();
+          }, 100);
         }, 500);
       }
     }
@@ -1339,6 +1338,9 @@
         left: 0,
         behavior: 'smooth'
       });
+
+      // Mettre à jour la position du bouton today-view après le changement de jour
+      updateTodayButtonPosition();
     }
 
     function areAllCoursesInThePast(dayData) {
@@ -1576,6 +1578,16 @@
 
       // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
       window.addEventListener('resize', handleResize);
+
+      // Mettre à jour la position du bouton today-view immédiatement
+      updateTodayButtonPosition();
+
+      // Afficher les boutons immédiatement
+      const navigation = document.querySelector('.navigation');
+      const weeklyButton = document.querySelector('.weekly-view-button');
+      
+      if (navigation) navigation.classList.add('loaded');
+      if (weeklyButton) weeklyButton.classList.add('loaded');
     }
 
     document.addEventListener('DOMContentLoaded', function () {
