@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning du jour</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Meta viewport to prevent zooming -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <style>
+    /* Variables de style réutilisées de daily.html */
+    :root {
+      /* Polices */
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      
+      /* Couleurs principales */
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      
+      /* Couleurs spécifiques */
+      --women-color: #E4A672;
+      --pool-color: #78D1B6;
+      
+      /* Couleurs de fond */
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      
+      /* Couleurs de texte */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-tertiary: #555555;
+      --text-light: #FFFFFF;
+      
+      /* Transparences primary */
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
+      --primary-lighter: rgba(72, 6, 7, 0.5);
+      
+      /* Transparences secondary */
+      --secondary-light: rgba(255, 166, 48, 0.75);
+      --secondary-lighter: rgba(255, 166, 48, 0.7);
+      
+      /* Transparences spécifiques */
+      --women-color-light: rgba(228, 166, 114, 0.3);
+      --pool-color-light: rgba(120, 209, 182, 0.3);
+      
+      /* Ombres */
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+    }
+
+    body {
+      font-family: var(--font-text);
+      background-color: var(--background-main);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 5px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      position: sticky;
+      top: 0;
+      background-color: var(--background-main);
+      z-index: 100;
+      padding: 2px 0;
+    }
+
+    .nav-button {
+      font-family: var(--font-title);
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .day-title {
+      font-family: var(--font-title);
+      color: var(--primary-color);
+      font-size: 1.8em;
+      text-align: center;
+      margin: 0;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      margin-bottom: 52px;
+    }
+
+    .studios-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .studios-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      min-height: 100px;
+    }
+
+    .studio-column {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      text-align: center;
+      background-color: var(--background-card);
+      padding: 2px;
+      height: fit-content;
+    }
+
+    .studio-title {
+      font-family: var(--font-title);
+      color: var(--primary-color);
+      font-size: 0.9em;
+      text-align: center;
+      margin: 0;
+      padding: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-bottom: 1px solid var(--primary-color);
+      background-color: var(--background-card);
+      z-index: 1;
+      order: -1;
+    }
+
+    .courses-container {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 3px;
+      min-height: 0;
+    }
+
+    .course-card {
+      margin-bottom: 4px;
+      font-size: 0.85em;
+      border-left: none;
+      padding: 0;
+      width: 95%;
+      line-height: 1.2;
+    }
+
+    .course-time {
+      font-family: var(--font-title);
+      color: white;
+      font-size: 0.85em;
+      font-weight: 500;
+      background-color: var(--primary-lighter);
+      padding: 1px 4px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-bottom: 2px;
+    }
+
+    .course-name {
+      font-family: var(--font-title);
+      font-size: 0.95em;
+      margin: 0 0 2px 0;
+    }
+
+    .course-coach {
+      color: var(--text-secondary);
+      font-size: 0.75em;
+      font-style: italic;
+    }
+
+    .empty-message {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 20px;
+    }
+
+    .no-courses-message {
+      color: var(--text-secondary);
+      font-size: 1.2em;
+      font-style: italic;
+      text-align: center;
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    .women-only .course-time {
+      background-color: var(--women-color);
+    }
+
+    .pool .course-time {
+      background-color: var(--pool-color);
+    }
+
+    .coaches-section {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--background-main);
+      z-index: 100;
+      height: 52px;
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      border-top: 1px solid var(--primary-lighter);
+      padding: 0 8px;
+      align-items: center;
+    }
+
+    .coach-card {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: fit-content;
+    }
+
+    .coach-image {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: var(--background-card);
+    }
+
+    .coach-name {
+      font-family: var(--font-title);
+      font-size: 0.8em;
+      white-space: nowrap;
+    }
+
+    /* Scrollbar styles */
+    ::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="nav-button" onclick="navigateDay(-1)">◀ HIER</button>
+    <h1 class="day-title" id="currentDay">LUNDI</h1>
+    <button class="nav-button" onclick="navigateDay(1)">DEMAIN ▶</button>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="studios-container" id="studiosContainer">
+      <!-- Les rangées de studios seront générées ici -->
+    </div>
+
+    <div class="coaches-section" id="coachesGrid">
+      <!-- Les cartes des coachs seront générées ici -->
+    </div>
+  </div>
+
+  <script>
+    let currentDate = new Date();
+    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+    function navigateDay(offset) {
+      currentDate.setDate(currentDate.getDate() + offset);
+      loadAndDisplayCourses();
+    }
+
+    async function loadAndDisplayCourses() {
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning.json');
+        const courses = await response.json();
+        
+        const today = days[currentDate.getDay()];
+        const todaysCourses = courses.filter(course => course.day.toLowerCase() === today.toLowerCase());
+        
+        const studiosContainer = document.getElementById('studiosContainer');
+        studiosContainer.innerHTML = '';
+
+        // Si aucun cours pour ce jour
+        if (todaysCourses.length === 0) {
+          const noCoursesMessage = document.createElement('div');
+          noCoursesMessage.className = 'no-courses-message';
+          noCoursesMessage.textContent = 'Pas de cours aujourd\'hui';
+          studiosContainer.appendChild(noCoursesMessage);
+          document.getElementById('currentDay').textContent = today.toUpperCase();
+          document.getElementById('coachesGrid').innerHTML = '';
+          return;
+        }
+
+        const studios = [...new Set(todaysCourses.map(course => course.studio))];
+        
+        // Créer des rangées de 3 studios
+        for (let i = 0; i < studios.length; i += 3) {
+          const row = document.createElement('div');
+          row.className = 'studios-row';
+          
+          // Ajouter les studios de cette rangée
+          for (let j = 0; j < 3 && i + j < studios.length; j++) {
+            const studio = studios[i + j];
+            const studioCourses = todaysCourses
+              .filter(course => course.studio === studio)
+              .sort((a, b) => a.startTime.localeCompare(b.startTime));
+            
+            const studioColumn = document.createElement('div');
+            studioColumn.className = 'studio-column';
+            
+            const studioTitle = document.createElement('h2');
+            studioTitle.className = 'studio-title';
+            studioTitle.textContent = studio;
+            
+            const coursesContainer = document.createElement('div');
+            coursesContainer.className = 'courses-container';
+            
+            studioCourses.forEach(course => {
+              const courseCard = document.createElement('div');
+              courseCard.className = 'course-card';
+              if (course.type.toLowerCase().includes('femme')) {
+                courseCard.classList.add('women-only');
+              }
+              if (studio.toLowerCase().includes('piscine')) {
+                courseCard.classList.add('pool');
+              }
+              
+              const coachNames = course.coach.split(',').map(name => name.trim());
+              
+              courseCard.innerHTML = `
+                <div class="course-time">${course.startTime} - ${course.endTime}</div>
+                <div class="course-name">${course.name}</div>
+                <div class="course-coach">${coachNames.join(', ')}</div>
+              `;
+              
+              coursesContainer.appendChild(courseCard);
+            });
+            
+            studioColumn.appendChild(studioTitle);
+            studioColumn.appendChild(coursesContainer);
+            row.appendChild(studioColumn);
+          }
+          
+          studiosContainer.appendChild(row);
+        }
+        
+        document.getElementById('currentDay').textContent = today.toUpperCase();
+        
+        // Gérer les coachs
+        const uniqueCoaches = [...new Set(todaysCourses.flatMap(course => 
+          course.coach.split(',').map(name => name.trim())
+        ))];
+        
+        const coachesGrid = document.getElementById('coachesGrid');
+        coachesGrid.innerHTML = '';
+        
+        uniqueCoaches.forEach(coach => {
+          const coachCard = document.createElement('div');
+          coachCard.className = 'coach-card';
+          
+          // Rechercher tous les cours de ce coach pour trouver la première photo disponible
+          const coachCourses = todaysCourses.filter(course => 
+            course.coach.split(',').map(name => name.trim()).includes(coach)
+          );
+          
+          let coachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
+          
+          // Chercher la première photo disponible
+          for (const course of coachCourses) {
+            if (course.coachImage && course.coachImage.trim() !== '') {
+              coachImage = course.coachImage;
+              break;
+            }
+          }
+          
+          coachCard.innerHTML = `
+            <img src="${coachImage}" alt="${coach}" class="coach-image" onerror="this.src='https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png'">
+            <div class="coach-name">${coach}</div>
+          `;
+          
+          coachesGrid.appendChild(coachCard);
+        });
+        
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAndDisplayCourses);
+    setInterval(loadAndDisplayCourses, 60000);
+  </script>
+</body>
+</html> 

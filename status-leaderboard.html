@@ -86,17 +86,19 @@
 
         /* Amélioration de la visibilité des tableaux */
         .table {
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 18px;
             margin: 20px 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             max-height: 400px;
             overflow-y: auto;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            position: relative;
+            overflow: visible;
         }
 
         .table::-webkit-scrollbar {
@@ -140,6 +142,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+            z-index: 2;
         }
 
         .table h3 img {
@@ -158,41 +161,78 @@
             margin-top: 10px;
         }
 
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 2px;
+            table-layout: fixed;
+        }
+
         table td {
             position: relative;
             padding: 16px 8px;
             transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         table td:first-child {
             font-weight: 700;
             color: #480607;
-            width: 40px;
+            width: 35px;
+            min-width: 35px;
+            max-width: 35px;
+            text-align: left;
+            padding-left: 8px;
+            padding-right: 0;
         }
 
         table td:nth-child(2) {
             font-weight: 500;
+            width: 40%;
+            padding-left: 2px;
+            padding-right: 5px;
         }
 
         table td:last-child {
             text-align: right;
             font-weight: 600;
+            width: 45%;
+            padding-right: 8px;
         }
 
         table td span.meps {
             background: rgba(72, 6, 7, 0.05);
             border: 1px solid rgba(72, 6, 7, 0.1);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 20px;
             font-size: 0.85em;
             letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            display: inline-block;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             text-transform: uppercase;
+            white-space: nowrap;
+            width: auto;
+            min-width: 110px;
+            text-align: center;
+            margin-right: 0;
+            position: relative;
+        }
+
+        table td div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        table td div img {
+            flex-shrink: 0;
         }
 
         table td span.meps strong {
@@ -200,6 +240,9 @@
             color: #480607;
             font-family: 'Montserrat', sans-serif;
             opacity: 1 !important;
+            margin-right: 3px;
+            position: relative;
+            z-index: 1;
         }
 
         table td span.meps::after {
@@ -208,13 +251,14 @@
             font-size: 0.8em;
             letter-spacing: 1px;
             color: #480607;
-            margin-left: 4px;
+            position: relative;
+            z-index: 1;
         }
 
         /* Style pour les positions spéciales avec icônes */
         tr[data-position="1"] td:first-child::before {
             content: '👑';
-            margin-right: 8px;
+            margin-right: 2px;
             font-size: 1.2em;
             vertical-align: middle;
             display: inline-block;
@@ -222,14 +266,14 @@
         }
         tr[data-position="2"] td:first-child::before {
             content: '🥈';
-            margin-right: 8px;
+            margin-right: 2px;
             font-size: 1.2em;
             vertical-align: middle;
             display: inline-block;
         }
         tr[data-position="3"] td:first-child::before {
             content: '🥉';
-            margin-right: 8px;
+            margin-right: 2px;
             font-size: 1.2em;
             vertical-align: middle;
             display: inline-block;
@@ -373,20 +417,6 @@
             display: inline-block;
             position: relative;
             top: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 2px;
-        }
-
-        table th, table td {
-            text-align: left;
-            padding: 12px 8px;
-            border-bottom: 1px solid rgba(72, 6, 7, 0.1);
-            color: #333;
-            transition: background-color 0.2s ease;
         }
 
         table tr:hover td {
