@@ -218,15 +218,29 @@
 
 /* Style pour le bouton de retour à la vue quotidienne */
 .today-view-button {
-  display: none;
   position: fixed;
+  top: 55px;
   right: 10px;
   z-index: 1000;
   background: none;
   padding: 0;
   width: 55px;
   height: 55px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
   animation: auraPulse 8s ease-in-out infinite;
+  display: none; /* Caché par défaut */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.today-view-button.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
 }
 
 .today-view-button::before {
@@ -240,33 +254,12 @@
   background-position: center;
   animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   transform-origin: center;
-}
-
-@keyframes rotate-icon {
-  0% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(180deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes auraPulse {
-  0%, 100% {
-    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
-  }
-  5% {
-    box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
-  }
-  10% {
-    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
-  }
-  15%, 100% {
-    box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
-  }
+  pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .today-view-button button {
@@ -280,6 +273,11 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+  pointer-events: all;
 }
 
 /* Suppression des styles hover qui créent l'effet de sélection */
@@ -444,6 +442,8 @@
     padding: 5px;
     margin: 2px;
     font-size: 0.9em;
+    position: relative;
+    padding-right: 45px; /* Ajouter de l'espace pour le countdown */
   }
 
   /* Styles pour les cours mixtes */
@@ -509,21 +509,21 @@
 /* Styles pour la pilule de compte à rebours */
 .countdown-pill {
     position: absolute;
-    top: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 14px;
+    top: -11px;
+    right: 0;
+    transform: translateX(0);
+    width: 30px;
+    height: 15px;
     background-color: var(--secondary-color);
     color: var(--primary-color);
     border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75em;
+    font-size: 0.8em;
     font-weight: bold;
-    padding: 0;
-    box-shadow: 0 2px 5px var(--shadow-medium);
+    padding: 0 2px;
+    box-shadow: 0 1px 3px var(--shadow-medium);
     z-index: 5;
 }
 
@@ -554,7 +554,8 @@
     font-size: 1em;
     font-weight: bold;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-right: 0;
+    padding-right: 0;
   }
 
   .single-coach {
@@ -844,7 +845,7 @@
 
   /* Style par défaut pour mobile */
   .modal-center-container img {
-    width: 70px !important;
+    width: 100px !important;
     height: auto !important;
     animation: zoom-logo 2s infinite !important;
     pointer-events: none !important;
@@ -853,14 +854,14 @@
   /* Style pour tablettes */
   @media screen and (min-width: 768px) {
     .modal-center-container img {
-      width: 100px !important;
+      width: 140px !important;
     }
   }
 
   /* Style pour desktop */
   @media screen and (min-width: 1024px) {
     .modal-center-container img {
-      width: 140px !important;
+      width: 170px !important;
     }
   }
 
@@ -981,6 +982,33 @@
     animation: zoom-logo 2s ease-in-out infinite;
   }
 
+  @keyframes rotate-icon {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes auraPulse {
+    0%, 100% {
+      box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+    }
+    5% {
+      box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+    }
+    10% {
+      box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+    }
+    15%, 100% {
+      box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+    }
+  }
+
 </style>
 </head>
 <body onload="initializeWeeklyPage();">
@@ -996,8 +1024,8 @@
   <div class="content-wrapper">
 
     <!-- Bouton pour revenir à aujourd'hui -->
-    <div class="today-view-button">
-      <button onclick="window.location.href='./daily.html'">
+    <div class="today-view-button" id="todayViewButton">
+      <button onclick="returnToToday()">
       </button>
     </div>
 
@@ -1040,6 +1068,19 @@
       // Ajouter la classe loading au body
       document.body.classList.add('loading');
       
+      // Masquer le bouton today-view au démarrage
+      const todayButton = document.getElementById('todayViewButton');
+      if (todayButton) {
+        todayButton.style.display = 'none';
+        todayButton.classList.remove('visible');
+      }
+      
+      // Afficher l'overlay de chargement
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+      }
+
       // Afficher le modal de chargement
       const modalBackdrop = document.querySelector('.modal-backdrop');
       const modalContent = document.querySelector('.modal-content');
@@ -1053,8 +1094,23 @@
       // Ajouter un délai artificiel de 2 secondes
       setTimeout(() => {
         fetchWeeklyData().then(data => {
-          // Ignorer la première ligne si elle contient des titres
-          data = data.slice(1);
+          // Logs pour vérifier la structure des données
+          console.group('Traitement des données');
+          console.log('Données reçues:', data);
+          
+          // Préparer les données pour le traitement
+          const planningData = data.planning;
+          const coursData = data.cours;
+          const coachsData = data.coachs;
+          const studiosData = data.studios;
+
+          // Vérification des données
+          console.log('Planning:', planningData);
+          console.log('Cours:', coursData);
+          console.log('Coachs:', coachsData);
+          console.log('Studios:', studiosData);
+          
+          console.groupEnd();
 
           // Assigner les données à la variable globale scheduleData
           scheduleData = data;
@@ -1071,13 +1127,17 @@
 
           // Récupérer la liste unique de coachs et les ajouter dans le select
           let uniqueCoaches = new Set();
-          scheduleData.forEach(course => {
-            if (course.coach) {
-              // Diviser la chaîne des coachs en coachs individuels
-              const coaches = course.coach.split(',').map(coach => coach.trim());
-              // Ajouter chaque coach individuellement à l'ensemble
-              coaches.forEach(coach => uniqueCoaches.add(coach));
-            }
+          Object.values(planningData).forEach(dayCourses => {
+            dayCourses.forEach(course => {
+              if (course.coachIds) {
+                course.coachIds.forEach(coachId => {
+                  const coach = coachsData.find(c => c.id === coachId);
+                  if (coach) {
+                    uniqueCoaches.add(coach.name);
+                  }
+                });
+              }
+            });
           });
 
           let coachFilterSelect = document.getElementById('coachFilter');
@@ -1103,6 +1163,13 @@
 
           // Mettre à jour les cercles de compte à rebours toutes les secondes
           setInterval(updateCountdownCircles, 1000);
+
+          // Afficher les boutons immédiatement
+          const todayButton = document.getElementById('todayViewButton');
+          if (todayButton) {
+            todayButton.style.display = 'block';
+            todayButton.classList.add('visible');
+          }
         }).catch(error => {
           console.error('Erreur lors de la récupération des données :', error);
           document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
@@ -1120,75 +1187,135 @@
       const cacheExpiration = localStorage.getItem(cacheExpirationKey);
       const now = new Date().getTime();
 
-      // Si les données sont en cache et que la cache n'est pas expirée (60 minutes = 3600000 ms)
       if (cachedData && cacheExpiration && now < cacheExpiration) {
         console.log('Utilisation des données en cache');
-        return Promise.resolve(JSON.parse(cachedData));  // Retourne les données du cache
+        return Promise.resolve(JSON.parse(cachedData));
       }
 
-      // Sinon, on fait un fetch pour obtenir les nouvelles données
-      //return fetch('testweeklydata1.json')
-      return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning.json')
-        .then(response => response.json())
+      // Récupération du fichier local
+      //return fetch('planning-v2.json')
+      return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
-          // Stocke les données dans le cache avec une expiration de 60 minutes
+          // Logs détaillés de validation
+          console.group('Validation des données');
+          
+          // Validation de la structure de base
+          console.log('Structure de base:', {
+            metadata: data.metadata ? '✅ Présent' : '❌ Manquant',
+            coachs: data.coachs ? `✅ ${data.coachs.length} coachs` : '❌ Manquant',
+            studios: data.studios ? `✅ ${data.studios.length} studios` : '❌ Manquant',
+            cours: data.cours ? `✅ ${data.cours.length} cours` : '❌ Manquant',
+            planning: data.planning ? `✅ ${Object.keys(data.planning).length} jours` : '❌ Manquant'
+          });
+
+          // Validation des jours du planning
+          const jours = Object.keys(data.planning);
+          console.log('Jours avec planning:', jours);
+
+          // Validation d'un échantillon de données
+          if (jours.length > 0) {
+            const premierJour = jours[0];
+            console.log(`Exemple de cours pour ${premierJour}:`, data.planning[premierJour][0]);
+          }
+
+          console.groupEnd();
+
+          // Stockage en cache
           localStorage.setItem(cacheKey, JSON.stringify(data));
-          localStorage.setItem(cacheExpirationKey, now + 360000); // Expire dans 60 minutes
-          console.log('Données récupérées du serveur et stockées dans le cache');
-          return data;  // Retourne les nouvelles données
+          localStorage.setItem(cacheExpirationKey, now + 360000);
+          console.log('✅ Données récupérées et stockées dans le cache');
+          
+          return data;
         })
         .catch(error => {
-          console.error('Erreur lors de la récupération des données :', error);
+          console.error('❌ Erreur lors de la récupération des données:', error);
+          throw error;
         });
     }
 
     function generateWeeklyScheduleHtml() {
       var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-
       var todayIndex = new Date().getDay();
       var todayName = weekDays[todayIndex];
+
+      // Logs pour vérifier la structure des données
+      console.group('Génération du planning');
+      console.log('Données reçues:', scheduleData);
+      
+      // Récupération des données nécessaires
+      const planning = scheduleData.planning;
+      const cours = scheduleData.cours;
+      const coachs = scheduleData.coachs;
+      const studios = scheduleData.studios;
+
+      // Vérification des données
+      console.log('Planning:', planning);
+      console.log('Cours:', cours);
+      console.log('Coachs:', coachs);
+      console.log('Studios:', studios);
+
+      // Création d'un objet pour stocker les cours par jour et heure
+      var scheduleByTimeAndDay = {};
+
+      // Parcours de chaque jour du planning
+      Object.entries(planning).forEach(([day, courses]) => {
+        // Conversion du nom du jour en français
+        const dayIndex = weekDays.findIndex(d => d.toLowerCase() === day);
+        const frenchDay = weekDays[dayIndex];
+
+        courses.forEach(course => {
+          const startTime = course.startTime;
+          
+          // Initialisation de la structure si nécessaire
+          if (!scheduleByTimeAndDay[startTime]) {
+            scheduleByTimeAndDay[startTime] = {};
+          }
+          if (!scheduleByTimeAndDay[startTime][frenchDay]) {
+            scheduleByTimeAndDay[startTime][frenchDay] = [];
+          }
+
+          // Recherche des informations complémentaires
+          const courseInfo = cours.find(c => c.id === course.coursId);
+          const studioInfo = studios.find(s => s.id === course.studioId);
+          const coachsInfo = course.coachIds.map(coachId => 
+            coachs.find(c => c.id === coachId)
+          );
+
+          // Ajout du cours avec toutes les informations
+          scheduleByTimeAndDay[startTime][frenchDay].push({
+            courseName: courseInfo ? courseInfo.name : 'Cours inconnu',
+            logo: courseInfo ? courseInfo.logo : '',
+            studio: studioInfo ? studioInfo.name : 'Studio inconnu',
+            endTime: course.endTime,
+            startTime: course.startTime,
+            duration: course.duration,
+            type: course.type,
+            coachs: coachsInfo.map(coach => ({
+              name: coach ? coach.name : 'Coach inconnu',
+              imageUrl: coach ? coach.imageUrl : ''
+            }))
+          });
+        });
+      });
+
+      // Logs pour vérifier la structure générée
+      console.log('Structure générée:', scheduleByTimeAndDay);
+      console.groupEnd();
 
       var daysWithCourses = new Set();
       var timesWithCourses = new Set();
 
-      var scheduleByTimeAndDay = {};
-
-      for (var i = 0; i < scheduleData.length; i++) {
-        var row = scheduleData[i];
-        var courseName = row.name;
-        var day = row.day;
-        var startTime = row.startTime;
-        var endTime = row.endTime;
-        var coach = row.coach;
-        var studio = row.studio;
-        var type = row.type;
-        var logoUrl = row.logo;
-        var coachImageUrl = row.coachImage;
-
-        if (!courseName || !day || !startTime) {
-          continue;
+      for (var time in scheduleByTimeAndDay) {
+        for (var day in scheduleByTimeAndDay[time]) {
+          daysWithCourses.add(day);
+          timesWithCourses.add(time);
         }
-
-        daysWithCourses.add(day);
-        timesWithCourses.add(startTime);
-
-        if (!scheduleByTimeAndDay[startTime]) {
-          scheduleByTimeAndDay[startTime] = {};
-        }
-        if (!scheduleByTimeAndDay[startTime][day]) {
-          scheduleByTimeAndDay[startTime][day] = [];
-        }
-
-        scheduleByTimeAndDay[startTime][day].push({
-          courseName: courseName,
-          coach: coach ? coach.split(',') : [],
-          studio: studio,
-          endTime: endTime,
-          type: type,
-          logo: logoUrl,
-          coachImage: coachImageUrl,
-          startTime: startTime
-        });
       }
 
       var daysArray = Array.from(daysWithCourses);
@@ -1250,14 +1377,14 @@
               }
 
               var coachImagesHtml = '';
-              if (course.coach.length === 1) {
-                var coachImageUrl = course.coachImage || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+              if (course.coachs.length === 1) {
+                var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
                 coachImagesHtml = '<div class="single-coach">' +
-                                  '<img src="' + coachImageUrl + '" alt="' + course.coach[0] + '">' +
-                                  '<span>' + course.coach[0] + '</span></div>';
-              } else if (course.coach.length > 1) {
+                                  '<img src="' + coachImageUrl + '" alt="' + course.coachs[0].name + '">' +
+                                  '<span>' + course.coachs[0].name + '</span></div>';
+              } else if (course.coachs.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
-                var coachImages = course.coachImage.split(';').map(img => img.trim()); // Séparer les images avec ";"
+                var coachImages = course.coachs.map(coach => coach.imageUrl).filter(Boolean); // Filtrer les images non vides
                 coachImages.forEach(function(coachImageUrl, index) {
                   coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
                 });
@@ -1278,21 +1405,48 @@
               // Vérifier si le cours commence dans moins de 15 minutes
               var now = new Date();
               var courseDate = new Date();
-              courseDate.setHours(parseInt(course.startTime.split(':')[0]), parseInt(course.startTime.split(':')[1]), 0, 0);
-              var dayOffset = weekDays.indexOf(day) - now.getDay();
-              if (dayOffset < 0) dayOffset += 7;
-              courseDate.setDate(now.getDate() + dayOffset);
-
-              var timeDifference = (courseDate - now) / 1000; // Différence en secondes
               
-              // 15 minutes = 900 secondes  
+              // Vérification et parsing sécurisé de l'heure
+              var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
+              var startHour = parseInt(startTimeParts[0]) || 0;
+              var startMinute = parseInt(startTimeParts[1]) || 0;
+              
+              // Calculer le jour de la semaine actuel (0-6, Dimanche = 0)
+              var currentDay = now.getDay();
+              var targetDay = weekDays.indexOf(day);
+              
+              // Calculer la différence de jours
+              var dayDiff = targetDay - currentDay;
+              if (dayDiff < 0) {
+                dayDiff += 7; // Si le jour cible est dans la semaine suivante
+              }
+              
+              // Définir la date du cours avec les heures et minutes exactes
+              courseDate.setDate(now.getDate() + dayDiff);
+              courseDate.setHours(startHour, startMinute, 0, 0);
+              
+              // Calculer la différence de temps en secondes
+              var timeDifference = Math.floor((courseDate - now) / 1000);
+              
+              // Vérifier si le cours commence dans les 15 prochaines minutes
               var isStartingSoon = timeDifference >= 0 && timeDifference <= 900;
-
+              
+              // Vérifier si le cours est en cours
+              var isInProgress = timeDifference < 0 && timeDifference > -course.duration * 60;
+              
+              // Ajouter des logs pour le débogage
+              console.log('Cours:', course.courseName, 'Heure:', course.startTime);
+              console.log('Différence de temps:', timeDifference, 'secondes');
+              console.log('Commence bientôt:', isStartingSoon);
+              console.log('En cours:', isInProgress);
+              
               if (isStartingSoon) {
                 courseClasses += ' starting-soon';
+              } else if (isInProgress) {
+                courseClasses += ' current';
               }
 
-              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coach.join(',') + '">';
+              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '">';
 
               // Ajouter le cercle de compte à rebours si le cours commence bientôt
               if (isStartingSoon) {
@@ -1339,16 +1493,21 @@
         // Déterminer si le bloc doit être affiché selon le coach sélectionné
         let showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
 
+        // Déterminer si le cours est en piscine
+        let isPiscine = block.classList.contains('piscine');
+
         // Déterminer si le bloc doit être affiché selon le type de cours
         let courseType = block.classList;
         let showByType = (
           (courseType.contains('mixte') && showMixte) ||
-          (courseType.contains('women-only') && showWomenOnly) ||
-          (courseType.contains('piscine') && showPiscine)
+          (courseType.contains('women-only') && showWomenOnly)
         );
 
-        // Afficher le bloc seulement si les filtres de coach et de type sont valides
-        block.style.display = showByCoach && showByType ? 'block' : 'none';
+        // Afficher le bloc seulement si :
+        // 1. Le filtre de coach est valide ET
+        // 2. Le filtre de type est valide ET
+        // 3. Si c'est un cours en piscine, le filtre piscine doit être coché
+        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
       });
 
       // Ajouter ou supprimer la classe 'hide-coaches' sur le conteneur principal
@@ -1475,6 +1634,23 @@
         });
       }
     });
+
+    // Initialisation du planning
+    function initSchedule() {
+      var scheduleContainer = document.getElementById('schedule-container');
+      if (scheduleContainer) {
+        scheduleContainer.innerHTML = generateWeeklyScheduleHtml(scheduleData);
+      }
+    }
+
+    // Rafraîchissement automatique toutes les 5 minutes
+    setInterval(function() {
+      initSchedule();
+    }, 5 * 60 * 1000);
+
+    function returnToToday() {
+      window.location.href = './daily.html';
+    }
 
   </script>
 
