@@ -121,12 +121,17 @@
     }
 
     .timeline.has-courses {
-      display: block; /* Affiche la timeline seulement quand il y a des cours */
+      display: block;
       margin-left: 15px;
     }
 
     .timeline:empty {
       border-left: none;
+    }
+
+    /* Nouveau style pour les jours sans cours */
+    .timeline.no-courses {
+      padding-left: 0;
     }
 
     .timeline-block {
@@ -135,12 +140,12 @@
       overflow: visible;
     }
 
+    /* Styles de base pour l'icône */
     .timeline-block::before {
       content: '';
       position: absolute;
-      left: -47px;
+      left: -52px;
       top: calc(50% + 15px);
-      transform: translateY(-50%);
       width: 30px;
       height: 30px;
       background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
@@ -150,42 +155,11 @@
       opacity: 1;
       transition: opacity 0.3s ease;
       pointer-events: none;
-    }
-
-    /* Ajustement pour les appareils mobiles */
-    @media screen and (max-width: 1024px) {
-      .timeline {
-        padding-left: 35px;
-      }
-
-      .timeline-block::before {
-        left: -50px;
-      }
-
-      .course-block {
-        width: calc(100% - 20px);
-        margin: 0;
-      }
-    }
-
-    .timeline-block .time {
-      position: relative;
-      top: 0;
-      margin-left: 0;
-    }
-
-    /* Correction de la transparence pour l'icône des cours passés */
-    .timeline-block.past::before {
-      opacity: 0.5;
+      transform: translateY(-50%);
+      will-change: transform;
     }
 
     /* Animation pour les cours en cours */
-    .timeline-block.current::before {
-      animation: rotate-icon 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      opacity: 1;
-      transform-origin: center;
-    }
-
     @keyframes rotate-icon {
       0% {
         transform: translateY(-50%) rotate(0deg) scale(1);
@@ -196,6 +170,23 @@
       100% {
         transform: translateY(-50%) rotate(360deg) scale(1);
       }
+    }
+
+    /* Application de l'animation pour les cours en cours */
+    .timeline-block.current::before {
+      top: 50%;
+      animation: rotate-icon 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    /* Correction de la transparence pour l'icône des cours passés */
+    .timeline-block.past::before {
+      opacity: 0.5;
+    }
+
+    /* Style pour les cours à venir et sur le point de démarrer */
+    .timeline-block.starting-soon::before,
+    .timeline-block.upcoming::before {
+      transform: translateY(-50%);
     }
 
     .time {
@@ -221,6 +212,29 @@
       box-sizing: border-box;
       overflow: visible;
       margin: 0;
+      min-height: 120px;
+    }
+
+    /* Styles pour le titre du cours */
+    .course-title {
+      font-family: var(--font-title);
+      font-size: 1.5em;
+      font-weight: 500;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      min-height: 40px; /* Hauteur minimale pour le titre sans logo */
+    }
+
+    .course-title h3 {
+      margin: 0;
+      padding: 0;
+    }
+
+    .course-title img {
+      max-width: 180px;
+      max-height: 70px;
+      object-fit: contain;
     }
 
     /* Styles pour le type de cours */
@@ -229,24 +243,40 @@
       position: absolute;
       top: 10px;
       right: 20px;
-      font-size: 0.8em;
+      font-size: 0.9em;
       font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* Couleurs pour les cours "100% Femmes" */
-    .course-block.women-only:not(.current):not(.starting-soon) .course-type {
+    /* Type de cours pour "100% Femmes" */
+    .course-block.women-only {
+      background-color: var(--women-color-light);
+    }
+
+    .course-block.women-only .course-type {
       color: var(--women-color);
     }
 
-    .course-block.women-only {
-      border: 2px solid var(--women-color);
-      background-color: var(--women-color-light);
-      box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    .course-block.women-only.current .course-type {
+      color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Couleurs pour les cours mixtes */
-    .course-block.mixte:not(.current):not(.starting-soon) .course-type {
-      color: var(--text-secondary);
+    /* Type de cours pour "Mixte" */
+    .course-block.mixte .course-type {
+      color: var(--primary-color);
+    }
+
+    /* Type de cours pour "Piscine" */
+    .course-block.piscine {
+      background-color: var(--pool-color-light);
+    }
+
+    .course-block.piscine .course-type {
+      color: var(--pool-color);
     }
 
     /* Cours passés */
@@ -264,38 +294,34 @@
 
     /* Cours qui vont bientôt démarrer */
     .course-block.starting-soon {
-      font-size: 1.3em;
+      font-size: 1.1em;
       padding: 20px 30px;
       animation: heartbeat-blink 1.5s ease-in-out infinite;
       box-shadow: 0px 6px 20px var(--shadow-dark);
     }
 
     .course-block.starting-soon.mixte {
-      border: 2px solid var(--text-secondary);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-mixte 1.5s ease-in-out infinite;
     }
 
     .course-block.starting-soon.women-only {
-      border: 2px solid var(--women-color);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-femmes 1.5s ease-in-out infinite;
       box-shadow: 0px 0px 15px 5px var(--women-color-light);
     }
 
     /* Cours en cours */
     .course-block.current {
-      font-size: 1.3em;
+      font-size: 1.1em;
       padding: 20px 30px;
       box-shadow: 0px 6px 20px var(--shadow-dark);
     }
 
     .course-block.current.mixte {
-      border: 2px solid var(--text-secondary);
       background-color: var(--background-card);
       color: var(--text-primary);
     }
 
     .course-block.current.women-only {
-      border: 2px solid var(--women-color);
       background-color: var(--women-color);
       color: var(--text-primary);
       box-shadow: 0px 0px 15px 5px var(--women-color-light);
@@ -304,7 +330,7 @@
     /* Animation pour le rebond */
     @keyframes heartbeat-blink {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.02); }
+      50% { transform: scale(1.01); }
     }
 
     /* Clignotement pour les cours mixtes */
@@ -319,14 +345,6 @@
       50% { background-color: rgba(228, 166, 114, 0.2); }
     }
 
-    /* Style pour le titre du cours */
-    .course-title {
-      font-family: var(--font-title);
-      font-size: 1.5em;
-      font-weight: 500;
-      margin-bottom: 5px;
-    }
-
     .course-coach {
       font-size: 1em;
       color: var(--text-secondary);
@@ -338,13 +356,19 @@
       color: var(--text-tertiary);
     }
 
+    /* Styles pour le compte à rebours */
     .countdown {
       font-family: var(--font-title);
       position: absolute;
-      bottom: 2px;
+      bottom: 10px;
       right: 20px;
       font-size: 0.9em;
       font-weight: 500;
+      color: var(--primary-color);
+      background: none;
+      padding: 4px 8px;
+      text-transform: uppercase;
+      text-align: right;
     }
 
     .focus {
@@ -563,7 +587,7 @@
       }
 
       .timeline-block::before {
-        left: -50px;
+        left: -52px;
       }
 
       .time {
@@ -641,7 +665,6 @@
       padding: 0;
       width: 60px;
       height: 60px;
-      animation: subtle-zoom 6s ease-in-out infinite;
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -651,10 +674,20 @@
       pointer-events: none;
     }
 
+    @keyframes subtle-zoom {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
     .weekly-view-button.loaded {
       opacity: 1;
       transform: translateY(0);
       pointer-events: all;
+      animation: subtle-zoom 6s ease-in-out infinite;
     }
 
     .weekly-view-button::before {
@@ -702,11 +735,21 @@
       padding: 0;
       width: 55px;
       height: 55px;
-      animation: auraPulse 8s ease-in-out infinite;
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
       pointer-events: none;
+      animation: none;
+      display: none; /* Caché par défaut */
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .today-view-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
     }
 
     .today-view-button::before {
@@ -721,6 +764,11 @@
       animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       transform-origin: center;
       pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
 
     .today-view-button button {
@@ -806,13 +854,13 @@
 
     .quote-text::before,
     .quote-text::after {
-      content: "«";
       font-size: 2em;
       color: var(--primary-color);
       position: absolute;
     }
 
     .quote-text::before {
+      content: "«";
       left: -10px;
       top: -10px;
     }
@@ -1049,19 +1097,18 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-    const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning.json';
-    //const apiUrl = './planning.json';
+    const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
+    //const apiUrl = './planning-v2.json';
     let allData = [];
 
     function updateTodayButtonPosition() {
       const weeklyButton = document.querySelector('.weekly-view-button');
       const todayButton = document.querySelector('.today-view-button');
       
-      if (weeklyButton && todayButton) {
+      if (weeklyButton && todayButton && todayButton.style.display !== 'none') {
         const weeklyButtonRect = weeklyButton.getBoundingClientRect();
         const spacing = 15;
-        const newTop = weeklyButtonRect.bottom + spacing;
-        todayButton.style.top = `${newTop}px`;
+        todayButton.style.top = `${weeklyButtonRect.bottom + spacing}px`;
       }
     }
 
@@ -1100,169 +1147,158 @@
       }, 300);
     }
 
-    function fetchAllData() {
-      const now = new Date();
-      const cacheExpiration = 60 * 60 * 1000; // 1 heure en millisecondes
-      const minimumLoadingTime = 2000; // 2 secondes minimum de chargement
+    async function fetchAllData() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        allData = {
+          planning: data.planning,
+          coachs: data.coachs,
+          studios: data.studios,
+          cours: data.cours,
+          icons: data.icons
+        };
 
-      // Vérifier si le cache existe et s'il est toujours valide
-      const cachedData = localStorage.getItem('scheduleData');
-      const cachedTime = localStorage.getItem('scheduleTimestamp');
+        localStorage.setItem('planningData', JSON.stringify(allData));
+        localStorage.setItem('lastUpdate', new Date().toISOString());
 
-      if (cachedData && cachedTime && now - new Date(cachedTime) < cacheExpiration) {
-        // Utiliser les données du cache
-        allData = JSON.parse(cachedData);
+        // Afficher le planning après avoir chargé les données
         displaySchedule(currentDayIndex);
-
-        // Attendre que le DOM soit complètement chargé avant de scroller
-        setTimeout(() => {
-          if (isToday(currentDayIndex)) {
-            initializeCountdowns();
-            scrollToNextUpcomingCourse();
-            setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
-          }
-        }, 100);
-
-        // Attendre le temps minimum avant de cacher l'overlay
-        setTimeout(hideLoadingOverlay, minimumLoadingTime);
-      } else {
-        // Pas de cache ou cache expiré, récupérer les données depuis l'API
-        const startTime = Date.now();
-
-        fetch(apiUrl)
-          .then(response => response.json())
-          .then(data => {
-            allData = data.slice(1); // Ignorer la première ligne (titres)
-            displaySchedule(currentDayIndex);
-
-            // Stocker les données dans le cache
-            localStorage.setItem('scheduleData', JSON.stringify(allData));
-            localStorage.setItem('scheduleTimestamp', now.toISOString());
-
-            // Attendre que le DOM soit complètement chargé avant de scroller
-            setTimeout(() => {
-              if (isToday(currentDayIndex)) {
-                initializeCountdowns();
-                scrollToNextUpcomingCourse();
-                setInterval(refreshSchedule, 900000); // Rafraîchir toutes les 15 minutes
-              }
-            }, 100);
-
-            // Calculer le temps restant pour atteindre le minimum de 2 secondes
-            const elapsedTime = Date.now() - startTime;
-            const remainingTime = Math.max(minimumLoadingTime - elapsedTime, 0);
-
-            // Attendre le temps minimum avant de cacher l'overlay
-            setTimeout(hideLoadingOverlay, remainingTime);
-          })
-          .catch(error => {
-            console.error('Erreur lors de la récupération des données :', error);
-            // En cas d'erreur, cacher l'overlay après le temps minimum
-            setTimeout(hideLoadingOverlay, minimumLoadingTime);
-          });
+        hideLoadingOverlay();
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        // En cas d'erreur, essayer d'utiliser les données en cache
+        const cachedData = localStorage.getItem('planningData');
+        if (cachedData) {
+          allData = JSON.parse(cachedData);
+          displaySchedule(currentDayIndex);
+          hideLoadingOverlay();
+        }
       }
     }
 
     function displaySchedule(dayIndex) {
-      const scheduleDiv = document.getElementById('timeline');
-      const dayOfWeek = getDayName(dayIndex);
+      const scheduleContainer = document.getElementById('timeline');
+      if (!scheduleContainer) return;
+
+      const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+      const dayOfWeek = days[dayIndex];
+      
+      // Mettre à jour le titre du jour
+      const dayOfWeekElement = document.getElementById('dayOfWeek');
+      const displayDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+      dayOfWeekElement.innerText = displayDayOfWeek;
+      document.getElementById('stickyDayName').innerText = displayDayOfWeek;
+
+      // Mettre à jour la date
       const today = new Date();
       today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
       const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-
-      document.getElementById('dayOfWeek').innerText = dayOfWeek;
       document.getElementById('dateStr').innerText = dateStr;
+      
+      if (!allData.planning || !allData.planning[dayOfWeek]) {
+        console.error('Pas de planning pour le jour:', dayOfWeek);
+        scheduleContainer.className = 'timeline no-courses';
+        scheduleContainer.innerHTML = displayNoCourseMessage();
+        return;
+      }
 
-      // Ligne ajoutée pour mettre à jour le sticky
-      document.getElementById('stickyDayName').innerText = dayOfWeek;
+      const courses = allData.planning[dayOfWeek];
+      
+      if (courses.length === 0) {
+        scheduleContainer.className = 'timeline no-courses';
+        scheduleContainer.innerHTML = displayNoCourseMessage();
+        return;
+      }
 
-      const dayData = allData.filter(course => course.day === dayOfWeek);
+      scheduleContainer.className = 'timeline has-courses';
+      
+      let scheduleHTML = '';
 
-      // Ajouter ou retirer la classe has-courses en fonction de la présence de cours
-      scheduleDiv.classList.toggle('has-courses', dayData.length > 0);
+      courses.forEach(course => {
+        const cours = allData.cours.find(c => c.id === course.coursId);
+        const coach = allData.coachs.find(c => c.id === course.coachIds[0]);
+        const studio = allData.studios.find(s => s.id === course.studioId);
 
-      if (dayData.length > 0) {
-        let html = '';
-        dayData.forEach((course, index) => {
-          let courseTypeClass = '';
-          if (course.type === '100% Femmes') {
-            courseTypeClass = 'women-only';
-          } else if (course.type === 'Mixte') {
-            courseTypeClass = 'mixte';
-          }
+        if (!cours || !coach || !studio) {
+          console.error('Données manquantes pour le cours:', course);
+          return;
+        }
 
-          // Studio "Piscine"
-          if (course.studio === 'Piscine') {
-            courseTypeClass += ' piscine';
-          }
+        // Déterminer le type de cours depuis le planning
+        let courseTypeClass = '';
+        let courseTypeText = course.type || 'Mixte'; // Utiliser le type du cours depuis le planning
 
-          // Determine course status
-          let courseStatusClass = '';
-          const now = new Date();
-          const currentTime = now.getHours() * 60 + now.getMinutes();
-          const [startHour, startMinute] = course.startTime.split(':').map(Number);
-          const [endHour, endMinute] = course.endTime.split(':').map(Number);
-          const courseStartTime = startHour * 60 + startMinute;
-          const courseEndTime = endHour * 60 + endMinute;
+        if (courseTypeText === '100% Femmes') {
+          courseTypeClass = 'women-only';
+        } else if (courseTypeText === 'Mixte') {
+          courseTypeClass = 'mixte';
+        }
 
-          let countdownHTML = '';
+        // Studio "Piscine"
+        if (studio.name === 'Piscine') {
+          courseTypeClass += ' piscine';
+        }
 
-          if (isToday(dayIndex)) {
-            if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
-              courseStatusClass = 'current focus';
-            } else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15) {
-              courseStatusClass = 'starting-soon focus';
-              countdownHTML = `<div class="countdown" data-start-time="${course.startTime}"></div>`;
-            } else if (currentTime < courseStartTime) {
-              courseStatusClass = 'upcoming';
-            } else {
-              courseStatusClass = 'past';
-            }
-          } else {
+        // Déterminer l'état du cours
+        let courseStatusClass = '';
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const [startHour, startMinute] = course.startTime.split(':').map(Number);
+        const [endHour, endMinute] = course.endTime.split(':').map(Number);
+        const courseStartTime = startHour * 60 + startMinute;
+        const courseEndTime = endHour * 60 + endMinute;
+
+        if (isToday(dayIndex)) {
+          if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+            courseStatusClass = 'current focus';
+          } else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15) {
+            courseStatusClass = 'starting-soon focus';
+          } else if (currentTime < courseStartTime) {
             courseStatusClass = 'upcoming';
+          } else {
+            courseStatusClass = 'past';
           }
+        } else {
+          courseStatusClass = 'upcoming';
+        }
 
-          // Course type display
-          const courseTypeDisplay = `<div class="course-type">${course.type}</div>`;
-
-          const courseDiv = `
-          <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}">
+        scheduleHTML += `
+          <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}" data-start-time="${course.startTime}" data-end-time="${course.endTime}">
             <div class="time">${course.startTime} - ${course.endTime}</div>
             <div class="course-block ${courseTypeClass} ${courseStatusClass}" id="${courseStatusClass.includes('focus') ? 'focus-course' : ''}">
-              ${courseTypeDisplay}
+              <div class="course-type">${courseTypeText}</div>
               <div class="course-title">
-                ${course.logo && course.logo !== 'default-logo.png'
-                  ? `<img src="${course.logo}" alt="${course.name}" style="max-width: 180px; max-height: 70px;" />`
-                  : course.name}
+                ${cours.logo 
+                  ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 180px; max-height: 70px;" />`
+                  : `<h3>${cours.name}</h3>`}
               </div>
               <div class="course-coach">
                 <div class="coach-images">
-                  ${course.coach.split(',').map((coachName, index) => {
-                    const coachImages = course.coachImage.split(';').map(image => image.trim());
-                    return `
-                      <div class="coach-item">
-                        <img class="coach-photo" src="${coachImages[index] || 'default-image.png'}" alt="${coachName.trim()}">
-                        ${course.coach.split(',').length > 1 ? '' : `<span>${coachName.trim()}</span>`}
-                      </div>`;
-                  }).join('')}
+                  <div class="coach-item">
+                    <img class="coach-photo" src="${coach.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png'}" alt="${coach.name}">
+                    <span>${coach.name}</span>
+                  </div>
                 </div>
               </div>
-              <div class="course-studio">${course.studio}</div>
-              ${countdownHTML}
+              <div class="course-studio">
+                ${studio.imageUrl 
+                  ? `<img src="${studio.imageUrl}" alt="${studio.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">`
+                  : ''}
+                ${studio.name}
+              </div>
+              ${courseStatusClass.includes('starting-soon') ? `<div class="countdown" data-start-time="${course.startTime}"></div>` : ''}
             </div>
-          </div>`;
-          html += courseDiv;
-        });
-        scheduleDiv.innerHTML = html;
-      } else {
-        scheduleDiv.innerHTML = displayNoCourseMessage();
-      }
+          </div>
+        `;
+      });
 
+      scheduleContainer.innerHTML = scheduleHTML;
       toggleTodayButton(dayIndex);
 
       if (isToday(dayIndex)) {
-        // Vérifie si tous les cours sont terminés
-        if (areAllCoursesInThePast(dayData)) {
+        if (areAllCoursesInThePast(courses)) {
           window.scrollTo({
             top: document.body.scrollHeight,
             behavior: 'smooth'
@@ -1275,16 +1311,17 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // Mettre à jour la position du bouton today-view après l'affichage du planning
       updateTodayButtonPosition();
     }
 
     function isToday(dayIndex) {
-      return dayIndex === new Date().getDay();
+      const today = new Date();
+      const currentDay = today.getDay();
+      return dayIndex === currentDay;
     }
 
     function getDayName(dayIndex) {
-      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
       return days[dayIndex];
     }
 
@@ -1320,13 +1357,41 @@
 
     function toggleTodayButton(dayIndex) {
       const todayIndex = new Date().getDay();
-      document.getElementById('todayViewButton').style.display = dayIndex === todayIndex ? 'none' : 'block';
+      const todayButton = document.getElementById('todayViewButton');
+      
+      if (dayIndex === todayIndex) {
+        todayButton.style.display = 'none';
+        todayButton.classList.remove('visible');
+      } else {
+        todayButton.style.display = 'block';
+        // Attendre le prochain frame pour calculer la position
+        requestAnimationFrame(() => {
+          updateTodayButtonPosition();
+          // Attendre que la position soit mise à jour pour rendre le bouton visible
+          requestAnimationFrame(() => {
+            todayButton.classList.add('visible');
+          });
+        });
+      }
     }
 
     function changeDay(direction) {
       const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
       
       currentDayIndex = (currentDayIndex + direction + 7) % 7;
+      
+      // Vérifier si on retourne au jour actuel
+      const todayIndex = new Date().getDay();
+      const todayButton = document.getElementById('todayViewButton');
+      
+      if (currentDayIndex === todayIndex && todayButton) {
+        // Si on retourne au jour actuel, masquer le bouton avec animation
+        todayButton.classList.remove('visible');
+        setTimeout(() => {
+          todayButton.style.display = 'none';
+        }, 300); // Attendre la fin de l'animation de fade-out
+      }
+      
       displaySchedule(currentDayIndex);
       
       // S'assurer qu'il n'y a pas de défilement horizontal
@@ -1335,16 +1400,13 @@
         left: 0,
         behavior: 'smooth'
       });
-
-      // Mettre à jour la position du bouton today-view après le changement de jour
-      updateTodayButtonPosition();
     }
 
-    function areAllCoursesInThePast(dayData) {
+    function areAllCoursesInThePast(courses) {
       const now = new Date();
       const currentTime = now.getHours() * 60 + now.getMinutes();
 
-      return dayData.every(course => {
+      return courses.every(course => {
         const [endHour, endMinute] = course.endTime.split(':').map(Number);
         const courseEndTime = endHour * 60 + endMinute;
         return courseEndTime < currentTime;
@@ -1452,7 +1514,7 @@
       return `
         <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
           <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
-          <p class="quote-text">« ${message} »</p>
+          <p class="quote-text">${message}</p>
         </div>
       `;
     }
@@ -1464,13 +1526,12 @@
 
     function updateCountdowns() {
       const countdownElements = document.querySelectorAll('.countdown');
-      const now = new Date();
-      
       countdownElements.forEach(el => {
         const startTimeStr = el.getAttribute('data-start-time');
         const [startHour, startMinute] = startTimeStr.split(':').map(Number);
         const startTime = new Date();
         startTime.setHours(startHour, startMinute, 0, 0);
+        const now = new Date();
         const diff = startTime - now;
         
         // Récupérer le bloc parent du cours
@@ -1564,6 +1625,13 @@
       // Ajouter la classe loading au body
       document.body.classList.add('loading');
       
+      // Masquer le bouton today-view au démarrage
+      const todayButton = document.getElementById('todayViewButton');
+      if (todayButton) {
+        todayButton.style.display = 'none';
+        todayButton.classList.remove('visible');
+      }
+      
       // Afficher l'overlay de chargement
       const loadingOverlay = document.getElementById('loadingOverlay');
       if (loadingOverlay) {
@@ -1571,20 +1639,17 @@
       }
 
       // Démarrer le chargement des données
-      fetchAllData();
+      fetchAllData().then(() => {
+        // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
+        window.addEventListener('resize', handleResize);
 
-      // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
-      window.addEventListener('resize', handleResize);
-
-      // Mettre à jour la position du bouton today-view immédiatement
-      updateTodayButtonPosition();
-
-      // Afficher les boutons immédiatement
-      const navigation = document.querySelector('.navigation');
-      const weeklyButton = document.querySelector('.weekly-view-button');
-      
-      if (navigation) navigation.classList.add('loaded');
-      if (weeklyButton) weeklyButton.classList.add('loaded');
+        // Afficher les boutons de navigation et weekly view
+        const navigation = document.querySelector('.navigation');
+        const weeklyButton = document.querySelector('.weekly-view-button');
+        
+        if (navigation) navigation.classList.add('loaded');
+        if (weeklyButton) weeklyButton.classList.add('loaded');
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
