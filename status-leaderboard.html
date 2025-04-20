@@ -88,8 +88,8 @@
         .table {
             background: white;
             border-radius: 15px;
-            padding: 18px;
-            margin: 20px 0;
+            padding: 12px;
+            margin: 15px 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -124,21 +124,21 @@
         .table h3 {
             display: flex;
             align-items: center;
-            font-size: 1.3em;
-            margin-bottom: 10px;
+            font-size: 1.2em;
+            margin-bottom: 8px;
             position: absolute;
-            top: -35px;
-            left: 20px;
+            top: -30px;
+            left: 15px;
             color: #ffffff;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             background: rgba(72, 6, 7, 0.9);
             border: none;
-            height: 60px;
-            width: calc(100% - 40px);
-            padding: 0 15px;
-            border-radius: 12px;
+            height: 50px;
+            width: calc(100% - 30px);
+            padding: 0 12px;
+            border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
@@ -146,9 +146,9 @@
         }
 
         .table h3 img {
-            width: 50px;
-            height: 50px;
-            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
             transition: transform 0.3s ease;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
@@ -164,17 +164,16 @@
         table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 2px;
+            border-spacing: 0 0.5px;
             table-layout: fixed;
         }
 
         table td {
             position: relative;
-            padding: 16px 8px;
+            padding: 6px 6px;
             transition: all 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
         }
 
         table td:first-child {
@@ -184,7 +183,7 @@
             min-width: 35px;
             max-width: 35px;
             text-align: left;
-            padding-left: 8px;
+            padding-left: 6px;
             padding-right: 0;
         }
 
@@ -192,14 +191,14 @@
             font-weight: 500;
             width: 40%;
             padding-left: 2px;
-            padding-right: 5px;
+            padding-right: 3px;
         }
 
         table td:last-child {
             text-align: right;
             font-weight: 600;
             width: 45%;
-            padding-right: 8px;
+            padding-right: 6px;
         }
 
         table td span.meps {
@@ -226,9 +225,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
         }
 
         table td div img {
@@ -297,9 +295,9 @@
             background: #ffffff;
             border: 1px solid rgba(72, 6, 7, 0.1);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin: 20px auto;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 15px auto;
             max-width: 300px;
             text-align: center;
             font-weight: 500;
@@ -332,14 +330,14 @@
             text-align: center;
             background-color: transparent;
             color: #ffffff;
-            padding: 20px 0;
-            margin-bottom: 20px;
+            padding: 15px 0;
+            margin-bottom: 15px;
             z-index: 10;
             position: relative;
         }
 
         .page-title h1 {
-            font-size: 1.8em;
+            font-size: 1.6em;
             font-weight: 700;
             margin: 0;
             letter-spacing: 1px;
@@ -363,10 +361,10 @@
         }
 
         .container {
-            padding: 40px;
+            padding: 30px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            gap: 30px;
             max-width: 1200px;
             margin: 0 auto;
             opacity: 1;
@@ -393,30 +391,30 @@
         }
 
         .description {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #666;
-            margin: 15px 0 45px 0;
+            margin: 8px 0 25px 0;
             font-weight: 500;
             text-align: center;
-            padding: 0 10px;
+            padding: 0 8px;
             white-space: normal;
             word-wrap: break-word;
             position: relative;
-            top: 10px;
+            top: 5px;
         }
 
         .status-count {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: #666;
             font-weight: 600;
-            margin: 15px 0;
+            margin: 8px 0;
             text-align: center;
             background-color: rgba(72, 6, 7, 0.05);
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             display: inline-block;
             position: relative;
-            top: 10px;
+            top: 5px;
         }
 
         table tr:hover td {
@@ -467,7 +465,7 @@
             }
 
             table th, table td {
-                padding: 12px 8px;
+                padding: 4px 4px;
                 font-size: 0.95em;
                 position: relative;
             }
@@ -539,6 +537,48 @@
 
             .table.fullscreen + .fullscreen-close {
                 display: block;
+            }
+
+            table td {
+                font-size: 0.9em;
+                padding: 5px 3px;
+            }
+
+            table td:first-child {
+                font-size: 0.85em;
+            }
+
+            table td:last-child {
+                font-size: 0.85em;
+            }
+
+            /* Ajustement de la taille des MEPS sur mobile */
+            table td span.meps {
+                font-size: 1em !important;
+                padding: 8px 12px !important;
+                min-width: 130px !important;
+            }
+
+            table td span.meps strong {
+                font-size: 1.1em !important;
+            }
+
+            table td span.meps::after {
+                font-size: 0.9em !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table td {
+                padding: 3px 3px;
+            }
+
+            table td:first-child {
+                font-size: 0.75em;
+            }
+
+            table td:last-child {
+                font-size: 0.75em;
             }
         }
 
@@ -780,9 +820,89 @@
         .new-row {
             animation: slideInUp 0.3s ease-out forwards;
         }
+
+        /* Styles pour l'overlay de chargement */
+        #loadingOverlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: rgba(72,6,7, 1) !important;
+            z-index: 999999 !important;
+            display: flex;
+            overflow: hidden !important;
+            pointer-events: all !important;
+            opacity: 1 !important;
+            transition: opacity 0.5s ease;
+        }
+
+        #loadingOverlay.fade-out {
+            opacity: 0 !important;
+        }
+
+        .modal-center-container {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
+            pointer-events: none !important;
+            gap: 50px !important;
+            background-color: transparent !important;
+        }
+
+        /* Style par défaut pour mobile */
+        .modal-center-container img {
+            width: 100px !important;
+            height: auto !important;
+            animation: zoom-logo 2s infinite !important;
+            pointer-events: none !important;
+        }
+
+        /* Style pour tablettes */
+        @media screen and (min-width: 768px) {
+            .modal-center-container img {
+                width: 140px !important;
+            }
+        }
+
+        /* Style pour desktop */
+        @media screen and (min-width: 1024px) {
+            .modal-center-container img {
+                width: 170px !important;
+            }
+        }
+
+        @keyframes zoom-logo {
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="loadingOverlay">
+        <div class="modal-center-container">
+            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Myzone Logo">
+        </div>
+    </div>
     <div class="medal-background"></div>
     <div class="page-title">
         <h1>Statuts Myzone</h1>
@@ -1246,6 +1366,24 @@
             setTimeout(() => {
                 document.body.classList.add('loaded');
             }, 500);
+        });
+    </script>
+
+    <script>
+        // Gestion de l'overlay de chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Afficher l'overlay au chargement
+            loadingOverlay.style.display = 'flex';
+            
+            // Masquer l'overlay après 2 secondes
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 2000);
         });
     </script>
 </body>
