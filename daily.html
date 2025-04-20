@@ -470,7 +470,7 @@
       bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      background-color: rgba(72,6,7, 1) !important;
+      background-color: var(--primary-overlay) !important;
       z-index: 999999 !important;
       display: flex;
       overflow: hidden !important;
@@ -486,11 +486,11 @@
     /* Style du message de chargement */
     #loadingMessage {
       font-size: 1.2em !important;
-      color: #fff !important;
+      color: var(--text-light) !important;
       text-align: center !important;
       width: 80% !important;
       max-width: 600px !important;
-      background-color: rgba(255, 255, 255, 0.2) !important;
+      background-color: var(--overlay-light) !important;
       padding: 10px !important;
       border-radius: 10px !important;
       pointer-events: none !important;
@@ -679,7 +679,7 @@
         transform: scale(1);
       }
       50% {
-        transform: scale(1.05);
+        transform: scale(1.08);
       }
     }
 
@@ -973,7 +973,7 @@
       bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      background-color: rgba(72,6,7, 1) !important;
+      background-color: var(--primary-overlay) !important;
       z-index: 999999 !important;
       display: flex;
       overflow: hidden !important;
@@ -1295,9 +1295,9 @@
       });
 
       scheduleContainer.innerHTML = scheduleHTML;
-      toggleTodayButton(dayIndex);
+      toggleTodayButton(currentDayIndex);
 
-      if (isToday(dayIndex)) {
+      if (isToday(currentDayIndex)) {
         if (areAllCoursesInThePast(courses)) {
           window.scrollTo({
             top: document.body.scrollHeight,
@@ -1329,29 +1329,32 @@
       const todayIndex = new Date().getDay();
 
       if (currentDayIndex !== todayIndex) {
-        currentDayIndex = todayIndex;
-
-        document.getElementById('loadingOverlay').style.display = 'flex';
-
-        setTimeout(() => {
-          displaySchedule(currentDayIndex);
-          document.getElementById('loadingOverlay').style.display = 'none';
-          
-          // S'assurer qu'il n'y a pas de défilement horizontal
-          window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-          });
-
-          // Mettre à jour la position du bouton today-view après le retour à aujourd'hui
-          updateTodayButtonPosition();
-
-          // Ajouter un délai pour s'assurer que le DOM est complètement chargé
+        // Masquer d'abord le bouton avec animation
+        const todayButton = document.getElementById('todayViewButton');
+        if (todayButton) {
+          todayButton.classList.remove('visible');
           setTimeout(() => {
-            scrollToNextUpcomingCourse();
-          }, 100);
-        }, 500);
+            todayButton.style.display = 'none';
+            // Une fois le bouton masqué, changer la page
+            currentDayIndex = todayIndex;
+            displaySchedule(currentDayIndex);
+            
+            // S'assurer qu'il n'y a pas de défilement horizontal
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+            });
+
+            // Mettre à jour la position du bouton today-view après le retour à aujourd'hui
+            updateTodayButtonPosition();
+
+            // Ajouter un délai pour s'assurer que le DOM est complètement chargé
+            setTimeout(() => {
+              scrollToNextUpcomingCourse();
+            }, 100);
+          }, 300);
+        }
       }
     }
 
@@ -1360,8 +1363,17 @@
       const todayButton = document.getElementById('todayViewButton');
       
       if (dayIndex === todayIndex) {
-        todayButton.style.display = 'none';
-        todayButton.classList.remove('visible');
+        // S'assurer que le bouton est visible avant de le masquer
+        todayButton.style.display = 'block';
+        todayButton.classList.add('visible');
+        
+        // Attendre le prochain frame pour l'animation de disparition
+        requestAnimationFrame(() => {
+          todayButton.classList.remove('visible');
+          setTimeout(() => {
+            todayButton.style.display = 'none';
+          }, 300);
+        });
       } else {
         todayButton.style.display = 'block';
         // Attendre le prochain frame pour calculer la position
@@ -1468,12 +1480,6 @@
       }
     }
 
-    function getWeekNumber(date) {
-      const firstJan = new Date(date.getFullYear(), 0, 1);
-      const days = Math.floor((date - firstJan) / (24 * 60 * 60 * 1000));
-      return Math.ceil((days + firstJan.getDay() + 1) / 7);
-    }
-
     const noCourseMessages = [
       "Profitez de cette journée pour vous reposer et reprendre des forces ! Nous vous attendons demain pour un entraînement intense. 💪",
       "Prenez soin de vous aujourd'hui, et retrouvez-nous dès demain pour continuer vos objectifs !",
@@ -1556,69 +1562,6 @@
           }
         }
       });
-    }
-
-    // Fonction pour vérifier l'état des cours
-    function checkCourseStates() {
-      const currentTime = new Date();
-      const timelineBlocks = document.querySelectorAll('.timeline-block');
-      
-      timelineBlocks.forEach(block => {
-        const courseStartTime = new Date(block.dataset.startTime);
-        const courseEndTime = new Date(block.dataset.endTime);
-        
-        // Vérifier si le cours est en cours
-        if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
-          if (!block.classList.contains('current')) {
-            block.classList.add('current', 'focus');
-            block.classList.remove('starting-soon', 'past');
-          }
-        }
-        // Vérifier si le cours est à venir dans 15 minutes
-        else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15 * 60 * 1000) {
-          if (!block.classList.contains('starting-soon')) {
-            block.classList.add('starting-soon', 'focus');
-            block.classList.remove('current', 'past');
-          }
-        }
-        // Vérifier si le cours est passé
-        else if (currentTime > courseEndTime) {
-          if (!block.classList.contains('past')) {
-            block.classList.add('past');
-            block.classList.remove('current', 'starting-soon', 'focus');
-          }
-        }
-      });
-    }
-
-    // Fonction pour rafraîchir l'affichage
-    function refreshSchedule() {
-      const today = new Date();
-      const currentDay = today.getDay();
-      
-      // Vérifier si c'est aujourd'hui
-      if (currentDay === currentDayIndex) {
-        // Utiliser requestAnimationFrame pour les mises à jour visuelles
-        requestAnimationFrame(() => {
-          // Mettre à jour la date
-          const dateElement = document.querySelector('.date');
-          if (dateElement) {
-            dateElement.textContent = formatDate(today);
-          }
-          
-          // Vérifier les états des cours
-          checkCourseStates();
-        });
-      }
-    }
-
-    // Rafraîchir toutes les minutes
-    setInterval(() => {
-      requestAnimationFrame(refreshSchedule);
-    }, 60000);
-
-    function formatDate(date) {
-      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
     }
 
     function initializePage() {
