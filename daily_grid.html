@@ -434,7 +434,7 @@
     async function loadAndDisplayCourses() {
       try {
         console.log('Début du chargement des données...');
-        const response = await fetch('planning-v2.json');
+        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
         allData = await response.json();
         console.log('Données chargées avec succès:', allData);
         console.log('Structure des données de planning:', Object.keys(allData.planning));
