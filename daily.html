@@ -397,6 +397,7 @@
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: none; /* Caché par défaut */
     }
 
     .navigation.loaded {
@@ -626,6 +627,17 @@
         max-height: 80px;
         height: auto;
       }
+
+      .navigation {
+        display: flex;
+      }
+
+      .weekly-view-button {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+      }
     }
 
     .coach-images {
@@ -672,6 +684,7 @@
       -webkit-user-select: none;
       user-select: none;
       pointer-events: none;
+      display: none;
     }
 
     @keyframes subtle-zoom {
@@ -740,7 +753,7 @@
       user-select: none;
       pointer-events: none;
       animation: none;
-      display: none; /* Caché par défaut */
+      display: none;
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.3s ease, transform 0.3s ease;
@@ -1113,6 +1126,36 @@
     }
 
     function handleResize() {
+      const isMobile = window.innerWidth <= 1024;
+      const weeklyButton = document.querySelector('.weekly-view-button');
+      const todayButton = document.querySelector('.today-view-button');
+      const navigation = document.querySelector('.navigation');
+      
+      if (isMobile) {
+        if (weeklyButton) {
+          weeklyButton.style.display = 'block';
+          weeklyButton.classList.add('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'block';
+        }
+        if (navigation) {
+          navigation.style.display = 'flex';
+        }
+      } else {
+        if (weeklyButton) {
+          weeklyButton.style.display = 'none';
+          weeklyButton.classList.remove('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'none';
+          todayButton.classList.remove('visible');
+        }
+        if (navigation) {
+          navigation.style.display = 'none';
+        }
+      }
+      
       updateTodayButtonPosition();
     }
 
@@ -1120,28 +1163,30 @@
       const loadingOverlay = document.getElementById('loadingOverlay');
       const modalContainer = document.querySelector('.modal-center-container');
 
-      // Masquer le conteneur modal immédiatement
       if (modalContainer) {
         modalContainer.style.display = 'none';
       }
 
-      // Ajouter la classe fade-out à l'overlay
       loadingOverlay.classList.add('fade-out');
 
-      // Afficher les boutons de navigation et weekly view immédiatement
+      const isMobile = window.innerWidth <= 1024;
       const navigation = document.querySelector('.navigation');
       const weeklyButton = document.querySelector('.weekly-view-button');
       
-      if (navigation) navigation.classList.add('loaded');
-      if (weeklyButton) weeklyButton.classList.add('loaded');
+      if (isMobile) {
+        if (navigation) navigation.classList.add('loaded');
+        if (weeklyButton) {
+          weeklyButton.classList.add('loaded');
+          weeklyButton.style.opacity = '1';
+          weeklyButton.style.transform = 'translateY(0)';
+          weeklyButton.style.pointerEvents = 'all';
+        }
+      }
 
-      // Retirer la classe loading du body immédiatement
       document.body.classList.remove('loading');
 
-      // Mettre à jour la position du bouton today-view
       updateTodayButtonPosition();
 
-      // Masquer l'overlay après une courte transition
       setTimeout(() => {
         loadingOverlay.style.display = 'none';
       }, 300);
@@ -1565,33 +1610,22 @@
     }
 
     function initializePage() {
-      // Ajouter la classe loading au body
       document.body.classList.add('loading');
       
-      // Masquer le bouton today-view au démarrage
       const todayButton = document.getElementById('todayViewButton');
       if (todayButton) {
         todayButton.style.display = 'none';
         todayButton.classList.remove('visible');
       }
       
-      // Afficher l'overlay de chargement
       const loadingOverlay = document.getElementById('loadingOverlay');
       if (loadingOverlay) {
         loadingOverlay.style.display = 'flex';
       }
 
-      // Démarrer le chargement des données
       fetchAllData().then(() => {
-        // Ajouter un écouteur d'événement pour le redimensionnement de la fenêtre
         window.addEventListener('resize', handleResize);
-
-        // Afficher les boutons de navigation et weekly view
-        const navigation = document.querySelector('.navigation');
-        const weeklyButton = document.querySelector('.weekly-view-button');
-        
-        if (navigation) navigation.classList.add('loaded');
-        if (weeklyButton) weeklyButton.classList.add('loaded');
+        handleResize(); // Appel initial pour configurer l'état correct
       });
     }
 
