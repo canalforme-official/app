@@ -93,8 +93,6 @@
       -ms-overflow-style: none;
       touch-action: pan-y;
       overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
@@ -1384,53 +1382,9 @@
       }
     }
 
-    // Gestionnaire de scroll optimisé pour le touch
-    let lastTouchY = 0;
-    let touchStartY = 0;
-    let isScrolling = false;
-    let scrollTimeout;
-
-    function handleTouchStart(e) {
-      touchStartY = e.touches[0].clientY;
-      isScrolling = true;
-    }
-
-    function handleTouchMove(e) {
-      if (!isScrolling) return;
-      
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchY - lastTouchY;
-      lastTouchY = touchY;
-
-      // Annuler le comportement par défaut pour éviter les conflits
-      e.preventDefault();
-
-      // Mettre à jour le rendu pendant le défilement
-      requestAnimationFrame(optimizeRender);
-    }
-
-    function handleTouchEnd() {
-      isScrolling = false;
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        requestAnimationFrame(optimizeRender);
-      }, 100);
-    }
-
-    // Ajouter les écouteurs d'événements touch
-    const contentWrapper = document.querySelector('.content-wrapper');
-    if (contentWrapper) {
-      contentWrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
-      contentWrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
-      contentWrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
-      contentWrapper.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-    }
-
     // Gestionnaire de scroll simplifié
     function handleScroll() {
-      if (!isScrolling) {
-        requestAnimationFrame(optimizeRender);
-      }
+      requestAnimationFrame(optimizeRender);
     }
 
     // Ajouter l'écouteur d'événements avec l'option passive
