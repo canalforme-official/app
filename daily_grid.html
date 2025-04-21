@@ -354,6 +354,90 @@
         box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
       }
     }
+
+    /* Style pour le bouton today-view */
+    .today-view-button {
+      position: fixed;
+      top: 55px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 55px;
+      height: 55px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      animation: none;
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Styles pour les appareils mobiles */
+    @media screen and (max-width: 1024px) {
+      .today-view-button {
+        display: block;
+      }
+    }
+
+    /* Styles pour les écrans plus grands */
+    @media screen and (min-width: 768px) {
+      .today-view-button {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
+
+    .today-view-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .today-view-button::before {
+      content: '';
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .today-view-button button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    @keyframes rotate-icon {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+      50% {
+        transform: rotate(180deg) scale(1.1);
+      }
+      100% {
+        transform: rotate(360deg) scale(1);
+      }
+    }
   </style>
 </head>
 <body>
@@ -376,9 +460,14 @@
       <!-- Les rangées de studios seront générées ici -->
     </div>
 
-    <div class="coaches-section" id="coachesGrid">
-      <!-- Les cartes des coachs seront générées ici -->
+    <div class="coaches-section" id="coachesSection">
+      <!-- Les cartes de coach seront injectées ici -->
     </div>
+  </div>
+
+  <!-- Bouton pour revenir à daily.html -->
+  <div class="today-view-button" id="todayViewButton">
+    <button onclick="returnToDaily()"></button>
   </div>
 
   <script>
@@ -498,7 +587,7 @@
           studiosContainer.appendChild(noCoursesContainer);
           
           document.getElementById('currentDay').textContent = days[currentDate.getDay()].toUpperCase();
-          document.getElementById('coachesGrid').innerHTML = '';
+          document.getElementById('coachesSection').innerHTML = '';
           return;
         }
 
@@ -591,8 +680,8 @@
           .filter(id => id !== undefined))];
         console.log('IDs des coachs uniques:', uniqueCoachIds);
         
-        const coachesGrid = document.getElementById('coachesGrid');
-        coachesGrid.innerHTML = '';
+        const coachesSection = document.getElementById('coachesSection');
+        coachesSection.innerHTML = '';
         
         if (uniqueCoachIds.length > 0) {
           uniqueCoachIds.forEach(coachId => {
@@ -616,7 +705,7 @@
               <div class="coach-name">${coachData.name}</div>
             `;
             
-            coachesGrid.appendChild(coachCard);
+            coachesSection.appendChild(coachCard);
           });
         }
         
@@ -635,6 +724,38 @@
       loadAndDisplayCourses();
     });
     setInterval(loadAndDisplayCourses, 60000);
+
+    // Fonction pour rediriger vers daily.html
+    function returnToDaily() {
+      window.location.href = 'daily.html';
+    }
+
+    // Afficher le bouton après le chargement
+    window.addEventListener('load', function() {
+      const todayButton = document.getElementById('todayViewButton');
+      todayButton.style.display = 'block';
+      setTimeout(() => {
+        todayButton.classList.add('visible');
+      }, 100);
+    });
+
+    function handleResize() {
+      const isMobile = window.innerWidth <= 768;
+      const todayButton = document.querySelector('.today-view-button');
+      
+      if (isMobile) {
+        if (todayButton) {
+          todayButton.style.display = 'block';
+        }
+      } else {
+        if (todayButton) {
+          todayButton.style.display = 'none';
+          todayButton.classList.remove('visible');
+        }
+      }
+      
+      updateTodayButtonPosition();
+    }
   </script>
 </body>
 </html> 
