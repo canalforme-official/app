@@ -583,20 +583,39 @@
         }
 
         /* Animation de chargement */
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(72, 6, 7, 0.4);
+            }
+            70% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 10px rgba(72, 6, 7, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(72, 6, 7, 0);
+            }
         }
 
         .loading {
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.05) 25%, 
-                rgba(255, 255, 255, 0.1) 50%, 
-                rgba(255, 255, 255, 0.05) 75%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
+            animation: pulse 1.5s infinite;
+            background: white;
+            border: 2px solid rgba(72, 6, 7, 0.1);
             position: relative;
             z-index: 2;
+        }
+
+        .loading::after {
+            content: "Mise à jour...";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #480607;
+            font-weight: 600;
+            font-size: 0.9em;
+            opacity: 0.8;
         }
 
         /* Style pour le mode étendu */
