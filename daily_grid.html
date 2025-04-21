@@ -78,7 +78,7 @@
       margin-bottom: 5px;
       position: sticky;
       top: 0;
-      background-color: var(--background-main);
+      background-color: var(--primary-color);
       z-index: 100;
       padding: 2px 0;
     }
@@ -89,7 +89,7 @@
 
     .day-title {
       font-family: var(--font-title);
-      color: var(--primary-color);
+      color: var(--secondary-color);
       font-size: 1.8em;
       text-align: center;
       margin: 0;
@@ -164,11 +164,11 @@
 
     .course-card {
       margin-bottom: 4px;
-      font-size: 1.2em; /* Taille de police augmentée */
+      font-size: 1.2em;
       border-left: none;
       padding: 0;
       width: 95%;
-      line-height: 1.4;
+      line-height: 1.2;
     }
 
     .course-time {
@@ -187,8 +187,8 @@
 
     .course-name {
       font-family: var(--font-title);
-      font-size: 1.3em; /* Taille de police augmentée */
-      margin: 0 0 4px 0;
+      font-size: 1.3em;
+      margin: 0 0 2px 0;
     }
 
     .course-coach {
@@ -226,7 +226,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background-color: var(--background-main);
+      background-color: var(--primary-color);
       z-index: 100;
       height: 52px;
       display: flex;
@@ -256,6 +256,7 @@
       font-family: var(--font-title);
       font-size: 0.8em;
       white-space: nowrap;
+      color: var(--secondary-color);
     }
 
     /* Scrollbar styles */
@@ -446,40 +447,100 @@
     }
 
     /* Ajustements pour les écrans en orientation portrait */
-    @media screen and (min-aspect-ratio: 9/16) {
+    @media screen and (max-width: 768px) {
       .content-wrapper {
-        height: calc(100vh - 80px); /* Ajustement pour les grands écrans */
+        height: calc(100vh - 80px);
       }
 
       .studios-row {
-        gap: 12px; /* Espacement augmenté */
+        gap: 8px;
       }
 
       .course-card {
-        margin-bottom: 8px; /* Espacement augmenté */
-        padding: 4px; /* Padding augmenté */
+        margin-bottom: 6px;
+        padding: 2px;
+        font-size: 1em;
       }
 
       .course-time {
-        font-size: 1.3em; /* Taille de police encore plus grande */
-        padding: 4px 16px; /* Padding encore plus grand */
+        font-size: 0.9em;
+        padding: 2px 8px;
+        min-width: 60px;
       }
 
       .course-name {
-        font-size: 1.5em; /* Taille de police encore plus grande */
+        font-size: 1.1em;
       }
 
       .course-coach {
-        font-size: 1.3em; /* Taille de police encore plus grande */
+        font-size: 0.9em;
       }
 
       .studio-title {
-        font-size: 1.8em; /* Taille de police encore plus grande pour les grands écrans */
-        padding: 8px; /* Padding augmenté pour les grands écrans */
+        font-size: 1.2em;
+        padding: 4px;
       }
 
       .studio-column {
-        padding: 4px; /* Padding augmenté pour les grands écrans */
+        padding: 2px;
+      }
+
+      .coach-image {
+        width: 28px;
+        height: 28px;
+      }
+
+      .coach-name {
+        font-size: 0.7em;
+      }
+    }
+
+    /* Styles pour les écrans plus grands (tablettes et desktop) */
+    @media screen and (min-width: 769px) {
+      .content-wrapper {
+        height: calc(100vh - 80px);
+      }
+
+      .studios-row {
+        gap: 12px;
+      }
+
+      .course-card {
+        margin-bottom: 8px;
+        padding: 4px;
+        font-size: 1.2em;
+      }
+
+      .course-time {
+        font-size: 1.1em;
+        padding: 2px 12px;
+        min-width: 80px;
+      }
+
+      .course-name {
+        font-size: 1.3em;
+      }
+
+      .course-coach {
+        font-size: 1.1em;
+      }
+
+      .studio-title {
+        font-size: 1.4em;
+        padding: 6px;
+      }
+
+      .studio-column {
+        padding: 4px;
+      }
+
+      .coach-image {
+        width: 28px;
+        height: 28px;
+      }
+
+      .coach-name {
+        font-size: 0.75em;
       }
     }
   </style>
