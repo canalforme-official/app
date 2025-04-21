@@ -92,12 +92,6 @@
       scrollbar-width: none;
       -ms-overflow-style: none;
       touch-action: pan-y;
-      -webkit-touch-callout: none;
-      -webkit-user-drag: none;
-      scroll-behavior: smooth;
-      overscroll-behavior: contain;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
@@ -169,6 +163,46 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    /* Style pour le select des coachs */
+    .filters select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: var(--background-card);
+      border: 2px solid var(--secondary-color);
+      border-radius: 3px;
+      padding: 5px 25px 5px 10px;
+      font-size: 0.9em;
+      color: var(--primary-color);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23480607' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+      margin-left: 5px;
+      min-width: 150px;
+    }
+
+    .filters select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .filters select option {
+      background-color: var(--background-card);
+      color: var(--primary-color);
+      padding: 5px;
+    }
+
+    .filters select option:checked {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+
+    .filters select option:hover {
+      background-color: var(--secondary-light);
     }
 
     /* Overlay de chargement */
@@ -370,25 +404,13 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0 auto;
-  table-layout: fixed; /* Assure une largeur égale des colonnes */
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-  overflow-scrolling: touch;
+  table-layout: fixed;
 }
 
 .weekly-schedule th, .weekly-schedule td {
-  padding: 5px; /* Réduction du padding */
+  padding: 5px;
   vertical-align: top;
   border: none;
-  transform: translateZ(0);
-  will-change: transform;
-  touch-action: pan-y;
-  -webkit-touch-callout: none;
-  -webkit-user-drag: none;
 }
 
 /* Ligne des titres avec fond rouge moins transparent et texte blanc */
@@ -494,16 +516,6 @@
     border-bottom: 1px solid var(--shadow-light);
     position: relative;
     padding: 5px;
-    transform: translateZ(0);
-    will-change: transform;
-    touch-action: pan-y;
-    -webkit-touch-callout: none;
-    -webkit-user-drag: none;
-    /* Nouvelles optimisations */
-    contain: content;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    content-visibility: auto;
   }
 
   /* Styles pour les lignes blanches et grises */
@@ -523,19 +535,11 @@
     border: 1px solid var(--shadow-light);
     border-radius: 5px;
     padding: 5px;
-    padding-bottom: 20px; /* Ajout d'un padding en bas pour laisser de l'espace à la pilule */
+    padding-bottom: 20px;
     margin: 2px;
     font-size: 0.9em;
     position: relative;
     padding-right: 45px;
-    touch-action: pan-y;
-    -webkit-touch-callout: none;
-    -webkit-user-drag: none;
-    /* Nouvelles optimisations */
-    contain: content;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    content-visibility: auto;
   }
 
   /* Styles pour les cours mixtes */
@@ -1359,134 +1363,81 @@
     }
 
     // Optimisation du rendu et de la mémoire
-    let visibleElements = new Set();
-    let lastScrollTop = 0;
-    let isScrolling = false;
-    let scrollTimeout;
-    let rafId;
-
     function optimizeRender() {
-      if (!isScrolling) return;
-
+      // Simplification de la fonction pour ne garder que l'essentiel
+      const blocks = document.querySelectorAll('.course-block');
       const viewportHeight = window.innerHeight;
-      const scrollTop = document.querySelector('.content-wrapper').scrollTop;
-      const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
-      lastScrollTop = scrollTop;
 
-      // Annuler l'animation frame précédente si elle existe
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-
-      rafId = requestAnimationFrame(() => {
-        const blocks = document.querySelectorAll('.course-block');
-        const visibleSet = new Set();
-
-        for (const block of blocks) {
-          const rect = block.getBoundingClientRect();
-          const isVisible = rect.top < viewportHeight && rect.bottom > 0;
-          
-          if (isVisible) {
-            visibleSet.add(block);
-            if (!visibleElements.has(block)) {
-              block.style.willChange = 'transform';
-              block.style.transform = 'translateZ(0)';
-              block.style.backfaceVisibility = 'hidden';
-            }
-          } else if (visibleElements.has(block)) {
-            block.style.willChange = 'auto';
-            block.style.transform = 'none';
-            block.style.backfaceVisibility = 'visible';
-          }
+      for (const block of blocks) {
+        const rect = block.getBoundingClientRect();
+        const isVisible = rect.top < viewportHeight && rect.bottom > 0;
+        
+        if (isVisible) {
+          block.style.willChange = 'transform';
+        } else {
+          block.style.willChange = 'auto';
         }
-
-        visibleElements = visibleSet;
-      });
+      }
     }
 
-    // Gestionnaire de scroll optimisé avec debounce
+    // Gestionnaire de scroll simplifié
     function handleScroll() {
-      isScrolling = true;
-      
-      // Annuler le timeout précédent
-      clearTimeout(scrollTimeout);
-      
-      // Optimiser le rendu immédiatement
-      optimizeRender();
-      
-      // Réinitialiser le flag après un court délai
-      scrollTimeout = setTimeout(() => {
-        isScrolling = false;
-        // Dernière optimisation du rendu
-        optimizeRender();
-      }, 100);
+      requestAnimationFrame(optimizeRender);
     }
 
     // Ajouter l'écouteur d'événements avec l'option passive
     document.querySelector('.content-wrapper').addEventListener('scroll', handleScroll, { passive: true });
 
-    // Optimisation de la fonction applyFilters avec debounce
-    let filterTimeout;
+    // Optimisation de la fonction applyFilters
     function applyFilters() {
-      clearTimeout(filterTimeout);
-      filterTimeout = setTimeout(() => {
-        const showMixte = document.getElementById('filter-mixte').checked;
-        const showWomenOnly = document.getElementById('filter-women-only').checked;
-        const showPiscine = document.getElementById('filter-piscine').checked;
-        const showCoachImages = document.getElementById('filter-coach').checked;
-        const selectedCoach = document.getElementById('coachFilter').value;
+      const showMixte = document.getElementById('filter-mixte').checked;
+      const showWomenOnly = document.getElementById('filter-women-only').checked;
+      const showPiscine = document.getElementById('filter-piscine').checked;
+      const showCoachImages = document.getElementById('filter-coach').checked;
+      const selectedCoach = document.getElementById('coachFilter').value;
 
-        requestAnimationFrame(() => {
-          const blocks = document.querySelectorAll('.course-block');
-          const contentWrapper = document.querySelector('.content-wrapper');
+      const blocks = document.querySelectorAll('.course-block');
+      const contentWrapper = document.querySelector('.content-wrapper');
 
-          for (const block of blocks) {
-            const dataCoaches = block.getAttribute('data-coaches') || '';
-            const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
-            const showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
-            const isPiscine = block.classList.contains('piscine');
-            const courseType = block.classList;
-            const showByType = (
-              (courseType.contains('mixte') && showMixte) ||
-              (courseType.contains('women-only') && showWomenOnly)
-            );
+      for (const block of blocks) {
+        const dataCoaches = block.getAttribute('data-coaches') || '';
+        const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
+        const showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
+        const isPiscine = block.classList.contains('piscine');
+        const courseType = block.classList;
+        const showByType = (
+          (courseType.contains('mixte') && showMixte) ||
+          (courseType.contains('women-only') && showWomenOnly)
+        );
 
-            block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
-          }
+        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
+      }
 
-          if (showCoachImages) {
-            contentWrapper.classList.remove('hide-coaches');
-          } else {
-            contentWrapper.classList.add('hide-coaches');
-          }
-        });
-      }, 50);
+      if (showCoachImages) {
+        contentWrapper.classList.remove('hide-coaches');
+      } else {
+        contentWrapper.classList.add('hide-coaches');
+      }
     }
 
-    // Optimisation de la fonction updateCountdownCircles avec debounce
-    let countdownTimeout;
+    // Optimisation de la fonction updateCountdownCircles
     function updateCountdownCircles() {
-      clearTimeout(countdownTimeout);
-      countdownTimeout = setTimeout(() => {
-        requestAnimationFrame(() => {
-          const badges = document.querySelectorAll('.countdown-pill');
-          
-          for (const badge of badges) {
-            const timeDiff = parseInt(badge.getAttribute('data-time-diff'));
+      const badges = document.querySelectorAll('.countdown-pill');
+      
+      for (const badge of badges) {
+        const timeDiff = parseInt(badge.getAttribute('data-time-diff'));
 
-            if (timeDiff >= 0) {
-              const minutes = Math.floor(timeDiff / 60);
-              const seconds = timeDiff % 60;
-              const timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-              badge.textContent = timeString;
-              badge.setAttribute('data-time-diff', timeDiff - 1);
-            } else {
-              badge.parentElement.classList.remove('starting-soon');
-              badge.remove();
-            }
-          }
-        });
-      }, 16); // Environ 60 FPS
+        if (timeDiff >= 0) {
+          const minutes = Math.floor(timeDiff / 60);
+          const seconds = timeDiff % 60;
+          const timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+          badge.textContent = timeString;
+          badge.setAttribute('data-time-diff', timeDiff - 1);
+        } else {
+          badge.parentElement.classList.remove('starting-soon');
+          badge.remove();
+        }
+      }
     }
 
     // Fonction pour générer le planning hebdomadaire
