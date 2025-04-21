@@ -89,8 +89,15 @@
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
       position: relative;
-      scrollbar-width: none; /* Pour Firefox */
-      -ms-overflow-style: none; /* Pour IE et Edge */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      touch-action: pan-y;
+      -webkit-touch-callout: none;
+      -webkit-user-drag: none;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
@@ -194,25 +201,25 @@
 
     @keyframes pulse {
       0% {
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
         opacity: 1;
       }
       50% {
-        transform: scale(1.2);
-        opacity: 0.8;
+        transform: scale(1.02) translateZ(0);
+        opacity: 0.95;
       }
       100% {
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
         opacity: 1;
       }
     }
 
     @keyframes zoomPulse {
-      0%, 80% {
-        transform: translate(-50%, -50%) scale(1);
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1) translateZ(0);
       }
       50% {
-        transform: translate(-50%, -50%) scale(1.1);
+        transform: translate(-50%, -50%) scale(1.02) translateZ(0);
       }
     }
 
@@ -230,11 +237,37 @@
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
-  animation: auraPulse 8s ease-in-out infinite;
-  display: none; /* Caché par défaut */
+  animation: none;
+  display: none;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.today-view-button::before {
+  content: '';
+  position: absolute;
+  width: 55px;
+  height: 55px;
+  background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center;
+  pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  will-change: transform;
+  background-color: transparent;
+}
+
+.today-view-button.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
 }
 
 /* Afficher uniquement sur mobile */
@@ -287,6 +320,7 @@
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   will-change: transform;
+  background-color: transparent;
 }
 
 .today-view-button button {
@@ -321,13 +355,13 @@
 
 @keyframes click-zoom {
   0% {
-    transform: scale(1);
+    transform: scale(1) translateZ(0);
   }
   50% {
-    transform: scale(0.9);
+    transform: scale(0.95) translateZ(0);
   }
   100% {
-    transform: scale(1);
+    transform: scale(1) translateZ(0);
   }
 }
 
@@ -337,12 +371,24 @@
   border-collapse: collapse;
   margin: 0 auto;
   table-layout: fixed; /* Assure une largeur égale des colonnes */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
 }
 
 .weekly-schedule th, .weekly-schedule td {
   padding: 5px; /* Réduction du padding */
   vertical-align: top;
   border: none;
+  transform: translateZ(0);
+  will-change: transform;
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 
 /* Ligne des titres avec fond rouge moins transparent et texte blanc */
@@ -448,6 +494,16 @@
     border-bottom: 1px solid var(--shadow-light);
     position: relative;
     padding: 5px;
+    transform: translateZ(0);
+    will-change: transform;
+    touch-action: pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    /* Nouvelles optimisations */
+    contain: content;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content-visibility: auto;
   }
 
   /* Styles pour les lignes blanches et grises */
@@ -470,7 +526,15 @@
     margin: 2px;
     font-size: 0.9em;
     position: relative;
-    padding-right: 45px; /* Ajouter de l'espace pour le countdown */
+    padding-right: 45px;
+    touch-action: pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    /* Nouvelles optimisations */
+    contain: content;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content-visibility: auto;
   }
 
   /* Styles pour les cours mixtes */
@@ -526,11 +590,20 @@
     color: var(--text-tertiary);
   }
 
-  /* Animation de pulsation */
+  /* Animation de pulsation optimisée */
   @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% { 
+      transform: scale(1) translateZ(0);
+      opacity: 1;
+    }
+    50% { 
+      transform: scale(1.02) translateZ(0);
+      opacity: 0.95;
+    }
+    100% { 
+      transform: scale(1) translateZ(0);
+      opacity: 1;
+    }
   }
 
 /* Styles pour la pilule de compte à rebours */
@@ -958,25 +1031,21 @@
 
   @keyframes rotateAndPulse {
     0% {
-      transform: rotate(-90deg);
+      transform: rotate(-90deg) translateZ(0);
     }
     100% {
-      transform: rotate(0deg);
+      transform: rotate(0deg) translateZ(0);
     }
   }
 
   @keyframes zoom-logo {
-    0% {
-      transform: scale(1);
+    0%, 100% {
+      transform: scale(1) translateZ(0);
       opacity: 0.9;
     }
     50% {
-      transform: scale(1.05);
+      transform: scale(1.05) translateZ(0);
       opacity: 1;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 0.9;
     }
   }
 
@@ -999,13 +1068,13 @@
 
   @keyframes rotate-icon {
     0% {
-      transform: rotate(0deg);
+      transform: rotate(0deg) translateZ(0);
     }
     50% {
-      transform: rotate(180deg);
+      transform: rotate(180deg) translateZ(0);
     }
     100% {
-      transform: rotate(360deg);
+      transform: rotate(360deg) translateZ(0);
     }
   }
 
@@ -1137,8 +1206,18 @@
           if (modalBackdrop && modalContent) {
             modalBackdrop.style.display = 'none';
             modalContent.style.display = 'none';
+            modalBackdrop.style.opacity = '0';
+            modalContent.style.opacity = '0';
           }
+          
+          // Retirer la classe loading du body
           document.body.classList.remove('loading');
+          
+          // S'assurer que l'overlay est bien caché
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+            loadingOverlay.style.opacity = '0';
+          }
 
           // Récupérer la liste unique de coachs et les ajouter dans le select
           let uniqueCoaches = new Set();
@@ -1173,7 +1252,12 @@
 
           // Appliquer les filtres initiaux
           applyFilters();
-          scrollToCurrentTime();
+          
+          // Attendre que le contenu soit complètement chargé avant de faire défiler
+          setTimeout(() => {
+            scrollToCurrentTime();
+          }, 1000);
+          
           updateCountdownCircles();
 
           // Mettre à jour les cercles de compte à rebours toutes les secondes
@@ -1188,6 +1272,19 @@
         }).catch(error => {
           console.error('Erreur lors de la récupération des données :', error);
           document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
+          
+          // En cas d'erreur, s'assurer que l'overlay est caché
+          if (modalBackdrop && modalContent) {
+            modalBackdrop.style.display = 'none';
+            modalContent.style.display = 'none';
+            modalBackdrop.style.opacity = '0';
+            modalContent.style.opacity = '0';
+          }
+          document.body.classList.remove('loading');
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+            loadingOverlay.style.opacity = '0';
+          }
         });
       }, 2000); // Délai de 2 secondes
     }
@@ -1254,26 +1351,148 @@
         });
     }
 
+    // Optimisation du rendu et de la mémoire
+    let visibleElements = new Set();
+    let lastScrollTop = 0;
+    let isScrolling = false;
+    let scrollTimeout;
+    let rafId;
+
+    function optimizeRender() {
+      if (!isScrolling) return;
+
+      const viewportHeight = window.innerHeight;
+      const scrollTop = document.querySelector('.content-wrapper').scrollTop;
+      const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
+      lastScrollTop = scrollTop;
+
+      // Annuler l'animation frame précédente si elle existe
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+
+      rafId = requestAnimationFrame(() => {
+        const blocks = document.querySelectorAll('.course-block');
+        const visibleSet = new Set();
+
+        for (const block of blocks) {
+          const rect = block.getBoundingClientRect();
+          const isVisible = rect.top < viewportHeight && rect.bottom > 0;
+          
+          if (isVisible) {
+            visibleSet.add(block);
+            if (!visibleElements.has(block)) {
+              block.style.willChange = 'transform';
+              block.style.transform = 'translateZ(0)';
+              block.style.backfaceVisibility = 'hidden';
+            }
+          } else if (visibleElements.has(block)) {
+            block.style.willChange = 'auto';
+            block.style.transform = 'none';
+            block.style.backfaceVisibility = 'visible';
+          }
+        }
+
+        visibleElements = visibleSet;
+      });
+    }
+
+    // Gestionnaire de scroll optimisé avec debounce
+    function handleScroll() {
+      isScrolling = true;
+      
+      // Annuler le timeout précédent
+      clearTimeout(scrollTimeout);
+      
+      // Optimiser le rendu immédiatement
+      optimizeRender();
+      
+      // Réinitialiser le flag après un court délai
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        // Dernière optimisation du rendu
+        optimizeRender();
+      }, 100);
+    }
+
+    // Ajouter l'écouteur d'événements avec l'option passive
+    document.querySelector('.content-wrapper').addEventListener('scroll', handleScroll, { passive: true });
+
+    // Optimisation de la fonction applyFilters avec debounce
+    let filterTimeout;
+    function applyFilters() {
+      clearTimeout(filterTimeout);
+      filterTimeout = setTimeout(() => {
+        const showMixte = document.getElementById('filter-mixte').checked;
+        const showWomenOnly = document.getElementById('filter-women-only').checked;
+        const showPiscine = document.getElementById('filter-piscine').checked;
+        const showCoachImages = document.getElementById('filter-coach').checked;
+        const selectedCoach = document.getElementById('coachFilter').value;
+
+        requestAnimationFrame(() => {
+          const blocks = document.querySelectorAll('.course-block');
+          const contentWrapper = document.querySelector('.content-wrapper');
+
+          for (const block of blocks) {
+            const dataCoaches = block.getAttribute('data-coaches') || '';
+            const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
+            const showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
+            const isPiscine = block.classList.contains('piscine');
+            const courseType = block.classList;
+            const showByType = (
+              (courseType.contains('mixte') && showMixte) ||
+              (courseType.contains('women-only') && showWomenOnly)
+            );
+
+            block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
+          }
+
+          if (showCoachImages) {
+            contentWrapper.classList.remove('hide-coaches');
+          } else {
+            contentWrapper.classList.add('hide-coaches');
+          }
+        });
+      }, 50);
+    }
+
+    // Optimisation de la fonction updateCountdownCircles avec debounce
+    let countdownTimeout;
+    function updateCountdownCircles() {
+      clearTimeout(countdownTimeout);
+      countdownTimeout = setTimeout(() => {
+        requestAnimationFrame(() => {
+          const badges = document.querySelectorAll('.countdown-pill');
+          
+          for (const badge of badges) {
+            const timeDiff = parseInt(badge.getAttribute('data-time-diff'));
+
+            if (timeDiff >= 0) {
+              const minutes = Math.floor(timeDiff / 60);
+              const seconds = timeDiff % 60;
+              const timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+              badge.textContent = timeString;
+              badge.setAttribute('data-time-diff', timeDiff - 1);
+            } else {
+              badge.parentElement.classList.remove('starting-soon');
+              badge.remove();
+            }
+          }
+        });
+      }, 16); // Environ 60 FPS
+    }
+
+    // Fonction pour générer le planning hebdomadaire
     function generateWeeklyScheduleHtml() {
       var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
       var todayIndex = new Date().getDay();
       var todayName = weekDays[todayIndex];
 
-      // Logs pour vérifier la structure des données
-      console.group('Génération du planning');
-      console.log('Données reçues:', scheduleData);
-      
       // Récupération des données nécessaires
       const planning = scheduleData.planning;
       const cours = scheduleData.cours;
       const coachs = scheduleData.coachs;
       const studios = scheduleData.studios;
-
-      // Vérification des données
-      console.log('Planning:', planning);
-      console.log('Cours:', cours);
-      console.log('Coachs:', coachs);
-      console.log('Studios:', studios);
 
       // Création d'un objet pour stocker les cours par jour et heure
       var scheduleByTimeAndDay = {};
@@ -1318,10 +1537,6 @@
           });
         });
       });
-
-      // Logs pour vérifier la structure générée
-      console.log('Structure générée:', scheduleByTimeAndDay);
-      console.groupEnd();
 
       var daysWithCourses = new Set();
       var timesWithCourses = new Set();
@@ -1399,7 +1614,7 @@
                                   '<span>' + course.coachs[0].name + '</span></div>';
               } else if (course.coachs.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
-                var coachImages = course.coachs.map(coach => coach.imageUrl).filter(Boolean); // Filtrer les images non vides
+                var coachImages = course.coachs.map(coach => coach.imageUrl).filter(Boolean);
                 coachImages.forEach(function(coachImageUrl, index) {
                   coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
                 });
@@ -1421,39 +1636,25 @@
               var now = new Date();
               var courseDate = new Date();
               
-              // Vérification et parsing sécurisé de l'heure
               var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
               var startHour = parseInt(startTimeParts[0]) || 0;
               var startMinute = parseInt(startTimeParts[1]) || 0;
               
-              // Calculer le jour de la semaine actuel (0-6, Dimanche = 0)
               var currentDay = now.getDay();
               var targetDay = weekDays.indexOf(day);
               
-              // Calculer la différence de jours
               var dayDiff = targetDay - currentDay;
               if (dayDiff < 0) {
-                dayDiff += 7; // Si le jour cible est dans la semaine suivante
+                dayDiff += 7;
               }
               
-              // Définir la date du cours avec les heures et minutes exactes
               courseDate.setDate(now.getDate() + dayDiff);
               courseDate.setHours(startHour, startMinute, 0, 0);
               
-              // Calculer la différence de temps en secondes
               var timeDifference = Math.floor((courseDate - now) / 1000);
               
-              // Vérifier si le cours commence dans les 15 prochaines minutes
               var isStartingSoon = timeDifference >= 0 && timeDifference <= 900;
-              
-              // Vérifier si le cours est en cours
               var isInProgress = timeDifference < 0 && timeDifference > -course.duration * 60;
-              
-              // Ajouter des logs pour le débogage
-              console.log('Cours:', course.courseName, 'Heure:', course.startTime);
-              console.log('Différence de temps:', timeDifference, 'secondes');
-              console.log('Commence bientôt:', isStartingSoon);
-              console.log('En cours:', isInProgress);
               
               if (isStartingSoon) {
                 courseClasses += ' starting-soon';
@@ -1463,7 +1664,6 @@
 
               courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '">';
 
-              // Ajouter le cercle de compte à rebours si le cours commence bientôt
               if (isStartingSoon) {
                 courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
               }
@@ -1486,126 +1686,60 @@
       return html;
     }
 
-    
-    function applyFilters() {
-      // Obtenir l'état des filtres de type de cours
-      let showMixte = document.getElementById('filter-mixte').checked;
-      let showWomenOnly = document.getElementById('filter-women-only').checked;
-      let showPiscine = document.getElementById('filter-piscine').checked;
-
-      // Obtenir l'état du filtre Coach
-      let showCoachImages = document.getElementById('filter-coach').checked;
-
-      // Obtenir le coach sélectionné dans la liste déroulante
-      let selectedCoach = document.getElementById('coachFilter').value;
-
-      // Parcourir tous les blocs de cours pour appliquer les filtres
-      document.querySelectorAll('.course-block').forEach(block => {
-        // Récupérer les coachs associés au bloc
-        let dataCoaches = block.getAttribute('data-coaches') || '';
-        let courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
-
-        // Déterminer si le bloc doit être affiché selon le coach sélectionné
-        let showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
-
-        // Déterminer si le cours est en piscine
-        let isPiscine = block.classList.contains('piscine');
-
-        // Déterminer si le bloc doit être affiché selon le type de cours
-        let courseType = block.classList;
-        let showByType = (
-          (courseType.contains('mixte') && showMixte) ||
-          (courseType.contains('women-only') && showWomenOnly)
-        );
-
-        // Afficher le bloc seulement si :
-        // 1. Le filtre de coach est valide ET
-        // 2. Le filtre de type est valide ET
-        // 3. Si c'est un cours en piscine, le filtre piscine doit être coché
-        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
-      });
-
-      // Ajouter ou supprimer la classe 'hide-coaches' sur le conteneur principal
-      let contentWrapper = document.querySelector('.content-wrapper');
-      if (showCoachImages) {
-        contentWrapper.classList.remove('hide-coaches');
-      } else {
-        contentWrapper.classList.add('hide-coaches');
-      }
-    }
-
-    // Fonction pour mettre à jour les pastilles de compte à rebours en mm:ss
-    function updateCountdownCircles() {
-      var countdownBadges = document.querySelectorAll('.countdown-pill');
-
-      countdownBadges.forEach(function(badge) {
-        var timeDiff = parseInt(badge.getAttribute('data-time-diff'));
-
-        if (timeDiff >= 0) {
-          // Calcul des minutes et des secondes
-          var minutes = Math.floor(timeDiff / 60);
-          var seconds = timeDiff % 60;
-
-          // Format mm:ss
-          var timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-
-          badge.textContent = timeString;
-
-          // Décrémente le temps restant de 1 seconde
-          badge.setAttribute('data-time-diff', timeDiff - 1);
-        } else {
-          // Retirer la pastille si le temps est écoulé
-          badge.parentElement.classList.remove('starting-soon');
-          badge.remove();
-        }
-      });
-    }
-
-    // Fonction pour scroller automatiquement vers l'heure actuelle
+    // Optimisation de la fonction scrollToCurrentTime
     function scrollToCurrentTime() {
-      var now = new Date();
-      var currentHour = now.getHours();
-      var currentMinutes = now.getMinutes();
+      // Attendre que le DOM soit complètement chargé
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          const contentWrapper = document.querySelector('.content-wrapper');
+          if (!contentWrapper) return;
 
-      // Sélectionne toutes les cellules de temps
-      var times = document.querySelectorAll('.time-cell');
+          // Recherche d'abord un cours en cours
+          let targetRow = document.querySelector('.course-block.current')?.closest('tr');
+          
+          // Si aucun cours en cours, cherche un cours qui va bientôt commencer
+          if (!targetRow) {
+            targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
+          }
+          
+          // Si toujours rien, cherche la ligne de l'heure actuelle
+          if (!targetRow) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+            const times = document.querySelectorAll('.time-cell');
+            
+            for (let i = 0; i < times.length; i++) {
+              const timeText = times[i].textContent.trim();
+              const [hour, minute] = timeText.split(':').map(Number);
+              
+              if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+                targetRow = times[i].parentElement;
+                break;
+              }
+            }
+          }
 
-      // Détermine la ligne cible à faire défiler
-      var targetRow = null;
-
-      for (var i = 0; i < times.length; i++) {
-        var timeText = times[i].textContent.trim();
-        var [hour, minute] = timeText.split(':').map(Number);
-
-        // Vérifie si l'heure est égale ou supérieure à l'heure actuelle
-        if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
-          targetRow = times[i].parentElement;
-          break;
-        }
-      }
-
-      if (targetRow) {
-        // Sélectionne le conteneur scrollable
-        var contentWrapper = document.querySelector('.content-wrapper');
-
-        // Obtenir la hauteur du bloc "Planning Hebdomadaire" (H1 + filtres)
-        var headerWrapper = document.querySelector('.header-wrapper');
-        var headerHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
-
-        // Obtenir la hauteur de la ligne des jours (thead)
-        var thead = document.querySelector('.weekly-schedule thead');
-        var theadHeight = thead ? thead.offsetHeight : 0;
-
-        // Calcul de la position cible : ajout de la hauteur du header + thead
-        var targetPosition = targetRow.offsetTop - headerHeight + (2 * theadHeight) + 4; // Ajouter pour descendre plus ajout manuel 3achwa2iy
-        
-
-        // Appliquer le défilement manuel
-        contentWrapper.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
+          if (targetRow) {
+            const headerWrapper = document.querySelector('.header-wrapper');
+            const thead = document.querySelector('.weekly-schedule thead');
+            
+            const headerHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
+            const theadHeight = thead ? thead.offsetHeight : 0;
+            
+            // Calcul de la position avec un petit décalage pour une meilleure visibilité
+            const targetPosition = targetRow.offsetTop - headerHeight - theadHeight - 10;
+            
+            // Forcer le défilement avec un délai supplémentaire
+            setTimeout(() => {
+              contentWrapper.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }, 100);
+          }
         });
-      }
+      }, 500); // Délai initial pour s'assurer que le contenu est chargé
     }
 
     // Exécute la fonction de scroll à chaque 15 minutes (900 000 ms)
