@@ -237,10 +237,21 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.today-view-button.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: all;
+/* Afficher uniquement sur mobile */
+@media screen and (max-width: 1024px) {
+  .today-view-button {
+    display: block;
+  }
+}
+
+/* Masquer explicitement sur les écrans plus grands */
+@media screen and (min-width: 1025px) {
+  .today-view-button {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
 }
 
 .today-view-button::before {
