@@ -92,6 +92,9 @@
       scrollbar-width: none;
       -ms-overflow-style: none;
       touch-action: pan-y;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
@@ -1364,7 +1367,6 @@
 
     // Optimisation du rendu et de la mémoire
     function optimizeRender() {
-      // Simplification de la fonction pour ne garder que l'essentiel
       const blocks = document.querySelectorAll('.course-block');
       const viewportHeight = window.innerHeight;
 
@@ -1374,15 +1376,61 @@
         
         if (isVisible) {
           block.style.willChange = 'transform';
+          block.style.transform = 'translateZ(0)';
         } else {
           block.style.willChange = 'auto';
+          block.style.transform = 'none';
         }
       }
     }
 
+    // Gestionnaire de scroll optimisé pour le touch
+    let lastTouchY = 0;
+    let touchStartY = 0;
+    let isScrolling = false;
+    let scrollTimeout;
+
+    function handleTouchStart(e) {
+      touchStartY = e.touches[0].clientY;
+      isScrolling = true;
+    }
+
+    function handleTouchMove(e) {
+      if (!isScrolling) return;
+      
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchY - lastTouchY;
+      lastTouchY = touchY;
+
+      // Annuler le comportement par défaut pour éviter les conflits
+      e.preventDefault();
+
+      // Mettre à jour le rendu pendant le défilement
+      requestAnimationFrame(optimizeRender);
+    }
+
+    function handleTouchEnd() {
+      isScrolling = false;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        requestAnimationFrame(optimizeRender);
+      }, 100);
+    }
+
+    // Ajouter les écouteurs d'événements touch
+    const contentWrapper = document.querySelector('.content-wrapper');
+    if (contentWrapper) {
+      contentWrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
+      contentWrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
+      contentWrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+      contentWrapper.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+    }
+
     // Gestionnaire de scroll simplifié
     function handleScroll() {
-      requestAnimationFrame(optimizeRender);
+      if (!isScrolling) {
+        requestAnimationFrame(optimizeRender);
+      }
     }
 
     // Ajouter l'écouteur d'événements avec l'option passive
@@ -1772,59 +1820,73 @@
       const courseBlocks = document.querySelectorAll('.course-block');
       
       courseBlocks.forEach(block => {
-        // Récupérer les informations du cours
-        const dayCell = block.closest('tr').querySelector('th');
-        const dayName = dayCell.textContent.trim();
-        
-        // Ne vérifier que les cours du jour actuel
-        if (dayName === currentDayName) {
-          const timeCell = block.closest('tr').querySelector('.time-cell');
-          const startTime = timeCell.textContent.trim();
-          const [startHour, startMinute] = startTime.split(':').map(Number);
-          const startTimeInMinutes = startHour * 60 + startMinute;
+        try {
+          // Vérifier si le block existe
+          if (!block) return;
+
+          // Récupérer les informations du cours avec vérification de nullité
+          const dayCell = block.closest('tr')?.querySelector('th');
+          if (!dayCell) return;
+
+          const dayName = dayCell.textContent?.trim();
+          if (!dayName) return;
           
-          // Calculer la différence de temps
-          const timeDifference = startTimeInMinutes - currentTimeInMinutes;
-          
-          // Vérifier si le cours est en cours ou sur le point de démarrer
-          const isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
-          const isInProgress = timeDifference < 0 && timeDifference > -60; // Supposons une durée maximale de 60 minutes
-          
-          // Mettre à jour les classes en conséquence
-          if (isStartingSoon) {
-            block.classList.add('starting-soon');
-            block.classList.remove('current');
-            // Ajouter ou mettre à jour la pilule de compte à rebours
-            let countdownPill = block.querySelector('.countdown-pill');
-            if (!countdownPill) {
-              countdownPill = document.createElement('div');
-              countdownPill.className = 'countdown-pill starting-soon';
-              block.insertBefore(countdownPill, block.firstChild);
-            }
-            countdownPill.setAttribute('data-time-diff', timeDifference * 60);
-          } else if (isInProgress) {
-            block.classList.add('current');
-            block.classList.remove('starting-soon');
-            // Supprimer la pilule de compte à rebours si elle existe
-            const countdownPill = block.querySelector('.countdown-pill');
-            if (countdownPill) {
-              countdownPill.remove();
+          // Ne vérifier que les cours du jour actuel
+          if (dayName === currentDayName) {
+            const timeCell = block.closest('tr')?.querySelector('.time-cell');
+            if (!timeCell) return;
+
+            const startTime = timeCell.textContent?.trim();
+            if (!startTime) return;
+
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const startTimeInMinutes = startHour * 60 + startMinute;
+            
+            // Calculer la différence de temps
+            const timeDifference = startTimeInMinutes - currentTimeInMinutes;
+            
+            // Vérifier si le cours est en cours ou sur le point de démarrer
+            const isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
+            const isInProgress = timeDifference < 0 && timeDifference > -60;
+            
+            // Mettre à jour les classes en conséquence
+            if (isStartingSoon) {
+              block.classList.add('starting-soon');
+              block.classList.remove('current');
+              // Ajouter ou mettre à jour la pilule de compte à rebours
+              let countdownPill = block.querySelector('.countdown-pill');
+              if (!countdownPill) {
+                countdownPill = document.createElement('div');
+                countdownPill.className = 'countdown-pill starting-soon';
+                block.insertBefore(countdownPill, block.firstChild);
+              }
+              countdownPill.setAttribute('data-time-diff', timeDifference * 60);
+            } else if (isInProgress) {
+              block.classList.add('current');
+              block.classList.remove('starting-soon');
+              // Supprimer la pilule de compte à rebours si elle existe
+              const countdownPill = block.querySelector('.countdown-pill');
+              if (countdownPill) {
+                countdownPill.remove();
+              }
+            } else {
+              block.classList.remove('starting-soon', 'current');
+              // Supprimer la pilule de compte à rebours si elle existe
+              const countdownPill = block.querySelector('.countdown-pill');
+              if (countdownPill) {
+                countdownPill.remove();
+              }
             }
           } else {
+            // Pour les autres jours, supprimer toutes les animations
             block.classList.remove('starting-soon', 'current');
-            // Supprimer la pilule de compte à rebours si elle existe
             const countdownPill = block.querySelector('.countdown-pill');
             if (countdownPill) {
               countdownPill.remove();
             }
           }
-        } else {
-          // Pour les autres jours, supprimer toutes les animations
-          block.classList.remove('starting-soon', 'current');
-          const countdownPill = block.querySelector('.countdown-pill');
-          if (countdownPill) {
-            countdownPill.remove();
-          }
+        } catch (error) {
+          console.error('Erreur lors de la vérification de l\'état du cours:', error);
         }
       });
     }
