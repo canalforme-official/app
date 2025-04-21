@@ -245,12 +245,28 @@
 }
 
 /* Masquer explicitement sur les écrans plus grands */
-@media screen and (min-width: 1025px) {
+@media screen and (min-width: 768px) {
   .today-view-button {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+  }
+}
+
+/* Styles spécifiques pour les appareils mobiles avec rotation */
+@media screen and (max-width: 767px) {
+  .today-view-button {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    position: fixed !important;
+    bottom: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
   }
 }
 
@@ -748,18 +764,6 @@
       font-size: 0.5em;
       top: -8px;
       right: -8px;
-    }
-
-    /* Placer le bouton de retour à la vue quotidienne en bas à droite */
-    .today-view-button {
-      display: flex !important;
-      position: fixed !important;
-      bottom: 10px !important;
-      right: 10px !important;
-      left: auto !important;
-      top: auto !important;
-      transform: none !important;
-      pointer-events: auto !important;
     }
 
     /* Styles pour les filtres en vue mobile */
