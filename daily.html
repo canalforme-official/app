@@ -643,25 +643,35 @@
     .coach-images {
       display: flex;
       flex-wrap: wrap;
-      gap: 0px;
+      gap: 5px;
+      align-items: center;
     }
 
     .coach-item {
       display: flex;
       align-items: center;
+    }
+
+    .coach-item.single {
       margin-right: 10px;
     }
 
     .coach-photo {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       margin-right: 5px;
     }
 
+    .coach-photo.multiple {
+      width: 35px;
+      height: 35px;
+      margin-right: 0;
+    }
+
     .course-coach img {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       vertical-align: middle;
       margin-right: 10px;
@@ -1263,10 +1273,11 @@
 
       courses.forEach(course => {
         const cours = allData.cours.find(c => c.id === course.coursId);
-        const coach = allData.coachs.find(c => c.id === course.coachIds[0]);
+        const coachs = course.coachIds.map(coachId => allData.coachs.find(c => c.id === coachId)).filter(Boolean);
+        const isMultipleCoachs = coachs.length > 1;
         const studio = allData.studios.find(s => s.id === course.studioId);
 
-        if (!cours || !coach || !studio) {
+        if (!cours || !coachs.length) {
           console.error('Données manquantes pour le cours:', course);
           return;
         }
@@ -1309,6 +1320,15 @@
           courseStatusClass = 'upcoming';
         }
 
+        const coachImagesHTML = coachs.map(coach => `
+          <div class="coach-item ${isMultipleCoachs ? '' : 'single'}">
+            <img class="coach-photo ${isMultipleCoachs ? 'multiple' : ''}" 
+                 src="${coach.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png'}" 
+                 alt="${coach.name}">
+            ${!isMultipleCoachs ? `<span>${coach.name}</span>` : ''}
+          </div>
+        `).join('');
+
         scheduleHTML += `
           <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}" data-start-time="${course.startTime}" data-end-time="${course.endTime}">
             <div class="time">${course.startTime} - ${course.endTime}</div>
@@ -1321,10 +1341,7 @@
               </div>
               <div class="course-coach">
                 <div class="coach-images">
-                  <div class="coach-item">
-                    <img class="coach-photo" src="${coach.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png'}" alt="${coach.name}">
-                    <span>${coach.name}</span>
-                  </div>
+                  ${coachImagesHTML}
                 </div>
               </div>
               <div class="course-studio">
@@ -1406,6 +1423,10 @@
     function toggleTodayButton(dayIndex) {
       const todayIndex = new Date().getDay();
       const todayButton = document.getElementById('todayViewButton');
+      const scheduleContainer = document.getElementById('timeline');
+      
+      // Vérifier si on est sur un jour sans cours
+      const isNoCourses = scheduleContainer.classList.contains('no-courses');
       
       if (dayIndex === todayIndex) {
         // S'assurer que le bouton est visible avant de le masquer
@@ -1420,6 +1441,7 @@
           }, 300);
         });
       } else {
+        // Afficher le bouton si on est sur un jour différent ou s'il n'y a pas de cours
         todayButton.style.display = 'block';
         // Attendre le prochain frame pour calculer la position
         requestAnimationFrame(() => {
