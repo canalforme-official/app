@@ -2081,13 +2081,14 @@
         handleMouseDown(e.touches[0]);
       }, { passive: false });
 
-      document.addEventListener('touchmove', (e) => {
+      touchArea.addEventListener('touchmove', (e) => {
         e.preventDefault();
         handleMouseMove(e.touches[0]);
       }, { passive: false });
 
-      document.addEventListener('touchend', handleMouseUp, { passive: true });
+      touchArea.addEventListener('touchend', handleMouseUp, { passive: true });
 
+      // Événements pour la souris
       touchArea.addEventListener('mousedown', handleMouseDown);
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
