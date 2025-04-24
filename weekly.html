@@ -1103,7 +1103,8 @@
   .custom-scrollbar {
     position: fixed;
     right: 20px;
-    top: 120px;
+    top: 50%;
+    transform: translateY(-50%);
     height: calc(100% - 200px);
     width: 50px;
     z-index: 1000;
@@ -1165,10 +1166,10 @@
   @media screen and (max-width: 767px) {
     .custom-scrollbar {
       right: 20px;
-      top: 120px;
+      top: 50%;
+      transform: translateY(-50%);
       height: calc(100% - 200px);
       width: 50px;
-      transform: none !important;
     }
 
     .scrollbar-track {
