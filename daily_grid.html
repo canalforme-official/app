@@ -103,7 +103,7 @@
       flex: 1;
       min-height: 0;
       margin-bottom: 52px;
-      height: calc(100vh - 60px); /* Hauteur totale moins le header et le footer */
+      height: calc(100vh - 60px);
     }
 
     .studios-container {
@@ -111,16 +111,17 @@
       flex-direction: column;
       gap: 8px;
       flex: 1;
-      overflow-y: auto;
       height: 100%;
+      overflow: hidden;
     }
 
     .studios-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      height: 50%; /* Chaque rangée prend 50% de la hauteur */
-      min-height: 0; /* Permet le redimensionnement */
+      height: 50%;
+      min-height: 0;
+      border: none;
     }
 
     .studio-column {
@@ -132,7 +133,8 @@
       padding: 2px;
       height: 100%;
       overflow: hidden;
-      border-right: none; /* Suppression de la bordure verticale */
+      border: none;
+      box-shadow: none;
     }
 
     .studio-title {
@@ -153,47 +155,54 @@
 
     .courses-container {
       flex: 1;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding-top: 3px;
       min-height: 0;
-      height: calc(100% - 30px); /* Hauteur totale moins le titre */
+      height: calc(100% - 30px);
+      overflow-y: auto;
+      scrollbar-width: none; /* Pour Firefox */
+      -ms-overflow-style: none; /* Pour IE et Edge */
+    }
+
+    .courses-container::-webkit-scrollbar {
+      display: none; /* Pour Chrome, Safari et Opera */
     }
 
     .course-card {
       margin-bottom: 4px;
       font-size: 1.2em;
-      border-left: none;
+      border: none;
       padding: 0;
       width: 95%;
       line-height: 1.2;
+      flex-shrink: 0;
     }
 
     .course-time {
       font-family: var(--font-title);
       color: white;
-      font-size: 1.1em; /* Taille de police augmentée */
+      font-size: 1.1em;
       font-weight: 500;
       background-color: var(--primary-lighter);
-      padding: 2px 12px; /* Padding augmenté */
+      padding: 2px 16px;
       border-radius: 3px;
       display: inline-block;
       margin-bottom: 4px;
-      min-width: 80px; /* Largeur minimale augmentée */
+      min-width: 100px;
       text-align: center;
     }
 
     .course-name {
       font-family: var(--font-title);
       font-size: 1.3em;
-      margin: 0 0 2px 0;
+      margin: 0 0 -1px 0;
     }
 
     .course-coach {
       color: var(--text-secondary);
-      font-size: 1.1em; /* Taille de police augmentée */
+      font-size: 1.1em;
       font-style: italic;
     }
 
@@ -464,8 +473,8 @@
 
       .course-time {
         font-size: 0.9em;
-        padding: 2px 8px;
-        min-width: 60px;
+        padding: 2px 12px;
+        min-width: 80px;
       }
 
       .course-name {
@@ -502,19 +511,38 @@
       }
 
       .studios-row {
-        gap: 12px;
+        height: 50%;
+        border: none;
+      }
+
+      .studio-column {
+        border: none;
+        box-shadow: none;
+        padding: 2px;
+      }
+
+      .courses-container {
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .courses-container::-webkit-scrollbar {
+        display: none;
       }
 
       .course-card {
-        margin-bottom: 8px;
-        padding: 4px;
+        margin-bottom: 6px;
+        padding: 2px;
         font-size: 1.2em;
+        border: none;
+        flex-shrink: 0;
       }
 
       .course-time {
         font-size: 1.1em;
-        padding: 2px 12px;
-        min-width: 80px;
+        padding: 2px 16px;
+        min-width: 100px;
       }
 
       .course-name {
@@ -527,11 +555,8 @@
 
       .studio-title {
         font-size: 1.4em;
-        padding: 6px;
-      }
-
-      .studio-column {
         padding: 4px;
+        border-bottom: 1px solid var(--primary-color);
       }
 
       .coach-image {
