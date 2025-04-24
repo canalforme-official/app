@@ -1105,7 +1105,7 @@
     right: 20px;
     top: 120px;
     height: calc(100% - 200px);
-    width: 30px;
+    width: 50px;
     z-index: 1000;
     pointer-events: auto;
     opacity: 1;
@@ -1114,9 +1114,10 @@
   .scrollbar-track {
     position: absolute;
     right: 0;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 4px;
-    height: 100%;
+    height: 60%;
     background-color: var(--primary-lighter);
     box-shadow: 0 0 8px var(--primary-lighter);
     border-radius: 2px;
@@ -1152,12 +1153,12 @@
 
   .scrollbar-touch-area {
     position: absolute;
-    right: -13px;
-    width: 30px;
+    right: -20px;
+    width: 50px;
     height: 100%;
     cursor: pointer;
     background-color: transparent;
-    border-radius: 15px;
+    border-radius: 25px;
   }
 
   /* Ajustement pour la rotation mobile */
@@ -1166,14 +1167,17 @@
       right: 20px;
       top: 120px;
       height: calc(100% - 200px);
-      width: 30px;
+      width: 50px;
       transform: none !important;
     }
 
     .scrollbar-track {
       width: 4px;
       opacity: 0.3;
-      display: block; /* S'assurer que le track est visible sur mobile */
+      display: block;
+      height: 60%;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     .scrollbar-thumb {
@@ -1189,8 +1193,8 @@
     }
 
     .scrollbar-touch-area {
-      right: -13px;
-      width: 30px;
+      right: -20px;
+      width: 50px;
     }
   }
 
@@ -1962,6 +1966,11 @@
       let isDragging = false;
       let startX;
       let startScrollTop;
+      let lastTouchY;
+      let velocity = 0;
+      let lastTime = 0;
+      let animationFrame;
+      let isScrolling = false;
 
       function updateScrollbar() {
         const contentWrapper = document.querySelector('.content-wrapper');
@@ -1986,6 +1995,15 @@
         isDragging = true;
         startX = e.clientX;
         startScrollTop = document.querySelector('.content-wrapper').scrollTop;
+        lastTouchY = e.clientY;
+        lastTime = performance.now();
+        velocity = 0;
+        isScrolling = false;
+        
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+        }
+        
         thumb.style.backgroundColor = 'var(--secondary-color)';
         thumb.style.boxShadow = '0 0 12px var(--secondary-color)';
         thumb.style.width = '6px';
@@ -1997,12 +2015,24 @@
         
         const contentWrapper = document.querySelector('.content-wrapper');
         const deltaX = e.clientX - startX;
+        const currentTime = performance.now();
+        const deltaTime = currentTime - lastTime;
+        
+        if (deltaTime > 0) {
+          const currentTouchY = e.clientY;
+          const deltaY = currentTouchY - lastTouchY;
+          velocity = deltaY / deltaTime;
+          lastTouchY = currentTouchY;
+          lastTime = currentTime;
+        }
+        
         const scrollHeight = contentWrapper.scrollHeight;
         const clientHeight = contentWrapper.clientHeight;
         
-        // Inversion du sens : mouvement vers la droite = défilement vers le bas
-        const newScrollTop = startScrollTop - (deltaX * scrollHeight / clientHeight);
+        // Inversion du sens : mouvement vers la droite = défilement vers le haut
+        const newScrollTop = startScrollTop + (deltaX * scrollHeight / clientHeight);
         contentWrapper.scrollTop = newScrollTop;
+        isScrolling = true;
       }
 
       function handleMouseUp() {
@@ -2011,20 +2041,52 @@
         thumb.style.boxShadow = '0 0 8px var(--primary-color)';
         thumb.style.width = '4px';
         thumb.style.right = '0';
+        
+        if (isScrolling && Math.abs(velocity) > 0.1) {
+          const contentWrapper = document.querySelector('.content-wrapper');
+          let currentScrollTop = contentWrapper.scrollTop;
+          const scrollHeight = contentWrapper.scrollHeight;
+          const clientHeight = contentWrapper.clientHeight;
+          const maxScroll = scrollHeight - clientHeight;
+          
+          function animateScroll() {
+            if (Math.abs(velocity) < 0.1) {
+              cancelAnimationFrame(animationFrame);
+              return;
+            }
+            
+            velocity *= 0.95; // Réduction progressive de la vitesse
+            currentScrollTop += velocity * 1000;
+            
+            // Limiter le défilement aux limites
+            if (currentScrollTop < 0) {
+              currentScrollTop = 0;
+              velocity = 0;
+            } else if (currentScrollTop > maxScroll) {
+              currentScrollTop = maxScroll;
+              velocity = 0;
+            }
+            
+            contentWrapper.scrollTop = currentScrollTop;
+            animationFrame = requestAnimationFrame(animateScroll);
+          }
+          
+          animationFrame = requestAnimationFrame(animateScroll);
+        }
       }
 
-      // Ajout des événements touch pour mobile
+      // Ajout des événements touch pour mobile avec support du momentum
       touchArea.addEventListener('touchstart', (e) => {
         e.preventDefault();
         handleMouseDown(e.touches[0]);
-      });
+      }, { passive: false });
 
       document.addEventListener('touchmove', (e) => {
         e.preventDefault();
         handleMouseMove(e.touches[0]);
-      });
+      }, { passive: false });
 
-      document.addEventListener('touchend', handleMouseUp);
+      document.addEventListener('touchend', handleMouseUp, { passive: true });
 
       touchArea.addEventListener('mousedown', handleMouseDown);
       document.addEventListener('mousemove', handleMouseMove);
