@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progression des MEPS</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background-color: #333;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 100%;
+      background-color: #444;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #32CD32, #00FF7F);
+      width: 0;
+      transition: width 1.5s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Flash effect */
+    .progress-bar-fill::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      animation: shine 2s linear infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        left: -50%;
+      }
+      100% {
+        left: 100%;
+      }
+    }
+
+    .progress-info {
+      position: fixed;
+      top: 10px; /* Juste en dessous de la barre */
+      text-align: right;
+      font-size: 0.6em;
+      color: #fff;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar-container">
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-bar-fill"></div>
+    </div>
+  </div>
+  <div id="progressInfo" class="progress-info">0% (0 / 120,000)</div>
+
+  <script>
+    // Charger les données JSON depuis le fichier
+    fetch('./leaderboard.json')
+      .then(response => response.json())
+      .then(data => {
+        const maleMEPs = data.current.total_meps_by_gender.male || 0;
+        const femaleMEPs = data.current.total_meps_by_gender.female || 0;
+        const totalMEPs = maleMEPs + femaleMEPs;
+        const goalMEPs = 120000; // Objectif total
+        const percentage = Math.min((totalMEPs / goalMEPs) * 100, 100); // Calcul du pourcentage
+
+        // Mettre à jour la barre et le texte
+        const progressFill = document.getElementById('progressFill');
+        const progressInfo = document.getElementById('progressInfo');
+        const remainingMEPs = goalMEPs - totalMEPs;
+
+        setTimeout(() => {
+          progressFill.style.width = `${percentage}%`;
+          progressInfo.innerHTML = `<strong>${percentage.toFixed(0)}%</strong> - ${remainingMEPs.toLocaleString('fr-FR')} MEPS restants pour atteindre l'objectif`;
+        }, 100);
+      })
+      .catch(error => {
+        console.error("Erreur lors du chargement des données JSON :", error);
+      });
+  </script>
+</body>
+</html>
