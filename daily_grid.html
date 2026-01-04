@@ -64,7 +64,7 @@
       color: var(--text-primary);
       margin: 0;
       padding: 5px;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -123,7 +123,7 @@
       flex: 1;
       min-height: 0;
       margin-bottom: 52px;
-      height: calc(100vh - 60px);
+      min-height: calc(100vh - 60px);
     }
 
     .studios-container {
@@ -236,11 +236,37 @@
 
     .no-courses-message {
       color: var(--text-secondary);
-      font-size: 1.2em;
+      font-size: 1.4em;
       font-style: italic;
       text-align: center;
       margin-top: 40px;
       width: 100%;
+      line-height: 1.5;
+      position: relative;
+      padding: 0 20px;
+    }
+
+    .no-courses-message::before,
+    .no-courses-message::after {
+      content: '';
+      position: absolute;
+      font-size: 2.5em;
+      color: var(--secondary-color);
+      font-weight: bold;
+      line-height: 0;
+      opacity: 0.8;
+    }
+
+    .no-courses-message::before {
+      content: '«';
+      left: -10px;
+      top: -10px;
+    }
+
+    .no-courses-message::after {
+      content: '»';
+      right: -10px;
+      bottom: -10px;
     }
 
     .women-only .course-time {
@@ -921,8 +947,16 @@
           const messageP = document.createElement('p');
           messageP.className = 'no-courses-message';
           messageP.style.fontStyle = 'italic';
-          messageP.style.fontSize = '1.2em';
-          messageP.textContent = `« ${message} »`;
+          messageP.style.fontSize = '1.4em';
+          messageP.style.color = 'var(--text-secondary)';
+          messageP.style.textAlign = 'center';
+          messageP.style.marginTop = '20px';
+          messageP.style.width = '100%';
+          messageP.style.lineHeight = '1.5';
+          messageP.textContent = message;
+          
+          console.log('Message créé:', message);
+          console.log('Texte du messageP:', messageP.textContent);
           
           // Assembler le tout
           noCoursesContainer.appendChild(img);
@@ -931,6 +965,8 @@
           
           console.log('Conteneur no-courses créé et ajouté au DOM');
           console.log('Image src:', img.src);
+          console.log('Message texte:', messageP.textContent);
+          console.log('Nombre d\'enfants dans noCoursesContainer:', noCoursesContainer.children.length);
           console.log('Nombre d\'enfants dans studiosContainer:', studiosContainer.children.length);
           
           updateDayTitle();
