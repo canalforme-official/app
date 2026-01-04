@@ -880,28 +880,36 @@
         // Si aucun cours pour ce jour
         if (todaysCourses.length === 0) {
           console.log('Aucun cours trouvé pour ce jour');
-          const { message, image } = getNoCourseMessage();
-          
-          // Utiliser innerHTML comme pour les coachs (plus fiable pour le chargement)
-          const noCoursesContainer = document.createElement('div');
-          noCoursesContainer.className = 'no-courses-container';
-          noCoursesContainer.style.textAlign = 'center';
-          noCoursesContainer.style.padding = '20px';
-          
-          // Image avec onerror handler comme pour les coachs
-          const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-          noCoursesContainer.innerHTML = `
-            <img src="${image}" alt="Image de repos" 
-                 style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;"
-                 onerror="this.src='${defaultImage}'">
-            <p class="no-courses-message" style="font-style: italic; font-size: 1.2em;">« ${message} »</p>
-          `;
-          
-          studiosContainer.appendChild(noCoursesContainer);
-          
-          updateDayTitle();
-          document.getElementById('coachesSection').innerHTML = '';
-          return;
+          try {
+            const { message, image } = getNoCourseMessage();
+            console.log('Message et image récupérés:', message, image);
+            
+            // Utiliser innerHTML comme pour les coachs (plus fiable pour le chargement)
+            const noCoursesContainer = document.createElement('div');
+            noCoursesContainer.className = 'no-courses-container';
+            noCoursesContainer.style.textAlign = 'center';
+            noCoursesContainer.style.padding = '20px';
+            
+            // Image avec onerror handler comme pour les coachs
+            const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
+            noCoursesContainer.innerHTML = `
+              <img src="${image}" alt="Image de repos" 
+                   style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;"
+                   onerror="this.src='${defaultImage}'">
+              <p class="no-courses-message" style="font-style: italic; font-size: 1.2em;">« ${message} »</p>
+            `;
+            
+            studiosContainer.appendChild(noCoursesContainer);
+            console.log('Conteneur no-courses ajouté au DOM');
+            
+            updateDayTitle();
+            document.getElementById('coachesSection').innerHTML = '';
+            return;
+          } catch (err) {
+            console.error('Erreur lors de la création du conteneur no-courses:', err);
+            console.error('Message d\'erreur:', err?.message || err?.toString());
+            throw err; // Re-lancer pour être capturé par le catch principal
+          }
         }
 
         // Trier les studios par rang (utiliser 'rang' ou 'rank' selon ce qui existe)
