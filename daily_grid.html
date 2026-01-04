@@ -242,6 +242,31 @@
       margin-top: 40px;
       width: 100%;
       line-height: 1.5;
+      position: relative;
+      padding: 0 20px;
+    }
+
+    .no-courses-message::before,
+    .no-courses-message::after {
+      content: '';
+      position: absolute;
+      font-size: 2.5em;
+      color: var(--secondary-color);
+      font-weight: bold;
+      line-height: 0;
+      opacity: 0.8;
+    }
+
+    .no-courses-message::before {
+      content: '«';
+      left: 0;
+      top: 0.2em;
+    }
+
+    .no-courses-message::after {
+      content: '»';
+      right: 0;
+      top: 0.2em;
     }
 
     .women-only .course-time {
@@ -928,7 +953,7 @@
           messageP.style.marginTop = '20px';
           messageP.style.width = '100%';
           messageP.style.lineHeight = '1.5';
-          messageP.textContent = `« ${message} »`;
+          messageP.textContent = message;
           
           console.log('Message créé:', message);
           console.log('Texte du messageP:', messageP.textContent);
