@@ -876,27 +876,21 @@
           console.log('Aucun cours trouvé pour ce jour');
           const { message, image } = getNoCourseMessage();
           
+          // Utiliser innerHTML comme pour les coachs (plus fiable pour le chargement)
           const noCoursesContainer = document.createElement('div');
           noCoursesContainer.className = 'no-courses-container';
           noCoursesContainer.style.textAlign = 'center';
           noCoursesContainer.style.padding = '20px';
           
-          const noCoursesImage = document.createElement('img');
-          noCoursesImage.src = image;
-          noCoursesImage.alt = 'Image de repos';
-          noCoursesImage.style.maxWidth = '100%';
-          noCoursesImage.style.height = 'auto';
-          noCoursesImage.style.marginBottom = '20px';
-          noCoursesImage.style.borderRadius = '10px';
+          // Image avec onerror handler comme pour les coachs
+          const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
+          noCoursesContainer.innerHTML = `
+            <img src="${image}" alt="Image de repos" 
+                 style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;"
+                 onerror="this.src='${defaultImage}'">
+            <p class="no-courses-message" style="font-style: italic; font-size: 1.2em;">« ${message} »</p>
+          `;
           
-          const noCoursesMessage = document.createElement('p');
-          noCoursesMessage.className = 'no-courses-message';
-          noCoursesMessage.style.fontStyle = 'italic';
-          noCoursesMessage.style.fontSize = '1.2em';
-          noCoursesMessage.textContent = `« ${message} »`;
-          
-          noCoursesContainer.appendChild(noCoursesImage);
-          noCoursesContainer.appendChild(noCoursesMessage);
           studiosContainer.appendChild(noCoursesContainer);
           
           updateDayTitle();
@@ -1048,7 +1042,8 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // Fonction pour initialiser la page
+    function initializePage() {
       // Afficher les boutons de navigation (seulement sur desktop)
       const isMobile = window.innerWidth <= 768;
       const navigation = document.querySelector('.navigation');
@@ -1058,8 +1053,28 @@
         navigation.style.display = 'none';
       }
       
-      loadAndDisplayCourses();
+      // Charger les cours
+      if (typeof loadAndDisplayCourses === 'function') {
+        loadAndDisplayCourses();
+      }
+    }
+    
+    // Appeler dès que possible (si le DOM est déjà chargé)
+    if (document.readyState === 'loading') {
+      // Le DOM est encore en cours de chargement
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      // Le DOM est déjà chargé
+      initializePage();
+    }
+    
+    // Aussi appeler au chargement complet de la page (pour être sûr)
+    window.addEventListener('load', function() {
+      if (typeof loadAndDisplayCourses === 'function') {
+        loadAndDisplayCourses();
+      }
     });
+    
     setInterval(loadAndDisplayCourses, 60000);
 
     // Fonction pour rediriger vers daily.html
