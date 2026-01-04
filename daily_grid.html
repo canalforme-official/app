@@ -880,24 +880,58 @@
         // Si aucun cours pour ce jour
         if (todaysCourses.length === 0) {
           console.log('Aucun cours trouvé pour ce jour');
-          const { message, image } = getNoCourseMessage();
           
-          // Utiliser innerHTML comme pour les coachs (plus fiable pour le chargement)
+          // Récupérer message et image de manière synchrone et simple
+          let message, image;
+          try {
+            const result = getNoCourseMessage();
+            message = result.message;
+            image = result.image;
+            console.log('Message et image récupérés:', message, image);
+          } catch (err) {
+            console.error('Erreur getNoCourseMessage:', err);
+            // Fallback si getNoCourseMessage échoue
+            message = 'Profitez de votre journée de repos !';
+            image = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/70a8506a-23ce-3fc3-0e6d-2bc78a5b13d6.png';
+          }
+          
+          // Créer le conteneur de manière simple et directe
           const noCoursesContainer = document.createElement('div');
           noCoursesContainer.className = 'no-courses-container';
           noCoursesContainer.style.textAlign = 'center';
           noCoursesContainer.style.padding = '20px';
           
-          // Image avec onerror handler comme pour les coachs
-          const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-          noCoursesContainer.innerHTML = `
-            <img src="${image}" alt="Image de repos" 
-                 style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;"
-                 onerror="this.src='${defaultImage}'">
-            <p class="no-courses-message" style="font-style: italic; font-size: 1.2em;">« ${message} »</p>
-          `;
+          // Créer l'image de manière explicite (pas innerHTML)
+          const img = document.createElement('img');
+          img.src = image;
+          img.alt = 'Image de repos';
+          img.style.maxWidth = '100%';
+          img.style.height = 'auto';
+          img.style.marginBottom = '20px';
+          img.style.borderRadius = '10px';
           
+          // Fallback si l'image ne charge pas
+          const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
+          img.onerror = function() {
+            console.log('Image principale échouée, utilisation du fallback');
+            this.src = defaultImage;
+          };
+          
+          // Créer le message
+          const messageP = document.createElement('p');
+          messageP.className = 'no-courses-message';
+          messageP.style.fontStyle = 'italic';
+          messageP.style.fontSize = '1.2em';
+          messageP.textContent = `« ${message} »`;
+          
+          // Assembler le tout
+          noCoursesContainer.appendChild(img);
+          noCoursesContainer.appendChild(messageP);
           studiosContainer.appendChild(noCoursesContainer);
+          
+          console.log('Conteneur no-courses créé et ajouté au DOM');
+          console.log('Image src:', img.src);
+          console.log('Nombre d\'enfants dans studiosContainer:', studiosContainer.children.length);
           
           updateDayTitle();
           document.getElementById('coachesSection').innerHTML = '';
