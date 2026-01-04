@@ -1042,7 +1042,8 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // Fonction pour initialiser la page
+    function initializePage() {
       // Afficher les boutons de navigation (seulement sur desktop)
       const isMobile = window.innerWidth <= 768;
       const navigation = document.querySelector('.navigation');
@@ -1052,8 +1053,28 @@
         navigation.style.display = 'none';
       }
       
-      loadAndDisplayCourses();
+      // Charger les cours
+      if (typeof loadAndDisplayCourses === 'function') {
+        loadAndDisplayCourses();
+      }
+    }
+    
+    // Appeler dès que possible (si le DOM est déjà chargé)
+    if (document.readyState === 'loading') {
+      // Le DOM est encore en cours de chargement
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      // Le DOM est déjà chargé
+      initializePage();
+    }
+    
+    // Aussi appeler au chargement complet de la page (pour être sûr)
+    window.addEventListener('load', function() {
+      if (typeof loadAndDisplayCourses === 'function') {
+        loadAndDisplayCourses();
+      }
     });
+    
     setInterval(loadAndDisplayCourses, 60000);
 
     // Fonction pour rediriger vers daily.html
