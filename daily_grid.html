@@ -131,9 +131,8 @@
       flex-direction: column;
       gap: 8px;
       flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
+      height: 100%;
+      overflow: hidden;
     }
 
     .studios-row {
@@ -237,11 +236,12 @@
 
     .no-courses-message {
       color: var(--text-secondary);
-      font-size: 1.2em;
+      font-size: 1.4em;
       font-style: italic;
       text-align: center;
       margin-top: 40px;
       width: 100%;
+      line-height: 1.5;
     }
 
     .women-only .course-time {
@@ -922,11 +922,12 @@
           const messageP = document.createElement('p');
           messageP.className = 'no-courses-message';
           messageP.style.fontStyle = 'italic';
-          messageP.style.fontSize = '1.2em';
+          messageP.style.fontSize = '1.4em';
           messageP.style.color = 'var(--text-secondary)';
           messageP.style.textAlign = 'center';
           messageP.style.marginTop = '20px';
           messageP.style.width = '100%';
+          messageP.style.lineHeight = '1.5';
           messageP.textContent = `« ${message} »`;
           
           console.log('Message créé:', message);
