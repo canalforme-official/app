@@ -69,6 +69,8 @@
       flex-direction: column;
       overflow-y: auto;
       box-sizing: border-box;
+      position: relative;
+      padding-bottom: 52px;
     }
 
     .header {
@@ -133,6 +135,11 @@
       flex: 1;
       height: 100%;
       overflow: hidden;
+      position: relative;
+    }
+    
+    .no-courses-container {
+      overflow: visible;
     }
 
     .studios-row {
@@ -240,10 +247,13 @@
       font-style: italic;
       text-align: center;
       margin-top: 40px;
-      width: 100%;
       line-height: 1.5;
       position: relative;
-      padding: 0 20px;
+      padding: 20px 30px;
+      display: block;
+      min-height: 80px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .no-courses-message::before,
@@ -253,8 +263,9 @@
       font-size: 2.5em;
       color: var(--secondary-color);
       font-weight: bold;
-      line-height: 0;
+      line-height: 1;
       opacity: 0.8;
+      z-index: 1;
     }
 
     .no-courses-message::before {
@@ -267,6 +278,8 @@
       content: '»';
       right: -10px;
       bottom: -10px;
+      top: auto;
+      line-height: 0;
     }
 
     .women-only .course-time {
