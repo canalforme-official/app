@@ -723,10 +723,31 @@
 
   <div class="header">
     <h1 class="day-title" id="currentDay">
-      <span class="day-name" id="dayName">LUNDI</span>
-      <span class="day-date" id="dayDate">03 JANVIER</span>
+      <span class="day-name" id="dayName"></span>
+      <span class="day-date" id="dayDate"></span>
     </h1>
   </div>
+
+  <!-- Script inline pour initialiser la date immédiatement -->
+  <script>
+    (function() {
+      const today = new Date();
+      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
+      
+      const dayName = document.getElementById('dayName');
+      const dayDate = document.getElementById('dayDate');
+      
+      if (dayName) {
+        dayName.textContent = days[today.getDay()].toUpperCase();
+      }
+      if (dayDate) {
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = months[today.getMonth()];
+        dayDate.textContent = `${day} ${month}`;
+      }
+    })();
+  </script>
 
   <div class="content-wrapper">
     <div class="studios-container" id="studiosContainer">
