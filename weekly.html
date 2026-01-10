@@ -258,16 +258,16 @@
       }
     }
 
-/* Style pour le bouton today-view */
+/* Style pour le bouton de retour à la vue quotidienne */
 .today-view-button {
   position: fixed;
-  bottom: 10px;
+  top: 55px;
   right: 10px;
   z-index: 1000;
   background: none;
   padding: 0;
-  width: 60px;
-  height: 60px;
+  width: 55px;
+  height: 55px;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
@@ -279,27 +279,75 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.today-view-button::before {
+  content: '';
+  position: absolute;
+  width: 55px;
+  height: 55px;
+  background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center;
+  pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  will-change: transform;
+  background-color: transparent;
+}
+
 .today-view-button.visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: all;
 }
 
+/* Afficher uniquement sur mobile */
+@media screen and (max-width: 1024px) {
+  .today-view-button {
+    display: block;
+  }
+}
+
+/* Masquer explicitement sur les écrans plus grands */
+@media screen and (min-width: 768px) {
+  .today-view-button {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* Styles spécifiques pour les appareils mobiles avec rotation */
+@media screen and (max-width: 767px) {
+  .today-view-button {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    position: fixed !important;
+    bottom: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+  }
+}
+
 .today-view-button::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(45deg, 
-    var(--primary-color) 0%, 
-    var(--primary-color) 50%, 
-    var(--secondary-color) 50%, 
-    var(--secondary-color) 100%);
-  border-radius: 8px;
-  animation: today-rotate 3s ease-in-out infinite;
-  transform: translate(-50%, -50%);
+  width: 55px;
+  height: 55px;
+  background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   transform-origin: center;
   pointer-events: none;
   backface-visibility: hidden;
@@ -307,48 +355,7 @@
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   will-change: transform;
-}
-
-/* Point central du bouton today */
-.today-view-button::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  background-color: var(--text-light);
-  border-radius: 50%;
-  animation: today-pulse-dot 2s ease-in-out infinite;
-  transform: translate(-50%, -50%);
-  transform-origin: center;
-  pointer-events: none;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* Animation pour le bouton today - Option B: Carré avec dégradé */
-@keyframes today-rotate {
-  0%, 100% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  50% {
-    transform: translate(-50%, -50%) rotate(180deg);
-  }
-}
-
-@keyframes today-pulse-dot {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.9;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.3);
-    opacity: 1;
-  }
+  background-color: transparent;
 }
 
 .today-view-button button {
@@ -367,6 +374,30 @@
   user-select: none;
   outline: none;
   pointer-events: all;
+}
+
+/* Suppression des styles hover qui créent l'effet de sélection */
+.today-view-button:hover {
+  transform: none;
+  background: none;
+  box-shadow: none;
+}
+
+/* Animation de zoom au clic */
+.today-view-button:active::before {
+  animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes click-zoom {
+  0% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(0.95) translateZ(0);
+  }
+  100% {
+    transform: scale(1) translateZ(0);
+  }
 }
 
 /* Styles pour le tableau du planning hebdomadaire */
@@ -1657,7 +1688,7 @@
                 courseClasses += ' mixte';
               }
 
-              if (course.studio.toLowerCase().includes('piscine') || course.studio.toLowerCase().includes('aqua')) {
+              if (course.studio === 'Piscine') {
                 courseClasses += ' piscine';
               }
 
