@@ -25,6 +25,22 @@
       --primary-color: #480607;
       --secondary-color: #FFA630;
       
+      /* Dégradé rouge-bordeaux (3 niveaux) */
+      --red-center: #e42218;
+      --red-middle: #981010;
+      --bordeaux-dark: #4c000a;
+      --gradient-primary: radial-gradient(circle, var(--red-center) 0%, var(--red-middle) 50%, var(--bordeaux-dark) 100%);
+      
+      /* Dégradé piscine/aqua (bleu uniquement) */
+      --pool-blue: #35767c;
+      --pool-middle: #42464d;
+      --gradient-pool: radial-gradient(circle, var(--pool-blue) 0%, var(--pool-middle) 100%);
+      
+      /* Dégradé femmes uniquement (violet uniquement) */
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --gradient-women: radial-gradient(circle, var(--women-light) 0%, var(--women-middle) 100%);
+      
       /* Couleurs spécifiques */
       --women-color: #E4A672;
       --pool-color: #78D1B6;
@@ -80,7 +96,7 @@
       margin-bottom: 5px;
       position: sticky;
       top: 0;
-      background-color: var(--primary-color);
+      background: var(--gradient-primary);
       z-index: 100;
       padding: 2px 0;
     }
@@ -91,7 +107,7 @@
 
     .day-title {
       font-family: var(--font-title);
-      color: var(--secondary-color);
+      color: var(--text-light);
       font-size: 1.8em;
       text-align: center;
       margin: 0;
@@ -109,14 +125,14 @@
 
     .day-date {
       font-family: var(--font-title);
-      color: var(--secondary-lighter);
+      color: var(--text-light);
       font-size: 0.6em;
       font-weight: 300;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       line-height: 1.3;
       margin-top: 3px;
-      opacity: 0.9;
+      opacity: 0.85;
     }
 
     .content-wrapper {
@@ -179,6 +195,17 @@
       z-index: 1;
       order: -1;
       text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .studio-icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
     }
 
     .courses-container {
@@ -213,7 +240,7 @@
       color: white;
       font-size: 1.1em;
       font-weight: 500;
-      background-color: var(--primary-lighter);
+      background: var(--gradient-primary);
       padding: 2px 16px;
       border-radius: 3px;
       display: inline-block;
@@ -283,11 +310,11 @@
     }
 
     .women-only .course-time {
-      background-color: var(--women-color);
+      background: var(--gradient-women);
     }
 
     .pool .course-time {
-      background-color: var(--pool-color);
+      background: var(--gradient-pool);
     }
 
     .coaches-section {
@@ -295,27 +322,30 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background-color: var(--primary-color);
+      background: var(--gradient-primary);
       z-index: 100;
       height: 52px;
       display: flex;
       overflow-x: auto;
-      gap: 10px;
-      border-top: 1px solid var(--primary-lighter);
-      padding: 0 8px;
+      gap: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0 16px;
       align-items: center;
+      justify-content: center;
     }
 
     .coach-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 2px;
       min-width: fit-content;
     }
 
     .coach-image {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       object-fit: cover;
       background-color: var(--background-card);
@@ -323,10 +353,12 @@
 
     .coach-name {
       font-family: var(--font-text);
-      font-size: 0.8em;
+      font-size: 0.65em;
       white-space: nowrap;
-      color: var(--secondary-color);
+      color: var(--text-light);
       font-style: italic;
+      line-height: 1;
+      text-align: center;
     }
 
     /* Scrollbar styles */
@@ -651,6 +683,12 @@
       .studio-title {
         font-size: 1.2em;
         padding: 4px;
+        gap: 10px;
+      }
+
+      .studio-icon {
+        width: 28px;
+        height: 28px;
       }
 
       .studio-column {
@@ -663,7 +701,7 @@
       }
 
       .coach-name {
-        font-size: 0.7em;
+        font-size: 0.6em;
       }
 
       .day-title {
@@ -730,6 +768,12 @@
         font-size: 1.4em;
         padding: 4px;
         border-bottom: 1px solid var(--primary-color);
+        gap: 12px;
+      }
+
+      .studio-icon {
+        width: 32px;
+        height: 32px;
       }
 
       .coach-image {
@@ -738,7 +782,7 @@
       }
 
       .coach-name {
-        font-size: 0.75em;
+        font-size: 0.65em;
       }
     }
   </style>
@@ -1019,7 +1063,24 @@
             
             const studioTitle = document.createElement('h2');
             studioTitle.className = 'studio-title';
-            studioTitle.textContent = studio.name;
+            
+            // Ajouter l'icône du studio si elle existe
+            if (studio.imageUrl) {
+              const studioIcon = document.createElement('img');
+              studioIcon.className = 'studio-icon';
+              studioIcon.src = studio.imageUrl;
+              studioIcon.alt = `${studio.name} icon`;
+              studioIcon.onerror = function() {
+                // Si l'image ne charge pas, la masquer
+                this.style.display = 'none';
+              };
+              studioTitle.appendChild(studioIcon);
+            }
+            
+            // Ajouter le texte du nom du studio
+            const studioNameText = document.createElement('span');
+            studioNameText.textContent = studio.name;
+            studioTitle.appendChild(studioNameText);
             
             const coursesContainer = document.createElement('div');
             coursesContainer.className = 'courses-container';
@@ -1067,7 +1128,7 @@
                 if (course.type.toLowerCase().includes('femme')) {
                   courseCard.classList.add('women-only');
                 }
-                if (studio.name.toLowerCase().includes('piscine')) {
+                if (studio.name.toLowerCase().includes('piscine') || studio.name.toLowerCase().includes('aqua')) {
                   courseCard.classList.add('pool');
                 }
                 
