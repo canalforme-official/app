@@ -235,6 +235,7 @@
       max-width: 180px;
       max-height: 70px;
       object-fit: contain;
+      margin-bottom: 12px;
     }
 
     /* Styles pour le type de cours */
@@ -352,8 +353,18 @@
     }
 
     .course-studio {
-      font-size: 0.9em;
-      color: var(--text-tertiary);
+      position: absolute;
+      bottom: 0;
+      right: 10px;
+      z-index: 10;
+    }
+
+    .course-studio img {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      margin: 0;
+      display: block;
     }
 
     /* Styles pour le compte à rebours */
@@ -618,8 +629,9 @@
         font-size: 0.9em;
       }
 
-      .course-studio {
-        font-size: 0.7em;
+      .course-studio img {
+        width: 56px;
+        height: 56px;
       }
 
       .logo img {
@@ -1292,8 +1304,8 @@
           courseTypeClass = 'mixte';
         }
 
-        // Studio "Piscine"
-        if (studio.name === 'Piscine') {
+        // Studio "Piscine" ou "AQUA"
+        if (studio.name.toLowerCase().includes('piscine') || studio.name.toLowerCase().includes('aqua')) {
           courseTypeClass += ' piscine';
         }
 
@@ -1333,6 +1345,11 @@
           <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}" data-start-time="${course.startTime}" data-end-time="${course.endTime}">
             <div class="time">${course.startTime} - ${course.endTime}</div>
             <div class="course-block ${courseTypeClass} ${courseStatusClass}" id="${courseStatusClass.includes('focus') ? 'focus-course' : ''}">
+              <div class="course-studio">
+                ${studio.imageUrl 
+                  ? `<img src="${studio.imageUrl}" alt="${studio.name}">`
+                  : ''}
+              </div>
               <div class="course-type">${courseTypeText}</div>
               <div class="course-title">
                 ${cours.logo 
@@ -1343,12 +1360,6 @@
                 <div class="coach-images">
                   ${coachImagesHTML}
                 </div>
-              </div>
-              <div class="course-studio">
-                ${studio.imageUrl 
-                  ? `<img src="${studio.imageUrl}" alt="${studio.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">`
-                  : ''}
-                ${studio.name}
               </div>
               ${courseStatusClass.includes('starting-soon') ? `<div class="countdown" data-start-time="${course.startTime}"></div>` : ''}
             </div>
