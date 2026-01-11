@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Planning du jour</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -79,14 +79,17 @@
       background-color: var(--background-main);
       color: var(--text-primary);
       margin: 0;
-      padding: 5px;
+      padding: 0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      overflow-x: hidden;
       box-sizing: border-box;
       position: relative;
       padding-bottom: 52px;
+      width: 100%;
+      max-width: 100vw;
     }
 
     .header {
@@ -94,11 +97,20 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 5px;
+      margin-top: 0;
+      margin-left: 0;
+      margin-right: 0;
       position: sticky;
       top: 0;
+      left: 0;
+      right: 0;
+      width: 100vw;
+      max-width: 100vw;
       background: var(--gradient-primary);
       z-index: 100;
       padding: 8px 16px;
+      padding-top: 8px;
+      box-sizing: border-box;
     }
 
     .nav-button {
@@ -150,6 +162,9 @@
       min-height: 0;
       margin-bottom: 52px;
       min-height: calc(100vh - 60px);
+      padding-left: 5px;
+      padding-right: 5px;
+      box-sizing: border-box;
     }
 
     .studios-container {
@@ -252,7 +267,7 @@
       padding: 2px 16px;
       border-radius: 3px;
       display: inline-block;
-      margin-bottom: 4px;
+      margin-bottom: 1px;
       min-width: 100px;
       text-align: center;
     }
@@ -260,7 +275,7 @@
     .course-name {
       font-family: var(--font-title);
       font-size: 1.3em;
-      margin: 0 0 -1px 0;
+      margin: 0 0 -3px 0;
     }
 
     .course-coach {
@@ -335,7 +350,7 @@
       height: 52px;
       display: flex;
       overflow-x: auto;
-      gap: 24px;
+      gap: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.2);
       padding: 0 16px;
       align-items: center;
@@ -496,21 +511,7 @@
       visibility: hidden;
     }
 
-    /* Cacher les boutons de navigation sur mobile */
-    @media screen and (max-width: 768px) {
-      .navigation {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-    }
-
-    @media screen and (min-width: 768px) {
-      .navigation {
-        display: none;
-      }
-    }
+    /* Les boutons sont gérés par JavaScript selon le contexte */
 
     @keyframes auraPulse {
       0%, 100% {
@@ -530,13 +531,13 @@
     /* Style pour le bouton today-view */
     .today-view-button {
       position: fixed;
-      top: 55px;
+      bottom: 70px;
       right: 10px;
       z-index: 1000;
       background: none;
       padding: 0;
-      width: 60px;
-      height: 60px;
+      width: 55px;
+      height: 55px;
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
@@ -557,18 +558,13 @@
     .today-view-button::before {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(45deg, 
-        var(--primary-color) 0%, 
-        var(--primary-color) 50%, 
-        var(--secondary-color) 50%, 
-        var(--secondary-color) 100%);
-      border-radius: 8px;
-      animation: today-rotate 3s ease-in-out infinite;
-      transform: translate(-50%, -50%);
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       transform-origin: center;
       pointer-events: none;
       backface-visibility: hidden;
@@ -584,39 +580,25 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 8px;
-      height: 8px;
-      background-color: var(--text-light);
-      border-radius: 50%;
-      animation: today-pulse-dot 2s ease-in-out infinite;
       transform: translate(-50%, -50%);
-      transform-origin: center;
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       pointer-events: none;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      -webkit-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      will-change: transform;
+      z-index: 2;
     }
 
-    /* Animation pour le bouton today - Option B: Carré avec dégradé */
-    @keyframes today-rotate {
-      0%, 100% {
-        transform: translate(-50%, -50%) rotate(0deg);
+    @keyframes rotate-icon {
+      0% {
+        transform: rotate(0deg);
       }
       50% {
-        transform: translate(-50%, -50%) rotate(180deg);
+        transform: rotate(180deg);
       }
-    }
-
-    @keyframes today-pulse-dot {
-      0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.9;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.3);
-        opacity: 1;
+      100% {
+        transform: rotate(360deg);
       }
     }
 
@@ -638,25 +620,7 @@
       pointer-events: all;
     }
 
-    /* Cacher le bouton today-view sur mobile */
-    @media screen and (max-width: 768px) {
-      .today-view-button {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-    }
-
-    /* Styles pour les écrans plus grands */
-    @media screen and (min-width: 768px) {
-      .today-view-button {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-    }
+    /* Les boutons sont gérés par JavaScript selon le contexte */
 
     /* Ajustements pour les écrans en orientation portrait */
     @media screen and (max-width: 768px) {
@@ -860,6 +824,105 @@
     const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
     let allData = null;
+    
+    // Détection automatique de Puppeteer/navigateur automatisé
+    function isAutomatedBrowser() {
+      // Vérifier plusieurs indicateurs de navigateur automatisé
+      // Mais exclure les vrais mobiles même s'ils ont certains indicateurs
+      const isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Si c'est un vrai mobile, ce n'est pas Puppeteer
+      if (isRealMobile && 'ontouchstart' in window) {
+        return false;
+      }
+      
+      // Sinon, vérifier les indicateurs de navigateur automatisé
+      return (
+        navigator.webdriver === true ||
+        window.navigator.webdriver === true ||
+        (navigator.platform === 'Linux x86_64' && navigator.userAgent.includes('HeadlessChrome')) ||
+        (navigator.userAgent.includes('HeadlessChrome') && !isRealMobile)
+      );
+    }
+
+    function updateButtonVisibility() {
+      const isMobile = window.innerWidth <= 768;
+      const isAutomated = isAutomatedBrowser();
+      const isLargeScreen = window.innerHeight > 1920 || window.innerWidth > 1920; // Écran 32 pouces ou plus
+      const navigation = document.querySelector('.navigation');
+      const todayButton = document.querySelector('.today-view-button');
+      const coachesSection = document.querySelector('.coaches-section');
+      
+      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen);
+      
+      // Masquer la barre en bas uniquement sur mobile réel (pas Puppeteer, pas grand écran)
+      if (coachesSection) {
+        if (isMobile && !isAutomated && !isLargeScreen) {
+          // Mobile réel : masquer la barre
+          coachesSection.style.display = 'none';
+          document.body.style.paddingBottom = '0';
+        } else {
+          // Puppeteer ou grand écran : afficher la barre
+          coachesSection.style.display = 'flex';
+          document.body.style.paddingBottom = '52px';
+        }
+      }
+      
+      // Si c'est Puppeteer/navigateur automatisé, masquer tous les boutons
+      if (isAutomated) {
+        console.log('Navigateur automatisé détecté - masquage des boutons');
+        if (navigation) {
+          navigation.style.display = 'none';
+          navigation.classList.remove('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'none';
+          todayButton.classList.remove('visible');
+        }
+        return; // Ne pas continuer, on masque tout
+      }
+      
+      // Sinon, comportement normal selon la taille d'écran
+      if (isMobile) {
+        // Sur mobile réel : afficher les boutons
+        console.log('Mobile détecté - affichage des boutons');
+        if (navigation) {
+          navigation.style.display = 'flex';
+          navigation.style.opacity = '1';
+          navigation.style.transform = 'translateY(0)';
+          navigation.style.pointerEvents = 'all';
+          navigation.classList.add('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'block';
+          todayButton.style.opacity = '1';
+          todayButton.style.transform = 'translateY(0)';
+          todayButton.style.pointerEvents = 'all';
+          setTimeout(() => {
+            todayButton.classList.add('visible');
+          }, 100);
+        }
+      } else {
+        // Sur desktop : afficher les boutons
+        console.log('Desktop détecté - affichage des boutons');
+        if (navigation) {
+          navigation.style.display = 'flex';
+          navigation.style.opacity = '1';
+          navigation.style.transform = 'translateY(0)';
+          navigation.style.pointerEvents = 'all';
+          navigation.classList.add('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'block';
+          todayButton.style.opacity = '1';
+          todayButton.style.transform = 'translateY(0)';
+          todayButton.style.pointerEvents = 'all';
+          setTimeout(() => {
+            todayButton.classList.add('visible');
+          }, 100);
+        }
+      }
+    }
 
     function formatDate(date) {
       const day = String(date.getDate()).padStart(2, '0');
@@ -1202,19 +1265,15 @@
 
     // Fonction pour initialiser la page
     function initializePage() {
-      // Afficher les boutons de navigation (seulement sur desktop)
-      const isMobile = window.innerWidth <= 768;
-      const navigation = document.querySelector('.navigation');
-      if (navigation && !isMobile) {
-        navigation.classList.add('loaded');
-      } else if (navigation && isMobile) {
-        navigation.style.display = 'none';
-      }
-      
       // Charger les cours
       if (typeof loadAndDisplayCourses === 'function') {
         loadAndDisplayCourses();
       }
+      
+      // Attendre un peu pour que le DOM soit prêt
+      setTimeout(() => {
+        updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+      }, 100);
     }
     
     // Appeler dès que possible (si le DOM est déjà chargé)
@@ -1231,6 +1290,7 @@
       if (typeof loadAndDisplayCourses === 'function') {
         loadAndDisplayCourses();
       }
+      updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
     });
     
     setInterval(loadAndDisplayCourses, 60000);
@@ -1240,52 +1300,12 @@
       window.location.href = 'daily.html';
     }
 
-    // Afficher le bouton après le chargement (seulement sur desktop)
-    window.addEventListener('load', function() {
-      const todayButton = document.getElementById('todayViewButton');
-      const isMobile = window.innerWidth <= 768;
-      
-      if (!isMobile && todayButton) {
-        todayButton.style.display = 'block';
-        setTimeout(() => {
-          todayButton.classList.add('visible');
-        }, 100);
-      } else if (isMobile && todayButton) {
-        todayButton.style.display = 'none';
-        todayButton.classList.remove('visible');
-      }
-    });
-
     function handleResize() {
-      const isMobile = window.innerWidth <= 768;
-      const todayButton = document.querySelector('.today-view-button');
-      const navigation = document.querySelector('.navigation');
-      
-      if (isMobile) {
-        if (todayButton) {
-          todayButton.style.display = 'none';
-          todayButton.classList.remove('visible');
-        }
-        if (navigation) {
-          navigation.style.display = 'none';
-          navigation.classList.remove('loaded');
-        }
-      } else {
-        if (todayButton) {
-          todayButton.style.display = 'block';
-          setTimeout(() => {
-            todayButton.classList.add('visible');
-          }, 100);
-        }
-        if (navigation) {
-          navigation.style.display = 'flex';
-          navigation.classList.add('loaded');
-        }
-      }
-      
       if (typeof updateTodayButtonPosition === 'function') {
         updateTodayButtonPosition();
       }
+      
+      updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
     }
     
     // Appeler handleResize au redimensionnement de la fenêtre
