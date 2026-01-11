@@ -25,6 +25,16 @@
       --primary-color: #480607;
       --secondary-color: #FFA630;
       
+      /* Dégradé piscine/aqua (bleu uniquement) */
+      --pool-blue: #35767c;
+      --pool-middle: #42464d;
+      --gradient-pool: radial-gradient(circle, var(--pool-blue) 0%, var(--pool-middle) 100%);
+      
+      /* Dégradé femmes uniquement (violet uniquement) */
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --gradient-women: radial-gradient(circle, var(--women-light) 0%, var(--women-middle) 100%);
+      
       /* Couleurs spécifiques */
       --women-color: #E4A672;
       --pool-color: #78D1B6;
@@ -140,59 +150,68 @@
       overflow: visible;
     }
 
-    /* Styles de base pour l'icône */
+    /* Styles de base pour le point (cours passés, à venir, sur le point de commencer) */
     .timeline-block::before {
       content: '';
       position: absolute;
-      left: -52px;
-      top: calc(50% + 15px);
-      width: 30px;
-      height: 30px;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
+      left: -35px; /* Décalé vers la droite par rapport à l'icône */
+      top: calc(50% + 12px); /* Décalé vers le bas */
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
       opacity: 1;
       transition: opacity 0.3s ease;
       pointer-events: none;
-      transform: translateY(-50%);
-      will-change: transform;
+      transform: translate(-50%, -50%);
     }
 
-    /* Animation pour les cours en cours */
+    /* Animation pour les cours en cours : pulse + rotation (exagéré) */
     @keyframes rotate-icon {
       0% {
-        transform: translateY(-50%) rotate(0deg) scale(1);
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.1); /* Très petit (3px) */
+      }
+      25% {
+        transform: translate(-50%, -50%) rotate(90deg) scale(1.3); /* Plus grand que la taille normale (39px) */
       }
       50% {
-        transform: translateY(-50%) rotate(180deg) scale(1.1);
+        transform: translate(-50%, -50%) rotate(180deg) scale(1.3); /* Plus grand que la taille normale */
+      }
+      75% {
+        transform: translate(-50%, -50%) rotate(270deg) scale(1.3); /* Plus grand que la taille normale */
       }
       100% {
-        transform: translateY(-50%) rotate(360deg) scale(1);
+        transform: translate(-50%, -50%) rotate(360deg) scale(0.1); /* Retour très petit (3px) */
       }
     }
 
     /* Application de l'animation pour les cours en cours */
     .timeline-block.current::before {
+      left: -52px; /* Centre à -37px : -37px - 15px (rayon) = -52px */
       top: 50%;
+      width: 30px;
+      height: 30px;
+      background-color: transparent;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 0;
+      transform-origin: center center;
       animation: rotate-icon 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
 
-    /* Correction de la transparence pour l'icône des cours passés */
+    /* Correction de la transparence pour le point des cours passés */
     .timeline-block.past::before {
       opacity: 0.5;
     }
 
-    /* Style pour les cours à venir et sur le point de démarrer */
-    .timeline-block.starting-soon::before,
-    .timeline-block.upcoming::before {
-      transform: translateY(-50%);
-    }
+    /* Les cours à venir et sur le point de démarrer gardent le point par défaut */
 
     .time {
       font-family: var(--font-title);
       font-size: 1.4em;
-      color: var(--primary-color);
+      color: rgba(72, 6, 7, 0.7);
       position: relative;
       top: 0;
       margin-left: 0;
@@ -256,14 +275,39 @@
     /* Type de cours pour "100% Femmes" */
     .course-block.women-only {
       background-color: var(--women-color-light);
+      position: relative;
     }
 
-    .course-block.women-only .course-type {
-      color: var(--women-color);
+    /* Dégradé femmes - mais pas si c'est aussi piscine */
+    .course-block.women-only:not(.piscine)::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-women) !important;
+      opacity: 0.4;
+      border-radius: 15px;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .course-block.women-only.current .course-type {
-      color: rgba(255, 255, 255, 0.9);
+    .course-block.women-only .course-title,
+    .course-block.women-only .course-coach,
+    .course-block.women-only .countdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-block.women-only .course-type,
+    .course-block.women-only .course-studio {
+      z-index: 1;
+    }
+
+    /* Type de cours en blanc pour 100% femmes (sans piscine) */
+    .course-block.women-only:not(.piscine) .course-type {
+      color: var(--text-light);
     }
 
     /* Type de cours pour "Mixte" */
@@ -271,21 +315,62 @@
       color: var(--primary-color);
     }
 
-    /* Type de cours pour "Piscine" */
+    /* Type de cours pour "Piscine" - priorité sur women-only */
     .course-block.piscine {
       background-color: var(--pool-color-light);
+      position: relative;
     }
 
+    .course-block.piscine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-pool) !important;
+      opacity: 0.4;
+      border-radius: 15px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .course-block.piscine .course-title,
+    .course-block.piscine .course-coach,
+    .course-block.piscine .countdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-block.piscine .course-type,
+    .course-block.piscine .course-studio {
+      z-index: 1;
+    }
+
+    /* Type de cours en blanc pour piscine/aqua */
     .course-block.piscine .course-type {
-      color: var(--pool-color);
+      color: var(--text-light);
     }
 
     /* Cours passés */
     .course-block.past {
-      border: 2px solid var(--state-past);
       opacity: 0.5;
       box-shadow: 0px 3px 10px var(--shadow-light);
       color: var(--state-past);
+    }
+
+    /* Titre des cours aqua/piscine passés - couleur plus foncée pour la lisibilité */
+    .course-block.past.piscine .course-title h3,
+    .course-block.past.piscine .course-title {
+      color: var(--text-primary);
+      opacity: 0.8;
+    }
+
+    /* Titre des cours 100% femmes passés - couleur plus foncée pour la lisibilité */
+    .course-block.past.women-only:not(.piscine) .course-title h3,
+    .course-block.past.women-only:not(.piscine) .course-title {
+      color: var(--text-primary);
+      opacity: 0.8;
     }
 
     /* Cours à venir */
@@ -310,6 +395,10 @@
       box-shadow: 0px 0px 15px 5px var(--women-color-light);
     }
 
+    .course-block.women-only.starting-soon:not(.piscine)::before {
+      opacity: 0.4;
+    }
+
     /* Cours en cours */
     .course-block.current {
       font-size: 1.1em;
@@ -322,10 +411,28 @@
       color: var(--text-primary);
     }
 
-    .course-block.current.women-only {
-      background-color: var(--women-color);
+    .course-block.current.women-only:not(.piscine) {
+      background-color: var(--women-color-light);
       color: var(--text-primary);
       box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    /* RÈGLE CRITIQUE : Dégradé rose pour les cours 100% femmes en cours (sans piscine) - PRIORITÉ MAXIMALE */
+    .course-block.current.women-only:not(.piscine)::before,
+    .course-block.women-only.current:not(.piscine)::before {
+      background: var(--gradient-women) !important;
+      opacity: 0.4 !important;
+    }
+
+    /* RÈGLE CRITIQUE : Dégradé bleu pour les cours piscine en cours - PRIORITÉ MAXIMALE (même si aussi women-only) */
+    .course-block.piscine.current::before,
+    .course-block.current.piscine::before,
+    .course-block.piscine.current.women-only::before,
+    .course-block.current.piscine.women-only::before,
+    .course-block.women-only.piscine.current::before,
+    .course-block.women-only.current.piscine::before {
+      background: var(--gradient-pool) !important;
+      opacity: 0.4 !important;
     }
 
     /* Animation pour le rebond */
@@ -352,6 +459,16 @@
       margin-bottom: 5px;
     }
 
+    /* Noms des coachs en blanc pour piscine/aqua */
+    .course-block.piscine .course-coach {
+      color: var(--text-light);
+    }
+
+    /* Noms des coachs en blanc pour 100% femmes (sans piscine) */
+    .course-block.women-only:not(.piscine) .course-coach {
+      color: var(--text-light);
+    }
+
     .course-studio {
       position: absolute;
       bottom: 0;
@@ -371,15 +488,17 @@
     .countdown {
       font-family: var(--font-title);
       position: absolute;
-      bottom: 10px;
-      right: 20px;
+      bottom: -20px; /* Compenser le padding-bottom de 20px du course-block */
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 0.9em;
       font-weight: 500;
       color: var(--primary-color);
       background: none;
       padding: 4px 8px;
       text-transform: uppercase;
-      text-align: right;
+      text-align: center;
+      width: auto;
     }
 
     .focus {
@@ -417,49 +536,94 @@
       pointer-events: all;
     }
 
-    .navigation button {
-      background: var(--primary-light);
+    .nav-button {
+      background: rgba(255, 255, 255, 0.35);
       border: none;
-      font-size: 2em;
-      padding: 10px;
-      cursor: pointer;
-      pointer-events: all;
-      outline: none;
       border-radius: 50%;
-      transition: all 0.3s ease;
-      color: var(--text-primary);
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: auraPulse 1.5s ease-in-out infinite;
+      cursor: pointer;
+      pointer-events: all;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(10px);
     }
 
-    .navigation button img {
-      width: 26px;
-      height: 26px;
-      pointer-events: none;
-      filter: brightness(0) invert(1);
+    .nav-segments {
+      position: relative;
+      width: 20px;
+      height: 20px;
     }
 
-    /* Styles pour les états :hover uniquement sur les appareils avec support du survol */
+    .segment {
+      position: absolute;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Segments pour le bouton précédent */
+    .prev-button .segment-1 {
+      width: 16px;
+      height: 3px;
+      top: 8px;
+      right: 1px;
+      transform: rotate(45deg);
+      transform-origin: left center;
+    }
+
+    .prev-button .segment-2 {
+      width: 16px;
+      height: 3px;
+      top: 10px;
+      right: 1px;
+      transform: rotate(-45deg);
+      transform-origin: left center;
+    }
+
+    /* Segments pour le bouton suivant */
+    .next-button .segment-1 {
+      width: 16px;
+      height: 3px;
+      top: 8px;
+      left: 1px;
+      transform: rotate(-45deg);
+      transform-origin: right center;
+    }
+
+    .next-button .segment-2 {
+      width: 16px;
+      height: 3px;
+      top: 10px;
+      left: 1px;
+      transform: rotate(45deg);
+      transform-origin: right center;
+    }
+
+    /* Effets hover pour les boutons avec segments */
     @media (hover: hover) {
-      .navigation button:hover {
-        background-color: var(--primary-lighter);
-        box-shadow: 0px 6px 12px var(--shadow-dark);
-        transform: scale(1.1);
+      .nav-button:hover {
+        background: var(--primary-color);
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .nav-button:hover .segment {
+        background: white;
       }
     }
 
-    /* Styles pour l'état :active */
-    .navigation button:active {
-      transform: scale(1.05);
+    /* Effet actif */
+    .nav-button:active {
+      transform: scale(0.95);
     }
 
-    .navigation button:disabled {
+    .nav-button:disabled {
       visibility: hidden;
     }
 
@@ -558,29 +722,26 @@
 
     /* Styles spécifiques aux cours du studio "Piscine" */
     .course-block.piscine {
-      border: 2px solid var(--pool-color);
       background-color: var(--pool-color-light);
-      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
-    /* Styles pour les cours en cours ou démarrant bientôt dans "Piscine" */
+    /* Styles pour les cours en cours dans "Piscine" - garder le background et le dégradé bleu */
     .course-block.piscine.current {
-      border: 2px solid var(--pool-color);
-      background-color: var(--pool-color);
-      color: var(--text-primary);
-      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
+      background-color: var(--pool-color-light);
     }
 
     .course-block.piscine.starting-soon {
-      border: 2px solid var(--pool-color);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-piscine 1.5s ease-in-out infinite;
-      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
     /* Animation pour le clignotement des cours "Piscine" */
     @keyframes blink-piscine {
-      0%, 100% { background-color: var(--pool-color-light); }
-      50% { background-color: rgba(120, 209, 182, 0.2); }
+      0%, 100% { 
+        background-color: var(--pool-color-light);
+      }
+      50% { 
+        background-color: rgba(120, 209, 182, 0.2);
+      }
     }
 
     /* Styles pour les appareils mobiles */
@@ -599,7 +760,11 @@
       }
 
       .timeline-block::before {
-        left: -52px;
+        left: -35px; /* Même position que la règle de base */
+      }
+      
+      .timeline-block.current::before {
+        left: -52px; /* L'icône garde sa position originale */
       }
 
       .time {
@@ -738,6 +903,21 @@
       pointer-events: none;
     }
 
+    .weekly-view-button::after {
+      content: '7';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: var(--secondary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
     .weekly-view-button a {
       z-index: 3;
       width: 100%;
@@ -804,6 +984,21 @@
       -webkit-transform-style: preserve-3d;
       transform-style: preserve-3d;
       will-change: transform;
+    }
+
+    .today-view-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
     }
 
     .today-view-button button {
@@ -873,6 +1068,26 @@
       opacity: 0;
       transform: translateY(-100%);
       transition: opacity 0.3s ease, transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .sticky-day-name .day-name {
+      font-size: 1em;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .sticky-day-name .day-date {
+      font-size: 0.5em;
+      font-weight: 300;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Style pour le texte en tant que citation */
@@ -889,21 +1104,28 @@
 
     .quote-text::before,
     .quote-text::after {
-      font-size: 2em;
-      color: var(--primary-color);
+      content: '';
       position: absolute;
+      font-size: 2.5em;
+      color: var(--secondary-color);
+      font-weight: bold;
+      line-height: 1;
+      opacity: 0.8;
+      z-index: 1;
     }
 
     .quote-text::before {
-      content: "«";
+      content: '«';
       left: -10px;
       top: -10px;
     }
 
     .quote-text::after {
-      content: "»";
+      content: '»';
       right: -10px;
       bottom: -10px;
+      top: auto;
+      line-height: 0;
     }
 
     .modal-backdrop {
@@ -1092,7 +1314,10 @@
 </head>
 <body onload="initializePage();" class="loading">
   <!-- Bloc de texte collant pour le nom du jour -->
-  <div id="stickyDayName" class="sticky-day-name"></div>
+  <div id="stickyDayName" class="sticky-day-name">
+    <span class="day-name"></span>
+    <span class="day-date"></span>
+  </div>
 
   <!-- Bouton Weekly view -->
   <div class="weekly-view-button">
@@ -1109,11 +1334,17 @@
 
   <!-- Boutons de navigation -->
   <div class="navigation">
-    <button id="prevDay" onclick="changeDay(-1)">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/78d64276-8c3e-a386-2885-2bbe34c80319.png" alt="Previous Day">
+    <button id="prevDay" onclick="changeDay(-1)" class="nav-button prev-button">
+      <div class="nav-segments">
+        <div class="segment segment-1"></div>
+        <div class="segment segment-2"></div>
+      </div>
     </button>
-    <button id="nextDay" onclick="changeDay(1)">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8ad9de66-44fa-f41e-9b4a-1ab563f063a3.png" alt="Next Day">
+    <button id="nextDay" onclick="changeDay(1)" class="nav-button next-button">
+      <div class="nav-segments">
+        <div class="segment segment-1"></div>
+        <div class="segment segment-2"></div>
+      </div>
     </button>
   </div>
 
@@ -1132,9 +1363,12 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-    const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
-    //const apiUrl = './planning-v2.json';
+    //const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
+  const apiUrl = './planning-v2.json';
     let allData = [];
+    
+    // Option pour afficher/masquer les images des cours
+    const SHOW_COURSE_IMAGES = false; // Mettre à true pour afficher les images, false pour n'afficher que les noms
 
     function updateTodayButtonPosition() {
       const weeklyButton = document.querySelector('.weekly-view-button');
@@ -1256,13 +1490,25 @@
       const dayOfWeekElement = document.getElementById('dayOfWeek');
       const displayDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
       dayOfWeekElement.innerText = displayDayOfWeek;
-      document.getElementById('stickyDayName').innerText = displayDayOfWeek;
 
       // Mettre à jour la date
       const today = new Date();
       today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
       const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
       document.getElementById('dateStr').innerText = dateStr;
+      
+      // Mettre à jour le sticky header avec le jour et la date
+      const stickyDayName = document.getElementById('stickyDayName');
+      const stickyDayNameSpan = stickyDayName.querySelector('.day-name');
+      const stickyDayDateSpan = stickyDayName.querySelector('.day-date');
+      if (stickyDayNameSpan) {
+        stickyDayNameSpan.innerText = displayDayOfWeek;
+      }
+      if (stickyDayDateSpan) {
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = today.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase();
+        stickyDayDateSpan.innerText = `${day} ${month}`;
+      }
       
       if (!allData.planning || !allData.planning[dayOfWeek]) {
         console.error('Pas de planning pour le jour:', dayOfWeek);
@@ -1352,7 +1598,7 @@
               </div>
               <div class="course-type">${courseTypeText}</div>
               <div class="course-title">
-                ${cours.logo 
+                ${SHOW_COURSE_IMAGES && cours.logo 
                   ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 180px; max-height: 70px;" />`
                   : `<h3>${cours.name}</h3>`}
               </div>
