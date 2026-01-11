@@ -251,8 +251,8 @@
     }
 
     .course-title img {
-      max-width: 180px;
-      max-height: 70px;
+      max-width: 150px;
+      max-height: 55px;
       object-fit: contain;
       margin-bottom: 12px;
     }
@@ -1364,11 +1364,11 @@
   <script>
     let currentDayIndex = new Date().getDay();
     const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
-    //const apiUrl = './planning-v2.json';
+  //const apiUrl = './planning-v2.json';
     let allData = [];
     
     // Option pour afficher/masquer les images des cours
-    const SHOW_COURSE_IMAGES = false; // Mettre à true pour afficher les images, false pour n'afficher que les noms
+    const SHOW_COURSE_IMAGES = true; // Mettre à true pour afficher les images, false pour n'afficher que les noms
 
     function updateTodayButtonPosition() {
       const weeklyButton = document.querySelector('.weekly-view-button');
@@ -1599,7 +1599,7 @@
               <div class="course-type">${courseTypeText}</div>
               <div class="course-title">
                 ${SHOW_COURSE_IMAGES && cours.logo 
-                  ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 180px; max-height: 70px;" />`
+                  ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 150px; max-height: 55px;" />`
                   : `<h3>${cours.name}</h3>`}
               </div>
               <div class="course-coach">
