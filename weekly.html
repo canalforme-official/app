@@ -5,7 +5,7 @@
   <title>Planning Hebdomadaire</title>
 
   <!-- Favicon -->
-  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png" type="image/png">
+  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   
 
@@ -307,6 +307,21 @@
   transform-style: preserve-3d;
   will-change: transform;
   background-color: transparent;
+}
+
+.today-view-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background-color: var(--background-main);
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .today-view-button.visible {
