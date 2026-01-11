@@ -16,6 +16,16 @@
       --primary-color: #480607;
       --secondary-color: #FFA630;
       
+      /* Dégradé piscine/aqua (bleu uniquement) */
+      --pool-blue: #35767c;
+      --pool-middle: #42464d;
+      --gradient-pool: radial-gradient(circle, var(--pool-blue) 0%, var(--pool-middle) 100%);
+      
+      /* Dégradé femmes uniquement (violet uniquement) */
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --gradient-women: radial-gradient(circle, var(--women-light) 0%, var(--women-middle) 100%);
+      
       /* Couleurs spécifiques */
       --women-color: #E4A672;
       --pool-color: #78D1B6;
@@ -533,7 +543,7 @@
   /* Ajustement des blocs de cours */
   .course-block {
     background-color: var(--background-card);
-    border: 1px solid var(--shadow-light);
+    border: none;
     border-radius: 5px;
     padding: 5px;
     padding-bottom: 20px;
@@ -541,34 +551,75 @@
     font-size: 0.9em;
     position: relative;
     padding-right: 45px;
+    box-shadow: 0px 2px 8px var(--shadow-light);
   }
 
   /* Styles pour les cours mixtes */
   .course-block.mixte {
-    border: 1px solid var(--text-secondary);
+    box-shadow: 0px 2px 8px var(--shadow-light);
   }
 
   /* Styles pour les cours femmes */
   .course-block.women-only {
-    border: 1px solid var(--women-color);
     background-color: var(--women-color-light);
+    position: relative;
+    box-shadow: 0px 2px 8px var(--shadow-light);
+  }
+
+  .course-block.women-only::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-women);
+    opacity: 0.4;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .course-block.women-only > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Styles pour les cours piscine */
   .course-block.piscine {
-    border: 1px solid var(--pool-color);
     background-color: var(--pool-color-light);
+    position: relative;
+    box-shadow: 0px 2px 8px var(--shadow-light);
+  }
+
+  .course-block.piscine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-pool);
+    opacity: 0.4;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .course-block.piscine > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Styles pour les cours en cours */
   .course-block.current {
-    border: 2px solid var(--primary-color);
+    box-shadow: 0px 4px 12px var(--shadow-medium);
     font-weight: bold;
   }
 
   /* Styles pour les cours qui vont bientôt démarrer */
   .course-block.starting-soon {
-    border: 2px solid var(--secondary-color);
+    box-shadow: 0px 4px 12px var(--shadow-medium);
     animation: pulse 1.5s infinite;
   }
 
@@ -582,6 +633,7 @@
   .course-title {
     font-weight: bold;
     margin-bottom: 2px;
+    font-size: 1.3em;
   }
 
   /* Style pour le nom du coach */
@@ -637,19 +689,61 @@
   /* Styles pour les cours "100% Femmes" */
   .course-block.women-only {
     background-color: var(--women-color-light);
-    border: 1px solid var(--women-color);
+    border: none;
+    box-shadow: 0px 2px 8px var(--shadow-light);
+    position: relative;
+  }
+
+  .course-block.women-only::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-women);
+    opacity: 0.4;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .course-block.women-only > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Styles pour les cours "Piscine" */
   .course-block.piscine {
     background-color: var(--pool-color-light);
-    border: 1px solid var(--pool-color);
+    border: none;
+    box-shadow: 0px 2px 8px var(--shadow-light);
+    position: relative;
+  }
+
+  .course-block.piscine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-pool);
+    opacity: 0.4;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .course-block.piscine > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Styles spécifiques pour les logos de cours */
   .logo-cours {
-    max-width: 90%;
-    max-height: 35px;
+    max-width: 75%;
+    max-height: 28px;
     object-fit: contain;
     display: block;
     margin: 0 auto;
@@ -665,7 +759,7 @@
   }
 
   .single-coach {
-    font-size: 1em;
+    font-size: 0.85em;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -681,9 +775,18 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 5px;
     margin-left: 10px; /* Ajoute de l'espace à gauche de l'image */
     margin-bottom: 2px;
+  }
+
+  /* Couleur des noms de coachs selon le type de cours */
+  .course-block.piscine .single-coach span {
+    color: var(--text-light);
+  }
+
+  .course-block.women-only:not(.piscine) .single-coach span {
+    color: var(--text-light);
   }
 
   /* Styles pour les coachs multiples avec uniquement les images */
@@ -1251,6 +1354,9 @@
   </div>
 
   <script>
+    // Option pour afficher/masquer les logos de cours
+    const SHOW_COURSE_IMAGES = true;
+    
     // Initialiser les variables
     var scheduleData = [];
 
@@ -1659,8 +1765,8 @@
               var logoUrl = course.logo || '';
               var courseNameDisplay = '';
 
-              // Affichage selon la présence du logo
-              if (logoUrl) {
+              // Affichage selon la présence du logo et la constante SHOW_COURSE_IMAGES
+              if (SHOW_COURSE_IMAGES && logoUrl) {
                 courseNameDisplay = '<img class="logo-cours" src="' + logoUrl + '" alt="' + course.courseName + ' Logo">';
               } else {
                 courseNameDisplay = '<div class="course-name-text">' + course.courseName + '</div>';
@@ -1688,7 +1794,7 @@
                 courseClasses += ' mixte';
               }
 
-              if (course.studio === 'Piscine') {
+              if (course.studio.toLowerCase().includes('piscine') || course.studio.toLowerCase().includes('aqua')) {
                 courseClasses += ' piscine';
               }
 
