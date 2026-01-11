@@ -813,12 +813,20 @@
     // Détection automatique de Puppeteer/navigateur automatisé
     function isAutomatedBrowser() {
       // Vérifier plusieurs indicateurs de navigateur automatisé
+      // Mais exclure les vrais mobiles même s'ils ont certains indicateurs
+      const isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Si c'est un vrai mobile, ce n'est pas Puppeteer
+      if (isRealMobile && 'ontouchstart' in window) {
+        return false;
+      }
+      
+      // Sinon, vérifier les indicateurs de navigateur automatisé
       return (
         navigator.webdriver === true ||
         window.navigator.webdriver === true ||
-        !window.chrome ||
-        (window.chrome && !window.chrome.runtime) ||
-        navigator.platform === 'Linux x86_64' && navigator.userAgent.includes('HeadlessChrome')
+        (navigator.platform === 'Linux x86_64' && navigator.userAgent.includes('HeadlessChrome')) ||
+        (navigator.userAgent.includes('HeadlessChrome') && !isRealMobile)
       );
     }
 
@@ -828,8 +836,11 @@
       const navigation = document.querySelector('.navigation');
       const todayButton = document.querySelector('.today-view-button');
       
+      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated);
+      
       // Si c'est Puppeteer/navigateur automatisé, masquer tous les boutons
       if (isAutomated) {
+        console.log('Navigateur automatisé détecté - masquage des boutons');
         if (navigation) {
           navigation.style.display = 'none';
           navigation.classList.remove('loaded');
@@ -844,24 +855,38 @@
       // Sinon, comportement normal selon la taille d'écran
       if (isMobile) {
         // Sur mobile réel : afficher les boutons
+        console.log('Mobile détecté - affichage des boutons');
         if (navigation) {
           navigation.style.display = 'flex';
+          navigation.style.opacity = '1';
+          navigation.style.transform = 'translateY(0)';
+          navigation.style.pointerEvents = 'all';
           navigation.classList.add('loaded');
         }
         if (todayButton) {
           todayButton.style.display = 'block';
+          todayButton.style.opacity = '1';
+          todayButton.style.transform = 'translateY(0)';
+          todayButton.style.pointerEvents = 'all';
           setTimeout(() => {
             todayButton.classList.add('visible');
           }, 100);
         }
       } else {
         // Sur desktop : afficher les boutons
+        console.log('Desktop détecté - affichage des boutons');
         if (navigation) {
           navigation.style.display = 'flex';
+          navigation.style.opacity = '1';
+          navigation.style.transform = 'translateY(0)';
+          navigation.style.pointerEvents = 'all';
           navigation.classList.add('loaded');
         }
         if (todayButton) {
           todayButton.style.display = 'block';
+          todayButton.style.opacity = '1';
+          todayButton.style.transform = 'translateY(0)';
+          todayButton.style.pointerEvents = 'all';
           setTimeout(() => {
             todayButton.classList.add('visible');
           }, 100);
@@ -1215,7 +1240,10 @@
         loadAndDisplayCourses();
       }
       
-      updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+      // Attendre un peu pour que le DOM soit prêt
+      setTimeout(() => {
+        updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+      }, 100);
     }
     
     // Appeler dès que possible (si le DOM est déjà chargé)
