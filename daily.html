@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Planning du jour</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -163,7 +163,7 @@
       opacity: 1;
       transition: opacity 0.3s ease;
       pointer-events: none;
-      transform: translate(-50%, -50%);
+      transform: translate(calc(-50% - 3px), calc(-50% - 4px));
     }
 
     /* Animation pour les cours en cours : pulse + rotation (exagéré) */
@@ -632,6 +632,10 @@
         display: none;
       }
       
+      .daily-grid-view-button {
+        display: none;
+      }
+      
       .weekly-view-button {
         display: none;
       }
@@ -681,7 +685,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(calc(-50% - 3px), calc(-50% - 4px));
     }
 
     .loading-logo img {
@@ -809,6 +813,13 @@
         display: flex;
       }
 
+      .daily-grid-view-button {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+      }
+      
       .weekly-view-button {
         display: block;
         opacity: 1;
@@ -854,10 +865,182 @@
       margin-right: 10px;
     }
 
+    /* Style pour le bouton daily-grid-view */
+    .daily-grid-view-button {
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom-grid {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom-grid 6s ease-in-out infinite;
+    }
+
+    .daily-grid-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .daily-grid-view-button::after {
+      content: '1';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 1px), calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #8dceb9;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .daily-grid-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .daily-grid-view-button img {
+      display: none;
+    }
+
+    /* Style pour le bouton daily-grid-view */
+    .daily-grid-view-button {
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom-grid {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom-grid 6s ease-in-out infinite;
+    }
+
+    .daily-grid-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .daily-grid-view-button::after {
+      content: '1';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 1px), calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #8dceb9;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .daily-grid-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .daily-grid-view-button img {
+      display: none;
+    }
+
     /* Style pour le bouton weekly-view */
     .weekly-view-button {
       position: fixed;
-      top: 50px;
+      top: 130px;
       right: 10px;
       z-index: 1000;
       background: none;
@@ -908,7 +1091,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, calc(-50% - 2px));
       font-family: var(--font-title);
       font-size: 1.8em;
       font-weight: 600;
@@ -994,7 +1177,7 @@
       transform: translate(-50%, -50%);
       width: 10px;
       height: 10px;
-      background-color: var(--primary-color);
+      background-color: var(--background-main);
       border-radius: 50%;
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       pointer-events: none;
@@ -1198,6 +1381,17 @@
     }
 
     /* Styles pour le bouton weekly-view */
+    .daily-grid-view-button {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .weekly-view-button {
       opacity: 0;
       transform: translateY(20px);
@@ -1319,6 +1513,13 @@
     <span class="day-date"></span>
   </div>
 
+  <!-- Bouton Daily Grid view -->
+  <div class="daily-grid-view-button">
+    <a href="./daily_grid.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png" alt="Vue Grille">
+    </a>
+  </div>
+
   <!-- Bouton Weekly view -->
   <div class="weekly-view-button">
     <a href="./weekly.html">
@@ -1383,11 +1584,16 @@
 
     function handleResize() {
       const isMobile = window.innerWidth <= 1024;
+      const dailyGridButton = document.querySelector('.daily-grid-view-button');
       const weeklyButton = document.querySelector('.weekly-view-button');
       const todayButton = document.querySelector('.today-view-button');
       const navigation = document.querySelector('.navigation');
       
       if (isMobile) {
+        if (dailyGridButton) {
+          dailyGridButton.style.display = 'block';
+          dailyGridButton.classList.add('loaded');
+        }
         if (weeklyButton) {
           weeklyButton.style.display = 'block';
           weeklyButton.classList.add('loaded');
@@ -1399,6 +1605,10 @@
           navigation.style.display = 'flex';
         }
       } else {
+        if (dailyGridButton) {
+          dailyGridButton.style.display = 'none';
+          dailyGridButton.classList.remove('loaded');
+        }
         if (weeklyButton) {
           weeklyButton.style.display = 'none';
           weeklyButton.classList.remove('loaded');
@@ -1427,10 +1637,17 @@
 
       const isMobile = window.innerWidth <= 1024;
       const navigation = document.querySelector('.navigation');
+      const dailyGridButton = document.querySelector('.daily-grid-view-button');
       const weeklyButton = document.querySelector('.weekly-view-button');
       
       if (isMobile) {
         if (navigation) navigation.classList.add('loaded');
+        if (dailyGridButton) {
+          dailyGridButton.classList.add('loaded');
+          dailyGridButton.style.opacity = '1';
+          dailyGridButton.style.transform = 'translateY(0)';
+          dailyGridButton.style.pointerEvents = 'all';
+        }
         if (weeklyButton) {
           weeklyButton.classList.add('loaded');
           weeklyButton.style.opacity = '1';
@@ -1905,6 +2122,7 @@
       fetchAllData().then(() => {
         window.addEventListener('resize', handleResize);
         handleResize(); // Appel initial pour configurer l'état correct
+        updateButtonVisibility(); // Appliquer le masquage si nécessaire
       });
     }
 
