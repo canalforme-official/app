@@ -90,6 +90,26 @@
       padding-bottom: 52px;
       width: 100%;
       max-width: 100vw;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Empêcher la sélection sur tous les éléments */
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Permettre la sélection uniquement pour les inputs et textarea si nécessaire */
+    input, textarea {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
     }
 
     .header {
@@ -757,6 +777,21 @@
         font-size: 0.65em;
       }
     }
+
+    /* Masquer les boutons de navigation sur les écrans 32 pouces et supérieurs en orientation portrait (rotation 90°) */
+    @media screen and (min-height: 1920px) and (orientation: portrait) {
+      .navigation {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+
+      .today-view-button {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -849,11 +884,12 @@
       const isMobile = window.innerWidth <= 768;
       const isAutomated = isAutomatedBrowser();
       const isLargeScreen = window.innerHeight > 1920 || window.innerWidth > 1920; // Écran 32 pouces ou plus
+      const isLargePortrait = window.innerHeight >= 1920 && window.innerHeight > window.innerWidth; // Écran 32 pouces et supérieurs en portrait (rotation 90°)
       const navigation = document.querySelector('.navigation');
       const todayButton = document.querySelector('.today-view-button');
       const coachesSection = document.querySelector('.coaches-section');
       
-      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen);
+      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen, 'isLargePortrait:', isLargePortrait);
       
       // Masquer la barre en bas uniquement sur mobile réel (pas Puppeteer, pas grand écran)
       if (coachesSection) {
@@ -866,6 +902,24 @@
           coachesSection.style.display = 'flex';
           document.body.style.paddingBottom = '52px';
         }
+      }
+      
+      // Si c'est un grand écran en portrait (32 pouces et supérieurs, rotation 90°), masquer les boutons
+      if (isLargePortrait) {
+        console.log('Grand écran en portrait (rotation 90°) détecté - masquage des boutons');
+        if (navigation) {
+          navigation.style.display = 'none';
+          navigation.style.opacity = '0';
+          navigation.style.pointerEvents = 'none';
+          navigation.classList.remove('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'none';
+          todayButton.style.opacity = '0';
+          todayButton.style.pointerEvents = 'none';
+          todayButton.classList.remove('visible');
+        }
+        return; // Ne pas continuer, on masque tout
       }
       
       // Si c'est Puppeteer/navigateur automatisé, masquer tous les boutons
