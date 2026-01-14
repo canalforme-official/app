@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning Hebdomadaire Vertical</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  
+
+  <style>
+    /* Styles généraux */
+    :root {
+      /* Couleurs principales */
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      
+      /* Dégradé piscine/aqua (bleu uniquement) */
+      --pool-blue: #35767c;
+      --pool-middle: #42464d;
+      --gradient-pool: radial-gradient(circle, var(--pool-blue) 0%, var(--pool-middle) 100%);
+      
+      /* Dégradé femmes uniquement (violet uniquement) */
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --gradient-women: radial-gradient(circle, var(--women-light) 0%, var(--women-middle) 100%);
+      
+      /* Couleurs spécifiques */
+      --women-color: #E4A672;
+      --pool-color: #78D1B6;
+      
+      /* Couleurs de fond */
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      
+      /* Couleurs de texte */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-tertiary: #555555;
+      --text-light: #FFFFFF;
+      
+      /* Transparences primary */
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
+      --primary-lighter: rgba(72, 6, 7, 0.5);
+      
+      /* Transparences secondary */
+      --secondary-light: rgba(255, 166, 48, 0.75);
+      --secondary-lighter: rgba(255, 166, 48, 0.7);
+      
+      /* Transparences spécifiques */
+      --women-color-light: rgba(228, 166, 114, 0.3);
+      --pool-color-light: rgba(120, 209, 182, 0.3);
+      
+      /* Ombres */
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      
+      /* États */
+      --state-past: #aaaaaa;
+      --overlay-light: rgba(255, 255, 255, 0.3);
+      --overlay-lighter: rgba(255, 255, 255, 0.2);
+    }
+
+    body, button, a, img {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      background-color: var(--background-main);
+      color: var(--primary-color);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100vh;
+      padding: 5px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      touch-action: pan-y;
+      overscroll-behavior: none;
+    }
+
+    /* Masquer la barre de défilement pour Chrome, Safari et Opera */
+    .content-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Style pour la disposition du titre et des filtres */
+    .header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      flex-wrap: wrap;
+      pointer-events: none;
+      padding: 5px;
+    }
+
+    .header-wrapper h1 {
+      color: var(--primary-color);
+      font-size: 1.2em;
+      margin: 0;
+    }
+
+    /* Styles pour le conteneur des filtres */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: auto;
+      flex-wrap: wrap;
+    }
+
+    .filters label {
+      font-size: 0.7em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: var(--primary-color);
+      pointer-events: auto;
+    }
+
+    .filters input[type="checkbox"] {
+      margin-right: 3px;
+      accent-color: var(--secondary-color);
+      pointer-events: auto;
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Style personnalisé pour les checkboxes */
+    .filters input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--secondary-color);
+      border-radius: 3px;
+      margin-right: 3px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .filters input[type="checkbox"]:checked {
+      background-color: var(--secondary-color);
+    }
+
+    .filters input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      color: var(--primary-color);
+      font-size: 8px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Style pour le select des coachs */
+    .filters select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: var(--background-card);
+      border: 2px solid var(--secondary-color);
+      border-radius: 3px;
+      padding: 3px 20px 3px 8px;
+      font-size: 0.7em;
+      color: var(--primary-color);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23480607' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      background-size: 10px;
+      margin-left: 3px;
+      min-width: 100px;
+    }
+
+    .filters select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .filters select option {
+      background-color: var(--background-card);
+      color: var(--primary-color);
+      padding: 3px;
+    }
+
+    .filters select option:checked {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+
+    .filters select option:hover {
+      background-color: var(--secondary-light);
+    }
+
+    /* Styles pour le tableau du planning hebdomadaire */
+    .weekly-schedule {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      table-layout: fixed;
+      font-size: 0.65em;
+    }
+
+    .weekly-schedule th, .weekly-schedule td {
+      padding: 2px;
+      vertical-align: top;
+      border: none;
+    }
+
+    /* Ligne des titres avec fond rouge moins transparent et texte blanc */
+    .weekly-schedule thead th {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      text-align: center;
+      font-size: 0.9em;
+      border-bottom: 1px solid var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      pointer-events: none;
+      border-radius: 0;
+      margin: 0;
+      padding: 3px 2px;
+    }
+
+    /* Rendre invisible la première cellule du thead (cellule des horaires) */
+    .weekly-schedule thead th:first-child {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Arrondir uniquement les extrémités de la barre de titres */
+    .weekly-schedule thead th:nth-child(2) {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .weekly-schedule thead th:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    /* Animation améliorée pour le jour actuel */
+    .weekly-schedule thead th.today {
+      background-color: var(--secondary-color);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      color: var(--primary-color);
+      overflow: hidden;
+      pointer-events: none;
+      margin: 0;
+    }
+
+    /* Préserver les bordures courbées même quand le jour est surligné */
+    .weekly-schedule thead th.today:nth-child(2) {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .weekly-schedule thead th.today:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    /* Styles pour la cellule des heures */
+    .weekly-schedule th:first-child,
+    .weekly-schedule td.time-cell {
+      width: 35px;
+      min-width: 30px;
+      max-width: 40px;
+      text-align: center;
+      padding: 2px;
+      font-weight: bold;
+      color: var(--primary-color);
+      font-size: 0.75em;
+      line-height: 1;
+    }
+
+    /* Alternance de couleurs pour les time-cell */
+    .weekly-schedule td.time-cell-white {
+      background-color: var(--background-card);
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    .weekly-schedule td.time-cell-grey {
+      background-color: var(--background-main);
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    /* Ajustement des cellules des cours */
+    .course-cell {
+      min-width: 80px;
+      text-align: center;
+      border-bottom: 1px solid var(--shadow-light);
+      position: relative;
+      padding: 2px;
+    }
+
+    /* Styles pour les lignes blanches et grises */
+    .course-row-white .course-cell {
+      background-color: var(--background-card);
+      color: var(--text-primary);
+    }
+
+    .course-row-grey .course-cell {
+      background-color: var(--background-main);
+      color: var(--text-primary);
+    }
+
+    /* Ajustement des blocs de cours */
+    .course-block {
+      background-color: var(--background-card);
+      border: none;
+      border-radius: 3px;
+      padding: 2px;
+      padding-bottom: 3px;
+      margin: 1px;
+      font-size: 0.75em;
+      position: relative;
+      padding-right: 30px;
+      box-shadow: 0px 1px 4px var(--shadow-light);
+    }
+
+    /* Styles pour les cours mixtes */
+    .course-block.mixte {
+      box-shadow: 0px 1px 4px var(--shadow-light);
+    }
+
+    /* Styles pour les cours femmes */
+    .course-block.women-only {
+      background-color: var(--women-color-light);
+      position: relative;
+      box-shadow: 0px 1px 4px var(--shadow-light);
+    }
+
+    .course-block.women-only::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-women);
+      opacity: 0.4;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .course-block.women-only > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Styles pour les cours piscine */
+    .course-block.piscine {
+      background-color: var(--pool-color-light);
+      position: relative;
+      box-shadow: 0px 1px 4px var(--shadow-light);
+    }
+
+    .course-block.piscine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-pool);
+      opacity: 0.4;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .course-block.piscine > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Styles pour les cours en cours */
+    .course-block.current {
+      box-shadow: 0px 2px 6px var(--shadow-medium);
+      font-weight: bold;
+    }
+
+    /* Styles pour les cours qui vont bientôt démarrer */
+    .course-block.starting-soon {
+      box-shadow: 0px 2px 6px var(--shadow-medium);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Styles pour les cours passés */
+    .course-block.past {
+      opacity: 0.5;
+      color: var(--state-past);
+    }
+
+    /* Style pour le titre du cours */
+    .course-title {
+      font-weight: bold;
+      margin-bottom: 1px;
+      font-size: 1em;
+    }
+
+    /* Style pour le nom du coach */
+    .coach-name {
+      font-size: 0.65em;
+      color: var(--text-secondary);
+    }
+
+    /* Style pour le studio */
+    .studio-name {
+      font-size: 0.6em;
+      color: var(--text-tertiary);
+    }
+
+    /* Animation de pulsation optimisée */
+    @keyframes pulse {
+      0% { 
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+      }
+      50% { 
+        transform: scale(1.02) translateZ(0);
+        opacity: 0.95;
+      }
+      100% { 
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+      }
+    }
+
+    /* Styles pour la pilule de compte à rebours */
+    .countdown-pill {
+      position: absolute;
+      top: 2px;
+      right: 0;
+      transform: translateX(0);
+      width: 25px;
+      height: 12px;
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65em;
+      font-weight: bold;
+      padding: 0 2px;
+      box-shadow: 0 1px 2px var(--shadow-medium);
+      z-index: 5;
+    }
+
+    /* Styles spécifiques pour les logos de cours */
+    .logo-cours {
+      max-width: 100%;
+      max-height: 104px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Styles pour les cours */
+    .course-info {
+      font-size: 1em;
+      font-weight: bold;
+      color: var(--text-primary);
+      margin-right: 0;
+      padding-right: 0;
+      line-height: 1.2;
+    }
+
+    .single-coach {
+      font-size: 0.55em;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-top: 1px;
+      color: var(--primary-color);
+    }
+
+    .single-coach span {
+      color: var(--primary-color);
+    }
+
+    .single-coach img {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 2px;
+      margin-left: 3px;
+      margin-bottom: 0;
+    }
+
+    /* Couleur des noms de coachs selon le type de cours */
+    .course-block.piscine .single-coach span {
+      color: var(--text-light);
+    }
+
+    .course-block.women-only:not(.piscine) .single-coach span {
+      color: var(--text-light);
+    }
+
+    /* Styles pour les coachs multiples avec uniquement les images */
+    .multiple-coaches {
+      display: flex;
+      justify-content: center;
+      gap: 1px;
+    }
+
+    .coach-image {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+    }
+
+    /* Cacher les coachs si le filtre est décoché */
+    .hide-coaches .single-coach,
+    .hide-coaches .multiple-coaches {
+      display: none;
+    }
+
+    #weeklySchedule {
+      height: 100%;
+    }
+
+    /* Styles responsives pour différentes tailles d'écran */
+    @media screen and (max-width: 480px) {
+      .header-wrapper h1 {
+        font-size: 1em;
+      }
+
+      .filters {
+        gap: 3px;
+      }
+
+      .filters label {
+        font-size: 0.6em;
+      }
+
+      .filters select {
+        font-size: 0.6em;
+        min-width: 80px;
+        padding: 2px 18px 2px 6px;
+      }
+
+      .weekly-schedule {
+        font-size: 0.55em;
+      }
+
+      .weekly-schedule thead th {
+        font-size: 0.75em;
+        padding: 2px 1px;
+      }
+
+      .weekly-schedule th:first-child,
+      .weekly-schedule td.time-cell {
+        width: 30px;
+        font-size: 0.7em;
+      }
+
+      .course-block {
+        padding: 1px;
+        padding-bottom: 3px;
+        padding-right: 25px;
+        font-size: 0.65em;
+      }
+
+      .logo-cours {
+        max-width: 100%;
+        max-height: 91px;
+        width: auto;
+        height: auto;
+      }
+
+      .course-info {
+        font-size: 0.9em;
+        width: 100%;
+      }
+
+      .single-coach img,
+      .coach-image {
+        width: 12px;
+        height: 12px;
+      }
+
+      .countdown-pill {
+        width: 20px;
+        height: 10px;
+        font-size: 0.55em;
+      }
+    }
+
+    @media screen and (min-width: 481px) and (max-width: 768px) {
+      .header-wrapper h1 {
+        font-size: 1.1em;
+      }
+
+      .weekly-schedule {
+        font-size: 0.6em;
+      }
+
+      .course-block {
+        font-size: 0.7em;
+      }
+
+      .course-info {
+        font-size: 0.95em;
+        width: 100%;
+      }
+
+      .logo-cours {
+        max-height: 98px;
+      }
+    }
+
+    @media screen and (min-width: 769px) and (max-width: 1024px) {
+      .header-wrapper h1 {
+        font-size: 1.15em;
+      }
+
+      .weekly-schedule {
+        font-size: 0.7em;
+      }
+
+      .course-block {
+        font-size: 0.75em;
+      }
+
+      .course-info {
+        font-size: 1em;
+        width: 100%;
+      }
+
+      .logo-cours {
+        max-height: 104px;
+      }
+    }
+
+    @media screen and (min-width: 1025px) {
+      .header-wrapper h1 {
+        font-size: 1.3em;
+      }
+
+      .weekly-schedule {
+        font-size: 0.75em;
+      }
+
+      .course-block {
+        font-size: 0.8em;
+      }
+
+      .course-info {
+        font-size: 1.1em;
+        width: 100%;
+      }
+
+      .logo-cours {
+        max-height: 111px;
+      }
+    }
+
+  </style>
+</head>
+<body onload="initializeWeeklyPage();">
+  <div class="content-wrapper">
+
+    <!-- En-tête avec le titre et les filtres -->
+    <div class="header-wrapper">
+      <h1>Planning Hebdomadaire</h1>
+      <div class="filters">
+        <label>
+          <input type="checkbox" id="filter-mixte" checked>
+          Mixte
+        </label>
+        <label>
+          <input type="checkbox" id="filter-women-only" checked>
+          100% Femmes
+        </label>
+        <label>
+          <input type="checkbox" id="filter-piscine" checked>
+          Piscine
+        </label>
+        <label>
+          <input type="checkbox" id="filter-coach" checked>
+          Coach
+        </label>
+        <select id="coachFilter">
+          <option value="">Tous les coachs</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Le planning hebdomadaire sera inséré ici -->
+    <div id="weeklySchedule"></div>
+
+  </div>
+
+  <script>
+    // Option pour afficher/masquer les logos de cours
+    const SHOW_COURSE_IMAGES = true;
+    
+    // Initialiser les variables
+    var scheduleData = [];
+
+    function initializeWeeklyPage() {
+      fetchWeeklyData().then(data => {
+        console.group('Traitement des données');
+        console.log('Données reçues:', data);
+        
+        const planningData = data.planning;
+        const coursData = data.cours;
+        const coachsData = data.coachs;
+        const studiosData = data.studios;
+
+        console.log('Planning:', planningData);
+        console.log('Cours:', coursData);
+        console.log('Coachs:', coachsData);
+        console.log('Studios:', studiosData);
+        
+        console.groupEnd();
+
+        scheduleData = data;
+
+        document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+
+        let uniqueCoaches = new Set();
+        Object.values(planningData).forEach(dayCourses => {
+          dayCourses.forEach(course => {
+            if (course.coachIds) {
+              course.coachIds.forEach(coachId => {
+                const coach = coachsData.find(c => c.id === coachId);
+                if (coach) {
+                  uniqueCoaches.add(coach.name);
+                }
+              });
+            }
+          });
+        });
+
+        let coachFilterSelect = document.getElementById('coachFilter');
+        Array.from(uniqueCoaches).sort().forEach(coach => {
+          let option = document.createElement('option');
+          option.value = coach;
+          option.textContent = coach;
+          coachFilterSelect.appendChild(option);
+        });
+
+        document.getElementById('filter-mixte').addEventListener('change', applyFilters);
+        document.getElementById('filter-women-only').addEventListener('change', applyFilters);
+        document.getElementById('filter-piscine').addEventListener('change', applyFilters);
+        document.getElementById('filter-coach').addEventListener('change', applyFilters);
+        coachFilterSelect.addEventListener('change', applyFilters);
+
+        applyFilters();
+        
+        setTimeout(() => {
+          scrollToCurrentTime();
+        }, 500);
+        
+        updateCountdownCircles();
+        setInterval(updateCountdownCircles, 1000);
+        setInterval(checkCourseStates, 60000);
+        setTimeout(checkCourseStates, 1000);
+      }).catch(error => {
+        console.error('Erreur lors de la récupération des données :', error);
+      });
+    }
+
+    function fetchWeeklyData() {
+      const cacheKey = 'weeklyData';
+      const cacheExpirationKey = 'weeklyDataExpiration';
+      
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheExpiration = localStorage.getItem(cacheExpirationKey);
+      const now = new Date().getTime();
+
+      if (cachedData && cacheExpiration && now < cacheExpiration) {
+        console.log('Utilisation des données en cache');
+        return Promise.resolve(JSON.parse(cachedData));
+      }
+
+      return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.group('Validation des données');
+          
+          console.log('Structure de base:', {
+            metadata: data.metadata ? '✅ Présent' : '❌ Manquant',
+            coachs: data.coachs ? `✅ ${data.coachs.length} coachs` : '❌ Manquant',
+            studios: data.studios ? `✅ ${data.studios.length} studios` : '❌ Manquant',
+            cours: data.cours ? `✅ ${data.cours.length} cours` : '❌ Manquant',
+            planning: data.planning ? `✅ ${Object.keys(data.planning).length} jours` : '❌ Manquant'
+          });
+
+          const jours = Object.keys(data.planning);
+          console.log('Jours avec planning:', jours);
+
+          if (jours.length > 0) {
+            const premierJour = jours[0];
+            console.log(`Exemple de cours pour ${premierJour}:`, data.planning[premierJour][0]);
+          }
+
+          console.groupEnd();
+
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+          localStorage.setItem(cacheExpirationKey, now + 360000);
+          console.log('✅ Données récupérées et stockées dans le cache');
+          
+          return data;
+        })
+        .catch(error => {
+          console.error('❌ Erreur lors de la récupération des données:', error);
+          throw error;
+        });
+    }
+
+    function applyFilters() {
+      const showMixte = document.getElementById('filter-mixte').checked;
+      const showWomenOnly = document.getElementById('filter-women-only').checked;
+      const showPiscine = document.getElementById('filter-piscine').checked;
+      const showCoachImages = document.getElementById('filter-coach').checked;
+      const selectedCoach = document.getElementById('coachFilter').value;
+
+      const blocks = document.querySelectorAll('.course-block');
+      const contentWrapper = document.querySelector('.content-wrapper');
+
+      for (const block of blocks) {
+        const dataCoaches = block.getAttribute('data-coaches') || '';
+        const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
+        const showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
+        const isPiscine = block.classList.contains('piscine');
+        const courseType = block.classList;
+        const showByType = (
+          (courseType.contains('mixte') && showMixte) ||
+          (courseType.contains('women-only') && showWomenOnly)
+        );
+
+        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
+      }
+
+      if (showCoachImages) {
+        contentWrapper.classList.remove('hide-coaches');
+      } else {
+        contentWrapper.classList.add('hide-coaches');
+      }
+    }
+
+    function updateCountdownCircles() {
+      const badges = document.querySelectorAll('.countdown-pill');
+      
+      for (const badge of badges) {
+        const timeDiff = parseInt(badge.getAttribute('data-time-diff'));
+
+        if (timeDiff >= 0) {
+          const minutes = Math.floor(timeDiff / 60);
+          const seconds = timeDiff % 60;
+          const timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+          badge.textContent = timeString;
+          badge.setAttribute('data-time-diff', timeDiff - 1);
+        } else {
+          badge.parentElement.classList.remove('starting-soon');
+          badge.remove();
+        }
+      }
+    }
+
+    function generateWeeklyScheduleHtml() {
+      var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      var todayIndex = new Date().getDay();
+      var todayName = weekDays[todayIndex];
+
+      const planning = scheduleData.planning;
+      const cours = scheduleData.cours;
+      const coachs = scheduleData.coachs;
+      const studios = scheduleData.studios;
+
+      var scheduleByTimeAndDay = {};
+
+      Object.entries(planning).forEach(([day, courses]) => {
+        const dayIndex = weekDays.findIndex(d => d.toLowerCase() === day);
+        const frenchDay = weekDays[dayIndex];
+
+        courses.forEach(course => {
+          const startTime = course.startTime;
+          
+          if (!scheduleByTimeAndDay[startTime]) {
+            scheduleByTimeAndDay[startTime] = {};
+          }
+          if (!scheduleByTimeAndDay[startTime][frenchDay]) {
+            scheduleByTimeAndDay[startTime][frenchDay] = [];
+          }
+
+          const courseInfo = cours.find(c => c.id === course.coursId);
+          const studioInfo = studios.find(s => s.id === course.studioId);
+          const coachsInfo = course.coachIds.map(coachId => 
+            coachs.find(c => c.id === coachId)
+          );
+
+          scheduleByTimeAndDay[startTime][frenchDay].push({
+            courseName: courseInfo ? courseInfo.name : 'Cours inconnu',
+            logo: courseInfo ? courseInfo.logo : '',
+            studio: studioInfo ? studioInfo.name : 'Studio inconnu',
+            endTime: course.endTime,
+            startTime: course.startTime,
+            duration: course.duration,
+            type: course.type,
+            coachs: coachsInfo.map(coach => ({
+              name: coach ? coach.name : 'Coach inconnu',
+              imageUrl: coach ? coach.imageUrl : ''
+            }))
+          });
+        });
+      });
+
+      var daysWithCourses = new Set();
+      var timesWithCourses = new Set();
+
+      for (var time in scheduleByTimeAndDay) {
+        for (var day in scheduleByTimeAndDay[time]) {
+          daysWithCourses.add(day);
+          timesWithCourses.add(time);
+        }
+      }
+
+      var daysArray = Array.from(daysWithCourses);
+      var timesArray = Array.from(timesWithCourses);
+
+      daysArray.sort(function(a, b) {
+        return weekDays.indexOf(a) - weekDays.indexOf(b);
+      });
+
+      timesArray.sort();
+
+      var html = '<table class="weekly-schedule">';
+
+      html += '<thead><tr><th></th>';
+      for (var i = 0; i < daysArray.length; i++) {
+        var dayClass = '';
+        if (daysArray[i] === todayName) {
+          dayClass = 'today';
+        }
+        html += '<th class="' + dayClass + '">' + daysArray[i] + '</th>';
+      }
+      html += '</tr></thead>';
+
+      html += '<tbody>';
+
+      var isWhiteRow = true;
+
+      for (var t = 0; t < timesArray.length; t++) {
+        var time = timesArray[t];
+
+        var rowClass = isWhiteRow ? 'course-row-white' : 'course-row-grey';
+        var timeCellClass = isWhiteRow ? 'time-cell-white' : 'time-cell-grey';
+
+        isWhiteRow = !isWhiteRow;
+
+        html += '<tr class="' + rowClass + '">';
+
+        // Trouver l'heure de fin pour cette ligne (première heure de fin trouvée)
+        var endTimeForRow = '';
+        for (var d = 0; d < daysArray.length; d++) {
+          var day = daysArray[d];
+          var courses = scheduleByTimeAndDay[time][day];
+          if (courses && courses.length > 0 && courses[0].endTime) {
+            endTimeForRow = courses[0].endTime;
+            break;
+          }
+        }
+        
+        // Afficher l'heure de début et de fin dans la colonne time-cell avec le tiret sur la deuxième ligne
+        var timeDisplay = time;
+        if (endTimeForRow) {
+          timeDisplay = time + '<br>-<br>' + endTimeForRow;
+        }
+        html += '<td class="time-cell ' + timeCellClass + '">' + timeDisplay + '</td>';
+
+        for (var d = 0; d < daysArray.length; d++) {
+          var day = daysArray[d];
+          var courses = scheduleByTimeAndDay[time][day];
+
+          html += '<td class="course-cell">';
+          if (courses && courses.length > 0) {
+            for (var c = 0; c < courses.length; c++) {
+              var course = courses[c];
+              var courseDisplay = '';
+
+              var logoUrl = course.logo || '';
+              var courseNameDisplay = '';
+
+              if (SHOW_COURSE_IMAGES && logoUrl) {
+                courseNameDisplay = '<img class="logo-cours" src="' + logoUrl + '" alt="' + course.courseName + ' Logo">';
+              } else {
+                courseNameDisplay = course.courseName;
+              }
+
+              var coachImagesHtml = '';
+              if (course.coachs.length === 1) {
+                var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+                coachImagesHtml = '<div class="single-coach">' +
+                                  '<img src="' + coachImageUrl + '" alt="' + course.coachs[0].name + '">' +
+                                  '<span>' + course.coachs[0].name + '</span></div>';
+              } else if (course.coachs.length > 1) {
+                coachImagesHtml = '<div class="multiple-coaches">';
+                var coachImages = course.coachs.map(coach => coach.imageUrl).filter(Boolean);
+                coachImages.forEach(function(coachImageUrl, index) {
+                  coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
+                });
+                coachImagesHtml += '</div>';
+              }
+
+              var courseClasses = 'course-block';
+              if (course.type === '100% Femmes') {
+                courseClasses += ' women-only';
+              } else {
+                courseClasses += ' mixte';
+              }
+
+              if (course.studio.toLowerCase().includes('piscine') || course.studio.toLowerCase().includes('aqua')) {
+                courseClasses += ' piscine';
+              }
+
+              var now = new Date();
+              var courseDate = new Date();
+              
+              var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
+              var startHour = parseInt(startTimeParts[0]) || 0;
+              var startMinute = parseInt(startTimeParts[1]) || 0;
+              
+              var currentDay = now.getDay();
+              var targetDay = weekDays.indexOf(day);
+              
+              var dayDiff = targetDay - currentDay;
+              if (dayDiff < 0) {
+                dayDiff += 7;
+              }
+              
+              courseDate.setDate(now.getDate() + dayDiff);
+              courseDate.setHours(startHour, startMinute, 0, 0);
+              
+              var timeDifference = Math.floor((courseDate - now) / 1000);
+              
+              var isStartingSoon = timeDifference >= 0 && timeDifference <= 900;
+              var isInProgress = timeDifference < 0 && timeDifference > -course.duration * 60;
+              
+              if (isStartingSoon) {
+                courseClasses += ' starting-soon';
+              } else if (isInProgress) {
+                courseClasses += ' current';
+              }
+
+              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '">';
+
+              if (isStartingSoon) {
+                courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
+              }
+
+              courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
+              courseDisplay += coachImagesHtml;
+              courseDisplay += '</div>';
+
+              html += courseDisplay;
+            }
+          }
+          html += '</td>';
+        }
+
+        html += '</tr>';
+      }
+      html += '</tbody>';
+      html += '</table>';
+
+      return html;
+    }
+
+    function scrollToCurrentTime() {
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          const contentWrapper = document.querySelector('.content-wrapper');
+          if (!contentWrapper) return;
+
+          let targetRow = document.querySelector('.course-block.current')?.closest('tr');
+          
+          if (!targetRow) {
+            targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
+          }
+          
+          if (!targetRow) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+            const times = document.querySelectorAll('.time-cell');
+            
+            for (let i = 0; i < times.length; i++) {
+              const timeText = times[i].textContent.trim();
+              const [hour, minute] = timeText.split(':').map(Number);
+              
+              if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+                targetRow = times[i].parentElement;
+                break;
+              }
+            }
+          }
+
+          if (targetRow) {
+            const headerWrapper = document.querySelector('.header-wrapper');
+            const thead = document.querySelector('.weekly-schedule thead');
+            
+            const headerHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
+            const theadHeight = thead ? thead.offsetHeight : 0;
+            
+            const targetPosition = targetRow.offsetTop - headerHeight - theadHeight - 10;
+            
+            setTimeout(() => {
+              contentWrapper.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }, 100);
+          }
+        });
+      }, 500);
+    }
+
+    setInterval(scrollToCurrentTime, 900000);
+
+    setInterval(function() {
+      location.reload();
+    }, 3600000);
+
+    function checkCourseStates() {
+      const now = new Date();
+      const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      const currentDay = now.getDay();
+      const currentDayName = weekDays[currentDay];
+      const currentHour = now.getHours();
+      const currentMinutes = now.getMinutes();
+      const currentTimeInMinutes = currentHour * 60 + currentMinutes;
+
+      const courseBlocks = document.querySelectorAll('.course-block');
+      
+      courseBlocks.forEach(block => {
+        try {
+          if (!block) return;
+
+          const dayCell = block.closest('tr')?.querySelector('th');
+          if (!dayCell) return;
+
+          const dayName = dayCell.textContent?.trim();
+          if (!dayName) return;
+          
+          if (dayName === currentDayName) {
+            const timeCell = block.closest('tr')?.querySelector('.time-cell');
+            if (!timeCell) return;
+
+            const startTime = timeCell.textContent?.trim();
+            if (!startTime) return;
+
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const startTimeInMinutes = startHour * 60 + startMinute;
+            
+            const timeDifference = startTimeInMinutes - currentTimeInMinutes;
+            
+            const isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
+            const isInProgress = timeDifference < 0 && timeDifference > -60;
+            
+            if (isStartingSoon) {
+              block.classList.add('starting-soon');
+              block.classList.remove('current');
+              let countdownPill = block.querySelector('.countdown-pill');
+              if (!countdownPill) {
+                countdownPill = document.createElement('div');
+                countdownPill.className = 'countdown-pill starting-soon';
+                block.insertBefore(countdownPill, block.firstChild);
+              }
+              countdownPill.setAttribute('data-time-diff', timeDifference * 60);
+            } else if (isInProgress) {
+              block.classList.add('current');
+              block.classList.remove('starting-soon');
+              const countdownPill = block.querySelector('.countdown-pill');
+              if (countdownPill) {
+                countdownPill.remove();
+              }
+            } else {
+              block.classList.remove('starting-soon', 'current');
+              const countdownPill = block.querySelector('.countdown-pill');
+              if (countdownPill) {
+                countdownPill.remove();
+              }
+            }
+          } else {
+            block.classList.remove('starting-soon', 'current');
+            const countdownPill = block.querySelector('.countdown-pill');
+            if (countdownPill) {
+              countdownPill.remove();
+            }
+          }
+        } catch (error) {
+          console.error('Erreur lors de la vérification de l\'état du cours:', error);
+        }
+      });
+    }
+
+  </script>
+
+</body>
+</html>
