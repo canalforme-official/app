@@ -112,19 +112,11 @@
 
     /* Style pour la disposition du titre et des filtres */
     .header-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 5px;
-      flex-wrap: wrap;
-      pointer-events: none;
-      padding: 5px;
+      display: none;
     }
 
     .header-wrapper h1 {
-      color: var(--primary-color);
-      font-size: 1.2em;
-      margin: 0;
+      display: none;
     }
 
     /* Styles pour le conteneur des filtres */
@@ -559,6 +551,176 @@
       height: 100%;
     }
 
+    /* Bouton de filtre intégré dans la barre */
+    .filters-sidebar .filter-button {
+      position: relative;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .filters-sidebar .filter-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .filters-sidebar.open .filter-button:hover {
+      background: var(--primary-color);
+    }
+
+    .filters-sidebar.open .filter-button:hover .filter-icon::before,
+    .filters-sidebar.open .filter-button:hover .filter-icon::after {
+      background: white;
+    }
+
+    .filters-sidebar.open .filter-button:hover .filter-icon::before {
+      border-bottom-color: white;
+    }
+
+    .filters-sidebar .filter-button:active {
+      transform: scale(0.95);
+    }
+
+    .filter-icon {
+      width: 24px;
+      height: 24px;
+      position: relative;
+    }
+
+    .filter-icon::before,
+    .filter-icon::after {
+      content: '';
+      position: absolute;
+      background: var(--primary-color);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 2px;
+    }
+
+    .filter-button:hover .filter-icon::before,
+    .filter-button:hover .filter-icon::after {
+      background: white;
+    }
+
+    /* Icône de filtre (triangle avec lignes) */
+    .filter-icon::before {
+      top: 4px;
+      left: 4px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 10px solid var(--primary-color);
+      background: transparent;
+    }
+
+    .filter-button:hover .filter-icon::before {
+      border-bottom-color: white;
+    }
+
+    .filter-icon::after {
+      top: 14px;
+      left: 2px;
+      width: 20px;
+      height: 3px;
+    }
+
+    /* Barre de filtres qui part du bouton */
+    .filters-sidebar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      z-index: 1000;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: visible;
+      padding: 0;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .filters-sidebar.open {
+      width: calc(100% - 40px);
+      border-radius: 25px;
+      overflow: visible;
+    }
+
+    .filters-sidebar-content {
+      display: none;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex: 1;
+      padding: 0 15px;
+      white-space: nowrap;
+    }
+
+    .filters-sidebar.open .filters-sidebar-content {
+      display: flex;
+    }
+
+    .filters-sidebar h2 {
+      display: none;
+    }
+
+    .filters-sidebar .filters {
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+
+    .filters-sidebar .filters label {
+      font-size: 0.85em;
+      color: var(--primary-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .filters-sidebar .filters input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    .filters-sidebar .filters select {
+      font-size: 0.85em;
+      padding: 5px 25px 5px 10px;
+      min-width: 120px;
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .filters-sidebar-close {
+      display: none;
+    }
+
     /* Styles responsives pour différentes tailles d'écran */
     @media screen and (max-width: 480px) {
       .header-wrapper h1 {
@@ -592,6 +754,7 @@
       .weekly-schedule td.time-cell {
         width: 30px;
         font-size: 0.7em;
+        line-height: 0.8;
       }
 
       .course-block {
@@ -603,14 +766,18 @@
 
       .logo-cours {
         max-width: 100%;
-        max-height: 91px;
+        max-height: 137px;
         width: auto;
         height: auto;
       }
 
       .course-info {
-        font-size: 0.9em;
+        font-size: 0.7em;
         width: 100%;
+      }
+
+      .single-coach {
+        font-size: 0.41em;
       }
 
       .single-coach img,
@@ -699,10 +866,16 @@
 </head>
 <body onload="initializeWeeklyPage();">
   <div class="content-wrapper">
+    <!-- Le planning hebdomadaire sera inséré ici -->
+    <div id="weeklySchedule"></div>
+  </div>
 
-    <!-- En-tête avec le titre et les filtres -->
-    <div class="header-wrapper">
-      <h1>Planning Hebdomadaire</h1>
+  <!-- Barre de filtres en bas avec le bouton intégré -->
+  <div class="filters-sidebar" id="filtersSidebar">
+    <button class="filter-button" onclick="toggleFiltersSidebar(event)">
+      <div class="filter-icon"></div>
+    </button>
+    <div class="filters-sidebar-content">
       <div class="filters">
         <label>
           <input type="checkbox" id="filter-mixte" checked>
@@ -725,10 +898,6 @@
         </select>
       </div>
     </div>
-
-    <!-- Le planning hebdomadaire sera inséré ici -->
-    <div id="weeklySchedule"></div>
-
   </div>
 
   <script>
@@ -1241,6 +1410,33 @@
         }
       });
     }
+
+    // Fonction pour ouvrir/fermer la barre de filtres
+    function toggleFiltersSidebar(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      const sidebar = document.getElementById('filtersSidebar');
+      
+      if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      } else {
+        sidebar.classList.add('open');
+      }
+    }
+
+    // Fermer la barre de filtres quand on clique ailleurs (mais pas sur le bouton ni la barre)
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('filtersSidebar');
+      const filterButton = document.querySelector('.filter-button');
+      
+      if (sidebar.classList.contains('open')) {
+        // Si le clic n'est pas sur la barre de filtres ni sur le bouton
+        if (!sidebar.contains(event.target) && !filterButton.contains(event.target)) {
+          sidebar.classList.remove('open');
+        }
+      }
+    });
 
   </script>
 
