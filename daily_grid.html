@@ -855,10 +855,21 @@
   </div>
 
   <script>
+    // Navigation "à la daily.html" : on boucle sur 7 jours (0..6) au lieu de faire défiler une date infiniment
+    let currentDayIndex = new Date().getDay();
     let currentDate = new Date();
     const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
     let allData = null;
+
+    function syncCurrentDateToWeekWindow() {
+      // Même logique que dans daily.html:
+      // on mappe un index de jour vers la prochaine occurrence de ce jour sur les 7 jours à venir
+      const base = new Date();
+      const baseDay = base.getDay();
+      base.setDate(base.getDate() + (currentDayIndex - baseDay + 7) % 7);
+      currentDate = base;
+    }
     
     // Détection automatique de Puppeteer/navigateur automatisé
     function isAutomatedBrowser() {
@@ -1037,12 +1048,14 @@
     }
 
     function navigateDay(offset) {
-      currentDate.setDate(currentDate.getDate() + offset);
+      currentDayIndex = (currentDayIndex + offset + 7) % 7;
+      syncCurrentDateToWeekWindow();
       loadAndDisplayCourses();
     }
 
     async function loadAndDisplayCourses() {
       try {
+        syncCurrentDateToWeekWindow();
         console.log('Début du chargement des données...');
         const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
         
