@@ -343,6 +343,9 @@
       position: relative;
       padding-right: 30px;
       box-shadow: 0px 1px 4px var(--shadow-light);
+      overflow: hidden;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     /* Styles pour les cours mixtes */
@@ -495,6 +498,8 @@
       margin-right: 0;
       padding-right: 0;
       line-height: 1.2;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .single-coach {
@@ -1012,14 +1017,17 @@
 
       .logo-cours {
         max-width: 100%;
-        max-height: 137px;
+        max-height: 180px;
         width: auto;
         height: auto;
       }
 
       .course-info {
-        font-size: 0.49em; /* Réduit de 30% (0.7 * 0.7) */
+        font-size: 0.4em; /* Réduit davantage pour éviter le débordement */
         width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.2;
       }
 
       .single-coach {
@@ -1053,12 +1061,15 @@
       }
 
       .course-info {
-        font-size: 0.665em; /* Réduit de 30% (0.95 * 0.7) */
+        font-size: 0.55em; /* Réduit davantage pour éviter le débordement */
         width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.2;
       }
 
       .logo-cours {
-        max-height: 98px;
+        max-height: 150px;
       }
     }
 
