@@ -553,7 +553,9 @@
 
     /* Bouton de filtre intégré dans la barre */
     .filters-sidebar .filter-button {
-      position: relative;
+      position: absolute;
+      right: 0;
+      top: 0;
       background: transparent;
       border: none;
       border-radius: 50%;
@@ -572,6 +574,8 @@
       box-shadow: none;
       margin: 0;
       padding: 0;
+      z-index: 1001;
+      pointer-events: all;
     }
 
     .filters-sidebar .filter-button:hover {
@@ -584,12 +588,9 @@
     }
 
     .filters-sidebar.open .filter-button:hover .filter-icon::before,
-    .filters-sidebar.open .filter-button:hover .filter-icon::after {
+    .filters-sidebar.open .filter-button:hover .filter-icon::after,
+    .filters-sidebar.open .filter-button:hover .filter-icon span {
       background: white;
-    }
-
-    .filters-sidebar.open .filter-button:hover .filter-icon::before {
-      border-bottom-color: white;
     }
 
     .filters-sidebar .filter-button:active {
@@ -600,43 +601,57 @@
       width: 24px;
       height: 24px;
       position: relative;
+      display: block;
     }
 
-    .filter-icon::before,
+    /* Trois barres horizontales qui diminuent de taille */
+    .filter-icon::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+
     .filter-icon::after {
       content: '';
       position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 2.5px;
       background: var(--primary-color);
+      border-radius: 1px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 2px;
+      z-index: 1;
+    }
+
+    /* Troisième barre (la plus petite) via un span dans le HTML */
+    .filter-icon span {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: block;
+      z-index: 1;
     }
 
     .filter-button:hover .filter-icon::before,
-    .filter-button:hover .filter-icon::after {
+    .filter-button:hover .filter-icon::after,
+    .filter-button:hover .filter-icon span {
       background: white;
-    }
-
-    /* Icône de filtre (triangle avec lignes) */
-    .filter-icon::before {
-      top: 4px;
-      left: 4px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 10px solid var(--primary-color);
-      background: transparent;
-    }
-
-    .filter-button:hover .filter-icon::before {
-      border-bottom-color: white;
-    }
-
-    .filter-icon::after {
-      top: 14px;
-      left: 2px;
-      width: 20px;
-      height: 3px;
     }
 
     /* Barre de filtres qui part du bouton */
@@ -650,8 +665,8 @@
       backdrop-filter: blur(10px);
       border-radius: 25px;
       z-index: 1000;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: visible;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      overflow: hidden;
       padding: 0;
       box-sizing: border-box;
       display: flex;
@@ -671,9 +686,9 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 15px;
+      gap: 8px;
       flex: 1;
-      padding: 0 15px;
+      padding: 0 60px 0 15px;
       white-space: nowrap;
     }
 
@@ -688,37 +703,268 @@
     .filters-sidebar .filters {
       display: flex;
       flex-direction: row;
-      gap: 15px;
+      gap: 8px;
       align-items: center;
       justify-content: center;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
     }
 
     .filters-sidebar .filters label {
-      font-size: 0.85em;
+      font-size: 0.65em;
       color: var(--primary-color);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 3px;
       white-space: nowrap;
     }
 
     .filters-sidebar .filters input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
       margin: 0;
     }
 
     .filters-sidebar .filters select {
-      font-size: 0.85em;
-      padding: 5px 25px 5px 10px;
-      min-width: 120px;
+      font-size: 0.65em;
+      padding: 3px 20px 3px 8px;
+      min-width: 90px;
       background-color: rgba(255, 255, 255, 0.9);
     }
 
     .filters-sidebar-close {
       display: none;
+    }
+
+    /* Style pour le bouton today-view (en haut) */
+    .today-view-button {
+      position: fixed;
+      top: 55px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 55px;
+      height: 55px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: all;
+      animation: none;
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Style pour le bouton today-view (en haut) */
+    .today-view-button-bottom {
+      position: fixed;
+      top: 55px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 55px;
+      height: 55px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: all;
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .today-view-button-bottom::before {
+      content: '';
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .today-view-button-bottom::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .today-view-button-bottom button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .today-view-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .today-view-button::before {
+      content: '';
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .today-view-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .today-view-button button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    @keyframes rotate-icon {
+      0% {
+        transform: rotate(0deg);
+      }
+      50% {
+        transform: rotate(180deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Style pour le bouton de rotation */
+    .rotation-view-button {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 0;
+      width: 50px;
+      height: 50px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: all;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .rotation-view-button::before {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/665404b9-0908-8116-6c7b-5c61a7075d36.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+    }
+
+    .rotation-view-button button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+      border-radius: 25px;
+    }
+
+    .rotation-view-button:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+
+    .rotation-view-button:active {
+      transform: scale(0.95);
     }
 
     /* Styles responsives pour différentes tailles d'écran */
@@ -772,12 +1018,12 @@
       }
 
       .course-info {
-        font-size: 0.7em;
+        font-size: 0.49em; /* Réduit de 30% (0.7 * 0.7) */
         width: 100%;
       }
 
       .single-coach {
-        font-size: 0.41em;
+        font-size: 0.287em; /* Réduit de 30% (0.41 * 0.7) */
       }
 
       .single-coach img,
@@ -807,7 +1053,7 @@
       }
 
       .course-info {
-        font-size: 0.95em;
+        font-size: 0.665em; /* Réduit de 30% (0.95 * 0.7) */
         width: 100%;
       }
 
@@ -870,10 +1116,22 @@
     <div id="weeklySchedule"></div>
   </div>
 
+  <!-- Bouton pour revenir à aujourd'hui -->
+  <div class="today-view-button" id="todayViewButton">
+    <button onclick="returnToToday()">
+    </button>
+  </div>
+
+  <!-- Bouton de rotation vers weekly.html -->
+  <div class="rotation-view-button" id="rotationViewButton">
+    <button onclick="goToWeekly()">
+    </button>
+  </div>
+
   <!-- Barre de filtres en bas avec le bouton intégré -->
   <div class="filters-sidebar" id="filtersSidebar">
     <button class="filter-button" onclick="toggleFiltersSidebar(event)">
-      <div class="filter-icon"></div>
+      <div class="filter-icon"><span></span></div>
     </button>
     <div class="filters-sidebar-content">
       <div class="filters">
@@ -1415,14 +1673,17 @@
     function toggleFiltersSidebar(event) {
       if (event) {
         event.stopPropagation();
+        event.preventDefault();
       }
       const sidebar = document.getElementById('filtersSidebar');
       
-      if (sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-      } else {
-        sidebar.classList.add('open');
+      if (!sidebar) {
+        console.error('Sidebar not found');
+        return;
       }
+      
+      // Toggle la classe open pour ouvrir/fermer la barre
+      sidebar.classList.toggle('open');
     }
 
     // Fermer la barre de filtres quand on clique ailleurs (mais pas sur le bouton ni la barre)
@@ -1437,6 +1698,16 @@
         }
       }
     });
+
+    // Fonction pour retourner à aujourd'hui (redirige vers daily.html)
+    function returnToToday() {
+      window.location.href = './daily.html';
+    }
+
+    // Fonction pour aller vers weekly.html
+    function goToWeekly() {
+      window.location.href = './weekly.html';
+    }
 
   </script>
 
