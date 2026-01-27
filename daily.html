@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Planning du jour</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +24,16 @@
       /* Couleurs principales */
       --primary-color: #480607;
       --secondary-color: #FFA630;
+      
+      /* Dégradé piscine/aqua (bleu uniquement) */
+      --pool-blue: #35767c;
+      --pool-middle: #42464d;
+      --gradient-pool: radial-gradient(circle, var(--pool-blue) 0%, var(--pool-middle) 100%);
+      
+      /* Dégradé femmes uniquement (violet uniquement) */
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --gradient-women: radial-gradient(circle, var(--women-light) 0%, var(--women-middle) 100%);
       
       /* Couleurs spécifiques */
       --women-color: #E4A672;
@@ -140,199 +150,68 @@
       overflow: visible;
     }
 
-    /* Styles de base pour l'icône - Carrés en rotation */
+    /* Styles de base pour le point (cours passés, à venir, sur le point de commencer) */
     .timeline-block::before {
       content: '';
       position: absolute;
-      left: -50px;
-      top: calc(50% + 15px);
-      width: 20px;
-      height: 20px;
-      background: linear-gradient(45deg, 
-        var(--primary-color) 0%, 
-        var(--primary-color) 50%, 
-        var(--secondary-color) 50%, 
-        var(--secondary-color) 100%);
-      border-radius: 4px;
-      opacity: 0.8;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-      transform: translateY(-50%);
-      will-change: transform;
-    }
-
-    /* Point central du carré */
-    .timeline-block::after {
-      content: '';
-      position: absolute;
-      left: -45px;
-      top: calc(50% + 15px);
-      width: 6px;
-      height: 6px;
-      background-color: var(--text-light);
+      left: -35px; /* Décalé vers la droite par rapport à l'icône */
+      top: calc(50% + 12px); /* Décalé vers le bas */
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-color);
       border-radius: 50%;
-      opacity: 0.9;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-      transform: translateY(-50%);
-      will-change: transform;
-    }
-
-    /* Animation pour les cours en cours - Rotation douce comme le bouton */
-    @keyframes rotate-current {
-      0% {
-        transform: translateY(-50%) rotate(0deg) scale(1);
-        opacity: 0.8;
-      }
-      50% {
-        transform: translateY(-50%) rotate(180deg) scale(1.05);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-50%) rotate(360deg) scale(1);
-        opacity: 0.8;
-      }
-    }
-
-    @keyframes pulse-dot-current {
-      0% {
-        transform: translateY(-50%) scale(1);
-        background-color: var(--text-light);
-        opacity: 0.9;
-      }
-      50% {
-        transform: translateY(-50%) scale(1.3);
-        background-color: var(--text-light);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-50%) scale(1);
-        background-color: var(--text-light);
-        opacity: 0.9;
-      }
-    }
-
-    /* Application de l'animation pour les cours en cours - Rotation douce */
-    .timeline-block.current::before {
-      animation: rotate-current 3s ease-in-out infinite;
-    }
-
-    .timeline-block.current::after {
-      animation: pulse-dot-current 2s ease-in-out infinite;
-    }
-
-    /* Styles pour les cours passés - Carré gris statique */
-    .timeline-block.past::before {
-      background: linear-gradient(45deg, 
-        var(--state-past) 0%, 
-        var(--state-past) 50%, 
-        var(--state-past) 50%, 
-        var(--state-past) 100%);
-      opacity: 0.3;
-      animation: none;
-    }
-
-    .timeline-block.past::after {
-      background-color: var(--state-past);
-      opacity: 0.3;
-      width: 4px;
-      height: 4px;
-      left: -44px;
-      animation: none;
-    }
-
-    /* Style pour les cours à venir - Carré avec pulsation douce */
-    .timeline-block.upcoming::before {
-      background: linear-gradient(45deg, 
-        var(--primary-color) 0%, 
-        var(--primary-color) 50%, 
-        var(--secondary-color) 50%, 
-        var(--secondary-color) 100%);
-      opacity: 0.6;
-      animation: pulse-upcoming 4s ease-in-out infinite;
-    }
-
-    .timeline-block.upcoming::after {
-      background-color: var(--text-light);
-      opacity: 0.7;
-      animation: pulse-dot-upcoming 4s ease-in-out infinite;
-    }
-
-    /* Style pour les cours qui vont commencer - Carré avec rotation lente */
-    .timeline-block.starting-soon::before {
-      background: linear-gradient(45deg, 
-        var(--primary-color) 0%, 
-        var(--primary-color) 50%, 
-        var(--secondary-color) 50%, 
-        var(--secondary-color) 100%);
-      opacity: 0.9;
-      animation: rotate-starting-soon 4s ease-in-out infinite;
-    }
-
-    .timeline-block.starting-soon::after {
-      background-color: var(--text-light);
       opacity: 1;
-      animation: pulse-dot-starting-soon 2s ease-in-out infinite;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      transform: translate(calc(-50% - 3px), calc(-50% - 4px));
     }
 
-    /* Animation pour les cours à venir - Pulsation douce */
-    @keyframes pulse-upcoming {
-      0%, 100% {
-        transform: translateY(-50%) scale(1);
-        opacity: 0.6;
-      }
-      50% {
-        transform: translateY(-50%) scale(1.02);
-        opacity: 0.8;
-      }
-    }
-
-    @keyframes pulse-dot-upcoming {
-      0%, 100% {
-        transform: translateY(-50%) scale(1);
-        opacity: 0.7;
-      }
-      50% {
-        transform: translateY(-50%) scale(1.1);
-        opacity: 0.9;
-      }
-    }
-
-    /* Animation pour les cours qui vont commencer - Rotation lente */
-    @keyframes rotate-starting-soon {
+    /* Animation pour les cours en cours : pulse + rotation (exagéré) */
+    @keyframes rotate-icon {
       0% {
-        transform: translateY(-50%) rotate(0deg) scale(1);
-        opacity: 0.9;
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.1); /* Très petit (3px) */
+      }
+      25% {
+        transform: translate(-50%, -50%) rotate(90deg) scale(1.3); /* Plus grand que la taille normale (39px) */
       }
       50% {
-        transform: translateY(-50%) rotate(90deg) scale(1.03);
-        opacity: 1;
+        transform: translate(-50%, -50%) rotate(180deg) scale(1.3); /* Plus grand que la taille normale */
+      }
+      75% {
+        transform: translate(-50%, -50%) rotate(270deg) scale(1.3); /* Plus grand que la taille normale */
       }
       100% {
-        transform: translateY(-50%) rotate(180deg) scale(1);
-        opacity: 0.9;
+        transform: translate(-50%, -50%) rotate(360deg) scale(0.1); /* Retour très petit (3px) */
       }
     }
 
-    @keyframes pulse-dot-starting-soon {
-      0% {
-        transform: translateY(-50%) scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: translateY(-50%) scale(1.2);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-50%) scale(1);
-        opacity: 1;
-      }
+    /* Application de l'animation pour les cours en cours */
+    .timeline-block.current::before {
+      left: -52px; /* Centre à -37px : -37px - 15px (rayon) = -52px */
+      top: 50%;
+      width: 30px;
+      height: 30px;
+      background-color: transparent;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 0;
+      transform-origin: center center;
+      animation: rotate-icon 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
+
+    /* Correction de la transparence pour le point des cours passés */
+    .timeline-block.past::before {
+      opacity: 0.5;
+    }
+
+    /* Les cours à venir et sur le point de démarrer gardent le point par défaut */
 
     .time {
       font-family: var(--font-title);
       font-size: 1.4em;
-      color: var(--primary-color);
+      color: rgba(72, 6, 7, 0.7);
       position: relative;
       top: 0;
       margin-left: 0;
@@ -372,9 +251,10 @@
     }
 
     .course-title img {
-      max-width: 180px;
-      max-height: 70px;
+      max-width: 150px;
+      max-height: 55px;
       object-fit: contain;
+      margin-bottom: 12px;
     }
 
     /* Styles pour le type de cours */
@@ -395,14 +275,39 @@
     /* Type de cours pour "100% Femmes" */
     .course-block.women-only {
       background-color: var(--women-color-light);
+      position: relative;
     }
 
-    .course-block.women-only .course-type {
-      color: var(--women-color);
+    /* Dégradé femmes - mais pas si c'est aussi piscine */
+    .course-block.women-only:not(.piscine)::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-women) !important;
+      opacity: 0.4;
+      border-radius: 15px;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .course-block.women-only.current .course-type {
-      color: rgba(255, 255, 255, 0.9);
+    .course-block.women-only .course-title,
+    .course-block.women-only .course-coach,
+    .course-block.women-only .countdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-block.women-only .course-type,
+    .course-block.women-only .course-studio {
+      z-index: 1;
+    }
+
+    /* Type de cours en blanc pour 100% femmes (sans piscine) */
+    .course-block.women-only:not(.piscine) .course-type {
+      color: var(--text-light);
     }
 
     /* Type de cours pour "Mixte" */
@@ -410,21 +315,62 @@
       color: var(--primary-color);
     }
 
-    /* Type de cours pour "Piscine" */
+    /* Type de cours pour "Piscine" - priorité sur women-only */
     .course-block.piscine {
       background-color: var(--pool-color-light);
+      position: relative;
     }
 
+    .course-block.piscine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-pool) !important;
+      opacity: 0.4;
+      border-radius: 15px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .course-block.piscine .course-title,
+    .course-block.piscine .course-coach,
+    .course-block.piscine .countdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-block.piscine .course-type,
+    .course-block.piscine .course-studio {
+      z-index: 1;
+    }
+
+    /* Type de cours en blanc pour piscine/aqua */
     .course-block.piscine .course-type {
-      color: var(--pool-color);
+      color: var(--text-light);
     }
 
     /* Cours passés */
     .course-block.past {
-      border: 2px solid var(--state-past);
       opacity: 0.5;
       box-shadow: 0px 3px 10px var(--shadow-light);
       color: var(--state-past);
+    }
+
+    /* Titre des cours aqua/piscine passés - couleur plus foncée pour la lisibilité */
+    .course-block.past.piscine .course-title h3,
+    .course-block.past.piscine .course-title {
+      color: var(--text-primary);
+      opacity: 0.8;
+    }
+
+    /* Titre des cours 100% femmes passés - couleur plus foncée pour la lisibilité */
+    .course-block.past.women-only:not(.piscine) .course-title h3,
+    .course-block.past.women-only:not(.piscine) .course-title {
+      color: var(--text-primary);
+      opacity: 0.8;
     }
 
     /* Cours à venir */
@@ -449,6 +395,10 @@
       box-shadow: 0px 0px 15px 5px var(--women-color-light);
     }
 
+    .course-block.women-only.starting-soon:not(.piscine)::before {
+      opacity: 0.4;
+    }
+
     /* Cours en cours */
     .course-block.current {
       font-size: 1.1em;
@@ -461,10 +411,28 @@
       color: var(--text-primary);
     }
 
-    .course-block.current.women-only {
-      background-color: var(--women-color);
+    .course-block.current.women-only:not(.piscine) {
+      background-color: var(--women-color-light);
       color: var(--text-primary);
       box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    /* RÈGLE CRITIQUE : Dégradé rose pour les cours 100% femmes en cours (sans piscine) - PRIORITÉ MAXIMALE */
+    .course-block.current.women-only:not(.piscine)::before,
+    .course-block.women-only.current:not(.piscine)::before {
+      background: var(--gradient-women) !important;
+      opacity: 0.4 !important;
+    }
+
+    /* RÈGLE CRITIQUE : Dégradé bleu pour les cours piscine en cours - PRIORITÉ MAXIMALE (même si aussi women-only) */
+    .course-block.piscine.current::before,
+    .course-block.current.piscine::before,
+    .course-block.piscine.current.women-only::before,
+    .course-block.current.piscine.women-only::before,
+    .course-block.women-only.piscine.current::before,
+    .course-block.women-only.current.piscine::before {
+      background: var(--gradient-pool) !important;
+      opacity: 0.4 !important;
     }
 
     /* Animation pour le rebond */
@@ -491,24 +459,46 @@
       margin-bottom: 5px;
     }
 
+    /* Noms des coachs en blanc pour piscine/aqua */
+    .course-block.piscine .course-coach {
+      color: var(--text-light);
+    }
+
+    /* Noms des coachs en blanc pour 100% femmes (sans piscine) */
+    .course-block.women-only:not(.piscine) .course-coach {
+      color: var(--text-light);
+    }
+
     .course-studio {
-      font-size: 0.9em;
-      color: var(--text-tertiary);
+      position: absolute;
+      bottom: 0;
+      right: 10px;
+      z-index: 10;
+    }
+
+    .course-studio img {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      margin: 0;
+      display: block;
     }
 
     /* Styles pour le compte à rebours */
     .countdown {
       font-family: var(--font-title);
       position: absolute;
-      bottom: 10px;
-      right: 20px;
+      bottom: -20px; /* Compenser le padding-bottom de 20px du course-block */
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 0.9em;
       font-weight: 500;
       color: var(--primary-color);
       background: none;
       padding: 4px 8px;
       text-transform: uppercase;
-      text-align: right;
+      text-align: center;
+      width: auto;
     }
 
     .focus {
@@ -562,13 +552,12 @@
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
     .nav-segments {
       position: relative;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
     }
 
     .segment {
@@ -578,12 +567,12 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Segments pour bouton précédent (pointent vers la droite) */
+    /* Segments pour le bouton précédent */
     .prev-button .segment-1 {
       width: 16px;
       height: 3px;
-      top: 11px;
-      right: 3px;
+      top: 8px;
+      right: 1px;
       transform: rotate(45deg);
       transform-origin: left center;
     }
@@ -591,18 +580,18 @@
     .prev-button .segment-2 {
       width: 16px;
       height: 3px;
-      top: 13px;
-      right: 3px;
+      top: 10px;
+      right: 1px;
       transform: rotate(-45deg);
       transform-origin: left center;
     }
 
-    /* Segments pour bouton suivant (pointent vers la gauche) */
+    /* Segments pour le bouton suivant */
     .next-button .segment-1 {
       width: 16px;
       height: 3px;
-      top: 11px;
-      left: 3px;
+      top: 8px;
+      left: 1px;
       transform: rotate(-45deg);
       transform-origin: right center;
     }
@@ -610,8 +599,8 @@
     .next-button .segment-2 {
       width: 16px;
       height: 3px;
-      top: 13px;
-      left: 3px;
+      top: 10px;
+      left: 1px;
       transform: rotate(45deg);
       transform-origin: right center;
     }
@@ -640,6 +629,10 @@
 
     @media screen and (min-width: 1025px) {
       .navigation {
+        display: none;
+      }
+      
+      .daily-grid-view-button {
         display: none;
       }
       
@@ -692,7 +685,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(calc(-50% - 3px), calc(-50% - 4px));
     }
 
     .loading-logo img {
@@ -733,29 +726,26 @@
 
     /* Styles spécifiques aux cours du studio "Piscine" */
     .course-block.piscine {
-      border: 2px solid var(--pool-color);
       background-color: var(--pool-color-light);
-      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
-    /* Styles pour les cours en cours ou démarrant bientôt dans "Piscine" */
+    /* Styles pour les cours en cours dans "Piscine" - garder le background et le dégradé bleu */
     .course-block.piscine.current {
-      border: 2px solid var(--pool-color);
-      background-color: var(--pool-color);
-      color: var(--text-primary);
-      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
+      background-color: var(--pool-color-light);
     }
 
     .course-block.piscine.starting-soon {
-      border: 2px solid var(--pool-color);
       animation: heartbeat-blink 1.5s ease-in-out infinite, blink-piscine 1.5s ease-in-out infinite;
-      box-shadow: 0px 0px 15px 5px var(--pool-color-light);
     }
 
     /* Animation pour le clignotement des cours "Piscine" */
     @keyframes blink-piscine {
-      0%, 100% { background-color: var(--pool-color-light); }
-      50% { background-color: rgba(120, 209, 182, 0.2); }
+      0%, 100% { 
+        background-color: var(--pool-color-light);
+      }
+      50% { 
+        background-color: rgba(120, 209, 182, 0.2);
+      }
     }
 
     /* Styles pour les appareils mobiles */
@@ -774,7 +764,11 @@
       }
 
       .timeline-block::before {
-        left: -52px;
+        left: -35px; /* Même position que la règle de base */
+      }
+      
+      .timeline-block.current::before {
+        left: -52px; /* L'icône garde sa position originale */
       }
 
       .time {
@@ -804,8 +798,9 @@
         font-size: 0.9em;
       }
 
-      .course-studio {
-        font-size: 0.7em;
+      .course-studio img {
+        width: 56px;
+        height: 56px;
       }
 
       .logo img {
@@ -818,6 +813,13 @@
         display: flex;
       }
 
+      .daily-grid-view-button {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+      }
+      
       .weekly-view-button {
         display: block;
         opacity: 1;
@@ -863,16 +865,188 @@
       margin-right: 10px;
     }
 
-    /* Style pour le bouton weekly-view */
-    .weekly-view-button {
+    /* Style pour le bouton daily-grid-view */
+    .daily-grid-view-button {
       position: fixed;
-      top: 55px;
-      right: 20px;
+      top: 50px;
+      right: 10px;
       z-index: 1000;
       background: none;
       padding: 0;
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom-grid {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom-grid 6s ease-in-out infinite;
+    }
+
+    .daily-grid-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .daily-grid-view-button::after {
+      content: '1';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 1px), calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #8dceb9;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .daily-grid-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .daily-grid-view-button img {
+      display: none;
+    }
+
+    /* Style pour le bouton daily-grid-view */
+    .daily-grid-view-button {
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom-grid {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom-grid 6s ease-in-out infinite;
+    }
+
+    .daily-grid-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .daily-grid-view-button::after {
+      content: '1';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 1px), calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #8dceb9;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .daily-grid-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .daily-grid-view-button img {
+      display: none;
+    }
+
+    /* Style pour le bouton weekly-view */
+    .weekly-view-button {
+      position: fixed;
+      top: 130px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -896,28 +1070,36 @@
       opacity: 1;
       transform: translateY(0);
       pointer-events: all;
+      animation: subtle-zoom 6s ease-in-out infinite;
     }
 
     .weekly-view-button::before {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      background: var(--secondary-color);
-      border-radius: 6px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/eb3b6e4d-5f0f-8674-90ee-871bf873cc0e.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
       transform-origin: center;
       pointer-events: none;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      -webkit-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      will-change: transform;
     }
 
+    .weekly-view-button::after {
+      content: '7';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: var(--secondary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
 
     .weekly-view-button a {
       z-index: 3;
@@ -938,70 +1120,8 @@
     }
 
     .weekly-view-button img {
-      display: block;
+      display: none;
     }
-
-    /* Fond du bouton */
-    .weekly-view-button::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      background: var(--secondary-color);
-      border: 1px solid var(--secondary-color);
-      border-radius: 6px;
-      transform: translate(-50%, -50%);
-      transform-origin: center;
-      pointer-events: none;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      -webkit-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      will-change: transform;
-    }
-
-    /* Icône weekly avec 3 lignes */
-    .weekly-icon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 24px;
-      height: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      pointer-events: none;
-    }
-
-    /* Icône weekly */
-    .weekly-icon-img {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 29px;
-      height: 29px;
-      z-index: 10;
-      filter: brightness(0) saturate(100%) invert(3%) sepia(100%) saturate(10000%) hue-rotate(350deg) brightness(30%) contrast(200%);
-      animation: weekly-pulse 3s ease-in-out infinite;
-    }
-
-    /* Animation subtile */
-    @keyframes weekly-pulse {
-      0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.9;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.05);
-        opacity: 1;
-      }
-    }
-
-
 
     /* Style pour le bouton today-view */
     .today-view-button {
@@ -1011,8 +1131,8 @@
       z-index: 1000;
       background: none;
       padding: 0;
-      width: 60px;
-      height: 60px;
+      width: 55px;
+      height: 55px;
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
@@ -1033,18 +1153,13 @@
     .today-view-button::before {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(45deg, 
-        var(--primary-color) 0%, 
-        var(--primary-color) 50%, 
-        var(--secondary-color) 50%, 
-        var(--secondary-color) 100%);
-      border-radius: 8px;
-      animation: today-rotate 3s ease-in-out infinite;
-      transform: translate(-50%, -50%);
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       transform-origin: center;
       pointer-events: none;
       backface-visibility: hidden;
@@ -1054,53 +1169,19 @@
       will-change: transform;
     }
 
-    /* Point central du bouton today */
     .today-view-button::after {
       content: '';
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 8px;
-      height: 8px;
-      background-color: var(--text-light);
-      border-radius: 50%;
-      animation: today-pulse-dot 2s ease-in-out infinite;
       transform: translate(-50%, -50%);
-      transform-origin: center;
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       pointer-events: none;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      -webkit-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      will-change: transform;
-    }
-
-    /* Animation pour le bouton today - Option B: Carré avec dégradé */
-    @keyframes today-rotate {
-      0%, 100% {
-        transform: translate(-50%, -50%) rotate(0deg);
-      }
-      50% {
-        transform: translate(-50%, -50%) rotate(180deg);
-      }
-    }
-
-    @keyframes today-pulse-dot {
-      0% {
-        transform: translate(-50%, -50%) scale(1);
-        background-color: var(--text-light);
-        opacity: 0.9;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.3);
-        background-color: var(--text-light);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1);
-        background-color: var(--text-light);
-        opacity: 0.9;
-      }
+      z-index: 2;
     }
 
     .today-view-button button {
@@ -1170,6 +1251,26 @@
       opacity: 0;
       transform: translateY(-100%);
       transition: opacity 0.3s ease, transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .sticky-day-name .day-name {
+      font-size: 1em;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .sticky-day-name .day-date {
+      font-size: 0.5em;
+      font-weight: 300;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Style pour le texte en tant que citation */
@@ -1186,21 +1287,28 @@
 
     .quote-text::before,
     .quote-text::after {
-      font-size: 2em;
-      color: var(--primary-color);
+      content: '';
       position: absolute;
+      font-size: 2.5em;
+      color: var(--secondary-color);
+      font-weight: bold;
+      line-height: 1;
+      opacity: 0.8;
+      z-index: 1;
     }
 
     .quote-text::before {
-      content: "«";
+      content: '«';
       left: -10px;
       top: -10px;
     }
 
     .quote-text::after {
-      content: "»";
+      content: '»';
       right: -10px;
       bottom: -10px;
+      top: auto;
+      line-height: 0;
     }
 
     .modal-backdrop {
@@ -1272,10 +1380,18 @@
       }
     }
 
-    .timeline-block::before {
-      left: -52px;  
-    }
     /* Styles pour le bouton weekly-view */
+    .daily-grid-view-button {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .weekly-view-button {
       opacity: 0;
       transform: translateY(20px);
@@ -1392,12 +1508,22 @@
 </head>
 <body onload="initializePage();" class="loading">
   <!-- Bloc de texte collant pour le nom du jour -->
-  <div id="stickyDayName" class="sticky-day-name"></div>
+  <div id="stickyDayName" class="sticky-day-name">
+    <span class="day-name"></span>
+    <span class="day-date"></span>
+  </div>
+
+  <!-- Bouton Daily Grid view -->
+  <div class="daily-grid-view-button">
+    <a href="./daily_grid.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png" alt="Vue Grille">
+    </a>
+  </div>
 
   <!-- Bouton Weekly view -->
   <div class="weekly-view-button">
-    <a href="./weekly.html">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8f9d5808-3db0-84ba-a4c9-24d99ec7043b.png" alt="Vue Hebdomadaire" class="weekly-icon-img">
+    <a href="./weekly_vertical.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8f9d5808-3db0-84ba-a4c9-24d99ec7043b.png" alt="Vue Hebdomadaire">
     </a>
   </div>
 
@@ -1438,9 +1564,12 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-    //const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
-    const apiUrl = './planning-v2.json';
+    const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
+  //const apiUrl = './planning-v2.json';
     let allData = [];
+    
+    // Option pour afficher/masquer les images des cours
+    const SHOW_COURSE_IMAGES = true; // Mettre à true pour afficher les images, false pour n'afficher que les noms
 
     function updateTodayButtonPosition() {
       const weeklyButton = document.querySelector('.weekly-view-button');
@@ -1455,11 +1584,16 @@
 
     function handleResize() {
       const isMobile = window.innerWidth <= 1024;
+      const dailyGridButton = document.querySelector('.daily-grid-view-button');
       const weeklyButton = document.querySelector('.weekly-view-button');
       const todayButton = document.querySelector('.today-view-button');
       const navigation = document.querySelector('.navigation');
       
       if (isMobile) {
+        if (dailyGridButton) {
+          dailyGridButton.style.display = 'block';
+          dailyGridButton.classList.add('loaded');
+        }
         if (weeklyButton) {
           weeklyButton.style.display = 'block';
           weeklyButton.classList.add('loaded');
@@ -1471,6 +1605,10 @@
           navigation.style.display = 'flex';
         }
       } else {
+        if (dailyGridButton) {
+          dailyGridButton.style.display = 'none';
+          dailyGridButton.classList.remove('loaded');
+        }
         if (weeklyButton) {
           weeklyButton.style.display = 'none';
           weeklyButton.classList.remove('loaded');
@@ -1499,10 +1637,17 @@
 
       const isMobile = window.innerWidth <= 1024;
       const navigation = document.querySelector('.navigation');
+      const dailyGridButton = document.querySelector('.daily-grid-view-button');
       const weeklyButton = document.querySelector('.weekly-view-button');
       
       if (isMobile) {
         if (navigation) navigation.classList.add('loaded');
+        if (dailyGridButton) {
+          dailyGridButton.classList.add('loaded');
+          dailyGridButton.style.opacity = '1';
+          dailyGridButton.style.transform = 'translateY(0)';
+          dailyGridButton.style.pointerEvents = 'all';
+        }
         if (weeklyButton) {
           weeklyButton.classList.add('loaded');
           weeklyButton.style.opacity = '1';
@@ -1562,13 +1707,25 @@
       const dayOfWeekElement = document.getElementById('dayOfWeek');
       const displayDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
       dayOfWeekElement.innerText = displayDayOfWeek;
-      document.getElementById('stickyDayName').innerText = displayDayOfWeek;
 
       // Mettre à jour la date
       const today = new Date();
       today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
       const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
       document.getElementById('dateStr').innerText = dateStr;
+      
+      // Mettre à jour le sticky header avec le jour et la date
+      const stickyDayName = document.getElementById('stickyDayName');
+      const stickyDayNameSpan = stickyDayName.querySelector('.day-name');
+      const stickyDayDateSpan = stickyDayName.querySelector('.day-date');
+      if (stickyDayNameSpan) {
+        stickyDayNameSpan.innerText = displayDayOfWeek;
+      }
+      if (stickyDayDateSpan) {
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = today.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase();
+        stickyDayDateSpan.innerText = `${day} ${month}`;
+      }
       
       if (!allData.planning || !allData.planning[dayOfWeek]) {
         console.error('Pas de planning pour le jour:', dayOfWeek);
@@ -1610,8 +1767,8 @@
           courseTypeClass = 'mixte';
         }
 
-        // Studio "Piscine"
-        if (studio.name === 'Piscine') {
+        // Studio "Piscine" ou "AQUA"
+        if (studio.name.toLowerCase().includes('piscine') || studio.name.toLowerCase().includes('aqua')) {
           courseTypeClass += ' piscine';
         }
 
@@ -1651,22 +1808,21 @@
           <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}" data-start-time="${course.startTime}" data-end-time="${course.endTime}">
             <div class="time">${course.startTime} - ${course.endTime}</div>
             <div class="course-block ${courseTypeClass} ${courseStatusClass}" id="${courseStatusClass.includes('focus') ? 'focus-course' : ''}">
+              <div class="course-studio">
+                ${studio.imageUrl 
+                  ? `<img src="${studio.imageUrl}" alt="${studio.name}">`
+                  : ''}
+              </div>
               <div class="course-type">${courseTypeText}</div>
               <div class="course-title">
-                ${cours.logo 
-                  ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 180px; max-height: 70px;" />`
+                ${SHOW_COURSE_IMAGES && cours.logo 
+                  ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 150px; max-height: 55px;" />`
                   : `<h3>${cours.name}</h3>`}
               </div>
               <div class="course-coach">
                 <div class="coach-images">
                   ${coachImagesHTML}
                 </div>
-              </div>
-              <div class="course-studio">
-                ${studio.imageUrl 
-                  ? `<img src="${studio.imageUrl}" alt="${studio.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">`
-                  : ''}
-                ${studio.name}
               </div>
               ${courseStatusClass.includes('starting-soon') ? `<div class="countdown" data-start-time="${course.startTime}"></div>` : ''}
             </div>
@@ -1966,6 +2122,7 @@
       fetchAllData().then(() => {
         window.addEventListener('resize', handleResize);
         handleResize(); // Appel initial pour configurer l'état correct
+        updateButtonVisibility(); // Appliquer le masquage si nécessaire
       });
     }
 
