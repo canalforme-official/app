@@ -112,12 +112,10 @@
 
     /* Style pour la disposition du titre et des filtres */
     .header-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-      pointer-events: none;
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
     }
 
     .header-wrapper h1 {
@@ -155,7 +153,7 @@
       -webkit-appearance: none;
       width: 16px;
       height: 16px;
-      border: 2px solid var(--secondary-color);
+      border: 2px solid #ffffff;
       border-radius: 3px;
       margin-right: 5px;
       position: relative;
@@ -163,7 +161,7 @@
     }
 
     .filters input[type="checkbox"]:checked {
-      background-color: var(--secondary-color);
+      background-color: rgba(255, 255, 255, 0.8);
     }
 
     .filters input[type="checkbox"]:checked::after {
@@ -268,6 +266,386 @@
       }
     }
 
+/* Style pour le bouton de rotation vers weekly_vertical.html */
+.rotation-view-button {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  top: auto;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rotation-view-button::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/665404b9-0908-8116-6c7b-5c61a7075d36.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform-origin: center;
+  pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.rotation-view-button button {
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+  pointer-events: all;
+  border-radius: 25px;
+}
+
+.rotation-view-button:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.rotation-view-button:active {
+  transform: scale(0.95);
+}
+
+/* Style pour le bouton de filtre (comme dans weekly_vertical.html) */
+.filters-sidebar {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  z-index: 999;
+  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filters-sidebar.open {
+  width: calc(100% - 40px);
+  border-radius: 25px;
+  overflow: visible;
+}
+
+.filters-sidebar .filter-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1001;
+  pointer-events: all;
+}
+
+.filters-sidebar .filter-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.filters-sidebar.open .filter-button:hover {
+  background: var(--primary-color);
+}
+
+.filters-sidebar.open .filter-button:hover .filter-icon::before,
+.filters-sidebar.open .filter-button:hover .filter-icon::after,
+.filters-sidebar.open .filter-button:hover .filter-icon span {
+  background: white;
+}
+
+.filters-sidebar .filter-button:active {
+  transform: scale(0.95);
+}
+
+.filter-icon {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  display: block;
+}
+
+.filter-icon::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2.5px;
+  background: var(--primary-color);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.filter-icon::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 2.5px;
+  background: var(--primary-color);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.filter-icon span {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 2.5px;
+  background: var(--primary-color);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+  z-index: 1;
+}
+
+.filter-button:hover .filter-icon::before,
+.filter-button:hover .filter-icon::after,
+.filter-button:hover .filter-icon span {
+  background: white;
+}
+
+.filters-sidebar-content {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  padding: 0 60px 0 15px;
+  white-space: nowrap;
+}
+
+.filters-sidebar.open .filters-sidebar-content {
+  display: flex;
+}
+
+.filters-sidebar h2 {
+  display: none;
+}
+
+.filters-sidebar .filters {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.filters-sidebar .filters label {
+  font-size: 0.85em;
+  color: var(--primary-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.filters-sidebar .filters input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 3px;
+  margin: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.filters-sidebar .filters input[type="checkbox"]:checked {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.filters-sidebar .filters input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  color: var(--primary-color);
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
+.filters-sidebar .filters select {
+  font-size: 0.85em;
+  padding: 5px 25px 5px 10px;
+  min-width: 120px;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Style pour la liste déroulante personnalisée des coachs */
+.coach-dropdown {
+  position: relative;
+  min-width: 140px;
+}
+
+.coach-dropdown-button {
+  width: 100%;
+  padding: 6px 28px 6px 12px;
+  font-size: 0.85em;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--primary-color);
+}
+
+.coach-dropdown-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.coach-dropdown-arrow {
+  font-size: 0.7em;
+  transition: transform 0.3s;
+}
+
+.coach-dropdown.open .coach-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.coach-dropdown-content {
+  display: none !important;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1002;
+  margin-top: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.coach-dropdown.open .coach-dropdown-content {
+  display: block !important;
+  visibility: visible;
+  opacity: 1;
+}
+
+.coach-dropdown-content.open-up {
+  top: auto !important;
+  bottom: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 2px !important;
+}
+
+.coach-dropdown-option {
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75em;
+  color: var(--primary-color);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.coach-dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.coach-dropdown-option:hover {
+  background-color: rgba(72, 6, 7, 0.1);
+}
+
+.coach-dropdown-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+  display: none;
+}
+
+.coach-dropdown-option .checkmark {
+  color: var(--primary-color);
+  font-weight: bold;
+  margin-left: auto;
+  font-size: 1em;
+}
+
+.coach-dropdown-option label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.coach-dropdown-option label span:first-child {
+  flex: 1;
+  font-size: 1.15em;
+  color: var(--primary-color);
+}
+
 /* Style pour le bouton de retour à la vue quotidienne */
 .today-view-button {
   position: fixed;
@@ -281,11 +659,11 @@
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
-  pointer-events: none;
+  pointer-events: all;
   animation: none;
-  display: none;
-  opacity: 0;
-  transform: translateY(20px);
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -355,11 +733,11 @@
     opacity: 1 !important;
     pointer-events: all !important;
     position: fixed !important;
-    bottom: 10px !important;
+    top: 55px !important;
     right: 10px !important;
     left: auto !important;
-    top: auto !important;
-    transform: none !important;
+    bottom: auto !important;
+    transform: translateY(0) !important;
   }
 }
 
@@ -474,11 +852,11 @@
 
 /* Animation améliorée pour le jour actuel */
 .weekly-schedule thead th.today {
-  background-color: var(--secondary-color);
+  background-color: #981010;
   position: sticky;
   top: 0;
   z-index: 10;
-  color: var(--primary-color);
+  color: var(--text-light);
   overflow: hidden;
   pointer-events: none;
   margin: 0;
@@ -1331,6 +1709,12 @@
 
   <div class="content-wrapper">
 
+    <!-- Bouton de rotation vers weekly_vertical.html -->
+    <div class="rotation-view-button" id="rotationViewButton">
+      <button onclick="goToWeeklyVertical()">
+      </button>
+    </div>
+
     <!-- Bouton pour revenir à aujourd'hui -->
     <div class="today-view-button" id="todayViewButton">
       <button onclick="returnToToday()">
@@ -1357,15 +1741,48 @@
           <input type="checkbox" id="filter-coach" checked>
           Coach
         </label>
-        <select id="coachFilter">
-          <option value="">Tous les coachs</option> <!-- Option par défaut pour afficher tous les coachs -->
-        </select>
       </div>
     </div>
 
     <!-- Le planning hebdomadaire sera inséré ici -->
     <div id="weeklySchedule"></div>
 
+  </div>
+
+  <!-- Barre de filtres en bas avec le bouton intégré -->
+  <div class="filters-sidebar" id="filtersSidebar">
+    <button class="filter-button" onclick="toggleFiltersSidebar(event)">
+      <div class="filter-icon"><span></span></div>
+    </button>
+    <div class="filters-sidebar-content">
+      <div class="filters">
+        <label>
+          <input type="checkbox" id="filter-mixte" checked>
+          Mixte
+        </label>
+        <label>
+          <input type="checkbox" id="filter-women-only" checked>
+          Femmes
+        </label>
+        <label>
+          <input type="checkbox" id="filter-piscine" checked>
+          Piscine
+        </label>
+        <label>
+          <input type="checkbox" id="filter-coach" checked>
+          Coach
+        </label>
+        <div class="coach-dropdown">
+          <button class="coach-dropdown-button" id="coachDropdownButton">
+            <span id="coachDropdownText">Aucun coach</span>
+            <span class="coach-dropdown-arrow">▼</span>
+          </button>
+          <div class="coach-dropdown-content" id="coachDropdownContent">
+            <!-- Les options seront ajoutées ici dynamiquement -->
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1375,9 +1792,14 @@
     // Initialiser les variables
     var scheduleData = [];
 
+    // Paramètre pour activer/désactiver l'overlay de chargement
+    const SHOW_LOADING_OVERLAY = false; // Mettre à true pour réactiver l'overlay
+    
     function initializeWeeklyPage() {
-      // Ajouter la classe loading au body
-      document.body.classList.add('loading');
+      // Ajouter la classe loading au body seulement si l'overlay est activé
+      if (SHOW_LOADING_OVERLAY) {
+        document.body.classList.add('loading');
+      }
       
       // Masquer le bouton today-view au démarrage
       const todayButton = document.getElementById('todayViewButton');
@@ -1386,23 +1808,29 @@
         todayButton.classList.remove('visible');
       }
       
-      // Afficher l'overlay de chargement
+      // Afficher l'overlay de chargement seulement si activé
       const loadingOverlay = document.getElementById('loadingOverlay');
-      if (loadingOverlay) {
+      if (loadingOverlay && SHOW_LOADING_OVERLAY) {
         loadingOverlay.style.display = 'flex';
+      } else if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
       }
 
-      // Afficher le modal de chargement
+      // Afficher le modal de chargement seulement si activé
       const modalBackdrop = document.querySelector('.modal-backdrop');
       const modalContent = document.querySelector('.modal-content');
       
-      if (modalBackdrop && modalContent) {
+      if (modalBackdrop && modalContent && SHOW_LOADING_OVERLAY) {
         modalBackdrop.style.display = 'block';
         modalContent.style.display = 'block';
         document.getElementById('loadingMessage').innerHTML = 'Chargement du planning hebdomadaire';
+      } else if (modalBackdrop && modalContent) {
+        modalBackdrop.style.display = 'none';
+        modalContent.style.display = 'none';
       }
 
-      // Ajouter un délai artificiel de 2 secondes
+      // Ajouter un délai artificiel de 2 secondes seulement si l'overlay est activé
+      const delay = SHOW_LOADING_OVERLAY ? 2000 : 0;
       setTimeout(() => {
         fetchWeeklyData().then(data => {
           // Logs pour vérifier la structure des données
@@ -1429,16 +1857,18 @@
           // Générer le contenu HTML pour le planning hebdomadaire
           document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
 
-          // Cacher le modal de chargement et retirer la classe loading
-          if (modalBackdrop && modalContent) {
+          // Cacher le modal de chargement et retirer la classe loading seulement si activé
+          if (modalBackdrop && modalContent && SHOW_LOADING_OVERLAY) {
             modalBackdrop.style.display = 'none';
             modalContent.style.display = 'none';
             modalBackdrop.style.opacity = '0';
             modalContent.style.opacity = '0';
           }
           
-          // Retirer la classe loading du body
-          document.body.classList.remove('loading');
+          // Retirer la classe loading du body seulement si activé
+          if (SHOW_LOADING_OVERLAY) {
+            document.body.classList.remove('loading');
+          }
           
           // S'assurer que l'overlay est bien caché
           if (loadingOverlay) {
@@ -1461,13 +1891,113 @@
             });
           });
 
-          let coachFilterSelect = document.getElementById('coachFilter');
-          // Convertir l'ensemble en tableau et trier alphabétiquement
+          // Cibler spécifiquement la liste déroulante dans la filters-sidebar
+          let coachDropdownContent = document.querySelector('#filtersSidebar .coach-dropdown-content');
+          let coachDropdownButton = document.querySelector('#filtersSidebar .coach-dropdown-button');
+          let coachDropdownText = document.querySelector('#filtersSidebar #coachDropdownText');
+          
+          if (!coachDropdownContent || !coachDropdownButton || !coachDropdownText) {
+            console.error('Éléments de la liste déroulante des coachs non trouvés');
+            return;
+          }
+          
+          let selectedCoaches = new Set(); // Aucun sélectionné par défaut
+          
+          // Créer les options avec checkboxes
           Array.from(uniqueCoaches).sort().forEach(coach => {
-            let option = document.createElement('option');
-            option.value = coach;
-            option.textContent = coach;
-            coachFilterSelect.appendChild(option);
+            let option = document.createElement('div');
+            option.className = 'coach-dropdown-option';
+            
+            let label = document.createElement('label');
+            label.style.display = 'flex';
+            label.style.justifyContent = 'space-between';
+            label.style.alignItems = 'center';
+            label.style.width = '100%';
+            label.style.cursor = 'pointer';
+            
+            let span = document.createElement('span');
+            span.textContent = coach;
+            span.style.flex = '1';
+            
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = coach;
+            checkbox.checked = false; // Aucun sélectionné par défaut
+            checkbox.style.display = 'none';
+            
+            let checkmark = document.createElement('span');
+            checkmark.className = 'checkmark';
+            checkmark.textContent = '✓';
+            checkmark.style.display = 'none'; // Masqué par défaut
+            
+            checkbox.addEventListener('change', function() {
+              if (checkbox.checked) {
+                selectedCoaches.add(coach);
+              } else {
+                selectedCoaches.delete(coach);
+              }
+              checkmark.style.display = checkbox.checked ? 'inline' : 'none';
+              updateCoachDropdownText();
+              applyFilters();
+            });
+            
+            option.addEventListener('click', function(e) {
+              if (e.target !== checkbox) {
+                e.preventDefault();
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+              }
+            });
+            
+            label.appendChild(span);
+            label.appendChild(checkmark);
+            label.appendChild(checkbox);
+            option.appendChild(label);
+            coachDropdownContent.appendChild(option);
+          });
+          
+          function updateCoachDropdownText() {
+            if (selectedCoaches.size === 0) {
+              coachDropdownText.textContent = 'Aucun coach';
+            } else if (selectedCoaches.size === uniqueCoaches.size) {
+              coachDropdownText.textContent = 'Tous les coachs';
+            } else {
+              coachDropdownText.textContent = selectedCoaches.size + ' coach(s)';
+            }
+          }
+          
+          // Mettre à jour le texte initial du bouton
+          updateCoachDropdownText();
+          
+          coachDropdownButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = coachDropdownButton.closest('.coach-dropdown');
+            const content = coachDropdownContent;
+            
+            dropdown.classList.toggle('open');
+            
+            if (dropdown.classList.contains('open')) {
+              const buttonRect = coachDropdownButton.getBoundingClientRect();
+              const spaceBelow = window.innerHeight - buttonRect.bottom;
+              const spaceAbove = buttonRect.top;
+              const contentHeight = 200;
+              
+              if (spaceBelow < contentHeight && spaceAbove > spaceBelow) {
+                content.classList.add('open-up');
+              } else {
+                content.classList.remove('open-up');
+              }
+            } else {
+              content.classList.remove('open-up');
+            }
+          });
+          
+          document.addEventListener('click', function(e) {
+            if (!e.target.closest('.coach-dropdown')) {
+              document.querySelectorAll('.coach-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('open');
+              });
+            }
           });
 
           // Ajouter des écouteurs d'événements pour les filtres de cases à cocher et le filtre de coachs
@@ -1475,7 +2005,6 @@
           document.getElementById('filter-women-only').addEventListener('change', applyFilters);
           document.getElementById('filter-piscine').addEventListener('change', applyFilters);
           document.getElementById('filter-coach').addEventListener('change', applyFilters);
-          coachFilterSelect.addEventListener('change', applyFilters);
 
           // Appliquer les filtres initiaux
           applyFilters();
@@ -1506,20 +2035,22 @@
           console.error('Erreur lors de la récupération des données :', error);
           document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
           
-          // En cas d'erreur, s'assurer que l'overlay est caché
-          if (modalBackdrop && modalContent) {
+          // En cas d'erreur, s'assurer que l'overlay est caché seulement si activé
+          if (modalBackdrop && modalContent && SHOW_LOADING_OVERLAY) {
             modalBackdrop.style.display = 'none';
             modalContent.style.display = 'none';
             modalBackdrop.style.opacity = '0';
             modalContent.style.opacity = '0';
           }
-          document.body.classList.remove('loading');
+          if (SHOW_LOADING_OVERLAY) {
+            document.body.classList.remove('loading');
+          }
           if (loadingOverlay) {
             loadingOverlay.style.display = 'none';
             loadingOverlay.style.opacity = '0';
           }
         });
-      }, 2000); // Délai de 2 secondes
+      }, delay); // Délai conditionnel selon SHOW_LOADING_OVERLAY
     }
 
     // Fonction pour récupérer les données avec mise en cache via localStorage
@@ -1617,7 +2148,12 @@
       const showWomenOnly = document.getElementById('filter-women-only').checked;
       const showPiscine = document.getElementById('filter-piscine').checked;
       const showCoachImages = document.getElementById('filter-coach').checked;
-      const selectedCoach = document.getElementById('coachFilter').value;
+      
+      // Récupérer tous les coachs sélectionnés
+      const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"]');
+      const selectedCoaches = Array.from(coachCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
 
       const blocks = document.querySelectorAll('.course-block');
       const contentWrapper = document.querySelector('.content-wrapper');
@@ -1625,7 +2161,10 @@
       for (const block of blocks) {
         const dataCoaches = block.getAttribute('data-coaches') || '';
         const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
-        const showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
+        
+        // Vérifier si au moins un des coachs du cours est dans la liste des coachs sélectionnés
+        const showByCoach = selectedCoaches.length === 0 || 
+          courseCoaches.some(coach => selectedCoaches.includes(coach));
         const isPiscine = block.classList.contains('piscine');
         const courseType = block.classList;
         const showByType = (
@@ -1950,18 +2489,20 @@
       }, 500);
     }
 
-    // Ajout de la classe loading au body au chargement
+    // Ajout de la classe loading au body au chargement seulement si activé
     document.addEventListener('DOMContentLoaded', function() {
-      document.body.classList.add('loading');
-      
-      // Suppression de la classe loading une fois l'    prêt
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      if (loadingOverlay) {
-        loadingOverlay.addEventListener('transitionend', function() {
-          if (loadingOverlay.classList.contains('fade-out')) {
-            document.body.classList.remove('loading');
-          }
-        });
+      if (SHOW_LOADING_OVERLAY) {
+        document.body.classList.add('loading');
+        
+        // Suppression de la classe loading une fois l'overlay prêt
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+          loadingOverlay.addEventListener('transitionend', function() {
+            if (loadingOverlay.classList.contains('fade-out')) {
+              document.body.classList.remove('loading');
+            }
+          });
+        }
       }
     });
 
@@ -1981,6 +2522,40 @@
     function returnToToday() {
       window.location.href = './daily.html';
     }
+
+    function goToWeeklyVertical() {
+      window.location.href = './weekly_vertical.html';
+    }
+
+    // Fonction pour ouvrir/fermer la barre de filtres
+    function toggleFiltersSidebar(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const sidebar = document.getElementById('filtersSidebar');
+      
+      if (!sidebar) {
+        console.error('Sidebar not found');
+        return;
+      }
+      
+      // Toggle la classe open pour ouvrir/fermer la barre
+      sidebar.classList.toggle('open');
+    }
+
+    // Fermer la barre de filtres quand on clique ailleurs (mais pas sur le bouton ni la barre)
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('filtersSidebar');
+      const filterButton = document.querySelector('.filter-button');
+      
+      if (sidebar && sidebar.classList.contains('open')) {
+        // Si le clic n'est pas sur la barre de filtres ni sur le bouton
+        if (!sidebar.contains(event.target) && !filterButton.contains(event.target)) {
+          sidebar.classList.remove('open');
+        }
+      }
+    });
 
     // Fonction pour vérifier l'état des cours et mettre à jour les animations
     function checkCourseStates() {
