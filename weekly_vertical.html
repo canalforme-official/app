@@ -240,7 +240,7 @@
       pointer-events: none;
       border-radius: 0;
       margin: 0;
-      padding: 3px 2px;
+      padding: 4px 2px; /* Augmenté de 30% (3px * 1.3 = 3.9px ≈ 4px) */
     }
 
     /* Rendre invisible la première cellule du thead (cellule des horaires) */
@@ -343,9 +343,6 @@
       position: relative;
       padding-right: 30px;
       box-shadow: 0px 1px 4px var(--shadow-light);
-      overflow: hidden;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
     }
 
     /* Styles pour les cours mixtes */
@@ -498,8 +495,6 @@
       margin-right: 0;
       padding-right: 0;
       line-height: 1.2;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
     }
 
     .single-coach {
@@ -715,26 +710,160 @@
     }
 
     .filters-sidebar .filters label {
-      font-size: 0.65em;
+      font-size: 0.85em;
       color: var(--primary-color);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 5px;
       white-space: nowrap;
     }
 
     .filters-sidebar .filters input[type="checkbox"] {
-      width: 12px;
-      height: 12px;
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-radius: 3px;
       margin: 0;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .filters-sidebar .filters input[type="checkbox"]:checked {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .filters-sidebar .filters input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      color: var(--primary-color);
+      font-size: 12px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
     }
 
     .filters-sidebar .filters select {
-      font-size: 0.65em;
-      padding: 3px 20px 3px 8px;
-      min-width: 90px;
+      font-size: 0.8em;
+      padding: 5px 25px 5px 10px;
+      min-width: 110px;
       background-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* Style pour la liste déroulante personnalisée des coachs */
+    .coach-dropdown {
+      position: relative;
+      min-width: 140px;
+    }
+    
+    .coach-dropdown-button {
+      width: 100%;
+      padding: 6px 28px 6px 12px;
+      font-size: 0.85em;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--primary-color);
+    }
+    
+    .coach-dropdown-button:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+    
+    .coach-dropdown-arrow {
+      font-size: 0.7em;
+      transition: transform 0.3s;
+    }
+    
+    .coach-dropdown.open .coach-dropdown-arrow {
+      transform: rotate(180deg);
+    }
+    
+    .coach-dropdown-content {
+      display: none !important;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ffffff;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1002;
+      margin-top: 2px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    
+    .coach-dropdown.open .coach-dropdown-content {
+      display: block !important;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Classe pour ouvrir vers le haut */
+    .coach-dropdown-content.open-up {
+      top: auto !important;
+      bottom: 100% !important;
+      margin-top: 0 !important;
+      margin-bottom: 2px !important;
+    }
+    
+    .coach-dropdown-option {
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75em;
+      color: var(--primary-color);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .coach-dropdown-option label span:first-child {
+      flex: 1;
+      font-size: 1.15em;
+      color: var(--primary-color);
+    }
+    
+    .coach-dropdown-option:last-child {
+      border-bottom: none;
+    }
+    
+    .coach-dropdown-option:hover {
+      background-color: rgba(72, 6, 7, 0.1);
+    }
+    
+    .coach-dropdown-option input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      cursor: pointer;
+      display: none;
+    }
+    
+    .coach-dropdown-option .checkmark {
+      color: var(--primary-color);
+      font-weight: bold;
+      margin-left: auto;
+      font-size: 1em;
+    }
+    
+    .coach-dropdown-option label {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      cursor: pointer;
     }
 
     .filters-sidebar-close {
@@ -998,7 +1127,7 @@
 
       .weekly-schedule thead th {
         font-size: 0.75em;
-        padding: 2px 1px;
+        padding: 2.6px 1px; /* Augmenté de 30% (2px * 1.3 = 2.6px) */
       }
 
       .weekly-schedule th:first-child,
@@ -1017,17 +1146,14 @@
 
       .logo-cours {
         max-width: 100%;
-        max-height: 180px;
+        max-height: 137px;
         width: auto;
         height: auto;
       }
 
       .course-info {
-        font-size: 0.4em; /* Réduit davantage pour éviter le débordement */
+        font-size: 0.49em; /* Réduit de 30% (0.7 * 0.7) */
         width: 100%;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        line-height: 1.2;
       }
 
       .single-coach {
@@ -1045,6 +1171,34 @@
         height: 10px;
         font-size: 0.55em;
       }
+
+      /* Réduire de 15% les éléments du filtre pour qu'ils tiennent sur une ligne */
+      .filters-sidebar .filters label {
+        font-size: 0.7225em; /* 0.85em * 0.85 */
+        gap: 4.25px; /* 5px * 0.85 */
+      }
+
+      .filters-sidebar .filters input[type="checkbox"] {
+        width: 13.6px; /* 16px * 0.85 */
+        height: 13.6px; /* 16px * 0.85 */
+      }
+
+      .filters-sidebar .filters input[type="checkbox"]:checked::after {
+        font-size: 10.2px; /* 12px * 0.85 */
+      }
+
+      .coach-dropdown {
+        min-width: 119px; /* 140px * 0.85 */
+      }
+
+      .coach-dropdown-button {
+        padding: 5.1px 23.8px 5.1px 10.2px; /* 6px 28px 6px 12px * 0.85 */
+        font-size: 0.7225em; /* 0.85em * 0.85 */
+      }
+
+      .filters-sidebar .filters {
+        gap: 6.8px; /* 8px * 0.85 */
+      }
     }
 
     @media screen and (min-width: 481px) and (max-width: 768px) {
@@ -1061,15 +1215,12 @@
       }
 
       .course-info {
-        font-size: 0.55em; /* Réduit davantage pour éviter le débordement */
+        font-size: 0.655em; /* Réduit de 30% (0.95 * 0.7) */
         width: 100%;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        line-height: 1.2;
       }
 
       .logo-cours {
-        max-height: 150px;
+        max-height: 98px;
       }
     }
 
@@ -1152,7 +1303,7 @@
         </label>
         <label>
           <input type="checkbox" id="filter-women-only" checked>
-          100% Femmes
+          Femmes
         </label>
         <label>
           <input type="checkbox" id="filter-piscine" checked>
@@ -1162,9 +1313,15 @@
           <input type="checkbox" id="filter-coach" checked>
           Coach
         </label>
-        <select id="coachFilter">
-          <option value="">Tous les coachs</option>
-        </select>
+        <div class="coach-dropdown">
+          <button class="coach-dropdown-button" id="coachDropdownButton">
+            <span id="coachDropdownText">Aucun coach</span>
+            <span class="coach-dropdown-arrow">▼</span>
+          </button>
+          <div class="coach-dropdown-content" id="coachDropdownContent">
+            <!-- Les options seront ajoutées ici dynamiquement -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1211,19 +1368,118 @@
           });
         });
 
-        let coachFilterSelect = document.getElementById('coachFilter');
+        let coachDropdownContent = document.getElementById('coachDropdownContent');
+        let coachDropdownButton = document.getElementById('coachDropdownButton');
+        let coachDropdownText = document.getElementById('coachDropdownText');
+        let selectedCoaches = new Set(); // Aucun sélectionné par défaut
+        
+        // Créer les options avec checkboxes
         Array.from(uniqueCoaches).sort().forEach(coach => {
-          let option = document.createElement('option');
-          option.value = coach;
-          option.textContent = coach;
-          coachFilterSelect.appendChild(option);
+          let option = document.createElement('div');
+          option.className = 'coach-dropdown-option';
+          
+          let label = document.createElement('label');
+          label.style.display = 'flex';
+          label.style.justifyContent = 'space-between';
+          label.style.alignItems = 'center';
+          label.style.width = '100%';
+          label.style.cursor = 'pointer';
+          
+          let span = document.createElement('span');
+          span.textContent = coach;
+          
+          let checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = coach;
+          checkbox.checked = false; // Aucun sélectionné par défaut
+          
+          let checkmark = document.createElement('span');
+          checkmark.className = 'checkmark';
+          checkmark.textContent = '✓';
+          checkmark.style.display = 'none'; // Masqué par défaut
+          
+          checkbox.addEventListener('change', function() {
+            if (checkbox.checked) {
+              selectedCoaches.add(coach);
+            } else {
+              selectedCoaches.delete(coach);
+            }
+            checkmark.style.display = checkbox.checked ? 'inline' : 'none';
+            updateCoachDropdownText();
+            applyFilters();
+          });
+          
+          // Permettre de cliquer sur toute la ligne pour cocher/décocher
+          option.addEventListener('click', function(e) {
+            if (e.target !== checkbox) {
+              e.preventDefault();
+              checkbox.checked = !checkbox.checked;
+              checkbox.dispatchEvent(new Event('change'));
+            }
+          });
+          
+          label.appendChild(span);
+          label.appendChild(checkmark);
+          label.appendChild(checkbox);
+          option.appendChild(label);
+          coachDropdownContent.appendChild(option);
+        });
+        
+        // Fonction pour mettre à jour le texte du bouton
+        function updateCoachDropdownText() {
+          if (selectedCoaches.size === 0) {
+            coachDropdownText.textContent = 'Aucun coach';
+          } else if (selectedCoaches.size === uniqueCoaches.size) {
+            coachDropdownText.textContent = 'Tous les coachs';
+          } else {
+            coachDropdownText.textContent = selectedCoaches.size + ' coach(s)';
+          }
+        }
+        
+        // Mettre à jour le texte initial du bouton
+        updateCoachDropdownText();
+        
+        // Toggle dropdown avec détection de l'espace disponible
+        coachDropdownButton.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const dropdown = coachDropdownButton.closest('.coach-dropdown');
+          const content = document.getElementById('coachDropdownContent');
+          
+          dropdown.classList.toggle('open');
+          
+          if (dropdown.classList.contains('open')) {
+            // Vérifier l'espace disponible en bas et en haut
+            const buttonRect = coachDropdownButton.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - buttonRect.bottom;
+            const spaceAbove = buttonRect.top;
+            const contentHeight = 200; // max-height
+            
+            // Si pas assez d'espace en bas mais assez en haut, ouvrir vers le haut
+            if (spaceBelow < contentHeight && spaceAbove > spaceBelow) {
+              content.classList.add('open-up');
+            } else {
+              // Ouvrir vers le bas (comportement par défaut)
+              content.classList.remove('open-up');
+            }
+          } else {
+            // Retirer la classe quand on ferme
+            content.classList.remove('open-up');
+          }
+        });
+        
+        // Fermer le dropdown quand on clique ailleurs
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.coach-dropdown')) {
+            document.querySelectorAll('.coach-dropdown').forEach(dropdown => {
+              dropdown.classList.remove('open');
+            });
+          }
         });
 
         document.getElementById('filter-mixte').addEventListener('change', applyFilters);
         document.getElementById('filter-women-only').addEventListener('change', applyFilters);
         document.getElementById('filter-piscine').addEventListener('change', applyFilters);
         document.getElementById('filter-coach').addEventListener('change', applyFilters);
-        coachFilterSelect.addEventListener('change', applyFilters);
 
         applyFilters();
         
@@ -1298,7 +1554,12 @@
       const showWomenOnly = document.getElementById('filter-women-only').checked;
       const showPiscine = document.getElementById('filter-piscine').checked;
       const showCoachImages = document.getElementById('filter-coach').checked;
-      const selectedCoach = document.getElementById('coachFilter').value;
+      
+      // Récupérer tous les coachs sélectionnés
+      const coachCheckboxes = document.querySelectorAll('#coachDropdownContent input[type="checkbox"]');
+      const selectedCoaches = Array.from(coachCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
 
       const blocks = document.querySelectorAll('.course-block');
       const contentWrapper = document.querySelector('.content-wrapper');
@@ -1306,7 +1567,11 @@
       for (const block of blocks) {
         const dataCoaches = block.getAttribute('data-coaches') || '';
         const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
-        const showByCoach = selectedCoach === "" || courseCoaches.includes(selectedCoach);
+        
+        // Vérifier si au moins un des coachs du cours est dans la liste des coachs sélectionnés
+        const showByCoach = selectedCoaches.length === 0 || 
+          courseCoaches.some(coach => selectedCoaches.includes(coach));
+        
         const isPiscine = block.classList.contains('piscine');
         const courseType = block.classList;
         const showByType = (
@@ -1470,7 +1735,7 @@
               if (SHOW_COURSE_IMAGES && logoUrl) {
                 courseNameDisplay = '<img class="logo-cours" src="' + logoUrl + '" alt="' + course.courseName + ' Logo">';
               } else {
-                courseNameDisplay = course.courseName;
+                courseNameDisplay = '<div class="course-name-text">' + course.courseName + '</div>';
               }
 
               var coachImagesHtml = '';
