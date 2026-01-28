@@ -1057,13 +1057,15 @@
       position: fixed;
       bottom: 80px;
       right: 20px;
-      z-index: 1000;
+      z-index: 1001;
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(10px);
       border-radius: 25px;
       padding: 0;
       width: 50px;
       height: 50px;
+      min-width: 48px;
+      min-height: 48px;
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
@@ -1072,7 +1074,8 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+      touch-action: manipulation;
     }
 
     .rotation-view-button::before {
@@ -1093,22 +1096,28 @@
     }
 
     .rotation-view-button button {
+      position: absolute;
+      inset: 0;
       z-index: 3;
       width: 100%;
       height: 100%;
       background: none;
       border: none;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+      display: block;
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
       outline: none;
       pointer-events: all;
       border-radius: 25px;
+      touch-action: manipulation;
+    }
+
+    /* Animation de clic (compatible mobile : active + classe JS) */
+    .rotation-view-button:active::before,
+    .rotation-view-button.tap-active::before {
+      animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .rotation-view-button:hover {
@@ -1117,7 +1126,13 @@
     }
 
     .rotation-view-button:active {
-      transform: scale(0.95);
+      transform: scale(0.98);
+    }
+
+    @keyframes click-zoom {
+      0% { transform: scale(1) translateZ(0); }
+      50% { transform: scale(0.95) translateZ(0); }
+      100% { transform: scale(1) translateZ(0); }
     }
 
     /* Styles responsives pour différentes tailles d'écran */
@@ -1376,9 +1391,8 @@
   </div>
 
   <!-- Bouton de rotation vers weekly.html -->
-  <div class="rotation-view-button" id="rotationViewButton">
-    <button onclick="goToWeekly()">
-    </button>
+  <div class="rotation-view-button" id="rotationViewButton" role="button" tabindex="0" aria-label="Vue horizontale du planning" onclick="goToWeekly()">
+    <button type="button" aria-label="Vue horizontale du planning"></button>
   </div>
 
   <!-- Barre de filtres en bas avec le bouton intégré -->
@@ -1406,7 +1420,7 @@
         </label>
         <div class="coach-dropdown">
           <button class="coach-dropdown-button" id="coachDropdownButton">
-            <span id="coachDropdownText">Aucun coach</span>
+            <span id="coachDropdownText">Sélection coach</span>
             <span class="coach-dropdown-arrow">▼</span>
           </button>
           <div class="coach-dropdown-content" id="coachDropdownContent">
@@ -1520,11 +1534,11 @@
         // Fonction pour mettre à jour le texte du bouton
         function updateCoachDropdownText() {
           if (selectedCoaches.size === 0) {
-            coachDropdownText.textContent = 'Aucun coach';
+            coachDropdownText.textContent = 'Sélection coach';
           } else if (selectedCoaches.size === uniqueCoaches.size) {
-            coachDropdownText.textContent = 'Tous les coachs';
+            coachDropdownText.textContent = 'Sélection coach';
           } else {
-            coachDropdownText.textContent = selectedCoaches.size + ' coach(s)';
+            coachDropdownText.textContent = selectedCoaches.size === 1 ? '1 coach' : selectedCoaches.size + ' coachs';
           }
         }
         
@@ -2090,6 +2104,20 @@
     function goToWeekly() {
       window.location.href = './weekly.html';
     }
+
+    // Animation de clic fiable au toucher sur le bouton rotation (mobile)
+    (function initRotationButtonTapAnimation() {
+      var el = document.getElementById('rotationViewButton');
+      if (!el) return;
+      function removeTapActive() {
+        var target = el;
+        setTimeout(function() { target.classList.remove('tap-active'); }, 320);
+      }
+      el.addEventListener('pointerdown', function() { el.classList.add('tap-active'); });
+      el.addEventListener('pointerup', removeTapActive);
+      el.addEventListener('pointerleave', removeTapActive);
+      el.addEventListener('pointercancel', removeTapActive);
+    })();
 
   </script>
 
