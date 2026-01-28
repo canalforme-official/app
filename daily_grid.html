@@ -792,6 +792,21 @@
         pointer-events: none !important;
       }
     }
+
+    /* Masquer les boutons en format téléviseur inversé (paysage, écran large) */
+    @media screen and (min-width: 1920px) and (orientation: landscape) {
+      .navigation {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+
+      .today-view-button {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -895,12 +910,13 @@
       const isMobile = window.innerWidth <= 768;
       const isAutomated = isAutomatedBrowser();
       const isLargeScreen = window.innerHeight > 1920 || window.innerWidth > 1920; // Écran 32 pouces ou plus
-      const isLargePortrait = window.innerHeight >= 1920 && window.innerHeight > window.innerWidth; // Écran 32 pouces et supérieurs en portrait (rotation 90°)
+      const isLargePortrait = window.innerHeight >= 1920 && window.innerHeight > window.innerWidth; // Écran 32 pouces en portrait (rotation 90°)
+      const isLargeLandscape = window.innerWidth >= 1920 && window.innerWidth > window.innerHeight; // Format téléviseur inversé (paysage)
       const navigation = document.querySelector('.navigation');
       const todayButton = document.querySelector('.today-view-button');
       const coachesSection = document.querySelector('.coaches-section');
       
-      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen, 'isLargePortrait:', isLargePortrait);
+      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen, 'isLargePortrait:', isLargePortrait, 'isLargeLandscape:', isLargeLandscape);
       
       // Masquer la barre en bas uniquement sur mobile réel (pas Puppeteer, pas grand écran)
       if (coachesSection) {
@@ -915,9 +931,9 @@
         }
       }
       
-      // Si c'est un grand écran en portrait (32 pouces et supérieurs, rotation 90°), masquer les boutons
-      if (isLargePortrait) {
-        console.log('Grand écran en portrait (rotation 90°) détecté - masquage des boutons');
+      // Si c'est un grand écran en portrait (32 pouces, rotation 90°) ou en paysage (format téléviseur inversé), masquer les boutons
+      if (isLargePortrait || isLargeLandscape) {
+        console.log(isLargePortrait ? 'Grand écran en portrait (rotation 90°)' : 'Format téléviseur inversé (paysage)', '- masquage des boutons');
         if (navigation) {
           navigation.style.display = 'none';
           navigation.style.opacity = '0';
@@ -930,7 +946,7 @@
           todayButton.style.pointerEvents = 'none';
           todayButton.classList.remove('visible');
         }
-        return; // Ne pas continuer, on masque tout
+        return;
       }
       
       // Si c'est Puppeteer/navigateur automatisé, masquer tous les boutons

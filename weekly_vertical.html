@@ -222,7 +222,7 @@
     }
 
     .weekly-schedule th, .weekly-schedule td {
-      padding: 2px;
+      padding: 1px;
       vertical-align: top;
       border: none;
     }
@@ -232,7 +232,7 @@
       background-color: var(--primary-color);
       color: var(--text-light);
       text-align: center;
-      font-size: 0.9em;
+      font-size: 1.4em;
       border-bottom: 1px solid var(--shadow-light);
       position: sticky;
       top: 0;
@@ -240,7 +240,7 @@
       pointer-events: none;
       border-radius: 0;
       margin: 0;
-      padding: 4px 2px; /* Augmenté de 30% (3px * 1.3 = 3.9px ≈ 4px) */
+      padding: 1px;
     }
 
     /* Rendre invisible la première cellule du thead (cellule des horaires) */
@@ -263,11 +263,11 @@
 
     /* Animation améliorée pour le jour actuel */
     .weekly-schedule thead th.today {
-      background-color: var(--secondary-color);
+      background-color: #981010;
       position: sticky;
       top: 0;
       z-index: 10;
-      color: var(--primary-color);
+      color: var(--text-light);
       overflow: hidden;
       pointer-events: none;
       margin: 0;
@@ -291,10 +291,10 @@
       min-width: 30px;
       max-width: 40px;
       text-align: center;
-      padding: 2px;
+      padding: 1px 0;
       font-weight: bold;
       color: var(--primary-color);
-      font-size: 0.75em;
+      font-size: 0.92em;
       line-height: 1;
     }
 
@@ -313,11 +313,11 @@
 
     /* Ajustement des cellules des cours */
     .course-cell {
-      min-width: 80px;
+      min-width: 70px;
       text-align: center;
       border-bottom: 1px solid var(--shadow-light);
       position: relative;
-      padding: 2px;
+      padding: 1px;
     }
 
     /* Styles pour les lignes blanches et grises */
@@ -336,13 +336,13 @@
       background-color: var(--background-card);
       border: none;
       border-radius: 3px;
-      padding: 2px;
-      padding-bottom: 3px;
-      margin: 1px;
-      font-size: 0.75em;
+      padding: 4px 1px 4px 1px;
+      padding-right: 22px;
+      margin: 0;
+      font-size: 0.68em;
       position: relative;
-      padding-right: 30px;
       box-shadow: 0px 1px 4px var(--shadow-light);
+      text-align: left;
     }
 
     /* Styles pour les cours mixtes */
@@ -424,18 +424,19 @@
     .course-title {
       font-weight: bold;
       margin-bottom: 1px;
-      font-size: 1em;
+      font-size: 0.78em;
+      text-align: left;
     }
 
-    /* Style pour le nom du coach */
+    /* Style pour le nom du coach (très réduit) */
     .coach-name {
-      font-size: 0.65em;
+      font-size: 0.34em;
       color: var(--text-secondary);
     }
 
     /* Style pour le studio */
     .studio-name {
-      font-size: 0.6em;
+      font-size: 0.55em;
       color: var(--text-tertiary);
     }
 
@@ -476,7 +477,7 @@
       z-index: 5;
     }
 
-    /* Styles spécifiques pour les logos de cours */
+    /* Styles spécifiques pour les logos de cours (alignés à gauche avec le titre) */
     .logo-cours {
       max-width: 100%;
       max-height: 104px;
@@ -484,21 +485,27 @@
       height: auto;
       object-fit: contain;
       display: block;
-      margin: 0 auto;
+      margin: 0 0 0 0;
     }
 
-    /* Styles pour les cours */
+    /* Styles pour les cours (titre) – réduit et aligné à gauche */
     .course-info {
-      font-size: 1em;
+      font-size: 0.66em;
       font-weight: bold;
       color: var(--text-primary);
       margin-right: 0;
       padding-right: 0;
       line-height: 1.2;
+      text-align: left;
+    }
+
+    .course-name-text {
+      text-align: left;
+      display: block;
     }
 
     .single-coach {
-      font-size: 0.55em;
+      font-size: 0.3em;
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -652,6 +659,13 @@
     .filter-button:hover .filter-icon::after,
     .filter-button:hover .filter-icon span {
       background: white;
+    }
+
+    /* Panneau fermé : forcer les barres en bordeaux (annule le :hover collant sur mobile au 2e clic) */
+    .filters-sidebar:not(.open) .filter-icon::before,
+    .filters-sidebar:not(.open) .filter-icon::after,
+    .filters-sidebar:not(.open) .filter-icon span {
+      background: var(--primary-color) !important;
     }
 
     /* Barre de filtres qui part du bouton */
@@ -1126,38 +1140,70 @@
       }
 
       .weekly-schedule thead th {
-        font-size: 0.75em;
-        padding: 2.6px 1px; /* Augmenté de 30% (2px * 1.3 = 2.6px) */
+        font-size: 1.2em;
+        padding: 1px;
       }
 
       .weekly-schedule th:first-child,
       .weekly-schedule td.time-cell {
         width: 30px;
-        font-size: 0.7em;
-        line-height: 0.8;
+        font-size: 0.88em;
+        line-height: 0.9;
+        padding: 1px 0;
       }
 
       .course-block {
-        padding: 1px;
-        padding-bottom: 3px;
-        padding-right: 25px;
-        font-size: 0.65em;
+        padding: 3px 1px 3px 1px;
+        padding-right: 18px;
+        font-size: 0.5em;
       }
 
       .logo-cours {
         max-width: 100%;
-        max-height: 137px;
+        max-height: 185px;
         width: auto;
         height: auto;
       }
 
       .course-info {
-        font-size: 0.49em; /* Réduit de 30% (0.7 * 0.7) */
+        font-size: 0.34em;
         width: 100%;
+        text-align: left;
+      }
+
+      .course-name-text {
+        font-size: 0.75em;
+        text-align: left;
+      }
+
+      /* Nom du cours en texte (sans logo) : réduction visuelle sur mobile */
+      .course-block .course-info .course-name-text {
+        font-size: 12px !important;
+        line-height: 1.2;
+        display: inline-block;
+        transform: scale(0.6);
+        transform-origin: left top;
+        margin-bottom: -8px;
+        max-width: 98%;
+      }
+
+      /* 2+ lignes : marges plus fortes pour rapprocher le coach (classe .multiline ajoutée par JS) */
+      .course-block .course-info .course-name-text.multiline {
+        margin-bottom: -12px;
+      }
+
+      .course-block:has(.course-info .course-name-text) .course-info + .single-coach,
+      .course-block:has(.course-info .course-name-text) .course-info + .multiple-coaches {
+        margin-top: -2px;
+      }
+
+      .course-block:has(.course-info .course-name-text.multiline) .course-info + .single-coach,
+      .course-block:has(.course-info .course-name-text.multiline) .course-info + .multiple-coaches {
+        margin-top: -6px;
       }
 
       .single-coach {
-        font-size: 0.287em; /* Réduit de 30% (0.41 * 0.7) */
+        font-size: 0.16em;
       }
 
       .single-coach img,
@@ -1211,12 +1257,19 @@
       }
 
       .course-block {
-        font-size: 0.7em;
+        font-size: 0.65em;
+        padding: 4px 1px 4px 1px;
+        padding-right: 22px;
       }
 
       .course-info {
-        font-size: 0.655em; /* Réduit de 30% (0.95 * 0.7) */
+        font-size: 0.55em;
         width: 100%;
+        text-align: left;
+      }
+
+      .single-coach {
+        font-size: 0.28em;
       }
 
       .logo-cours {
@@ -1234,12 +1287,19 @@
       }
 
       .course-block {
-        font-size: 0.75em;
+        font-size: 0.68em;
+        padding: 4px 1px 4px 1px;
+        padding-right: 22px;
       }
 
       .course-info {
-        font-size: 1em;
+        font-size: 0.64em;
         width: 100%;
+        text-align: left;
+      }
+
+      .single-coach {
+        font-size: 0.29em;
       }
 
       .logo-cours {
@@ -1257,17 +1317,56 @@
       }
 
       .course-block {
-        font-size: 0.8em;
+        font-size: 0.72em;
+        padding: 5px 1px 5px 1px;
+        padding-right: 22px;
       }
 
       .course-info {
-        font-size: 1.1em;
+        font-size: 0.68em;
         width: 100%;
+        text-align: left;
+      }
+
+      .single-coach {
+        font-size: 0.3em;
       }
 
       .logo-cours {
         max-height: 111px;
       }
+    }
+
+    /* Séparation matin / après-midi : zone agrandie 30 %, fond bordeaux, ligne continue à 50 % opaque */
+    tr.noon-separator td {
+      height: 57px;
+      min-height: 57px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: rgba(72, 6, 7, 0.12);
+      vertical-align: middle;
+    }
+
+    tr.noon-separator td.time-cell {
+      background: rgba(72, 6, 7, 0.12);
+    }
+
+    tr.noon-separator td.noon-separator-line {
+      position: relative;
+      background: rgba(72, 6, 7, 0.12);
+    }
+
+    /* Ligne bordeaux 50 % opaque au milieu (élément réel pour compatibilité) */
+    .noon-separator-line-inner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 3px;
+      background: rgba(72, 6, 7, 0.5);
+      border-radius: 2px;
     }
 
   </style>
@@ -1353,6 +1452,7 @@
         scheduleData = data;
 
         document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+        markMultilineCourseNames();
 
         let uniqueCoaches = new Set();
         Object.values(planningData).forEach(dayCourses => {
@@ -1691,8 +1791,22 @@
 
       var isWhiteRow = true;
 
+      function isAfterNoon(timeStr) {
+        var parts = (timeStr || '').split(':');
+        var h = parseInt(parts[0], 10) || 0;
+        return h >= 12;
+      }
+
       for (var t = 0; t < timesArray.length; t++) {
         var time = timesArray[t];
+
+        /* Ligne de séparation entre matinée et après-midi (avant la première heure >= 12:00), zone continue */
+        if (t > 0 && isAfterNoon(time) && !isAfterNoon(timesArray[t - 1])) {
+          html += '<tr class="noon-separator">';
+          html += '<td class="time-cell time-cell-grey"></td>';
+          html += '<td class="noon-separator-line course-cell" colspan="' + daysArray.length + '"></td>';
+          html += '</tr>';
+        }
 
         var rowClass = isWhiteRow ? 'course-row-white' : 'course-row-grey';
         var timeCellClass = isWhiteRow ? 'time-cell-white' : 'time-cell-grey';
@@ -1701,23 +1815,8 @@
 
         html += '<tr class="' + rowClass + '">';
 
-        // Trouver l'heure de fin pour cette ligne (première heure de fin trouvée)
-        var endTimeForRow = '';
-        for (var d = 0; d < daysArray.length; d++) {
-          var day = daysArray[d];
-          var courses = scheduleByTimeAndDay[time][day];
-          if (courses && courses.length > 0 && courses[0].endTime) {
-            endTimeForRow = courses[0].endTime;
-            break;
-          }
-        }
-        
-        // Afficher l'heure de début et de fin dans la colonne time-cell avec le tiret sur la deuxième ligne
-        var timeDisplay = time;
-        if (endTimeForRow) {
-          timeDisplay = time + '<br>-<br>' + endTimeForRow;
-        }
-        html += '<td class="time-cell ' + timeCellClass + '">' + timeDisplay + '</td>';
+        // Afficher uniquement l'heure de début dans la colonne de gauche
+        html += '<td class="time-cell ' + timeCellClass + '">' + time + '</td>';
 
         for (var d = 0; d < daysArray.length; d++) {
           var day = daysArray[d];
@@ -1815,6 +1914,21 @@
       html += '</table>';
 
       return html;
+    }
+
+    /** Marque les noms de cours sur 2+ lignes (mobile) pour appliquer des marges réduites. */
+    function markMultilineCourseNames() {
+      requestAnimationFrame(function() {
+        var els = document.querySelectorAll('.course-info .course-name-text');
+        var lineHeightPx = 14;
+        els.forEach(function(el) {
+          if (el.scrollHeight > lineHeightPx + 4) {
+            el.classList.add('multiline');
+          } else {
+            el.classList.remove('multiline');
+          }
+        });
+      });
     }
 
     function scrollToCurrentTime() {
