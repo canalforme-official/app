@@ -462,6 +462,13 @@
   background: white;
 }
 
+/* Panneau fermé : forcer les barres en bordeaux (annule le :hover collant sur mobile au 2e clic) */
+.filters-sidebar:not(.open) .filter-icon::before,
+.filters-sidebar:not(.open) .filter-icon::after,
+.filters-sidebar:not(.open) .filter-icon span {
+  background: var(--primary-color) !important;
+}
+
 .filters-sidebar-content {
   display: none;
   flex-direction: row;
@@ -811,6 +818,14 @@
   table-layout: fixed;
 }
 
+/* Première colonne = heures (largeur au contenu), le reste = jours */
+.weekly-schedule col.col-hours {
+  width: 40px;
+}
+.weekly-schedule col.col-day {
+  width: auto;
+}
+
 .weekly-schedule th, .weekly-schedule td {
   padding: 5px;
   vertical-align: top;
@@ -888,16 +903,14 @@
   }
 }
 
-  /* Styles pour la cellule des heures */
+  /* Cellules de la colonne des heures (la largeur vient de colgroup) */
   .weekly-schedule th:first-child,
   .weekly-schedule td.time-cell {
-    width: 50px;
-    min-width: 20px;
-    max-width: 60px;
     text-align: center;
-    padding: 5px;
+    padding: 2px 1px;
     font-weight: bold;
     color: var(--primary-color);
+    white-space: nowrap;
   }
 
   /* Alternance de couleurs pour les time-cell */
@@ -911,6 +924,25 @@
     background-color: var(--background-main);
     color: var(--primary-color);
     text-align: center;
+  }
+
+  /* Séparation matin / après-midi : zone agrandie 50 %, sans ligne */
+  .weekly-schedule tr.noon-separator td {
+    height: 86px;
+    min-height: 86px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: rgba(72, 6, 7, 0.12);
+    vertical-align: middle;
+  }
+
+  .weekly-schedule tr.noon-separator td.time-cell {
+    background: rgba(72, 6, 7, 0.12);
+  }
+
+  .weekly-schedule tr.noon-separator td.noon-separator-line {
+    background: rgba(72, 6, 7, 0.12);
   }
 
   /* Ajustement des cellules des cours */
@@ -1252,6 +1284,11 @@
       touch-action: pan-y;
     }
 
+    /* En rotation 90° : colonne heures légèrement élargie pour voir toute l'heure */
+    .weekly-schedule col.col-hours {
+      width: 36px !important;
+    }
+
     .weekly-schedule th,
     .weekly-schedule td {
       padding: 5px 2px;
@@ -1263,38 +1300,38 @@
       touch-action: pan-y;
     }
 
-      /* Ajout de styles pour le first-child (colonne des heures) dans la ligne des titres */
+      /* Colonne des heures au strict minimum en rotation 90° (weekly.html) */
     .weekly-schedule th:first-child {
-      width: 40px;
-      min-width: 30px;
-      max-width: 50px;
+      width: 22px !important;
+      min-width: 22px !important;
+      max-width: 26px !important;
       text-align: center;
       writing-mode: vertical-rl;
       white-space: nowrap;
-      padding: 2px;
+      padding: 1px;
       transform: none;
-      font-size: 1.2em;
+      font-size: 1em;
     }
 
-      /* Ajustement des autres colonnes dans la ligne */
       .weekly-schedule th:not(:first-child) {
-      width: calc((100% - 40px) / 7); /* Les autres colonnes se partagent l'espace restant */
+      width: calc((100% - 22px) / 7) !important;
       padding: 2px;
     }
 
-    /* Ajustement des largeurs de colonnes */
     .weekly-schedule .time-cell {
-      width: 40px;
+      width: 22px !important;
+      min-width: 22px !important;
+      max-width: 26px !important;
       writing-mode: unset;
-      font-size: 1.2em;
+      font-size: 1em;
       white-space: nowrap;
-      padding: 2px;
+      padding: 1px;
       text-align: center;
       transform: none;
     }
 
     .weekly-schedule .course-cell {
-      width: calc((100% - 30px) / 7);
+      width: calc((100% - 22px) / 7) !important;
       padding: 2px;
     }
 
@@ -2277,8 +2314,13 @@
 
       timesArray.sort();
 
+      var numDays = daysArray.length;
       var html = '<table class="weekly-schedule">';
-
+      html += '<colgroup><col class="col-hours">';
+      for (var c = 0; c < numDays; c++) {
+        html += '<col class="col-day">';
+      }
+      html += '</colgroup>';
       html += '<thead><tr><th></th>';
       for (var i = 0; i < daysArray.length; i++) {
         var dayClass = '';
@@ -2293,8 +2335,22 @@
 
       var isWhiteRow = true;
 
+      function isAfterNoon(timeStr) {
+        var parts = (timeStr || '').split(':');
+        var h = parseInt(parts[0], 10) || 0;
+        return h >= 12;
+      }
+
       for (var t = 0; t < timesArray.length; t++) {
         var time = timesArray[t];
+
+        /* Ligne de séparation entre matinée et après-midi (avant la première heure >= 12:00) */
+        if (t > 0 && isAfterNoon(time) && !isAfterNoon(timesArray[t - 1])) {
+          html += '<tr class="noon-separator">';
+          html += '<td class="time-cell time-cell-grey"></td>';
+          html += '<td class="noon-separator-line course-cell" colspan="' + daysArray.length + '"></td>';
+          html += '</tr>';
+        }
 
         // Détermine la classe pour la couleur de la ligne (blanche ou grise)
         var rowClass = isWhiteRow ? 'course-row-white' : 'course-row-grey';
