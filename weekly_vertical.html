@@ -222,7 +222,7 @@
     }
 
     .weekly-schedule th, .weekly-schedule td {
-      padding: 2px;
+      padding: 1px;
       vertical-align: top;
       border: none;
     }
@@ -232,7 +232,7 @@
       background-color: var(--primary-color);
       color: var(--text-light);
       text-align: center;
-      font-size: 0.9em;
+      font-size: 1.4em;
       border-bottom: 1px solid var(--shadow-light);
       position: sticky;
       top: 0;
@@ -240,7 +240,7 @@
       pointer-events: none;
       border-radius: 0;
       margin: 0;
-      padding: 4px 2px; /* Augmenté de 30% (3px * 1.3 = 3.9px ≈ 4px) */
+      padding: 1px;
     }
 
     /* Rendre invisible la première cellule du thead (cellule des horaires) */
@@ -263,11 +263,11 @@
 
     /* Animation améliorée pour le jour actuel */
     .weekly-schedule thead th.today {
-      background-color: var(--secondary-color);
+      background-color: #981010;
       position: sticky;
       top: 0;
       z-index: 10;
-      color: var(--primary-color);
+      color: var(--text-light);
       overflow: hidden;
       pointer-events: none;
       margin: 0;
@@ -291,10 +291,10 @@
       min-width: 30px;
       max-width: 40px;
       text-align: center;
-      padding: 2px;
+      padding: 1px 0;
       font-weight: bold;
       color: var(--primary-color);
-      font-size: 0.75em;
+      font-size: 0.92em;
       line-height: 1;
     }
 
@@ -313,11 +313,11 @@
 
     /* Ajustement des cellules des cours */
     .course-cell {
-      min-width: 80px;
+      min-width: 70px;
       text-align: center;
       border-bottom: 1px solid var(--shadow-light);
       position: relative;
-      padding: 2px;
+      padding: 1px;
     }
 
     /* Styles pour les lignes blanches et grises */
@@ -336,12 +336,12 @@
       background-color: var(--background-card);
       border: none;
       border-radius: 3px;
-      padding: 2px;
-      padding-bottom: 3px;
-      margin: 1px;
+      padding: 1px;
+      padding-bottom: 2px;
+      margin: 0;
       font-size: 0.75em;
       position: relative;
-      padding-right: 30px;
+      padding-right: 22px;
       box-shadow: 0px 1px 4px var(--shadow-light);
     }
 
@@ -1126,34 +1126,39 @@
       }
 
       .weekly-schedule thead th {
-        font-size: 0.75em;
-        padding: 2.6px 1px; /* Augmenté de 30% (2px * 1.3 = 2.6px) */
+        font-size: 1.2em;
+        padding: 1px;
       }
 
       .weekly-schedule th:first-child,
       .weekly-schedule td.time-cell {
         width: 30px;
-        font-size: 0.7em;
-        line-height: 0.8;
+        font-size: 0.88em;
+        line-height: 0.9;
+        padding: 1px 0;
       }
 
       .course-block {
         padding: 1px;
-        padding-bottom: 3px;
-        padding-right: 25px;
-        font-size: 0.65em;
+        padding-bottom: 2px;
+        padding-right: 18px;
+        font-size: 0.55em;
       }
 
       .logo-cours {
         max-width: 100%;
-        max-height: 137px;
+        max-height: 185px;
         width: auto;
         height: auto;
       }
 
       .course-info {
-        font-size: 0.49em; /* Réduit de 30% (0.7 * 0.7) */
+        font-size: 0.42em;
         width: 100%;
+      }
+
+      .course-name-text {
+        font-size: 0.9em;
       }
 
       .single-coach {
@@ -1701,23 +1706,8 @@
 
         html += '<tr class="' + rowClass + '">';
 
-        // Trouver l'heure de fin pour cette ligne (première heure de fin trouvée)
-        var endTimeForRow = '';
-        for (var d = 0; d < daysArray.length; d++) {
-          var day = daysArray[d];
-          var courses = scheduleByTimeAndDay[time][day];
-          if (courses && courses.length > 0 && courses[0].endTime) {
-            endTimeForRow = courses[0].endTime;
-            break;
-          }
-        }
-        
-        // Afficher l'heure de début et de fin dans la colonne time-cell avec le tiret sur la deuxième ligne
-        var timeDisplay = time;
-        if (endTimeForRow) {
-          timeDisplay = time + '<br>-<br>' + endTimeForRow;
-        }
-        html += '<td class="time-cell ' + timeCellClass + '">' + timeDisplay + '</td>';
+        // Afficher uniquement l'heure de début dans la colonne de gauche
+        html += '<td class="time-cell ' + timeCellClass + '">' + time + '</td>';
 
         for (var d = 0; d < daysArray.length; d++) {
           var day = daysArray[d];
