@@ -345,6 +345,11 @@
       text-align: left;
     }
 
+    /* Petite séparation verticale entre plusieurs cours dans la même tranche horaire */
+    .course-block + .course-block {
+      margin-top: 3px;
+    }
+
     /* Styles pour les cours mixtes */
     .course-block.mixte {
       box-shadow: 0px 1px 4px var(--shadow-light);
@@ -1337,10 +1342,10 @@
       }
     }
 
-    /* Séparation matin / après-midi : zone agrandie 30 %, fond bordeaux, ligne continue à 50 % opaque */
+    /* Séparation matin / après-midi : zone agrandie 50 %, sans ligne */
     tr.noon-separator td {
-      height: 57px;
-      min-height: 57px;
+      height: 60px;
+      min-height: 60px;
       padding: 0;
       margin: 0;
       border: none;
@@ -1353,20 +1358,7 @@
     }
 
     tr.noon-separator td.noon-separator-line {
-      position: relative;
       background: rgba(72, 6, 7, 0.12);
-    }
-
-    /* Ligne bordeaux 50 % opaque au milieu (élément réel pour compatibilité) */
-    .noon-separator-line-inner {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      height: 3px;
-      background: rgba(72, 6, 7, 0.5);
-      border-radius: 2px;
     }
 
   </style>
