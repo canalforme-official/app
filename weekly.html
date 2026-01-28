@@ -272,13 +272,15 @@
   bottom: 80px;
   right: 20px;
   top: auto;
-  z-index: 1000;
+  z-index: 1001;
   background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(10px);
   border-radius: 25px;
   padding: 0;
   width: 50px;
   height: 50px;
+  min-width: 48px;
+  min-height: 48px;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
@@ -287,7 +289,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+  touch-action: manipulation;
 }
 
 .rotation-view-button::before {
@@ -308,22 +311,28 @@
 }
 
 .rotation-view-button button {
+  position: absolute;
+  inset: 0;
   z-index: 3;
   width: 100%;
   height: 100%;
   background: none;
   border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  display: block;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
   outline: none;
   pointer-events: all;
   border-radius: 25px;
+  touch-action: manipulation;
+}
+
+/* Animation de clic (compatible mobile : active + classe JS) */
+.rotation-view-button:active::before,
+.rotation-view-button.tap-active::before {
+  animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .rotation-view-button:hover {
@@ -332,7 +341,7 @@
 }
 
 .rotation-view-button:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 /* Style pour le bouton de filtre (comme dans weekly_vertical.html) */
@@ -577,7 +586,8 @@
 .coach-dropdown-content {
   display: none !important;
   position: absolute;
-  top: 100%;
+  bottom: 100%;
+  top: auto;
   left: 0;
   right: 0;
   background-color: rgba(255, 255, 255, 0.8);
@@ -586,8 +596,9 @@
   max-height: 200px;
   overflow-y: auto;
   z-index: 1002;
-  margin-top: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 2px;
+  margin-top: 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.2s, visibility 0.2s;
@@ -597,13 +608,6 @@
   display: block !important;
   visibility: visible;
   opacity: 1;
-}
-
-.coach-dropdown-content.open-up {
-  top: auto !important;
-  bottom: 100% !important;
-  margin-top: 0 !important;
-  margin-bottom: 2px !important;
 }
 
 .coach-dropdown-option {
@@ -1747,9 +1751,8 @@
   <div class="content-wrapper">
 
     <!-- Bouton de rotation vers weekly_vertical.html -->
-    <div class="rotation-view-button" id="rotationViewButton">
-      <button onclick="goToWeeklyVertical()">
-      </button>
+    <div class="rotation-view-button" id="rotationViewButton" role="button" tabindex="0" aria-label="Vue verticale du planning" onclick="goToWeeklyVertical()">
+      <button type="button" aria-label="Vue verticale du planning"></button>
     </div>
 
     <!-- Bouton pour revenir à aujourd'hui -->
@@ -1811,7 +1814,7 @@
         </label>
         <div class="coach-dropdown">
           <button class="coach-dropdown-button" id="coachDropdownButton">
-            <span id="coachDropdownText">Aucun coach</span>
+            <span id="coachDropdownText">Sélection coach</span>
             <span class="coach-dropdown-arrow">▼</span>
           </button>
           <div class="coach-dropdown-content" id="coachDropdownContent">
@@ -1995,11 +1998,11 @@
           
           function updateCoachDropdownText() {
             if (selectedCoaches.size === 0) {
-              coachDropdownText.textContent = 'Aucun coach';
+              coachDropdownText.textContent = 'Sélection coach';
             } else if (selectedCoaches.size === uniqueCoaches.size) {
-              coachDropdownText.textContent = 'Tous les coachs';
+              coachDropdownText.textContent = 'Sélection coach';
             } else {
-              coachDropdownText.textContent = selectedCoaches.size + ' coach(s)';
+              coachDropdownText.textContent = selectedCoaches.size === 1 ? '1 coach' : selectedCoaches.size + ' coachs';
             }
           }
           
@@ -2012,21 +2015,6 @@
             const content = coachDropdownContent;
             
             dropdown.classList.toggle('open');
-            
-            if (dropdown.classList.contains('open')) {
-              const buttonRect = coachDropdownButton.getBoundingClientRect();
-              const spaceBelow = window.innerHeight - buttonRect.bottom;
-              const spaceAbove = buttonRect.top;
-              const contentHeight = 200;
-              
-              if (spaceBelow < contentHeight && spaceAbove > spaceBelow) {
-                content.classList.add('open-up');
-              } else {
-                content.classList.remove('open-up');
-              }
-            } else {
-              content.classList.remove('open-up');
-            }
           });
           
           document.addEventListener('click', function(e) {
@@ -2582,6 +2570,20 @@
     function goToWeeklyVertical() {
       window.location.href = './weekly_vertical.html';
     }
+
+    // Animation de clic fiable au toucher sur le bouton rotation (mobile)
+    (function initRotationButtonTapAnimation() {
+      var el = document.getElementById('rotationViewButton');
+      if (!el) return;
+      function removeTapActive() {
+        var target = el;
+        setTimeout(function() { target.classList.remove('tap-active'); }, 320);
+      }
+      el.addEventListener('pointerdown', function() { el.classList.add('tap-active'); });
+      el.addEventListener('pointerup', removeTapActive);
+      el.addEventListener('pointerleave', removeTapActive);
+      el.addEventListener('pointercancel', removeTapActive);
+    })();
 
     // Fonction pour ouvrir/fermer la barre de filtres
     function toggleFiltersSidebar(event) {
