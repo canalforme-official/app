@@ -649,9 +649,19 @@
   align-items: center;
   width: 100%;
   cursor: pointer;
+  gap: 10px;
 }
 
-.coach-dropdown-option label span:first-child {
+.coach-dropdown-option-photo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background-color: rgba(72, 6, 7, 0.1);
+}
+
+.coach-dropdown-option label span:first-of-type {
   flex: 1;
   font-size: 1.15em;
   color: var(--primary-color);
@@ -1797,19 +1807,19 @@
     <div class="filters-sidebar-content">
       <div class="filters">
         <label>
-          <input type="checkbox" id="filter-mixte" checked>
+          <input type="checkbox" id="filter-mixte-sidebar" checked>
           Mixte
         </label>
         <label>
-          <input type="checkbox" id="filter-women-only" checked>
+          <input type="checkbox" id="filter-women-only-sidebar" checked>
           Femmes
         </label>
         <label>
-          <input type="checkbox" id="filter-piscine" checked>
+          <input type="checkbox" id="filter-piscine-sidebar" checked>
           Piscine
         </label>
         <label>
-          <input type="checkbox" id="filter-coach" checked>
+          <input type="checkbox" id="filter-coach-sidebar" checked>
           Coach
         </label>
         <div class="coach-dropdown">
@@ -1916,20 +1926,22 @@
             loadingOverlay.style.opacity = '0';
           }
 
-          // Récupérer la liste unique de coachs et les ajouter dans le select
-          let uniqueCoaches = new Set();
+          // Récupérer la liste unique de coachs (nom -> { name, imageUrl }) pour le menu déroulant
+          let uniqueCoachesMap = new Map();
+          const defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
           Object.values(planningData).forEach(dayCourses => {
             dayCourses.forEach(course => {
               if (course.coachIds) {
                 course.coachIds.forEach(coachId => {
                   const coach = coachsData.find(c => c.id === coachId);
-                  if (coach) {
-                    uniqueCoaches.add(coach.name);
+                  if (coach && !uniqueCoachesMap.has(coach.name)) {
+                    uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
                   }
                 });
               }
             });
           });
+          let uniqueCoaches = new Set(uniqueCoachesMap.keys());
 
           // Cibler spécifiquement la liste déroulante dans la filters-sidebar
           let coachDropdownContent = document.querySelector('#filtersSidebar .coach-dropdown-content');
@@ -1943,8 +1955,8 @@
           
           let selectedCoaches = new Set(); // Aucun sélectionné par défaut
           
-          // Créer les options avec checkboxes
-          Array.from(uniqueCoaches).sort().forEach(coach => {
+          // Créer les options avec photo + checkboxes
+          Array.from(uniqueCoachesMap.values()).sort((a, b) => a.name.localeCompare(b.name)).forEach(function(coachObj) {
             let option = document.createElement('div');
             option.className = 'coach-dropdown-option';
             
@@ -1955,13 +1967,18 @@
             label.style.width = '100%';
             label.style.cursor = 'pointer';
             
+            let img = document.createElement('img');
+            img.className = 'coach-dropdown-option-photo';
+            img.src = coachObj.imageUrl;
+            img.alt = coachObj.name;
+            
             let span = document.createElement('span');
-            span.textContent = coach;
+            span.textContent = coachObj.name;
             span.style.flex = '1';
             
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.value = coach;
+            checkbox.value = coachObj.name;
             checkbox.checked = false; // Aucun sélectionné par défaut
             checkbox.style.display = 'none';
             
@@ -1972,9 +1989,9 @@
             
             checkbox.addEventListener('change', function() {
               if (checkbox.checked) {
-                selectedCoaches.add(coach);
+                selectedCoaches.add(coachObj.name);
               } else {
-                selectedCoaches.delete(coach);
+                selectedCoaches.delete(coachObj.name);
               }
               checkmark.style.display = checkbox.checked ? 'inline' : 'none';
               updateCoachDropdownText();
@@ -1989,6 +2006,7 @@
               }
             });
             
+            label.appendChild(img);
             label.appendChild(span);
             label.appendChild(checkmark);
             label.appendChild(checkbox);
@@ -2026,10 +2044,24 @@
           });
 
           // Ajouter des écouteurs d'événements pour les filtres de cases à cocher et le filtre de coachs
-          document.getElementById('filter-mixte').addEventListener('change', applyFilters);
-          document.getElementById('filter-women-only').addEventListener('change', applyFilters);
-          document.getElementById('filter-piscine').addEventListener('change', applyFilters);
-          document.getElementById('filter-coach').addEventListener('change', applyFilters);
+          function addFilterListeners(name) {
+            const header = document.getElementById('filter-' + name);
+            const sidebar = document.getElementById('filter-' + name + '-sidebar');
+            function onChange() {
+              if (header && sidebar) sidebar.checked = header.checked;
+              applyFilters();
+            }
+            function onSidebarChange() {
+              if (header && sidebar) header.checked = sidebar.checked;
+              applyFilters();
+            }
+            if (header) header.addEventListener('change', onChange);
+            if (sidebar) sidebar.addEventListener('change', onSidebarChange);
+          }
+          addFilterListeners('mixte');
+          addFilterListeners('women-only');
+          addFilterListeners('piscine');
+          addFilterListeners('coach');
 
           // Appliquer les filtres initiaux
           applyFilters();
@@ -2167,12 +2199,12 @@
     // Ajouter l'écouteur d'événements avec l'option passive
     document.querySelector('.content-wrapper').addEventListener('scroll', handleScroll, { passive: true });
 
-    // Optimisation de la fonction applyFilters
+    // Optimisation de la fonction applyFilters (lit sidebar ou header pour éviter IDs dupliqués)
     function applyFilters() {
-      const showMixte = document.getElementById('filter-mixte').checked;
-      const showWomenOnly = document.getElementById('filter-women-only').checked;
-      const showPiscine = document.getElementById('filter-piscine').checked;
-      const showCoachImages = document.getElementById('filter-coach').checked;
+      const showMixte = (document.getElementById('filter-mixte-sidebar') || document.getElementById('filter-mixte')).checked;
+      const showWomenOnly = (document.getElementById('filter-women-only-sidebar') || document.getElementById('filter-women-only')).checked;
+      const showPiscine = (document.getElementById('filter-piscine-sidebar') || document.getElementById('filter-piscine')).checked;
+      const showCoachImages = (document.getElementById('filter-coach-sidebar') || document.getElementById('filter-coach')).checked;
       
       // Récupérer tous les coachs sélectionnés
       const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"]');
