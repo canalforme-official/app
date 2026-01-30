@@ -62,6 +62,10 @@
       --state-past: #aaaaaa;
       --overlay-light: rgba(255, 255, 255, 0.3);
       --overlay-lighter: rgba(255, 255, 255, 0.2);
+      /* Planning vertical : 4 jours et quelques visibles, scroll pour le reste */
+      --schedule-hours-width: 42px;
+      --schedule-hours-min-width: 42px;
+      --schedule-day-width: calc((100vw - var(--schedule-hours-width)) / 4.4);
     }
 
     body, button, a, img {
@@ -101,13 +105,135 @@
       position: relative;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      /* Vertical uniquement ici : le horizontal est géré par les wrappers enfants */
       touch-action: pan-y;
-      overscroll-behavior: none;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
     .content-wrapper::-webkit-scrollbar {
       display: none;
+    }
+
+    /* Barre des jours sticky — en dehors du scroll horizontal pour que sticky fonctionne */
+    .sticky-days-bar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: var(--background-main);
+      flex-shrink: 0;
+    }
+
+    .sticky-days-bar .weekly-schedule-header {
+      width: calc(var(--schedule-hours-width) + 7 * var(--schedule-day-width));
+      min-width: calc(var(--schedule-hours-width) + 7 * var(--schedule-day-width));
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 0;
+    }
+
+    .sticky-days-bar .weekly-schedule-header th {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      text-align: center;
+      font-size: 1.5em !important;
+      font-weight: 600;
+      border-bottom: 2px solid var(--shadow-light);
+      padding: 6px 4px;
+      margin: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Noms des jours : taille lisible sans être trop grande */
+    .sticky-days-bar .weekly-schedule-header th:not(:first-child) {
+      font-size: 1.5em !important;
+    }
+
+    /* Première cellule (heures) : fond blanc, taille normale */
+    .sticky-days-bar .weekly-schedule-header th:first-child {
+      background-color: var(--background-card);
+      border: none;
+      box-shadow: none;
+      font-size: 1em !important;
+    }
+
+    .sticky-days-bar .weekly-schedule-header th.today {
+      background-color: #981010;
+    }
+
+    .sticky-days-bar .weekly-schedule-header th:nth-child(2) {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .sticky-days-bar .weekly-schedule-header th:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    .sticky-days-bar .weekly-schedule-header th:first-child {
+      min-width: 42px;
+      width: var(--schedule-hours-width);
+    }
+
+    .sticky-days-bar .weekly-schedule-header col.col-hours {
+      width: var(--schedule-hours-width);
+      min-width: 42px;
+    }
+
+    .sticky-days-bar .weekly-schedule-header col.col-day {
+      width: var(--schedule-day-width);
+    }
+
+    /* Barre des jours : scroll uniquement piloté par JS (synchro depuis le tableau), pas de scroll tactile pour ne pas casser l'inertie */
+    .sticky-scroll-wrapper {
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      touch-action: none;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .sticky-scroll-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Wrapper scroll horizontal : inertie préservée (pas d'écriture scrollLeft depuis la barre sticky) */
+    .schedule-scroll-wrapper {
+      overflow-x: auto;
+      overflow-y: visible;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      overscroll-behavior-x: contain;
+    }
+
+    .schedule-scroll-wrapper::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .schedule-scroll-wrapper::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 3px;
+    }
+
+    /* Ombre à droite tant qu'il y a du contenu à défiler — opacité réduite */
+    .scroll-shadow-right {
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 72px;
+      width: 40px;
+      pointer-events: none;
+      z-index: 50;
+      background: linear-gradient(to left, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.12), transparent);
+      transition: opacity 0.25s ease;
+    }
+
+    .scroll-shadow-right.at-end {
+      opacity: 0;
     }
 
     /* Style pour la disposition du titre et des filtres */
@@ -212,13 +338,29 @@
       background-color: var(--secondary-light);
     }
 
-    /* Styles pour le tableau du planning hebdomadaire */
+    /* Styles pour le tableau du planning hebdomadaire — 4 jours et quelques visibles */
     .weekly-schedule {
-      width: 100%;
+      width: calc(var(--schedule-hours-width) + 7 * var(--schedule-day-width));
+      min-width: calc(var(--schedule-hours-width) + 7 * var(--schedule-day-width));
       border-collapse: collapse;
-      margin: 0 auto;
+      margin: 0;
       table-layout: fixed;
-      font-size: 0.65em;
+      font-size: 0.72em;
+    }
+
+    /* Aucun background sur les colonnes : alternance uniquement par tranche horaire (ligne) */
+    .weekly-schedule col.col-hours,
+    .weekly-schedule col.col-day {
+      background: transparent !important;
+    }
+
+    .weekly-schedule col.col-hours {
+      width: var(--schedule-hours-width);
+      min-width: 42px;
+    }
+
+    .weekly-schedule col.col-day {
+      width: var(--schedule-day-width);
     }
 
     .weekly-schedule th, .weekly-schedule td {
@@ -227,27 +369,33 @@
       border: none;
     }
 
-    /* Ligne des titres avec fond rouge moins transparent et texte blanc */
+    /* Ligne des titres (barre des jours) — sticky comme weekly.html */
     .weekly-schedule thead th {
       background-color: var(--primary-color);
       color: var(--text-light);
       text-align: center;
-      font-size: 1.4em;
-      border-bottom: 1px solid var(--shadow-light);
+      font-size: 1.35em;
+      font-weight: 600;
+      border-bottom: 2px solid var(--shadow-light);
       position: sticky;
       top: 0;
       z-index: 10;
       pointer-events: none;
       border-radius: 0;
       margin: 0;
-      padding: 1px;
+      padding: 6px 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
 
-    /* Rendre invisible la première cellule du thead (cellule des horaires) */
+    /* Première cellule du thead (horaires) — sticky en haut à gauche */
     .weekly-schedule thead th:first-child {
-      background-color: transparent;
+      background-color: var(--background-main);
       border: none;
-      box-shadow: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 20;
     }
 
     /* Arrondir uniquement les extrémités de la barre de titres */
@@ -284,21 +432,27 @@
       border-bottom-right-radius: 3px;
     }
 
-    /* Styles pour la cellule des heures */
+    /* Colonne des heures — largeur réduite, sticky à gauche */
     .weekly-schedule th:first-child,
     .weekly-schedule td.time-cell {
-      width: 35px;
-      min-width: 30px;
-      max-width: 40px;
+      width: var(--schedule-hours-width);
+      min-width: 42px;
+      max-width: none;
       text-align: center;
-      padding: 1px 0;
+      padding: 6px 2px;
       font-weight: bold;
       color: var(--primary-color);
-      font-size: 0.92em;
-      line-height: 1;
+      font-size: 1.2em;
+      line-height: 1.15;
     }
 
-    /* Alternance de couleurs pour les time-cell */
+    .weekly-schedule td.time-cell {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+    }
+
+    /* Alternance blanc / gris par tranche horaire uniquement (pas par colonne de jour) */
     .weekly-schedule td.time-cell-white {
       background-color: var(--background-card);
       color: var(--primary-color);
@@ -311,16 +465,17 @@
       text-align: center;
     }
 
-    /* Ajustement des cellules des cours */
+    /* Cellules des cours — largeur fixe par jour, espace entre colonnes (+2px entre les jours) */
     .course-cell {
-      min-width: 70px;
+      width: var(--schedule-day-width);
+      min-width: var(--schedule-day-width);
       text-align: center;
       border-bottom: 1px solid var(--shadow-light);
       position: relative;
-      padding: 1px;
+      padding: 2px 9px;
     }
 
-    /* Styles pour les lignes blanches et grises */
+    /* Même alternance par tranche horaire pour les cellules cours (pas de fond par colonne jour) */
     .course-row-white .course-cell {
       background-color: var(--background-card);
       color: var(--text-primary);
@@ -331,35 +486,35 @@
       color: var(--text-primary);
     }
 
-    /* Ajustement des blocs de cours */
+    /* Ajustement des blocs de cours — padding interne (nom pas collé au bord), ombre marquée */
     .course-block {
       background-color: var(--background-card);
       border: none;
-      border-radius: 3px;
-      padding: 4px 1px 4px 1px;
-      padding-right: 22px;
+      border-radius: 10px;
+      padding: 10px 12px 10px 14px;
+      padding-right: 20px;
       margin: 0;
-      font-size: 0.68em;
+      font-size: 0.82em;
       position: relative;
-      box-shadow: 0px 1px 4px var(--shadow-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
       text-align: left;
     }
 
-    /* Petite séparation verticale entre plusieurs cours dans la même tranche horaire */
+    /* Espace entre blocs de la même heure */
     .course-block + .course-block {
-      margin-top: 3px;
+      margin-top: 8px;
     }
 
     /* Styles pour les cours mixtes */
     .course-block.mixte {
-      box-shadow: 0px 1px 4px var(--shadow-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     /* Styles pour les cours femmes */
     .course-block.women-only {
       background-color: var(--women-color-light);
       position: relative;
-      box-shadow: 0px 1px 4px var(--shadow-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     .course-block.women-only::before {
@@ -371,7 +526,7 @@
       bottom: 0;
       background: var(--gradient-women);
       opacity: 0.4;
-      border-radius: 3px;
+      border-radius: 10px;
       pointer-events: none;
       z-index: 0;
     }
@@ -385,7 +540,7 @@
     .course-block.piscine {
       background-color: var(--pool-color-light);
       position: relative;
-      box-shadow: 0px 1px 4px var(--shadow-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     .course-block.piscine::before {
@@ -397,7 +552,7 @@
       bottom: 0;
       background: var(--gradient-pool);
       opacity: 0.4;
-      border-radius: 3px;
+      border-radius: 10px;
       pointer-events: none;
       z-index: 0;
     }
@@ -409,13 +564,13 @@
 
     /* Styles pour les cours en cours */
     .course-block.current {
-      box-shadow: 0px 2px 6px var(--shadow-medium);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
       font-weight: bold;
     }
 
     /* Styles pour les cours qui vont bientôt démarrer */
     .course-block.starting-soon {
-      box-shadow: 0px 2px 6px var(--shadow-medium);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
       animation: pulse 1.5s infinite;
     }
 
@@ -425,17 +580,17 @@
       color: var(--state-past);
     }
 
-    /* Style pour le titre du cours */
+    /* Style pour le titre du cours — bien lisible */
     .course-title {
       font-weight: bold;
-      margin-bottom: 1px;
-      font-size: 0.78em;
+      margin-bottom: 3px;
+      font-size: 1.6em;
       text-align: left;
     }
 
-    /* Style pour le nom du coach (très réduit) */
+    /* Style pour le nom du coach */
     .coach-name {
-      font-size: 0.34em;
+      font-size: 0.68em;
       color: var(--text-secondary);
     }
 
@@ -482,10 +637,10 @@
       z-index: 5;
     }
 
-    /* Styles spécifiques pour les logos de cours (alignés à gauche avec le titre) */
+    /* Styles spécifiques pour les logos de cours (+10 %) */
     .logo-cours {
       max-width: 100%;
-      max-height: 104px;
+      max-height: 23px;
       width: auto;
       height: auto;
       object-fit: contain;
@@ -493,28 +648,39 @@
       margin: 0 0 0 0;
     }
 
-    /* Styles pour les cours (titre) – réduit et aligné à gauche */
+    /* Styles pour les cours (titre) — -5 % */
     .course-info {
-      font-size: 0.66em;
+      font-size: 1.14em;
       font-weight: bold;
       color: var(--text-primary);
       margin-right: 0;
       padding-right: 0;
-      line-height: 1.2;
+      line-height: 1.3;
       text-align: left;
     }
 
+    /* Retour à la ligne uniquement quand le nom complet dépasse la largeur du bloc (pas de coupure entre 2 mots si tout tient) */
     .course-name-text {
       text-align: left;
       display: block;
+      width: max-content;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: normal;
+      white-space: normal;
+    }
+
+    /* Quand un retour à la ligne est détecté (classe .multiline) : réduire la taille de police uniquement alors */
+    .course-block .course-info .course-name-text.multiline {
+      font-size: 0.84em;
     }
 
     .single-coach {
-      font-size: 0.3em;
+      font-size: 0.82em;
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      margin-top: 1px;
+      margin-top: 5px;
       color: var(--primary-color);
     }
 
@@ -523,11 +689,11 @@
     }
 
     .single-coach img {
-      width: 15px;
-      height: 15px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      margin-right: 2px;
-      margin-left: 3px;
+      margin-right: 4px;
+      margin-left: 2px;
       margin-bottom: 0;
     }
 
@@ -548,8 +714,8 @@
     }
 
     .coach-image {
-      width: 15px;
-      height: 15px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
     }
 
@@ -849,12 +1015,6 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
     
-    .coach-dropdown-option label span:first-child {
-      flex: 1;
-      font-size: 1.15em;
-      color: var(--primary-color);
-    }
-    
     .coach-dropdown-option:last-child {
       border-bottom: none;
     }
@@ -883,6 +1043,22 @@
       align-items: center;
       width: 100%;
       cursor: pointer;
+      gap: 10px;
+    }
+
+    .coach-dropdown-option-photo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: rgba(72, 6, 7, 0.1);
+    }
+
+    .coach-dropdown-option label span:first-of-type {
+      flex: 1;
+      font-size: 1.15em;
+      color: var(--primary-color);
     }
 
     .filters-sidebar-close {
@@ -1137,6 +1313,12 @@
 
     /* Styles responsives pour différentes tailles d'écran */
     @media screen and (max-width: 480px) {
+      :root {
+        --schedule-hours-width: 40px;
+        --schedule-hours-min-width: 40px;
+        --schedule-day-width: calc((100vw - 40px) / 4.4);
+      }
+
       .header-wrapper h1 {
         font-size: 1em;
       }
@@ -1159,28 +1341,36 @@
         font-size: 0.55em;
       }
 
-      .weekly-schedule thead th {
+      .weekly-schedule thead th:not(:first-child) {
         font-size: 1.2em;
-        padding: 1px;
+        padding: 6px 4px;
       }
 
+      /* Colonne heures mobile : plus étroite, texte un peu plus grand pour rester lisible */
       .weekly-schedule th:first-child,
       .weekly-schedule td.time-cell {
-        width: 30px;
-        font-size: 0.88em;
-        line-height: 0.9;
-        padding: 1px 0;
+        width: 40px;
+        min-width: 40px;
+        font-size: 1.2em;
+        line-height: 1.15;
+        padding: 4px 2px;
+      }
+
+      .sticky-days-bar .weekly-schedule-header th:first-child,
+      .sticky-days-bar .weekly-schedule-header col.col-hours {
+        width: 40px;
+        min-width: 40px;
       }
 
       .course-block {
-        padding: 3px 1px 3px 1px;
-        padding-right: 18px;
+        padding: 5px 6px 5px 8px;
+        padding-right: 16px;
         font-size: 0.5em;
       }
 
       .logo-cours {
         max-width: 100%;
-        max-height: 185px;
+        max-height: 22px;
         width: auto;
         height: auto;
       }
@@ -1192,44 +1382,44 @@
       }
 
       .course-name-text {
-        font-size: 0.75em;
+        font-size: 0.71em;
         text-align: left;
       }
 
-      /* Nom du cours en texte (sans logo) : réduction visuelle sur mobile */
+      /* Nom du cours en texte (sans logo) sur mobile : pleine largeur du bloc, retour à la ligne seulement si débordement */
       .course-block .course-info .course-name-text {
-        font-size: 12px !important;
+        font-size: 9.5px !important;
         line-height: 1.2;
-        display: inline-block;
-        transform: scale(0.6);
-        transform-origin: left top;
-        margin-bottom: -8px;
-        max-width: 98%;
+        display: block;
+        transform: none;
+        margin-bottom: 6px;
+        max-width: 100%;
       }
 
-      /* 2+ lignes : marges plus fortes pour rapprocher le coach (classe .multiline ajoutée par JS) */
+      /* 2+ lignes : taille de police réduite (classe .multiline ajoutée par JS), léger rapprochement sans chevauchement */
       .course-block .course-info .course-name-text.multiline {
-        margin-bottom: -12px;
+        font-size: 8px !important;
+        margin-bottom: 4px;
       }
 
       .course-block:has(.course-info .course-name-text) .course-info + .single-coach,
       .course-block:has(.course-info .course-name-text) .course-info + .multiple-coaches {
-        margin-top: -2px;
+        margin-top: 0;
       }
 
       .course-block:has(.course-info .course-name-text.multiline) .course-info + .single-coach,
       .course-block:has(.course-info .course-name-text.multiline) .course-info + .multiple-coaches {
-        margin-top: -6px;
+        margin-top: 0;
       }
 
       .single-coach {
-        font-size: 0.16em;
+        font-size: 0.78em;
       }
 
       .single-coach img,
       .coach-image {
-        width: 12px;
-        height: 12px;
+        width: 20px;
+        height: 20px;
       }
 
       .countdown-pill {
@@ -1278,8 +1468,8 @@
 
       .course-block {
         font-size: 0.65em;
-        padding: 4px 1px 4px 1px;
-        padding-right: 22px;
+        padding: 8px 10px 8px 10px;
+        padding-right: 18px;
       }
 
       .course-info {
@@ -1293,7 +1483,7 @@
       }
 
       .logo-cours {
-        max-height: 98px;
+        max-height: 24px;
       }
     }
 
@@ -1308,8 +1498,8 @@
 
       .course-block {
         font-size: 0.68em;
-        padding: 4px 1px 4px 1px;
-        padding-right: 22px;
+        padding: 8px 10px 8px 12px;
+        padding-right: 18px;
       }
 
       .course-info {
@@ -1323,7 +1513,7 @@
       }
 
       .logo-cours {
-        max-height: 104px;
+        max-height: 26px;
       }
     }
 
@@ -1338,8 +1528,8 @@
 
       .course-block {
         font-size: 0.72em;
-        padding: 5px 1px 5px 1px;
-        padding-right: 22px;
+        padding: 10px 12px 10px 16px;
+        padding-right: 20px;
       }
 
       .course-info {
@@ -1353,36 +1543,65 @@
       }
 
       .logo-cours {
-        max-height: 111px;
+        max-height: 29px;
       }
     }
 
-    /* Séparation matin / après-midi : zone agrandie 50 %, sans ligne */
+    /* Séparation matin / après-midi : motif 64×64 en tuilage, 50 % opaque ; colonne heures 100 % opaque */
     tr.noon-separator td {
       height: 60px;
       min-height: 60px;
       padding: 0;
       margin: 0;
       border: none;
-      background: rgba(72, 6, 7, 0.12);
+      background-color: rgba(72, 6, 7, 0.12);
+      position: relative;
       vertical-align: middle;
     }
 
+    tr.noon-separator td::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-image: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
+      background-size: 67px 67px;
+      background-repeat: repeat;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Colonne des heures (sticky) : ni fond ni motif */
     tr.noon-separator td.time-cell {
-      background: rgba(72, 6, 7, 0.12);
+      background-color: transparent;
+    }
+
+    tr.noon-separator td.time-cell::before {
+      display: none;
     }
 
     tr.noon-separator td.noon-separator-line {
-      background: rgba(72, 6, 7, 0.12);
+      background-color: rgba(72, 6, 7, 0.12);
     }
 
   </style>
 </head>
 <body onload="initializeWeeklyPage();">
   <div class="content-wrapper">
-    <!-- Le planning hebdomadaire sera inséré ici -->
-    <div id="weeklySchedule"></div>
+    <!-- Barre des jours sticky (hors overflow-x) + scroll horizontal synchronisé -->
+    <div class="sticky-days-bar" id="stickyDaysBar" aria-hidden="true">
+      <div class="sticky-scroll-wrapper" id="stickyScrollWrapper">
+        <div id="stickyHeaderContent"></div>
+      </div>
+    </div>
+    <div class="schedule-scroll-wrapper" id="scheduleScrollWrapper">
+      <div id="weeklySchedule"></div>
+    </div>
   </div>
+  <div class="scroll-shadow-right" id="scrollShadowRight" aria-hidden="true"></div>
 
   <!-- Bouton pour revenir à aujourd'hui -->
   <div class="today-view-button" id="todayViewButton">
@@ -1458,29 +1677,80 @@
         scheduleData = data;
 
         document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+
+        /* Barre des jours sticky : cloner thead hors du scroll-wrapper pour que sticky fonctionne */
+        (function setupStickyDaysBar() {
+          var mainTable = document.querySelector('#weeklySchedule .weekly-schedule');
+          var thead = mainTable && mainTable.querySelector('thead');
+          var stickyContent = document.getElementById('stickyHeaderContent');
+          var stickyWrapper = document.getElementById('stickyScrollWrapper');
+          var scheduleWrapper = document.getElementById('scheduleScrollWrapper');
+          if (!thead || !stickyContent || !stickyWrapper || !scheduleWrapper) return;
+          var colgroup = mainTable.querySelector('colgroup');
+          var headerTable = document.createElement('table');
+          headerTable.className = 'weekly-schedule weekly-schedule-header';
+          headerTable.setAttribute('aria-hidden', 'true');
+          if (colgroup) headerTable.appendChild(colgroup.cloneNode(true));
+          headerTable.appendChild(thead.cloneNode(true));
+          stickyContent.appendChild(headerTable);
+          thead.remove();
+          /* Synchro scroll horizontal : tableau -> barre sticky (raf pour défilement fluide sur mobile) */
+          var syncScheduled = false;
+          function syncFromSchedule() {
+            if (syncScheduled) return;
+            syncScheduled = true;
+            requestAnimationFrame(function() {
+              stickyWrapper.scrollLeft = scheduleWrapper.scrollLeft;
+              syncScheduled = false;
+            });
+          }
+          scheduleWrapper.addEventListener('scroll', syncFromSchedule, { passive: true });
+          /* Barre sticky non défilable au doigt : évite d'écrire dans scheduleWrapper.scrollLeft et de casser l'inertie */
+          scheduleWrapper.style.webkitOverflowScrolling = 'touch';
+        })();
+
         markMultilineCourseNames();
 
-        let uniqueCoaches = new Set();
+        /* Ombre à droite : visible tant qu'il y a du scroll horizontal, masquée en fin de scroll */
+        (function setupScrollShadow() {
+          var wrapper = document.getElementById('scheduleScrollWrapper');
+          var shadow = document.getElementById('scrollShadowRight');
+          if (!wrapper || !shadow) return;
+          function updateShadow() {
+            if (wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 2) {
+              shadow.classList.add('at-end');
+            } else {
+              shadow.classList.remove('at-end');
+            }
+          }
+          wrapper.addEventListener('scroll', updateShadow);
+          window.addEventListener('resize', updateShadow);
+          updateShadow();
+        })();
+
+        let uniqueCoachesMap = new Map();
+        const defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
         Object.values(planningData).forEach(dayCourses => {
           dayCourses.forEach(course => {
             if (course.coachIds) {
               course.coachIds.forEach(coachId => {
                 const coach = coachsData.find(c => c.id === coachId);
-                if (coach) {
-                  uniqueCoaches.add(coach.name);
+                if (coach && !uniqueCoachesMap.has(coach.name)) {
+                  uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
                 }
               });
             }
           });
         });
+        let uniqueCoaches = new Set(uniqueCoachesMap.keys());
 
         let coachDropdownContent = document.getElementById('coachDropdownContent');
         let coachDropdownButton = document.getElementById('coachDropdownButton');
         let coachDropdownText = document.getElementById('coachDropdownText');
         let selectedCoaches = new Set(); // Aucun sélectionné par défaut
         
-        // Créer les options avec checkboxes
-        Array.from(uniqueCoaches).sort().forEach(coach => {
+        // Créer les options avec photo + checkboxes
+        Array.from(uniqueCoachesMap.values()).sort((a, b) => a.name.localeCompare(b.name)).forEach(function(coachObj) {
           let option = document.createElement('div');
           option.className = 'coach-dropdown-option';
           
@@ -1491,12 +1761,17 @@
           label.style.width = '100%';
           label.style.cursor = 'pointer';
           
+          let img = document.createElement('img');
+          img.className = 'coach-dropdown-option-photo';
+          img.src = coachObj.imageUrl;
+          img.alt = coachObj.name;
+          
           let span = document.createElement('span');
-          span.textContent = coach;
+          span.textContent = coachObj.name;
           
           let checkbox = document.createElement('input');
           checkbox.type = 'checkbox';
-          checkbox.value = coach;
+          checkbox.value = coachObj.name;
           checkbox.checked = false; // Aucun sélectionné par défaut
           
           let checkmark = document.createElement('span');
@@ -1506,16 +1781,15 @@
           
           checkbox.addEventListener('change', function() {
             if (checkbox.checked) {
-              selectedCoaches.add(coach);
+              selectedCoaches.add(coachObj.name);
             } else {
-              selectedCoaches.delete(coach);
+              selectedCoaches.delete(coachObj.name);
             }
             checkmark.style.display = checkbox.checked ? 'inline' : 'none';
             updateCoachDropdownText();
             applyFilters();
           });
           
-          // Permettre de cliquer sur toute la ligne pour cocher/décocher
           option.addEventListener('click', function(e) {
             if (e.target !== checkbox) {
               e.preventDefault();
@@ -1524,6 +1798,7 @@
             }
           });
           
+          label.appendChild(img);
           label.appendChild(span);
           label.appendChild(checkmark);
           label.appendChild(checkbox);
@@ -1782,7 +2057,11 @@
       timesArray.sort();
 
       var html = '<table class="weekly-schedule">';
-
+      html += '<colgroup><col class="col-hours">';
+      for (var i = 0; i < daysArray.length; i++) {
+        html += '<col class="col-day">';
+      }
+      html += '</colgroup>';
       html += '<thead><tr><th></th>';
       for (var i = 0; i < daysArray.length; i++) {
         var dayClass = '';
@@ -1941,6 +2220,7 @@
       setTimeout(() => {
         requestAnimationFrame(() => {
           const contentWrapper = document.querySelector('.content-wrapper');
+          const scrollWrapper = document.getElementById('scheduleScrollWrapper');
           if (!contentWrapper) return;
 
           let targetRow = document.querySelector('.course-block.current')?.closest('tr');
@@ -1981,6 +2261,23 @@
                 behavior: 'smooth'
               });
             }, 100);
+          }
+
+          /* Défilement horizontal : centrer le jour en cours */
+          if (scrollWrapper) {
+            var todayTh = document.querySelector('.weekly-schedule thead th.today');
+            if (todayTh) {
+              var targetLeft = todayTh.offsetLeft - (scrollWrapper.clientWidth / 2) + (todayTh.offsetWidth / 2);
+              if (targetLeft < 0) targetLeft = 0;
+              var maxLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
+              if (targetLeft > maxLeft) targetLeft = maxLeft;
+              setTimeout(function() {
+                scrollWrapper.scrollTo({
+                  left: targetLeft,
+                  behavior: 'smooth'
+                });
+              }, 300);
+            }
           }
         });
       }, 500);
