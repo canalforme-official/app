@@ -148,9 +148,9 @@
       font-size: 1.5em !important;
     }
 
-    /* Première cellule (heures) : fond blanc, taille normale */
+    /* Première cellule (heures) en haut à gauche : transparente, l’ombre gauche ne la recouvre pas */
     .sticky-days-bar .weekly-schedule-header th:first-child {
-      background-color: var(--background-card);
+      background-color: transparent;
       border: none;
       box-shadow: none;
       font-size: 1em !important;
@@ -219,12 +219,12 @@
       border-radius: 3px;
     }
 
-    /* Ombre à droite tant qu'il y a du contenu à défiler — opacité réduite */
+    /* Ombre à droite tant qu'il y a du contenu à défiler — pleine hauteur de la page */
     .scroll-shadow-right {
       position: fixed;
       right: 0;
       top: 0;
-      bottom: 72px;
+      bottom: 0;
       width: 40px;
       pointer-events: none;
       z-index: 50;
@@ -234,6 +234,23 @@
 
     .scroll-shadow-right.at-end {
       opacity: 0;
+    }
+
+    /* Ombre à droite de la colonne sticky (heures) : left positionné en JS au bord droit de la colonne, même style que la droite mais inversée */
+    .scroll-shadow-left {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      pointer-events: none;
+      z-index: 50;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.12), transparent);
+      transition: opacity 0.25s ease;
+      opacity: 0;
+    }
+
+    .scroll-shadow-left.visible {
+      opacity: 1;
     }
 
     /* Style pour la disposition du titre et des filtres */
@@ -1601,6 +1618,7 @@
       <div id="weeklySchedule"></div>
     </div>
   </div>
+  <div class="scroll-shadow-left" id="scrollShadowLeft" aria-hidden="true"></div>
   <div class="scroll-shadow-right" id="scrollShadowRight" aria-hidden="true"></div>
 
   <!-- Bouton pour revenir à aujourd'hui -->
@@ -1711,21 +1729,44 @@
 
         markMultilineCourseNames();
 
-        /* Ombre à droite : visible tant qu'il y a du scroll horizontal, masquée en fin de scroll */
+        /* Ombres : droite = masquée en fin de scroll ; gauche = positionnée au bord droit de la colonne sticky (JS), visible uniquement quand on a défilé vers la droite */
         (function setupScrollShadow() {
           var wrapper = document.getElementById('scheduleScrollWrapper');
-          var shadow = document.getElementById('scrollShadowRight');
-          if (!wrapper || !shadow) return;
-          function updateShadow() {
-            if (wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 2) {
-              shadow.classList.add('at-end');
+          var shadowRight = document.getElementById('scrollShadowRight');
+          var shadowLeft = document.getElementById('scrollShadowLeft');
+          var contentWrapper = document.querySelector('.content-wrapper');
+          if (!wrapper || !shadowRight) return;
+          function updateShadows() {
+            var scrollLeft = wrapper.scrollLeft;
+            if (scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 2) {
+              shadowRight.classList.add('at-end');
             } else {
-              shadow.classList.remove('at-end');
+              shadowRight.classList.remove('at-end');
+            }
+            if (shadowLeft) {
+              var timeCell = document.querySelector('#weeklySchedule .weekly-schedule td.time-cell');
+              var firstCellSticky = document.querySelector('.sticky-days-bar .weekly-schedule-header th:first-child');
+              if (timeCell) {
+                var rect = timeCell.getBoundingClientRect();
+                shadowLeft.style.left = rect.right + 'px';
+              }
+              if (firstCellSticky) {
+                var topRect = firstCellSticky.getBoundingClientRect();
+                shadowLeft.style.top = topRect.bottom + 'px';
+              } else {
+                shadowLeft.style.top = '0';
+              }
+              if (scrollLeft > 0) {
+                shadowLeft.classList.add('visible');
+              } else {
+                shadowLeft.classList.remove('visible');
+              }
             }
           }
-          wrapper.addEventListener('scroll', updateShadow);
-          window.addEventListener('resize', updateShadow);
-          updateShadow();
+          wrapper.addEventListener('scroll', updateShadows, { passive: true });
+          if (contentWrapper) contentWrapper.addEventListener('scroll', updateShadows, { passive: true });
+          window.addEventListener('resize', updateShadows);
+          updateShadows();
         })();
 
         let uniqueCoachesMap = new Map();
