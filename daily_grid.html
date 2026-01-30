@@ -642,54 +642,89 @@
 
     /* Les boutons sont gérés par JavaScript selon le contexte */
 
-    /* Ajustements pour les écrans en orientation portrait */
+    /* Ajustements pour les écrans en orientation portrait (mobile) — compacts mais lisibles */
     @media screen and (max-width: 768px) {
+      body {
+        padding-bottom: 48px;
+      }
+
+      .header {
+        padding: 6px 12px;
+      }
+
       .content-wrapper {
-        height: calc(100vh - 80px);
+        height: calc(100vh - 74px);
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-bottom: 48px;
+      }
+
+      .studios-container {
+        gap: 6px;
       }
 
       .studios-row {
-        gap: 8px;
-      }
-
-      .course-card {
-        margin-bottom: 6px;
-        padding: 2px;
-        font-size: 1em;
-      }
-
-      .course-time {
-        font-size: 0.9em;
-        padding: 2px 12px;
-        min-width: 80px;
-      }
-
-      .course-name {
-        font-size: 1.1em;
-      }
-
-      .course-coach {
-        font-size: 0.9em;
-      }
-
-      .studio-title {
-        font-size: 1.2em;
-        padding: 4px;
-        gap: 10px;
-      }
-
-      .studio-icon {
-        width: 28px;
-        height: 28px;
+        gap: 6px;
       }
 
       .studio-column {
         padding: 2px;
       }
 
+      .studio-title {
+        font-size: 1.05em;
+        padding: 4px 5px;
+        gap: 8px;
+      }
+
+      .studio-icon {
+        width: 26px;
+        height: 26px;
+      }
+
+      .courses-container {
+        padding-top: 3px;
+        height: calc(100% - 28px);
+      }
+
+      .course-card {
+        margin-bottom: 3px;
+        padding: 0;
+        font-size: 0.92em;
+        width: 98%;
+        line-height: 1.2;
+      }
+
+      .course-time {
+        font-size: 0.82em;
+        padding: 2px 10px;
+        min-width: 62px;
+        margin-bottom: 1px;
+      }
+
+      .course-name {
+        font-size: 1.02em;
+        margin: 0 0 -2px 0;
+      }
+
+      .course-coach {
+        font-size: 0.82em;
+      }
+
+      .empty-message {
+        font-size: 0.85em;
+        margin-top: 10px;
+      }
+
+      .coaches-section {
+        height: 48px;
+        gap: 12px;
+        padding: 0 12px;
+      }
+
       .coach-image {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
       }
 
       .coach-name {
@@ -697,13 +732,66 @@
       }
 
       .day-title {
-        font-size: 1.4em;
+        font-size: 1.25em;
         gap: 8px;
       }
 
       .day-date {
-        font-size: 0.7em;
-        letter-spacing: 0.5px;
+        font-size: 0.65em;
+        letter-spacing: 0.4px;
+      }
+    }
+
+    /* Mobile très petit : un peu plus compact qu'au-dessus */
+    @media screen and (max-width: 380px) {
+      .header {
+        padding: 5px 8px;
+      }
+
+      .studio-title {
+        font-size: 0.95em;
+        padding: 3px 4px;
+      }
+
+      .studio-icon {
+        width: 22px;
+        height: 22px;
+      }
+
+      .course-time {
+        font-size: 0.78em;
+        padding: 1px 8px;
+        min-width: 54px;
+      }
+
+      .course-name {
+        font-size: 0.95em;
+      }
+
+      .course-coach {
+        font-size: 0.75em;
+      }
+
+      .day-title {
+        font-size: 1.1em;
+      }
+
+      .day-date {
+        font-size: 0.6em;
+      }
+
+      .coaches-section {
+        height: 44px;
+        gap: 10px;
+      }
+
+      .coach-image {
+        width: 24px;
+        height: 24px;
+      }
+
+      .coach-name {
+        font-size: 0.55em;
       }
     }
 
