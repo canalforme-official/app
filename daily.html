@@ -90,6 +90,14 @@
       box-sizing: border-box;
     }
 
+    /* Images non sélectionnables */
+    img {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
     /* Exception pour les champs de texte et les zones éditables */
     input, textarea, [contenteditable] {
       user-select: text;
