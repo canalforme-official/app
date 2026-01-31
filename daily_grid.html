@@ -642,29 +642,40 @@
 
     /* Les boutons sont gérés par JavaScript selon le contexte */
 
-    /* Ajustements pour les écrans en orientation portrait (mobile) — compacts mais lisibles */
+    /* Ajustements pour les écrans en orientation portrait (mobile) — compacts mais lisibles, pas de marge basse */
     @media screen and (max-width: 768px) {
       body {
-        padding-bottom: 48px;
+        padding-bottom: 0;
       }
 
       .header {
         padding: 6px 12px;
+        background: var(--primary-color);
       }
 
       .content-wrapper {
         height: calc(100vh - 74px);
+        min-height: 0;
         padding-left: 5px;
         padding-right: 5px;
-        margin-bottom: 48px;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
       }
 
       .studios-container {
         gap: 6px;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
       }
 
       .studios-row {
         gap: 6px;
+        flex: 1;
+        min-height: 0;
+        height: auto;
       }
 
       .studio-column {
@@ -718,6 +729,7 @@
 
       .coaches-section {
         height: 48px;
+        flex-shrink: 0;
         gap: 12px;
         padding: 0 12px;
       }
