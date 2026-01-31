@@ -988,7 +988,7 @@
     color: var(--text-primary);
   }
 
-  /* Ajustement des blocs de cours : padding uniforme, justification à gauche, largeur pleine */
+  /* Ajustement des blocs de cours : padding uniforme, ombres comme weekly_vertical */
   .course-block {
     background-color: var(--background-card);
     border: none;
@@ -998,7 +998,7 @@
     font-size: 0.9em;
     position: relative;
     text-align: left;
-    box-shadow: 0px 2px 8px var(--shadow-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
     width: 100%;
     box-sizing: border-box;
     min-width: 0;
@@ -1006,14 +1006,14 @@
 
   /* Styles pour les cours mixtes */
   .course-block.mixte {
-    box-shadow: 0px 2px 8px var(--shadow-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   /* Styles pour les cours femmes */
   .course-block.women-only {
     background-color: var(--women-color-light);
     position: relative;
-    box-shadow: 0px 2px 8px var(--shadow-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .course-block.women-only::before {
@@ -1039,7 +1039,7 @@
   .course-block.piscine {
     background-color: var(--pool-color-light);
     position: relative;
-    box-shadow: 0px 2px 8px var(--shadow-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .course-block.piscine::before {
@@ -1063,13 +1063,13 @@
 
   /* Styles pour les cours en cours */
   .course-block.current {
-    box-shadow: 0px 4px 12px var(--shadow-medium);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
     font-weight: bold;
   }
 
   /* Styles pour les cours qui vont bientôt démarrer */
   .course-block.starting-soon {
-    box-shadow: 0px 4px 12px var(--shadow-medium);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
     animation: pulse 1.5s infinite;
   }
 
@@ -1140,7 +1140,7 @@
   .course-block.women-only {
     background-color: var(--women-color-light);
     border: none;
-    box-shadow: 0px 2px 8px var(--shadow-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
     position: relative;
   }
 
@@ -1167,7 +1167,7 @@
   .course-block.piscine {
     background-color: var(--pool-color-light);
     border: none;
-    box-shadow: 0px 2px 8px var(--shadow-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.05);
     position: relative;
   }
 
