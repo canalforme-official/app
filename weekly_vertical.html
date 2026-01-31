@@ -63,8 +63,8 @@
       --overlay-light: rgba(255, 255, 255, 0.3);
       --overlay-lighter: rgba(255, 255, 255, 0.2);
       /* Planning vertical : 4 jours et quelques visibles, scroll pour le reste */
-      --schedule-hours-width: 42px;
-      --schedule-hours-min-width: 42px;
+      --schedule-hours-width: 38px;
+      --schedule-hours-min-width: 38px;
       --schedule-day-width: calc((100vw - var(--schedule-hours-width)) / 4.4);
     }
 
@@ -171,33 +171,34 @@
     }
 
     .sticky-days-bar .weekly-schedule-header th:first-child {
-      min-width: 42px;
+      min-width: 38px;
       width: var(--schedule-hours-width);
     }
 
     .sticky-days-bar .weekly-schedule-header col.col-hours {
       width: var(--schedule-hours-width);
-      min-width: 42px;
+      min-width: 38px;
     }
 
     .sticky-days-bar .weekly-schedule-header col.col-day {
       width: var(--schedule-day-width);
     }
 
-    /* Barre des jours : scroll uniquement piloté par JS (synchro depuis le tableau), pas de scroll tactile pour ne pas casser l'inertie */
+    /* Barre des jours : contenu déplacé par transform (synchro fluide, pas de reflow) */
     .sticky-scroll-wrapper {
-      overflow-x: auto;
+      overflow-x: hidden;
       overflow-y: hidden;
       width: 100%;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior-x: contain;
       touch-action: none;
       transform: translateZ(0);
       backface-visibility: hidden;
     }
 
-    .sticky-scroll-wrapper::-webkit-scrollbar {
-      display: none;
+    #stickyHeaderContent {
+      display: inline-block;
+      will-change: transform;
+      transform: translateZ(0);
+      contain: layout;
     }
 
     /* Wrapper scroll horizontal : inertie préservée (pas d'écriture scrollLeft depuis la barre sticky) */
@@ -373,7 +374,7 @@
 
     .weekly-schedule col.col-hours {
       width: var(--schedule-hours-width);
-      min-width: 42px;
+      min-width: 38px;
     }
 
     .weekly-schedule col.col-day {
@@ -449,17 +450,17 @@
       border-bottom-right-radius: 3px;
     }
 
-    /* Colonne des heures — largeur réduite, sticky à gauche */
+    /* Colonne des heures — largeur et padding réduits, taille des heures légèrement augmentée */
     .weekly-schedule th:first-child,
     .weekly-schedule td.time-cell {
       width: var(--schedule-hours-width);
-      min-width: 42px;
+      min-width: 38px;
       max-width: none;
       text-align: center;
-      padding: 6px 2px;
+      padding: 5px 1px;
       font-weight: bold;
       color: var(--primary-color);
-      font-size: 1.2em;
+      font-size: 1.28em;
       line-height: 1.15;
     }
 
@@ -1331,9 +1332,9 @@
     /* Styles responsives pour différentes tailles d'écran */
     @media screen and (max-width: 480px) {
       :root {
-        --schedule-hours-width: 40px;
-        --schedule-hours-min-width: 40px;
-        --schedule-day-width: calc((100vw - 40px) / 4.4);
+        --schedule-hours-width: 36px;
+        --schedule-hours-min-width: 36px;
+        --schedule-day-width: calc((100vw - 36px) / 4.4);
       }
 
       .header-wrapper h1 {
@@ -1363,20 +1364,20 @@
         padding: 6px 4px;
       }
 
-      /* Colonne heures mobile : plus étroite, texte un peu plus grand pour rester lisible */
+      /* Colonne heures mobile : plus étroite, padding réduit, texte un peu plus grand */
       .weekly-schedule th:first-child,
       .weekly-schedule td.time-cell {
-        width: 40px;
-        min-width: 40px;
-        font-size: 1.2em;
+        width: 36px;
+        min-width: 36px;
+        font-size: 1.28em;
         line-height: 1.15;
-        padding: 4px 2px;
+        padding: 3px 1px;
       }
 
       .sticky-days-bar .weekly-schedule-header th:first-child,
       .sticky-days-bar .weekly-schedule-header col.col-hours {
-        width: 40px;
-        min-width: 40px;
+        width: 36px;
+        min-width: 36px;
       }
 
       .course-block {
@@ -1712,18 +1713,39 @@
           headerTable.appendChild(thead.cloneNode(true));
           stickyContent.appendChild(headerTable);
           thead.remove();
-          /* Synchro scroll horizontal : tableau -> barre sticky (raf pour défilement fluide sur mobile) */
-          var syncScheduled = false;
-          function syncFromSchedule() {
-            if (syncScheduled) return;
-            syncScheduled = true;
-            requestAnimationFrame(function() {
-              stickyWrapper.scrollLeft = scheduleWrapper.scrollLeft;
-              syncScheduled = false;
-            });
+          /* Synchro scroll horizontal fluide : boucle rAF + transform (mise à jour à chaque frame, écriture DOM seulement si la valeur change) */
+          var rafId = null;
+          var lastScrollLeft = -1;
+          var lastApplied = -1;
+          var sameCount = 0;
+          function tick() {
+            var current = scheduleWrapper.scrollLeft;
+            if (current !== lastApplied) {
+              lastApplied = current;
+              stickyContent.style.transform = 'translate3d(' + (-current) + 'px,0,0)';
+            }
+            if (current === lastScrollLeft) {
+              sameCount++;
+              if (sameCount >= 3) {
+                rafId = null;
+                return;
+              }
+            } else {
+              sameCount = 0;
+              lastScrollLeft = current;
+            }
+            rafId = requestAnimationFrame(tick);
           }
-          scheduleWrapper.addEventListener('scroll', syncFromSchedule, { passive: true });
-          /* Barre sticky non défilable au doigt : évite d'écrire dans scheduleWrapper.scrollLeft et de casser l'inertie */
+          function onScroll() {
+            if (rafId === null) {
+              lastScrollLeft = scheduleWrapper.scrollLeft;
+              lastApplied = -1;
+              sameCount = 0;
+              rafId = requestAnimationFrame(tick);
+            }
+          }
+          scheduleWrapper.addEventListener('scroll', onScroll, { passive: true });
+          stickyContent.style.transform = 'translate3d(0,0,0)';
           scheduleWrapper.style.webkitOverflowScrolling = 'touch';
         })();
 
