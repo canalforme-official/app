@@ -5,10 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Myzone Leaderboard - Canal Forme</title>
-  <link rel="icon" type="image/png"
-    href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
+  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+    /* Charte : bordeaux Canal Forme (entre #981010 et #480607) */
+    :root {
+      --primary: #6e0c0c;
+      --primary-light: #8a1212;
+      --primary-rgb: 110, 12, 12;
+      --pattern-url: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
+    }
 
     /* Réinitialisation des marges et des paddings */
     * {
@@ -17,7 +24,7 @@
       box-sizing: border-box;
     }
 
-    /* Styles généraux */
+    /* Fond de page : motif séparation matin/après-midi en 128×128 + overlay bordeaux ~8% */
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: #f8f9fa;
@@ -28,8 +35,28 @@
       overflow-x: hidden;
       scrollbar-width: none;
       -ms-overflow-style: none;
-      /* Ajout de règles supplémentaires pour tous les conteneurs */
       -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: var(--pattern-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-color: rgba(var(--primary-rgb), 0.08);
+      z-index: 1;
+      pointer-events: none;
     }
 
     /* Masque la barre de défilement pour tous les navigateurs Webkit */
@@ -85,6 +112,8 @@
       justify-content: flex-start;
       padding: 20px;
       box-sizing: border-box;
+      position: relative;
+      z-index: 2;
     }
 
     .logo-container {
@@ -121,25 +150,23 @@
     .month-title {
       font-size: 1.2em;
       font-weight: bold;
-      color: #480607;
+      color: var(--primary);
       margin: 10px 0;
       text-align: center;
       background-color: transparent;
-      /* Ajout d'un fond transparent */
       position: relative;
       z-index: 4;
-      /* Augmentation du z-index pour s'assurer qu'il est au-dessus du bloc */
     }
 
     /* Bloc du mois */
     .month-block {
-      background-color: #480607;
+      background-color: var(--primary);
       color: #ffffff;
       padding: 20px;
       border-radius: 16px 16px 0 0;
       width: 95%;
       max-width: 600px;
-      box-shadow: 0 5px 10px rgba(72, 6, 7, 0.4);
+      box-shadow: 0 5px 10px rgba(var(--primary-rgb), 0.4);
       margin-top: -20px;
       /* Réduction de la marge négative de 5px */
       position: relative;
@@ -245,7 +272,7 @@
       bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      background-color: rgba(72,6,7, 1) !important;
+      background-color: rgba(var(--primary-rgb), 1) !important;
       z-index: 999999 !important;
       display: flex;
       overflow: hidden !important;
@@ -301,7 +328,7 @@
       width: 30px;
       height: 30px;
       border: 3px solid #f3f3f3;
-      border-top: 3px solid #ff0000;
+      border-top: 3px solid var(--primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-top: 20px;
@@ -357,6 +384,8 @@
     .podium-wrapper {
       display: flex;
       justify-content: center;
+      position: relative;
+      z-index: 2;
       align-items: flex-end;
       gap: 12px;
       padding: 20px;
@@ -379,6 +408,7 @@
     /* Ajuster l'espacement du conteneur de compétition */
     .competition-container {
       position: relative;
+      z-index: 2;
       margin: 0 auto;
       width: 90%;
       max-width: 600px;
@@ -533,7 +563,7 @@
       font-weight: 700;
       opacity: 0;
       animation: fadeIn 1s ease forwards;
-      background: rgba(72, 6, 7, 0.1);
+      background: rgba(var(--primary-rgb), 0.1);
       padding: 4px 4px;
       border-radius: 8px;
       width: 100%;
@@ -584,8 +614,7 @@
       font-weight: bold;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       line-height: 0.72;
-      color: rgba(72, 6, 7, 0.3);
-      /* Changé en marron foncé avec transparence */
+      color: rgba(var(--primary-rgb), 0.3);
       width: 100%;
       text-align: center;
     }
@@ -680,7 +709,7 @@
       margin-bottom: 10px;
     }
 
-    /* Style pour l'indicateur de tirage vers le bas */
+    /* Style pour l'indicateur de tirage vers le bas — invisible tant que .show n'est pas ajouté au tirage */
     .pull-to-refresh {
       position: absolute;
       top: 0;
@@ -691,29 +720,30 @@
       justify-content: center;
       align-items: center;
       height: 80px;
-      background: rgba(0, 0, 0, 0.9);
+      background: var(--primary);
       color: white;
       font-size: 14px;
       transform: translateY(-80px);
-      /* Cache initialement */
-      transition: transform 0.3s ease-out;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.3s ease-out, opacity 0.2s ease-out;
       z-index: 1000;
     }
 
     .pull-to-refresh.show {
       transform: translateY(0);
-      /* Montre l'indicateur */
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .loading-spinner {
       width: 25px;
       height: 25px;
       border: 3px solid #f3f3f3;
-      border-top: 3px solid #ff0000;
+      border-top: 3px solid var(--primary);
       border-radius: 50%;
       margin-top: 5px;
       display: none;
-      /* Caché initialement */
     }
 
     .loading-spinner.active {
@@ -792,7 +822,7 @@
       font-size: 0.6rem;
       font-weight: normal;
       opacity: 0.9;
-      color: #480607;
+      color: var(--primary);
       position: relative;
       display: flex;
       align-items: center;
@@ -854,7 +884,7 @@
     /* Segments Homme/Femme avec arrondis personnalisés */
     .progress-bar .male {
       border-radius: 15px 0 0 5px;
-      background: linear-gradient(to right, #480607, #5a0a0a);
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
       transition: width 1.5s ease-in-out;
       display: flex;
       align-items: center;
@@ -965,7 +995,7 @@
       bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      background-color: rgba(72,6,7, 1) !important;
+      background-color: rgba(var(--primary-rgb), 1) !important;
       z-index: 999999 !important;
       display: flex;
       overflow: hidden !important;
@@ -1070,11 +1100,13 @@
 
   <script>
 
+    /* Activer/désactiver l'overlay de chargement au démarrage (true = affiché, false = masqué) */
+    const SHOW_LOADING_OVERLAY = true;
+
     /* code pour mise à jour avec tirage*/
-    // Variables pour le tirage et l'élément de rafraîchissement
     let startY = 0;
     let isPulling = false;
-    const pullThreshold = 120; // Distance de tirage nécessaire
+    const pullThreshold = 120;
     let timer = 60;
 
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1123,10 +1155,10 @@
     let isInitialAnimationDone = false; // Pour contrôler l'animation du podium
 
     /**
-     * Affiche l'overlay de chargement lors du premier chargement
+     * Affiche l'overlay de chargement (uniquement si SHOW_LOADING_OVERLAY est true)
      */
     function showLoadingOverlay() {
-      if (isFirstLoad) {
+      if (SHOW_LOADING_OVERLAY && isFirstLoad) {
         document.getElementById('loadingOverlay').style.display = 'flex';
       }
     }
@@ -1135,24 +1167,24 @@
      * Cache l'overlay de chargement et affiche le contenu principal
      */
     function hideLoadingOverlay() {
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      
-      // Ajouter la classe fade-out à l'overlay
-      loadingOverlay.classList.add('fade-out');
+      const overlay = document.getElementById('loadingOverlay');
 
-      // Attendre que l'animation de fade-out soit terminée
-      setTimeout(() => {
-        loadingOverlay.style.display = 'none';
+      function revealContent() {
+        overlay.style.display = 'none';
         document.body.classList.remove('loading');
-
-        // Rétablir l'affichage des conteneurs
         document.querySelectorAll('.container').forEach(el => el.style.display = 'flex');
         document.querySelectorAll('.month-block').forEach(el => el.style.display = 'block');
         document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'flex');
         document.querySelector('.competition-container').style.display = 'block';
-
         isFirstLoad = false;
-      }, 500);
+      }
+
+      if (SHOW_LOADING_OVERLAY) {
+        overlay.classList.add('fade-out');
+        setTimeout(revealContent, 500);
+      } else {
+        revealContent();
+      }
     }
 
     /**
@@ -1648,10 +1680,13 @@
       document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'none');
       document.querySelector('.competition-container').style.display = 'none';
 
-      // S'assurer que l'overlay est visible
       const loadingOverlay = document.getElementById('loadingOverlay');
-      loadingOverlay.style.display = 'flex';
-      loadingOverlay.classList.remove('fade-out');
+      if (SHOW_LOADING_OVERLAY) {
+        loadingOverlay.style.display = 'flex';
+        loadingOverlay.classList.remove('fade-out');
+      } else {
+        loadingOverlay.style.display = 'none';
+      }
 
       // Charger les données après un court délai
       setTimeout(() => {
