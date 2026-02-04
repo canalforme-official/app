@@ -752,6 +752,24 @@
         font-size: 0.65em;
         letter-spacing: 0.4px;
       }
+
+      /* Puppeteer (viewport ≤768px) : mêmes dimensions qu’avant les changements mobile (dégradé, marge basse, rows 50 %) */
+      body.puppeteer-view .header {
+        background: var(--gradient-primary);
+      }
+      body.puppeteer-view .content-wrapper {
+        height: calc(100vh - 74px);
+        margin-bottom: 48px;
+      }
+      body.puppeteer-view .studios-container {
+        flex: 1;
+        min-height: 0;
+      }
+      body.puppeteer-view .studios-row {
+        flex: none;
+        height: 50%;
+        min-height: 0;
+      }
     }
 
     /* Mobile très petit : un peu plus compact qu'au-dessus */
@@ -1009,6 +1027,11 @@
     function updateButtonVisibility() {
       const isMobile = window.innerWidth <= 768;
       const isAutomated = isAutomatedBrowser();
+      if (isAutomated) {
+        document.body.classList.add('puppeteer-view');
+      } else {
+        document.body.classList.remove('puppeteer-view');
+      }
       const isLargeScreen = window.innerHeight > 1920 || window.innerWidth > 1920; // Écran 32 pouces ou plus
       const isLargePortrait = window.innerHeight >= 1920 && window.innerHeight > window.innerWidth; // Écran 32 pouces en portrait (rotation 90°)
       const isLargeLandscape = window.innerWidth >= 1920 && window.innerWidth > window.innerHeight; // Format téléviseur inversé (paysage)
