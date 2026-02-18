@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning Hebdomadaire Vertical</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  
+
+  <style>
+    /* Styles généraux */
+    :root {
+      /* Couleurs principales */
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      
+      /* Dégradé piscine/aqua (bleu uniquement) */
+      --pool-blue: #35767c;
+      --pool-middle: #42464d;
+      --gradient-pool: radial-gradient(circle, var(--pool-blue) 0%, var(--pool-middle) 100%);
+      
+      /* Dégradé femmes uniquement (violet uniquement) */
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --gradient-women: radial-gradient(circle, var(--women-light) 0%, var(--women-middle) 100%);
+      
+      /* Couleurs spécifiques */
+      --women-color: #E4A672;
+      --pool-color: #78D1B6;
+      
+      /* Couleurs de fond */
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      
+      /* Couleurs de texte */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-tertiary: #555555;
+      --text-light: #FFFFFF;
+      
+      /* Transparences primary */
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
+      --primary-lighter: rgba(72, 6, 7, 0.5);
+      
+      /* Transparences secondary */
+      --secondary-light: rgba(255, 166, 48, 0.75);
+      --secondary-lighter: rgba(255, 166, 48, 0.7);
+      
+      /* Transparences spécifiques */
+      --women-color-light: rgba(228, 166, 114, 0.3);
+      --pool-color-light: rgba(120, 209, 182, 0.3);
+      
+      /* Ombres */
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      
+      /* États */
+      --state-past: #aaaaaa;
+      --overlay-light: rgba(255, 255, 255, 0.3);
+      --overlay-lighter: rgba(255, 255, 255, 0.2);
+    }
+    body.planning-ramadan { --primary-color: #26462d; --primary-overlay: rgba(38, 70, 45, 0.95); --primary-light: rgba(38, 70, 45, 0.85); --secondary-color: #c9a227; position: relative; }
+    body.planning-ramadan::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      min-height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');
+      background-repeat: repeat;
+      background-size: 40px 40px;
+      background-position: 0 0;
+      opacity: 0.04;
+      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+    body.planning-ramadan .content-wrapper { position: relative; z-index: 1; }
+    body.planning-ramadan .rotation-view-button::before {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
+    }
+    body.planning-ramadan .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
+    }
+    body.planning-ramadan .ramadan-switch-button {
+      background: transparent;
+    }
+    body.planning-ramadan .ramadan-icon {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Bouton switch planning Ramadan — au-dessus du bouton de rotation, mobile uniquement */
+    .ramadan-switch-button {
+      position: fixed;
+      bottom: 145px;
+      right: 20px;
+      width: auto;
+      height: auto;
+      background: transparent;
+      border: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 998;
+      overflow: visible;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: all;
+      opacity: 0;
+      transform: translateY(20px);
+      padding: 0;
+    }
+    .ramadan-switch-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .ramadan-icon {
+      width: 55px;
+      height: 55px;
+      filter: brightness(0) saturate(0%) invert(8%) sepia(94%) saturate(1352%) hue-rotate(335deg) brightness(95%) contrast(88%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      transition: filter 0.3s;
+      z-index: 10;
+      position: relative;
+      display: block;
+      animation: float-icon 3s ease-in-out infinite;
+    }
+    @keyframes float-icon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .ramadan-switch-button:active {
+      transform: translateY(20px) scale(0.9);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ramadan-switch-button.loaded:active {
+      transform: translateY(0) scale(0.9);
+    }
+    .confetti-burst {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: confetti-burst-anim 2s ease-out forwards;
+    }
+    @keyframes confetti-burst-anim {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(0) rotate(720deg); opacity: 0; }
+    }
+    .confetti-container {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+    /* Vue non mobile : masquer tous les boutons */
+    @media screen and (min-width: 769px) {
+      .ramadan-switch-button,
+      .today-view-button,
+      .rotation-view-button,
+      .filters-sidebar { display: none !important; }
+    }
+
+    #planningViewSwitcher { display: none !important; }
+
+    body, button, a, img {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      background-color: var(--background-main);
+      color: var(--primary-color);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100vh;
+      padding: 5px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      touch-action: pan-y;
+      overscroll-behavior: none;
+    }
+
+    /* Masquer la barre de défilement pour Chrome, Safari et Opera */
+    .content-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Style pour la disposition du titre et des filtres */
+    .header-wrapper {
+      display: none;
+    }
+
+    .header-wrapper h1 {
+      display: none;
+    }
+
+    /* Styles pour le conteneur des filtres */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: auto;
+      flex-wrap: wrap;
+    }
+
+    .filters label {
+      font-size: 0.7em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: var(--primary-color);
+      pointer-events: auto;
+    }
+
+    .filters input[type="checkbox"] {
+      margin-right: 3px;
+      accent-color: var(--secondary-color);
+      pointer-events: auto;
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Style personnalisé pour les checkboxes */
+    .filters input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--secondary-color);
+      border-radius: 3px;
+      margin-right: 3px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .filters input[type="checkbox"]:checked {
+      background-color: var(--secondary-color);
+    }
+
+    .filters input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      color: var(--primary-color);
+      font-size: 8px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Style pour le select des coachs */
+    .filters select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: var(--background-card);
+      border: 2px solid var(--secondary-color);
+      border-radius: 3px;
+      padding: 3px 20px 3px 8px;
+      font-size: 0.7em;
+      color: var(--primary-color);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23480607' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      background-size: 10px;
+      margin-left: 3px;
+      min-width: 100px;
+    }
+
+    .filters select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .filters select option {
+      background-color: var(--background-card);
+      color: var(--primary-color);
+      padding: 3px;
+    }
+
+    .filters select option:checked {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+
+    .filters select option:hover {
+      background-color: var(--secondary-light);
+    }
+
+    /* Styles pour le tableau du planning hebdomadaire */
+    .weekly-schedule {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      table-layout: fixed;
+      font-size: 0.65em;
+    }
+
+    .weekly-schedule th, .weekly-schedule td {
+      padding: 1px;
+      vertical-align: top;
+      border: none;
+    }
+
+    /* Ligne des titres avec fond rouge moins transparent et texte blanc */
+    .weekly-schedule thead th {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      text-align: center;
+      font-size: 1.4em;
+      border-bottom: 1px solid var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      pointer-events: none;
+      border-radius: 0;
+      margin: 0;
+      padding: 1px;
+    }
+
+    /* Rendre invisible la première cellule du thead (cellule des horaires) */
+    .weekly-schedule thead th:first-child {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Arrondir uniquement les extrémités de la barre de titres */
+    .weekly-schedule thead th:nth-child(2) {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .weekly-schedule thead th:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    /* Animation améliorée pour le jour actuel */
+    .weekly-schedule thead th.today {
+      background-color: #981010;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      color: var(--text-light);
+      overflow: hidden;
+      pointer-events: none;
+      margin: 0;
+    }
+
+    /* Préserver les bordures courbées même quand le jour est surligné */
+    .weekly-schedule thead th.today:nth-child(2) {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .weekly-schedule thead th.today:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    /* Styles pour la cellule des heures */
+    .weekly-schedule th:first-child,
+    .weekly-schedule td.time-cell {
+      width: 38px;
+      min-width: 34px;
+      max-width: 44px;
+      text-align: center;
+      padding: 1px 0;
+      font-weight: bold;
+      color: var(--primary-color);
+      font-size: 1.2em;
+      line-height: 1;
+    }
+
+    /* Alternance des horaires : même contraste que les lignes de cours */
+    .weekly-schedule td.time-cell-white {
+      background-color: #fcfcfc;
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    .weekly-schedule td.time-cell-grey {
+      background-color: #e5e5e5;
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    /* Ajustement des cellules des cours : le premier et le dernier cours ne touchent pas les bords */
+    .course-cell {
+      min-width: 70px;
+      text-align: left;
+      border-bottom: 1px solid var(--shadow-light);
+      position: relative;
+      padding: 0 4px;
+      vertical-align: top;
+    }
+
+    .course-cell .course-block:first-child {
+      margin-top: 8px;
+    }
+
+    .course-cell .course-block:last-child {
+      margin-bottom: 8px;
+    }
+
+    /* Lignes d’horaires : fond bien marqué pour distinguer les créneaux */
+    .course-row-white .course-cell {
+      background-color: #fcfcfc;
+      color: var(--text-primary);
+    }
+
+    .course-row-grey .course-cell {
+      background-color: #e5e5e5;
+      color: var(--text-primary);
+    }
+
+    /* Blocs de cours : photo coach à gauche (bullet) + contenu */
+    .course-block {
+      background: none;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      margin: 0;
+      font-size: 0.98em;
+      position: relative;
+      box-shadow: none;
+      text-align: left;
+      overflow: visible;
+    }
+
+    .course-block-inner {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* Photo coach à gauche, type bullet (diamètre 18px) */
+    .course-bullet {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .coach-bullet-img {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .course-block + .course-block {
+      margin-top: 8px;
+    }
+
+    .course-block.mixte,
+    .course-block.women-only,
+    .course-block.piscine { background: none; box-shadow: none; }
+    .course-block.women-only::before,
+    .course-block.piscine::before { display: none; }
+    .course-block.current { font-weight: bold; box-shadow: none; }
+    .course-block.starting-soon { animation: pulse 1.5s infinite; box-shadow: none; }
+    .course-block.past { opacity: 0.5; color: var(--state-past); }
+
+    /* Style pour le titre du cours — bien lisible */
+    .course-title {
+      font-weight: bold;
+      margin-bottom: 3px;
+      font-size: 2.05em;
+      text-align: left;
+    }
+
+    /* Style pour le nom du coach */
+    .coach-name {
+      font-size: 0.68em;
+      color: var(--text-secondary);
+    }
+
+    /* Style pour le studio */
+    .studio-name {
+      font-size: 0.55em;
+      color: var(--text-tertiary);
+    }
+
+    /* Animation de pulsation optimisée */
+    @keyframes pulse {
+      0% { 
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+      }
+      50% { 
+        transform: scale(1.02) translateZ(0);
+        opacity: 0.95;
+      }
+      100% { 
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+      }
+    }
+
+    /* Disque de compte à rebours : petit, en overflow en haut à droite du cours (décalé à gauche) */
+    .countdown-pill {
+      position: absolute;
+      top: -4px;
+      right: 4px;
+      width: 14px;
+      height: 14px;
+      min-width: 14px;
+      min-height: 14px;
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82em;
+      font-weight: bold;
+      padding: 0;
+      box-shadow: 0 1px 2px var(--shadow-medium);
+      z-index: 5;
+    }
+
+    /* Logos de cours : taille un peu plus grande, cohérente avec le texte */
+    .logo-cours {
+      max-width: 100%;
+      max-height: 2.2em;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0;
+      vertical-align: middle;
+    }
+
+    /* Styles pour les cours (titre) — line-height aligné avec la hauteur max des logos */
+    .course-info {
+      font-size: 1.55em;
+      font-weight: bold;
+      color: var(--text-primary);
+      margin-right: 0;
+      padding-right: 0;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    .course-name-text {
+      text-align: left;
+      display: block;
+      width: max-content;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: normal;
+      white-space: normal;
+    }
+
+    .course-block .course-info .course-name-text.multiline {
+      font-size: 0.9em;
+    }
+
+    /* Nom du coach (à droite du bullet, masqué si filtre décoché) */
+    .single-coach {
+      font-size: 0.82em;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-top: 4px;
+      color: var(--primary-color);
+    }
+
+    .single-coach span {
+      color: var(--primary-color);
+    }
+
+    .course-content .single-coach img {
+      display: none;
+    }
+
+    .single-coach img {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      margin-right: 4px;
+      margin-left: 2px;
+      margin-bottom: 0;
+    }
+
+    /* Couleur des noms de coachs selon le type de cours */
+    .course-block.piscine .single-coach span {
+      color: var(--text-light);
+    }
+
+    .course-block.women-only:not(.piscine) .single-coach span {
+      color: var(--text-light);
+    }
+
+    /* Styles pour les coachs multiples (sous le nom du cours) */
+    .multiple-coaches {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .coach-image {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Cacher les coachs si le filtre est décoché */
+    .hide-coaches .single-coach,
+    .hide-coaches .multiple-coaches {
+      display: none;
+    }
+
+    #weeklySchedule {
+      height: 100%;
+    }
+
+    /* Bouton de filtre intégré dans la barre */
+    .filters-sidebar .filter-button {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      z-index: 1001;
+      pointer-events: all;
+    }
+
+    .filters-sidebar .filter-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .filters-sidebar.open .filter-button:hover {
+      background: var(--primary-color);
+    }
+
+    .filters-sidebar.open .filter-button:hover .filter-icon::before,
+    .filters-sidebar.open .filter-button:hover .filter-icon::after,
+    .filters-sidebar.open .filter-button:hover .filter-icon span {
+      background: white;
+    }
+
+    .filters-sidebar .filter-button:active {
+      transform: scale(0.95);
+    }
+
+    .filter-icon {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      display: block;
+    }
+
+    /* Trois barres horizontales qui diminuent de taille */
+    .filter-icon::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+
+    .filter-icon::after {
+      content: '';
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+
+    /* Troisième barre (la plus petite) via un span dans le HTML */
+    .filter-icon span {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: block;
+      z-index: 1;
+    }
+
+    .filter-button:hover .filter-icon::before,
+    .filter-button:hover .filter-icon::after,
+    .filter-button:hover .filter-icon span {
+      background: white;
+    }
+
+    /* Panneau fermé : forcer les barres en bordeaux (annule le :hover collant sur mobile au 2e clic) */
+    .filters-sidebar:not(.open) .filter-icon::before,
+    .filters-sidebar:not(.open) .filter-icon::after,
+    .filters-sidebar:not(.open) .filter-icon span {
+      background: var(--primary-color) !important;
+    }
+
+    /* Barre de filtres qui part du bouton */
+    .filters-sidebar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      z-index: 1000;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      overflow: hidden;
+      padding: 0;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .filters-sidebar.open {
+      width: calc(100% - 40px);
+      border-radius: 25px;
+      overflow: visible;
+    }
+
+    .filters-sidebar-content {
+      display: none;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+      padding: 0 60px 0 15px;
+      white-space: nowrap;
+    }
+
+    .filters-sidebar.open .filters-sidebar-content {
+      display: flex;
+    }
+
+    .filters-sidebar h2 {
+      display: none;
+    }
+
+    .filters-sidebar .filters {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .filters-sidebar .filters label {
+      font-size: 0.85em;
+      color: var(--primary-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .filters-sidebar .filters input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-radius: 3px;
+      margin: 0;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .filters-sidebar .filters input[type="checkbox"]:checked {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .filters-sidebar .filters input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      color: var(--primary-color);
+      font-size: 12px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+    }
+
+    .filters-sidebar .filters select {
+      font-size: 0.8em;
+      padding: 5px 25px 5px 10px;
+      min-width: 110px;
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* Style pour la liste déroulante personnalisée des coachs */
+    .coach-dropdown {
+      position: relative;
+      min-width: 140px;
+    }
+    
+    .coach-dropdown-button {
+      width: 100%;
+      padding: 6px 28px 6px 12px;
+      font-size: 0.85em;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--primary-color);
+    }
+    
+    .coach-dropdown-button:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+    
+    .coach-dropdown-arrow {
+      font-size: 0.7em;
+      transition: transform 0.3s;
+    }
+    
+    .coach-dropdown.open .coach-dropdown-arrow {
+      transform: rotate(180deg);
+    }
+    
+    .coach-dropdown-content {
+      display: none !important;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ffffff;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1002;
+      margin-top: 2px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    
+    .coach-dropdown.open .coach-dropdown-content {
+      display: block !important;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Classe pour ouvrir vers le haut */
+    .coach-dropdown-content.open-up {
+      top: auto !important;
+      bottom: 100% !important;
+      margin-top: 0 !important;
+      margin-bottom: 2px !important;
+    }
+    
+    .coach-dropdown-option {
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75em;
+      color: var(--primary-color);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .coach-dropdown-option label span:first-child {
+      flex: 1;
+      font-size: 1.15em;
+      color: var(--primary-color);
+    }
+    
+    .coach-dropdown-option:last-child {
+      border-bottom: none;
+    }
+    
+    .coach-dropdown-option:hover {
+      background-color: rgba(72, 6, 7, 0.1);
+    }
+    
+    .coach-dropdown-option input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      cursor: pointer;
+      display: none;
+    }
+    
+    .coach-dropdown-option .checkmark {
+      color: var(--primary-color);
+      font-weight: bold;
+      margin-left: auto;
+      font-size: 1em;
+    }
+    
+    .coach-dropdown-option label {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .filters-sidebar-close {
+      display: none;
+    }
+
+    /* Style pour le bouton today-view (en haut) */
+    .today-view-button {
+      position: fixed;
+      top: 55px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 55px;
+      height: 55px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: all;
+      animation: none;
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Style pour le bouton today-view (en haut) */
+    .today-view-button-bottom {
+      position: fixed;
+      top: 55px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 55px;
+      height: 55px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: all;
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .today-view-button-bottom::before {
+      content: '';
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .today-view-button-bottom::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .today-view-button-bottom button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .today-view-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .today-view-button::before {
+      content: '';
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .today-view-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .today-view-button button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    @keyframes rotate-icon {
+      0% {
+        transform: rotate(0deg);
+      }
+      50% {
+        transform: rotate(180deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Style pour le bouton de rotation */
+    .rotation-view-button {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      z-index: 1001;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 0;
+      width: 50px;
+      height: 50px;
+      min-width: 48px;
+      min-height: 48px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: all;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .rotation-view-button::before {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/665404b9-0908-8116-6c7b-5c61a7075d36.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+    }
+
+    .rotation-view-button button {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: block;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+      border-radius: 25px;
+      touch-action: manipulation;
+    }
+
+    /* Animation de clic (compatible mobile : active + classe JS) */
+    .rotation-view-button:active::before,
+    .rotation-view-button.tap-active::before {
+      animation: click-zoom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .rotation-view-button:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+
+    .rotation-view-button:active {
+      transform: scale(0.98);
+    }
+
+    @keyframes click-zoom {
+      0% { transform: scale(1) translateZ(0); }
+      50% { transform: scale(0.95) translateZ(0); }
+      100% { transform: scale(1) translateZ(0); }
+    }
+
+    /* Styles responsives pour différentes tailles d'écran */
+    @media screen and (max-width: 480px) {
+      .header-wrapper h1 {
+        font-size: 1em;
+      }
+
+      .filters {
+        gap: 3px;
+      }
+
+      .filters label {
+        font-size: 0.6em;
+      }
+
+      .filters select {
+        font-size: 0.6em;
+        min-width: 80px;
+        padding: 2px 18px 2px 6px;
+      }
+
+      .weekly-schedule {
+        font-size: 0.55em;
+      }
+
+      .weekly-schedule thead th {
+        font-size: 1.2em;
+        padding: 1px;
+      }
+
+      .weekly-schedule th:first-child,
+      .weekly-schedule td.time-cell {
+        width: 32px;
+        font-size: 1.05em;
+        line-height: 0.9;
+        padding: 1px 0;
+      }
+
+      .course-block {
+        padding: 0;
+        font-size: 0.58em;
+      }
+
+      .logo-cours {
+        max-width: 100%;
+        max-height: 2.2em;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+      }
+
+      .course-info {
+        font-size: 0.34em;
+        width: 100%;
+        text-align: left;
+      }
+
+      .course-name-text {
+        font-size: 0.75em;
+        text-align: left;
+      }
+
+      /* Nom du cours en texte (sans logo) : réduction visuelle sur mobile */
+      .course-block .course-info .course-name-text {
+        font-size: 12px !important;
+        line-height: 1.2;
+        display: inline-block;
+        transform: scale(0.6);
+        transform-origin: left top;
+        margin-bottom: -8px;
+        max-width: 98%;
+      }
+
+      /* 2+ lignes : marges plus fortes pour rapprocher le coach (classe .multiline ajoutée par JS) */
+      .course-block .course-info .course-name-text.multiline {
+        margin-bottom: -12px;
+      }
+
+      .course-block:has(.course-info .course-name-text) .course-info + .single-coach,
+      .course-block:has(.course-info .course-name-text) .course-info + .multiple-coaches {
+        margin-top: -2px;
+      }
+
+      .course-block:has(.course-info .course-name-text.multiline) .course-info + .single-coach,
+      .course-block:has(.course-info .course-name-text.multiline) .course-info + .multiple-coaches {
+        margin-top: -6px;
+      }
+
+      .single-coach {
+        font-size: 0.16em;
+      }
+
+      .single-coach img,
+      .coach-image {
+        width: 12px;
+        height: 12px;
+      }
+
+      .countdown-pill {
+        top: -3px;
+        right: 3px;
+        width: 12px;
+        height: 12px;
+        min-width: 12px;
+        min-height: 12px;
+        border-radius: 50%;
+        font-size: 0.78em;
+      }
+
+      /* Réduire de 15% les éléments du filtre pour qu'ils tiennent sur une ligne */
+      .filters-sidebar .filters label {
+        font-size: 0.7225em; /* 0.85em * 0.85 */
+        gap: 4.25px; /* 5px * 0.85 */
+      }
+
+      .filters-sidebar .filters input[type="checkbox"] {
+        width: 13.6px; /* 16px * 0.85 */
+        height: 13.6px; /* 16px * 0.85 */
+      }
+
+      .filters-sidebar .filters input[type="checkbox"]:checked::after {
+        font-size: 10.2px; /* 12px * 0.85 */
+      }
+
+      .coach-dropdown {
+        min-width: 119px; /* 140px * 0.85 */
+      }
+
+      .coach-dropdown-button {
+        padding: 5.1px 23.8px 5.1px 10.2px; /* 6px 28px 6px 12px * 0.85 */
+        font-size: 0.7225em; /* 0.85em * 0.85 */
+      }
+
+      .filters-sidebar .filters {
+        gap: 6.8px; /* 8px * 0.85 */
+      }
+    }
+
+    @media screen and (min-width: 481px) and (max-width: 768px) {
+      .header-wrapper h1 {
+        font-size: 1.1em;
+      }
+
+      .weekly-schedule {
+        font-size: 0.6em;
+      }
+
+      .course-block {
+        font-size: 0.76em;
+        padding: 0;
+      }
+
+      .course-info {
+        font-size: 0.62em;
+        width: 100%;
+        text-align: left;
+      }
+
+      .single-coach {
+        font-size: 0.28em;
+      }
+
+      .logo-cours {
+        max-height: 2.2em;
+      }
+    }
+
+    @media screen and (min-width: 769px) and (max-width: 1024px) {
+      .header-wrapper h1 {
+        font-size: 1.15em;
+      }
+
+      .weekly-schedule {
+        font-size: 0.7em;
+      }
+
+      .course-block {
+        font-size: 0.8em;
+        padding: 0;
+      }
+
+      .course-info {
+        font-size: 0.72em;
+        width: 100%;
+        text-align: left;
+      }
+
+      .single-coach {
+        font-size: 0.29em;
+      }
+
+      .logo-cours {
+        max-height: 2.2em;
+      }
+    }
+
+    @media screen and (min-width: 1025px) {
+      .header-wrapper h1 {
+        font-size: 1.3em;
+      }
+
+      .weekly-schedule {
+        font-size: 0.75em;
+      }
+
+      .course-block {
+        font-size: 0.88em;
+        padding: 0;
+      }
+
+      .course-info {
+        font-size: 0.78em;
+        width: 100%;
+        text-align: left;
+      }
+
+      .single-coach {
+        font-size: 0.3em;
+      }
+
+      .logo-cours {
+        max-height: 2.2em;
+      }
+    }
+
+    /* Séparation matin / après-midi (régulier) ou avant/après ftour (Ramadan) : motif via div interne */
+    tr.noon-separator td {
+      height: 60px;
+      min-height: 60px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background-color: rgba(72, 6, 7, 0.12);
+      position: relative;
+      vertical-align: middle;
+    }
+
+    .noon-separator-inner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-image: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
+      background-size: 67px 67px;
+      background-repeat: repeat;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    tr.noon-separator td.noon-separator-line {
+      background-color: rgba(72, 6, 7, 0.12);
+    }
+
+    /* Mode Ramadan : fond blanc (masque l’arrière-plan) + motif sur le div (bien visible) */
+    body.planning-ramadan tr.noon-separator td {
+      background-color: #FFFFFF !important;
+    }
+
+    body.planning-ramadan tr.noon-separator td.noon-separator-line {
+      background-color: #FFFFFF;
+    }
+
+    body.planning-ramadan .noon-separator-inner {
+      opacity: 0.5;
+    }
+
+  </style>
+</head>
+<body onload="initializeWeeklyPage();">
+  <div class="content-wrapper">
+    <div id="planningViewSwitcher" style="display: none;"></div>
+    <!-- Le planning hebdomadaire sera inséré ici -->
+    <div id="weeklySchedule"></div>
+  </div>
+
+  <!-- Bouton pour revenir à aujourd'hui -->
+  <div class="today-view-button" id="todayViewButton">
+    <button onclick="returnToToday()">
+    </button>
+  </div>
+
+  <!-- Bouton de rotation vers weekly.html -->
+  <div class="rotation-view-button" id="rotationViewButton" role="button" tabindex="0" aria-label="Vue horizontale du planning" onclick="goToWeekly()">
+    <button type="button" aria-label="Vue horizontale du planning"></button>
+  </div>
+
+  <!-- Bouton switch planning Ramadan (au-dessus du bouton de rotation, mobile uniquement) -->
+  <button id="ramadanSwitchButton" class="ramadan-switch-button" onclick="toggleRamadanPlanning()">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
+    <div class="confetti-container"></div>
+  </button>
+
+  <!-- Barre de filtres en bas avec le bouton intégré -->
+  <div class="filters-sidebar" id="filtersSidebar">
+    <button class="filter-button" onclick="toggleFiltersSidebar(event)">
+      <div class="filter-icon"><span></span></div>
+    </button>
+    <div class="filters-sidebar-content">
+      <div class="filters">
+        <label>
+          <input type="checkbox" id="filter-mixte" checked>
+          Mixte
+        </label>
+        <label>
+          <input type="checkbox" id="filter-women-only" checked>
+          Femmes
+        </label>
+        <label>
+          <input type="checkbox" id="filter-piscine" checked>
+          Piscine
+        </label>
+        <label>
+          <input type="checkbox" id="filter-coach">
+          Coach
+        </label>
+        <div class="coach-dropdown">
+          <button class="coach-dropdown-button" id="coachDropdownButton">
+            <span id="coachDropdownText">Sélection coach</span>
+            <span class="coach-dropdown-arrow">▼</span>
+          </button>
+          <div class="coach-dropdown-content" id="coachDropdownContent">
+            <!-- Les options seront ajoutées ici dynamiquement -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Option pour afficher/masquer les logos de cours
+    const SHOW_COURSE_IMAGES = true;
+    
+    // Initialiser les variables
+    var scheduleData = [];
+    var activePlanningView = 'regulier';
+
+    (function initRamadanButtonResize() {
+      function update() {
+        if (scheduleData && scheduleData.planning && typeof renderPlanningViewSwitcher === 'function') renderPlanningViewSwitcher(scheduleData);
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { window.addEventListener('resize', update); });
+      } else {
+        window.addEventListener('resize', update);
+      }
+    })();
+
+    function getCurrentPlanning() {
+      if (!scheduleData || !scheduleData.planning) return {};
+      if (activePlanningView === 'ramadan' && scheduleData.planningRamadan) {
+        var pr = scheduleData.planningRamadan;
+        var hasCourses = Object.keys(pr).some(function(day) { return pr[day] && pr[day].length > 0; });
+        if (hasCourses) return pr;
+      }
+      return scheduleData.planning;
+    }
+    function initPlanningView(data) {
+      var params = new URLSearchParams(window.location.search);
+      var urlView = params.get('planning');
+      var stored = localStorage.getItem('planningView');
+      var today = new Date().toISOString().slice(0, 10);
+      var ramadanStart = data.metadata && data.metadata.ramadanStart;
+      var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
+      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; localStorage.setItem('planningView', urlView); }
+      else if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
+      else if (inRamadan) { activePlanningView = 'ramadan'; localStorage.setItem('planningView', 'ramadan'); }
+      else { activePlanningView = 'regulier'; localStorage.setItem('planningView', 'regulier'); }
+      document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
+    }
+    function renderPlanningViewSwitcher(data) {
+      var ramadanButton = document.getElementById('ramadanSwitchButton');
+      if (!ramadanButton || !data) return;
+      var isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        ramadanButton.style.display = 'none';
+        return;
+      }
+      var meta = data.metadata || {};
+      var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
+      var today = new Date().toISOString().slice(0, 10);
+      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var daysBefore = 7;
+      var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore));
+      if (showSwitcher) {
+        ramadanButton.style.display = 'flex';
+        setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
+      } else {
+        ramadanButton.style.display = 'none';
+      }
+    }
+    function toggleRamadanPlanning() {
+      var button = document.getElementById('ramadanSwitchButton');
+      if (!button) return;
+      var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#26462d';
+      var pageConfettiContainer = document.getElementById('pageConfettiContainer');
+      if (!pageConfettiContainer) {
+        pageConfettiContainer = document.createElement('div');
+        pageConfettiContainer.id = 'pageConfettiContainer';
+        pageConfettiContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000; overflow: visible;';
+        document.body.appendChild(pageConfettiContainer);
+      }
+      var buttonRect = button.getBoundingClientRect();
+      var centerX = buttonRect.left + buttonRect.width / 2;
+      var centerY = buttonRect.top + buttonRect.height / 2;
+      for (var i = 0; i < 100; i++) {
+        var burst = document.createElement('div');
+        burst.className = 'confetti-burst';
+        burst.style.cssText = 'position: absolute; width: 8px; height: 8px; border-radius: 50%; background: ' + color + '; z-index: 10000;';
+        burst.style.left = centerX + 'px';
+        burst.style.top = centerY + 'px';
+        var angle = (Math.random() * 360) * Math.PI / 180;
+        var distance = 200 + Math.random() * 400;
+        var x = Math.cos(angle) * distance;
+        var y = Math.sin(angle) * distance;
+        burst.style.setProperty('--burst-x', x + 'px');
+        burst.style.setProperty('--burst-y', y + 'px');
+        pageConfettiContainer.appendChild(burst);
+        setTimeout(function(el) { if (el && el.parentNode) el.remove(); }, 2000, burst);
+      }
+      var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
+      setPlanningView(currentView);
+    }
+    function setPlanningView(view) {
+      activePlanningView = view;
+      localStorage.setItem('planningView', view);
+      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
+      refreshPlanningDisplay();
+      renderPlanningViewSwitcher(scheduleData);
+    }
+    function refreshPlanningDisplay() {
+      if (!scheduleData || !scheduleData.planning) return;
+      document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+      markMultilineCourseNames();
+      var planningData = getCurrentPlanning();
+      var coachsData = scheduleData.coachs;
+      var uniqueCoaches = new Set();
+      Object.values(planningData).forEach(dayCourses => {
+        (dayCourses || []).forEach(course => {
+          if (course.coachIds) {
+            course.coachIds.forEach(coachId => {
+              var coach = coachsData.find(c => c.id === coachId);
+              if (coach) uniqueCoaches.add(coach.name);
+            });
+          }
+        });
+      });
+      var coachDropdownContent = document.getElementById('coachDropdownContent');
+      var coachDropdownText = document.getElementById('coachDropdownText');
+      if (coachDropdownContent) {
+        coachDropdownContent.innerHTML = '';
+        Array.from(uniqueCoaches).sort().forEach(coach => {
+          var option = document.createElement('div');
+          option.className = 'coach-dropdown-option';
+          var label = document.createElement('label');
+          label.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;cursor:pointer';
+          var span = document.createElement('span');
+          span.textContent = coach;
+          var checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = coach;
+          checkbox.checked = false;
+          var checkmark = document.createElement('span');
+          checkmark.className = 'checkmark';
+          checkmark.textContent = '✓';
+          checkmark.style.display = 'none';
+          checkbox.addEventListener('change', function() { applyFilters(); });
+          option.addEventListener('click', function(e) { if (e.target !== checkbox) { e.preventDefault(); checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change')); } });
+          label.appendChild(span);
+          label.appendChild(checkmark);
+          label.appendChild(checkbox);
+          option.appendChild(label);
+          coachDropdownContent.appendChild(option);
+        });
+      }
+      if (coachDropdownText) coachDropdownText.textContent = 'Sélection coach';
+      renderPlanningViewSwitcher(scheduleData);
+      applyFilters();
+    }
+
+    function initializeWeeklyPage() {
+      fetchWeeklyData().then(data => {
+        console.group('Traitement des données');
+        console.log('Données reçues:', data);
+        
+        const coursData = data.cours;
+        const coachsData = data.coachs;
+        const studiosData = data.studios;
+
+        scheduleData = data;
+        initPlanningView(data);
+        renderPlanningViewSwitcher(data);
+
+        const planningData = getCurrentPlanning();
+        console.log('Planning actif:', activePlanningView, 'Planning:', planningData);
+        console.log('Cours:', coursData);
+        console.log('Coachs:', coachsData);
+        console.log('Studios:', studiosData);
+        
+        console.groupEnd();
+
+        document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+        markMultilineCourseNames();
+
+        let uniqueCoaches = new Set();
+        Object.values(planningData).forEach(dayCourses => {
+          dayCourses.forEach(course => {
+            if (course.coachIds) {
+              course.coachIds.forEach(coachId => {
+                const coach = coachsData.find(c => c.id === coachId);
+                if (coach) {
+                  uniqueCoaches.add(coach.name);
+                }
+              });
+            }
+          });
+        });
+
+        let coachDropdownContent = document.getElementById('coachDropdownContent');
+        let coachDropdownButton = document.getElementById('coachDropdownButton');
+        let coachDropdownText = document.getElementById('coachDropdownText');
+        let selectedCoaches = new Set(); // Aucun sélectionné par défaut
+        
+        // Créer les options avec checkboxes
+        Array.from(uniqueCoaches).sort().forEach(coach => {
+          let option = document.createElement('div');
+          option.className = 'coach-dropdown-option';
+          
+          let label = document.createElement('label');
+          label.style.display = 'flex';
+          label.style.justifyContent = 'space-between';
+          label.style.alignItems = 'center';
+          label.style.width = '100%';
+          label.style.cursor = 'pointer';
+          
+          let span = document.createElement('span');
+          span.textContent = coach;
+          
+          let checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = coach;
+          checkbox.checked = false; // Aucun sélectionné par défaut
+          
+          let checkmark = document.createElement('span');
+          checkmark.className = 'checkmark';
+          checkmark.textContent = '✓';
+          checkmark.style.display = 'none'; // Masqué par défaut
+          
+          checkbox.addEventListener('change', function() {
+            if (checkbox.checked) {
+              selectedCoaches.add(coach);
+            } else {
+              selectedCoaches.delete(coach);
+            }
+            checkmark.style.display = checkbox.checked ? 'inline' : 'none';
+            updateCoachDropdownText();
+            applyFilters();
+          });
+          
+          // Permettre de cliquer sur toute la ligne pour cocher/décocher
+          option.addEventListener('click', function(e) {
+            if (e.target !== checkbox) {
+              e.preventDefault();
+              checkbox.checked = !checkbox.checked;
+              checkbox.dispatchEvent(new Event('change'));
+            }
+          });
+          
+          label.appendChild(span);
+          label.appendChild(checkmark);
+          label.appendChild(checkbox);
+          option.appendChild(label);
+          coachDropdownContent.appendChild(option);
+        });
+        
+        // Fonction pour mettre à jour le texte du bouton
+        function updateCoachDropdownText() {
+          if (selectedCoaches.size === 0) {
+            coachDropdownText.textContent = 'Sélection coach';
+          } else if (selectedCoaches.size === uniqueCoaches.size) {
+            coachDropdownText.textContent = 'Sélection coach';
+          } else {
+            coachDropdownText.textContent = selectedCoaches.size === 1 ? '1 coach' : selectedCoaches.size + ' coachs';
+          }
+        }
+        
+        // Mettre à jour le texte initial du bouton
+        updateCoachDropdownText();
+        
+        // Toggle dropdown avec détection de l'espace disponible
+        coachDropdownButton.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const dropdown = coachDropdownButton.closest('.coach-dropdown');
+          const content = document.getElementById('coachDropdownContent');
+          
+          dropdown.classList.toggle('open');
+          
+          if (dropdown.classList.contains('open')) {
+            // Vérifier l'espace disponible en bas et en haut
+            const buttonRect = coachDropdownButton.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - buttonRect.bottom;
+            const spaceAbove = buttonRect.top;
+            const contentHeight = 200; // max-height
+            
+            // Si pas assez d'espace en bas mais assez en haut, ouvrir vers le haut
+            if (spaceBelow < contentHeight && spaceAbove > spaceBelow) {
+              content.classList.add('open-up');
+            } else {
+              // Ouvrir vers le bas (comportement par défaut)
+              content.classList.remove('open-up');
+            }
+          } else {
+            // Retirer la classe quand on ferme
+            content.classList.remove('open-up');
+          }
+        });
+        
+        // Fermer le dropdown quand on clique ailleurs
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.coach-dropdown')) {
+            document.querySelectorAll('.coach-dropdown').forEach(dropdown => {
+              dropdown.classList.remove('open');
+            });
+          }
+        });
+
+        document.getElementById('filter-mixte').addEventListener('change', applyFilters);
+        document.getElementById('filter-women-only').addEventListener('change', applyFilters);
+        document.getElementById('filter-piscine').addEventListener('change', applyFilters);
+        document.getElementById('filter-coach').addEventListener('change', applyFilters);
+
+        applyFilters();
+        
+        setTimeout(() => {
+          scrollToCurrentTime();
+        }, 500);
+        
+        updateCountdownCircles();
+        setInterval(updateCountdownCircles, 1000);
+        setInterval(checkCourseStates, 60000);
+        setTimeout(checkCourseStates, 1000);
+      }).catch(error => {
+        console.error('Erreur lors de la récupération des données :', error);
+      });
+    }
+
+    function fetchWeeklyData() {
+      const cacheKey = 'weeklyData';
+      const cacheExpirationKey = 'weeklyDataExpiration';
+      
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheExpiration = localStorage.getItem(cacheExpirationKey);
+      const now = new Date().getTime();
+
+      if (cachedData && cacheExpiration && now < cacheExpiration) {
+        console.log('Utilisation des données en cache');
+        return Promise.resolve(JSON.parse(cachedData));
+      }
+
+      return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.group('Validation des données');
+          
+          console.log('Structure de base:', {
+            metadata: data.metadata ? '✅ Présent' : '❌ Manquant',
+            coachs: data.coachs ? `✅ ${data.coachs.length} coachs` : '❌ Manquant',
+            studios: data.studios ? `✅ ${data.studios.length} studios` : '❌ Manquant',
+            cours: data.cours ? `✅ ${data.cours.length} cours` : '❌ Manquant',
+            planning: data.planning ? `✅ ${Object.keys(data.planning).length} jours` : '❌ Manquant'
+          });
+
+          const jours = Object.keys(data.planning || {});
+          console.log('Jours avec planning:', jours);
+          if (jours.length > 0 && data.planning) {
+            const premierJour = jours[0];
+            console.log(`Exemple de cours pour ${premierJour}:`, data.planning[premierJour][0]);
+          }
+
+          console.groupEnd();
+
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+          localStorage.setItem(cacheExpirationKey, now + 360000);
+          console.log('✅ Données récupérées et stockées dans le cache');
+          
+          return data;
+        })
+        .catch(error => {
+          console.error('❌ Erreur lors de la récupération des données:', error);
+          throw error;
+        });
+    }
+
+    function applyFilters() {
+      const showMixte = document.getElementById('filter-mixte').checked;
+      const showWomenOnly = document.getElementById('filter-women-only').checked;
+      const showPiscine = document.getElementById('filter-piscine').checked;
+      const showCoachImages = document.getElementById('filter-coach').checked;
+      
+      // Récupérer tous les coachs sélectionnés
+      const coachCheckboxes = document.querySelectorAll('#coachDropdownContent input[type="checkbox"]');
+      const selectedCoaches = Array.from(coachCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      const blocks = document.querySelectorAll('.course-block');
+      const contentWrapper = document.querySelector('.content-wrapper');
+
+      for (const block of blocks) {
+        const dataCoaches = block.getAttribute('data-coaches') || '';
+        const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
+        
+        // Vérifier si au moins un des coachs du cours est dans la liste des coachs sélectionnés
+        const showByCoach = selectedCoaches.length === 0 || 
+          courseCoaches.some(coach => selectedCoaches.includes(coach));
+        
+        const isPiscine = block.classList.contains('piscine');
+        const courseType = block.classList;
+        const showByType = (
+          (courseType.contains('mixte') && showMixte) ||
+          (courseType.contains('women-only') && showWomenOnly)
+        );
+
+        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
+      }
+
+      if (showCoachImages) {
+        contentWrapper.classList.remove('hide-coaches');
+      } else {
+        contentWrapper.classList.add('hide-coaches');
+      }
+    }
+
+    function updateCountdownCircles() {
+      const badges = document.querySelectorAll('.countdown-pill');
+      
+      for (const badge of badges) {
+        const timeDiff = parseInt(badge.getAttribute('data-time-diff'));
+
+        if (timeDiff >= 0) {
+          const minutes = Math.floor(timeDiff / 60);
+          badge.textContent = minutes + "'";
+          badge.setAttribute('data-time-diff', timeDiff - 1);
+        } else {
+          badge.parentElement.classList.remove('starting-soon');
+          badge.remove();
+        }
+      }
+    }
+
+    function generateWeeklyScheduleHtml() {
+      var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      var todayIndex = new Date().getDay();
+      var todayName = weekDays[todayIndex];
+
+      const planning = getCurrentPlanning();
+      const cours = scheduleData.cours;
+      const coachs = scheduleData.coachs;
+      const studios = scheduleData.studios;
+
+      var scheduleByTimeAndDay = {};
+
+      Object.entries(planning).forEach(([day, courses]) => {
+        const dayIndex = weekDays.findIndex(d => d.toLowerCase() === day);
+        const frenchDay = weekDays[dayIndex];
+
+        courses.forEach(course => {
+          const startTime = course.startTime;
+          
+          if (!scheduleByTimeAndDay[startTime]) {
+            scheduleByTimeAndDay[startTime] = {};
+          }
+          if (!scheduleByTimeAndDay[startTime][frenchDay]) {
+            scheduleByTimeAndDay[startTime][frenchDay] = [];
+          }
+
+          const courseInfo = cours.find(c => c.id === course.coursId);
+          const studioInfo = studios.find(s => s.id === course.studioId);
+          const coachsInfo = course.coachIds.map(coachId => 
+            coachs.find(c => c.id === coachId)
+          );
+
+          scheduleByTimeAndDay[startTime][frenchDay].push({
+            courseName: courseInfo ? courseInfo.name : 'Cours inconnu',
+            logo: courseInfo ? courseInfo.logo : '',
+            studio: studioInfo ? studioInfo.name : 'Studio inconnu',
+            endTime: course.endTime,
+            startTime: course.startTime,
+            duration: course.duration,
+            type: course.type,
+            coachs: coachsInfo.map(coach => ({
+              name: coach ? coach.name : 'Coach inconnu',
+              imageUrl: coach ? coach.imageUrl : ''
+            }))
+          });
+        });
+      });
+
+      var daysWithCourses = new Set();
+      var timesWithCourses = new Set();
+
+      for (var time in scheduleByTimeAndDay) {
+        for (var day in scheduleByTimeAndDay[time]) {
+          daysWithCourses.add(day);
+          timesWithCourses.add(time);
+        }
+      }
+
+      var daysArray = Array.from(daysWithCourses);
+      var timesArray = Array.from(timesWithCourses);
+
+      daysArray.sort(function(a, b) {
+        return weekDays.indexOf(a) - weekDays.indexOf(b);
+      });
+
+      timesArray.sort();
+
+      var html = '<table class="weekly-schedule">';
+
+      html += '<thead><tr><th></th>';
+      for (var i = 0; i < daysArray.length; i++) {
+        var dayClass = '';
+        if (daysArray[i] === todayName) {
+          dayClass = 'today';
+        }
+        html += '<th class="' + dayClass + '">' + daysArray[i] + '</th>';
+      }
+      html += '</tr></thead>';
+
+      html += '<tbody>';
+
+      var isWhiteRow = true;
+
+      var isRamadanMode = activePlanningView === 'ramadan';
+      
+      function isAfterSeparatorTime(timeStr) {
+        var parts = (timeStr || '').split(':');
+        var h = parseInt(parts[0], 10) || 0;
+        var m = parseInt(parts[1], 10) || 0;
+        if (isRamadanMode) {
+          return h > 18 || (h === 18 && m >= 30) || h >= 19;
+        } else {
+          return h >= 12;
+        }
+      }
+
+      for (var t = 0; t < timesArray.length; t++) {
+        var time = timesArray[t];
+
+        /* Ligne de séparation : toute la largeur (heures + jours), matin/après-midi (régulier) ou avant/après ftour (Ramadan) */
+        if (t > 0 && isAfterSeparatorTime(time) && !isAfterSeparatorTime(timesArray[t - 1])) {
+          html += '<tr class="noon-separator">';
+          html += '<td class="noon-separator-line" colspan="' + (1 + daysArray.length) + '"><div class="noon-separator-inner"></div></td>';
+          html += '</tr>';
+        }
+
+        var rowClass = isWhiteRow ? 'course-row-white' : 'course-row-grey';
+        var timeCellClass = isWhiteRow ? 'time-cell-white' : 'time-cell-grey';
+
+        isWhiteRow = !isWhiteRow;
+
+        html += '<tr class="' + rowClass + '">';
+
+        // Afficher uniquement l'heure de début dans la colonne de gauche
+        html += '<td class="time-cell ' + timeCellClass + '">' + time + '</td>';
+
+        for (var d = 0; d < daysArray.length; d++) {
+          var day = daysArray[d];
+          var courses = scheduleByTimeAndDay[time][day];
+
+          html += '<td class="course-cell">';
+          if (courses && courses.length > 0) {
+            for (var c = 0; c < courses.length; c++) {
+              var course = courses[c];
+              var courseDisplay = '';
+
+              var logoUrl = course.logo || '';
+              var courseNameDisplay = '';
+
+              if (SHOW_COURSE_IMAGES && logoUrl) {
+                courseNameDisplay = '<img class="logo-cours" src="' + logoUrl + '" alt="' + course.courseName + ' Logo">';
+              } else {
+                courseNameDisplay = '<div class="course-name-text">' + course.courseName + '</div>';
+              }
+
+              var firstCoachImageUrl = (course.coachs.length > 0 && course.coachs[0].imageUrl) ? course.coachs[0].imageUrl : 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+              var bulletHtml = '<div class="course-bullet"><img class="coach-bullet-img" src="' + firstCoachImageUrl + '" alt=""></div>';
+
+              var coachNamesHtml = '';
+              if (course.coachs.length === 1) {
+                coachNamesHtml = '<div class="single-coach"><span>' + course.coachs[0].name + '</span></div>';
+              } else if (course.coachs.length > 1) {
+                coachNamesHtml = '<div class="multiple-coaches">';
+                course.coachs.forEach(function(coach) {
+                  var imgUrl = coach.imageUrl;
+                  if (imgUrl) coachNamesHtml += '<img src="' + imgUrl + '" alt="" class="coach-image">';
+                });
+                coachNamesHtml += '</div>';
+              }
+
+              var courseClasses = 'course-block';
+              if (course.type === '100% Femmes') {
+                courseClasses += ' women-only';
+              } else {
+                courseClasses += ' mixte';
+              }
+
+              if (course.studio.toLowerCase().includes('piscine') || course.studio.toLowerCase().includes('aqua')) {
+                courseClasses += ' piscine';
+              }
+
+              var now = new Date();
+              var courseDate = new Date();
+              
+              var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
+              var startHour = parseInt(startTimeParts[0]) || 0;
+              var startMinute = parseInt(startTimeParts[1]) || 0;
+              
+              var currentDay = now.getDay();
+              var targetDay = weekDays.indexOf(day);
+              
+              var dayDiff = targetDay - currentDay;
+              if (dayDiff < 0) {
+                dayDiff += 7;
+              }
+              
+              courseDate.setDate(now.getDate() + dayDiff);
+              courseDate.setHours(startHour, startMinute, 0, 0);
+              
+              var timeDifference = Math.floor((courseDate - now) / 1000);
+              
+              var isStartingSoon = timeDifference >= 0 && timeDifference <= 900;
+              var isInProgress = timeDifference < 0 && timeDifference > -course.duration * 60;
+              
+              if (isStartingSoon) {
+                courseClasses += ' starting-soon';
+              } else if (isInProgress) {
+                courseClasses += ' current';
+              }
+
+              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '">';
+
+              if (isStartingSoon) {
+                courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
+              }
+
+              courseDisplay += '<div class="course-block-inner">';
+              courseDisplay += bulletHtml;
+              courseDisplay += '<div class="course-content">';
+              courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
+              courseDisplay += coachNamesHtml;
+              courseDisplay += '</div></div>';
+              courseDisplay += '</div>';
+
+              html += courseDisplay;
+            }
+          }
+          html += '</td>';
+        }
+
+        html += '</tr>';
+      }
+      html += '</tbody>';
+      html += '</table>';
+
+      return html;
+    }
+
+    /** Marque les noms de cours sur 2+ lignes (mobile) pour appliquer des marges réduites. */
+    function markMultilineCourseNames() {
+      requestAnimationFrame(function() {
+        var els = document.querySelectorAll('.course-info .course-name-text');
+        var lineHeightPx = 14;
+        els.forEach(function(el) {
+          if (el.scrollHeight > lineHeightPx + 4) {
+            el.classList.add('multiline');
+          } else {
+            el.classList.remove('multiline');
+          }
+        });
+      });
+    }
+
+    function scrollToCurrentTime() {
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          const contentWrapper = document.querySelector('.content-wrapper');
+          if (!contentWrapper) return;
+
+          let targetRow = document.querySelector('.course-block.current')?.closest('tr');
+          
+          if (!targetRow) {
+            targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
+          }
+          
+          if (!targetRow) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+            const times = document.querySelectorAll('.time-cell');
+            
+            for (let i = 0; i < times.length; i++) {
+              const timeText = times[i].textContent.trim();
+              const [hour, minute] = timeText.split(':').map(Number);
+              
+              if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+                targetRow = times[i].parentElement;
+                break;
+              }
+            }
+          }
+
+          if (targetRow) {
+            const headerWrapper = document.querySelector('.header-wrapper');
+            const thead = document.querySelector('.weekly-schedule thead');
+            
+            const headerHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
+            const theadHeight = thead ? thead.offsetHeight : 0;
+            
+            const targetPosition = targetRow.offsetTop - headerHeight - theadHeight - 10;
+            
+            setTimeout(() => {
+              contentWrapper.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }, 100);
+          }
+        });
+      }, 500);
+    }
+
+    setInterval(scrollToCurrentTime, 900000);
+
+    setInterval(function() {
+      location.reload();
+    }, 3600000);
+
+    function checkCourseStates() {
+      const now = new Date();
+      const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      const currentDay = now.getDay();
+      const currentDayName = weekDays[currentDay];
+      const currentHour = now.getHours();
+      const currentMinutes = now.getMinutes();
+      const currentTimeInMinutes = currentHour * 60 + currentMinutes;
+
+      const courseBlocks = document.querySelectorAll('.course-block');
+      
+      courseBlocks.forEach(block => {
+        try {
+          if (!block) return;
+
+          const dayCell = block.closest('tr')?.querySelector('th');
+          if (!dayCell) return;
+
+          const dayName = dayCell.textContent?.trim();
+          if (!dayName) return;
+          
+          if (dayName === currentDayName) {
+            const timeCell = block.closest('tr')?.querySelector('.time-cell');
+            if (!timeCell) return;
+
+            const startTime = timeCell.textContent?.trim();
+            if (!startTime) return;
+
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const startTimeInMinutes = startHour * 60 + startMinute;
+            
+            const timeDifference = startTimeInMinutes - currentTimeInMinutes;
+            
+            const isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
+            const isInProgress = timeDifference < 0 && timeDifference > -60;
+            
+            if (isStartingSoon) {
+              block.classList.add('starting-soon');
+              block.classList.remove('current');
+              let countdownPill = block.querySelector('.countdown-pill');
+              if (!countdownPill) {
+                countdownPill = document.createElement('div');
+                countdownPill.className = 'countdown-pill starting-soon';
+                block.insertBefore(countdownPill, block.firstChild);
+              }
+              countdownPill.setAttribute('data-time-diff', timeDifference * 60);
+            } else if (isInProgress) {
+              block.classList.add('current');
+              block.classList.remove('starting-soon');
+              const countdownPill = block.querySelector('.countdown-pill');
+              if (countdownPill) {
+                countdownPill.remove();
+              }
+            } else {
+              block.classList.remove('starting-soon', 'current');
+              const countdownPill = block.querySelector('.countdown-pill');
+              if (countdownPill) {
+                countdownPill.remove();
+              }
+            }
+          } else {
+            block.classList.remove('starting-soon', 'current');
+            const countdownPill = block.querySelector('.countdown-pill');
+            if (countdownPill) {
+              countdownPill.remove();
+            }
+          }
+        } catch (error) {
+          console.error('Erreur lors de la vérification de l\'état du cours:', error);
+        }
+      });
+    }
+
+    // Fonction pour ouvrir/fermer la barre de filtres
+    function toggleFiltersSidebar(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const sidebar = document.getElementById('filtersSidebar');
+      
+      if (!sidebar) {
+        console.error('Sidebar not found');
+        return;
+      }
+      
+      // Toggle la classe open pour ouvrir/fermer la barre
+      sidebar.classList.toggle('open');
+    }
+
+    // Fermer la barre de filtres quand on clique ailleurs (mais pas sur le bouton ni la barre)
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('filtersSidebar');
+      const filterButton = document.querySelector('.filter-button');
+      
+      if (sidebar.classList.contains('open')) {
+        // Si le clic n'est pas sur la barre de filtres ni sur le bouton
+        if (!sidebar.contains(event.target) && !filterButton.contains(event.target)) {
+          sidebar.classList.remove('open');
+        }
+      }
+    });
+
+    // Fonction pour retourner à aujourd'hui (redirige vers daily.html)
+    function returnToToday() {
+      window.location.href = './daily.html';
+    }
+
+    // Fonction pour aller vers weekly.html
+    function goToWeekly() {
+      window.location.href = './weekly.html';
+    }
+
+    // Animation de clic fiable au toucher sur le bouton rotation (mobile)
+    (function initRotationButtonTapAnimation() {
+      var el = document.getElementById('rotationViewButton');
+      if (!el) return;
+      function removeTapActive() {
+        var target = el;
+        setTimeout(function() { target.classList.remove('tap-active'); }, 320);
+      }
+      el.addEventListener('pointerdown', function() { el.classList.add('tap-active'); });
+      el.addEventListener('pointerup', removeTapActive);
+      el.addEventListener('pointerleave', removeTapActive);
+      el.addEventListener('pointercancel', removeTapActive);
+    })();
+
+  </script>
+
+</body>
+</html>
