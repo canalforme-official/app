@@ -92,32 +92,92 @@
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
     }
     body.planning-ramadan .content-wrapper { position: relative; z-index: 1; }
+    /* Icône de rotation en vert Ramadan (#1a472a) opaque en mode Ramadan */
+    body.planning-ramadan .rotation-view-button::before {
+      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+    }
+    /* Icône retour à aujourd'hui en vert Ramadan (#1a472a) opaque en mode Ramadan */
+    body.planning-ramadan .today-view-button::before {
+      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+    }
 
-    /* Conteneur des boutons Ramadan / Régulier */
-    #planningViewSwitcher {
-      display: flex;
-      gap: 8px;
+    /* Bouton switch planning Ramadan — au-dessus du bouton de rotation, mobile uniquement */
+    .ramadan-switch-button {
+      position: fixed;
+      bottom: 145px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(72, 6, 7, 0.8);
+      border: none;
+      display: none;
+      align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
-      padding: 2px 0;
-      margin: 0 0 2px 0;
-    }
-    #planningViewSwitcher button {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--primary-color);
-      background: var(--background-card);
-      color: var(--primary-color);
-      font-size: 0.9em;
       cursor: pointer;
+      z-index: 1002;
+      overflow: visible;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: auto;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px);
     }
-    #planningViewSwitcher button.active {
-      background: var(--primary-color);
-      color: var(--text-light);
+    .ramadan-switch-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
     }
-    #planningViewSwitcher button:not(.active):hover {
-      background: var(--primary-lighter);
-      color: #fff;
+    .ramadan-icon {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0) invert(1);
+      transition: filter 0.3s;
+      z-index: 10;
+      position: relative;
+    }
+    body.planning-ramadan .ramadan-switch-button {
+      background: rgba(26, 71, 42, 0.8);
+    }
+    body.planning-ramadan .ramadan-icon {
+      filter: brightness(0) invert(1);
+    }
+    .ramadan-switch-button:active {
+      transform: scale(0.85);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* Paillettes d'explosion au clic */
+    .confetti-burst {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: confetti-burst-anim 1s ease-out forwards;
+    }
+    @keyframes confetti-burst-anim {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(0) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    /* Container pour les paillettes */
+    .confetti-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+    @media screen and (min-width: 769px) {
+      .ramadan-switch-button { display: none !important; }
     }
 
     body, button, a, img {
@@ -1910,13 +1970,16 @@
       </div>
     </div>
 
-    <!-- Boutons Planning Ramadan / Régulier (affichés selon période) -->
-    <div id="planningViewSwitcher" style="display: none;"></div>
-
     <!-- Le planning hebdomadaire sera inséré ici -->
     <div id="weeklySchedule"></div>
 
   </div>
+
+  <!-- Bouton switch planning Ramadan (au-dessus du bouton de rotation, mobile uniquement) -->
+  <button id="ramadanSwitchButton" class="ramadan-switch-button">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
+    <div class="confetti-container"></div>
+  </button>
 
   <!-- Barre de filtres en bas avec le bouton intégré -->
   <div class="filters-sidebar" id="filtersSidebar">
@@ -1962,6 +2025,35 @@
     var scheduleData = [];
     var activePlanningView = 'regulier'; // 'regulier' | 'ramadan'
 
+    // Mise à jour de la visibilité du bouton Ramadan au resize et attacher l'event listener
+    (function initRamadanButtonResize() {
+      function update() {
+        if (scheduleData && typeof renderPlanningViewSwitcher === 'function') renderPlanningViewSwitcher(scheduleData);
+      }
+      function attachListener() {
+        var ramadanButton = document.getElementById('ramadanSwitchButton');
+        if (ramadanButton) {
+          // Retirer l'ancien listener s'il existe et en ajouter un nouveau
+          ramadanButton.removeEventListener('click', toggleRamadanPlanning);
+          ramadanButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Clic détecté sur le bouton Ramadan');
+            toggleRamadanPlanning();
+          });
+          console.log('Event listener attaché au bouton Ramadan');
+        } else {
+          console.warn('Bouton ramadanSwitchButton non trouvé lors de l\'initialisation');
+        }
+        window.addEventListener('resize', update);
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachListener);
+      } else {
+        attachListener();
+      }
+    })();
+
     /** Retourne le planning actuellement affiché (régulier ou Ramadan). Si Ramadan vide, affiche le régulier. */
     function getCurrentPlanning() {
       if (!scheduleData || !scheduleData.planning) return {};
@@ -2000,10 +2092,23 @@
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
     }
 
-    /** Un seul bouton qui bascule : affiche "Voir planning Ramadan" ou "Voir planning régulier" selon la vue actuelle. */
+    /** Affiche ou masque le bouton flottant Ramadan selon période et contexte (mobile uniquement). */
     function renderPlanningViewSwitcher(data) {
-      var container = document.getElementById('planningViewSwitcher');
-      if (!container) return;
+      var ramadanButton = document.getElementById('ramadanSwitchButton');
+      if (!ramadanButton) {
+        console.warn('renderPlanningViewSwitcher: bouton ramadanSwitchButton non trouvé');
+        return;
+      }
+      if (!data) {
+        console.warn('renderPlanningViewSwitcher: pas de données');
+        return;
+      }
+      var isMobile = window.innerWidth <= 768;
+      console.log('renderPlanningViewSwitcher: isMobile=', isMobile, 'window.innerWidth=', window.innerWidth);
+      if (!isMobile) {
+        ramadanButton.style.display = 'none';
+        return;
+      }
       var meta = data.metadata || {};
       var ramadanStart = meta.ramadanStart;
       var ramadanEnd = meta.ramadanEnd;
@@ -2013,33 +2118,63 @@
       var showSwitcher = (data.planningRamadan && ramadanStart) && (
         inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore)
       );
-      if (!showSwitcher) {
-        container.style.display = 'none';
-        container.innerHTML = '';
+      console.log('renderPlanningViewSwitcher: showSwitcher=', showSwitcher, 'ramadanStart=', ramadanStart, 'planningRamadan présent=', !!data.planningRamadan);
+      if (showSwitcher) {
+        ramadanButton.style.display = 'flex';
+        ramadanButton.style.pointerEvents = 'auto';
+        setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
+        console.log('Bouton Ramadan affiché');
+      } else {
+        ramadanButton.style.display = 'none';
+        console.log('Bouton Ramadan masqué');
+      }
+    }
+    function toggleRamadanPlanning() {
+      console.log('toggleRamadanPlanning appelé, activePlanningView actuel:', activePlanningView);
+      var button = document.getElementById('ramadanSwitchButton');
+      if (!button) {
+        console.error('Bouton ramadanSwitchButton non trouvé');
         return;
       }
-      container.innerHTML = '';
-      var btn = document.createElement('button');
-      if (activePlanningView === 'ramadan') {
-        btn.textContent = 'Voir planning régulier';
-        btn.classList.add('active');
-        btn.onclick = function() { setPlanningView('regulier'); };
-      } else {
-        var dateDebut = ramadanStart ? (function(s) { var p = s.split('-'); if (p.length !== 3) return ''; var mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']; return p[2] + ' ' + (mois[parseInt(p[1],10)-1] || ''); })(ramadanStart) : '';
-        btn.textContent = inRamadan ? 'Voir planning Ramadan' : 'Voir planning Ramadan' + (dateDebut ? ' (' + dateDebut + ')' : ' (à venir)');
-        btn.classList.toggle('active', false);
-        btn.onclick = function() { setPlanningView('ramadan'); };
+      
+      // Animation d'explosion de paillettes au clic
+      var container = button.querySelector('.confetti-container');
+      if (container) {
+        var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#1a472a';
+        for (var i = 0; i < 12; i++) {
+          var burst = document.createElement('div');
+          burst.className = 'confetti-burst';
+          burst.style.background = color;
+          burst.style.left = '50%';
+          burst.style.top = '50%';
+          var angle = (i * 30) * Math.PI / 180;
+          var distance = 60 + Math.random() * 20;
+          burst.style.setProperty('--burst-x', Math.cos(angle) * distance + 'px');
+          burst.style.setProperty('--burst-y', Math.sin(angle) * distance + 'px');
+          container.appendChild(burst);
+          setTimeout(function(el) { if (el.parentNode) el.remove(); }, 1000, burst);
+        }
       }
-      container.appendChild(btn);
-      container.style.display = 'flex';
+      
+      var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
+      console.log('Basculement vers:', currentView);
+      setPlanningView(currentView);
     }
 
     /** Bascule l’affichage vers planning Ramadan ou régulier et rafraîchit. */
     function setPlanningView(view) {
+      console.log('setPlanningView appelé avec view:', view, 'scheduleData:', scheduleData ? 'présent' : 'absent');
       activePlanningView = view;
-      localStorage.setItem('planningView', view);
+      try {
+        localStorage.setItem('planningView', view);
+      } catch(e) {
+        console.warn('Erreur localStorage:', e);
+      }
       document.body.classList.toggle('planning-ramadan', view === 'ramadan');
       refreshPlanningDisplay();
+      if (scheduleData) {
+        renderPlanningViewSwitcher(scheduleData);
+      }
     }
 
     /** Re-génère le planning et met à jour la liste des coachs (sidebar). */
@@ -2134,7 +2269,27 @@
         fetchWeeklyData().then(data => {
           scheduleData = data;
           initPlanningView(data);
+          
+          // Attacher l'event listener AVANT renderPlanningViewSwitcher
+          var ramadanButton = document.getElementById('ramadanSwitchButton');
+          if (ramadanButton) {
+            // Cloner le bouton pour retirer tous les anciens listeners
+            var newButton = ramadanButton.cloneNode(true);
+            ramadanButton.parentNode.replaceChild(newButton, ramadanButton);
+            ramadanButton = newButton;
+            
+            ramadanButton.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Clic détecté sur le bouton Ramadan');
+              toggleRamadanPlanning();
+            });
+            
+            console.log('Event listener attaché au bouton Ramadan');
+          }
+          
           renderPlanningViewSwitcher(data);
+
 
           console.group('Traitement des données');
           console.log('Données reçues:', data);
