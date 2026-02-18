@@ -73,6 +73,10 @@
       --shadow-medium: rgba(150, 150, 150, 0.5);
       --shadow-dark: rgba(0, 0, 0, 0.4);
     }
+    body.planning-ramadan { --primary-color: #1a472a; --primary-overlay: rgba(26, 71, 42, 0.95); --primary-light: rgba(26, 71, 42, 0.85); --secondary-color: #c9a227; }
+    #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 8px 0; margin: 0 0 8px 0; }
+    #planningViewSwitcher button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--primary-color); background: var(--background-card); color: var(--primary-color); font-size: 0.9em; cursor: pointer; }
+    #planningViewSwitcher button.active { background: var(--primary-color); color: var(--text-light); }
 
     body {
       font-family: var(--font-text);
@@ -754,6 +758,7 @@
       }
 
       /* Puppeteer (viewport ≤768px) : mêmes dimensions qu’avant les changements mobile (dégradé, marge basse, rows 50 %) */
+      body.puppeteer-view #planningViewSwitcher { display: none !important; }
       body.puppeteer-view .header {
         background: var(--gradient-primary);
       }
@@ -973,6 +978,7 @@
   </script>
 
   <div class="content-wrapper">
+    <div id="planningViewSwitcher" style="display: none;"></div>
     <div class="studios-container" id="studiosContainer">
       <!-- Les rangées de studios seront générées ici -->
     </div>
@@ -994,6 +1000,54 @@
     const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
     let allData = null;
+    var activePlanningView = 'regulier';
+    function getCurrentPlanning() {
+      if (!allData || !allData.planning) return {};
+      if (activePlanningView === 'ramadan' && allData.planningRamadan) {
+        var pr = allData.planningRamadan;
+        var hasCourses = Object.keys(pr).some(function(day) { return pr[day] && pr[day].length > 0; });
+        if (hasCourses) return pr;
+      }
+      return allData.planning;
+    }
+    function initPlanningView(data) {
+      if (!data) return;
+      var params = new URLSearchParams(window.location.search);
+      var urlView = params.get('planning');
+      var stored = localStorage.getItem('planningView');
+      var today = new Date().toISOString().slice(0, 10);
+      var ramadanStart = data.metadata && data.metadata.ramadanStart;
+      var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
+      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; localStorage.setItem('planningView', urlView); }
+      else if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
+      else if (inRamadan) { activePlanningView = 'ramadan'; localStorage.setItem('planningView', 'ramadan'); }
+      else { activePlanningView = 'regulier'; localStorage.setItem('planningView', 'regulier'); }
+      document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
+    }
+    function renderPlanningViewSwitcher(data) {
+      var container = document.getElementById('planningViewSwitcher');
+      if (!container || !data) return;
+      var meta = data.metadata || {};
+      var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
+      var today = new Date().toISOString().slice(0, 10);
+      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var daysBefore = 7;
+      var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore));
+      if (!showSwitcher) { container.style.display = 'none'; container.innerHTML = ''; return; }
+      container.innerHTML = '';
+      var btn = document.createElement('button');
+      if (activePlanningView === 'ramadan') { btn.textContent = 'Voir planning régulier'; btn.classList.add('active'); btn.onclick = function() { setPlanningView('regulier'); }; }
+      else { var dateDebut = ramadanStart ? (function(s) { var p = s.split('-'); if (p.length !== 3) return ''; var mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']; return p[2] + ' ' + (mois[parseInt(p[1],10)-1] || ''); })(ramadanStart) : ''; btn.textContent = inRamadan ? 'Voir planning Ramadan' : 'Voir planning Ramadan' + (dateDebut ? ' (' + dateDebut + ')' : ' (à venir)'); btn.onclick = function() { setPlanningView('ramadan'); }; }
+      container.appendChild(btn);
+      container.style.display = 'flex';
+    }
+    function setPlanningView(view) {
+      activePlanningView = view;
+      localStorage.setItem('planningView', view);
+      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
+      if (allData) { renderPlanningViewSwitcher(allData); loadAndDisplayCourses(); }
+    }
 
     function syncCurrentDateToWeekWindow() {
       // Même logique que dans daily.html:
@@ -1204,35 +1258,21 @@
         }
         
         allData = await response.json();
+        initPlanningView(allData);
+        renderPlanningViewSwitcher(allData);
         console.log('Données chargées avec succès:', allData);
-        console.log('Structure des données de planning:', Object.keys(allData.planning));
+        var planning = getCurrentPlanning();
+        console.log('Structure des données de planning:', Object.keys(planning));
 
-        // Convertir la date en format "YYYY-MM-DD"
         const today = currentDate.toISOString().split('T')[0];
-        console.log('Date du jour (ISO):', today);
-        
-        // Convertir en format "jour" (ex: "lundi")
         const dayName = days[currentDate.getDay()].toLowerCase();
-        console.log('Nom du jour:', dayName);
         
-        // Essayer d'abord avec le format jour
-        let todaysCourses = allData.planning[dayName] || [];
-        console.log('Cours du jour (format jour):', todaysCourses);
-        console.log('Structure complète des cours du jour:', JSON.stringify(todaysCourses, null, 2));
-        console.log('Détail des cours du jour:', todaysCourses.map(course => ({
-          studioId: course.studioId,
-          coursId: course.coursId,
-          coachIds: course.coachIds,
-          startTime: course.startTime
-        })));
-        console.log('IDs des studios dans les cours:', todaysCourses.map(c => c.studioId));
-        console.log('Liste des studios disponibles:', allData.studios.map(s => ({ id: s.id, name: s.name })));
-        
-        // Si pas de cours, essayer avec le format date
+        let todaysCourses = planning[dayName] || [];
         if (todaysCourses.length === 0) {
-          todaysCourses = allData.planning[today] || [];
-          console.log('Cours du jour (format date):', todaysCourses);
+          todaysCourses = planning[today] || [];
         }
+        console.log('Cours du jour:', todaysCourses);
+        if (allData.studios) console.log('Liste des studios disponibles:', allData.studios.map(s => ({ id: s.id, name: s.name })));
 
         const studiosContainer = document.getElementById('studiosContainer');
         studiosContainer.innerHTML = '';
