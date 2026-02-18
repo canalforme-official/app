@@ -783,17 +783,22 @@
         margin-bottom: 48px;
         visibility: visible !important;
         opacity: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
       }
       body.puppeteer-view .studios-container {
-        flex: 1;
-        min-height: 0;
+        flex: 1 1 auto;
+        min-height: 50vh;
         visibility: visible !important;
         opacity: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: visible;
       }
       body.puppeteer-view .studios-row {
-        flex: none;
-        height: 50%;
-        min-height: 0;
+        flex: 1 1 auto;
+        min-height: 180px;
+        height: auto;
       }
     }
 
@@ -1370,6 +1375,18 @@
         }
 
         // Trier les studios par rang (utiliser 'rang' ou 'rank' selon ce qui existe)
+        if (!allData.studios || !Array.isArray(allData.studios) || allData.studios.length === 0) {
+          console.warn('Aucun studio dans les données');
+          const studiosContainer = document.getElementById('studiosContainer');
+          const fallback = document.createElement('div');
+          fallback.className = 'no-courses-container';
+          fallback.style.cssText = 'text-align:center;padding:20px;color:var(--text-secondary);';
+          fallback.textContent = 'Aucun studio configuré.';
+          studiosContainer.appendChild(fallback);
+          updateDayTitle();
+          document.body.setAttribute('data-daily-grid-ready', 'true');
+          return;
+        }
         console.log('Studios avant tri:', allData.studios.map(s => ({ name: s.name, rank: s.rank, rang: s.rang })));
         const sortedStudios = allData.studios
           .sort((a, b) => {
