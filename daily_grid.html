@@ -1037,17 +1037,20 @@
     }
     function initPlanningView(data) {
       if (!data) return;
-      var params = new URLSearchParams(window.location.search);
-      var urlView = params.get('planning');
-      var stored = localStorage.getItem('planningView');
+      var urlView = '', stored = '';
+      try {
+        var params = new URLSearchParams(window.location.search);
+        urlView = params.get('planning') || '';
+        stored = (typeof localStorage !== 'undefined' && localStorage.getItem) ? localStorage.getItem('planningView') || '' : '';
+      } catch (e) { urlView = ''; stored = ''; }
       var today = new Date().toISOString().slice(0, 10);
       var ramadanStart = data.metadata && data.metadata.ramadanStart;
       var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; localStorage.setItem('planningView', urlView); }
+      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; try { localStorage.setItem('planningView', urlView); } catch (e) {} }
       else if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
-      else if (inRamadan) { activePlanningView = 'ramadan'; localStorage.setItem('planningView', 'ramadan'); }
-      else { activePlanningView = 'regulier'; localStorage.setItem('planningView', 'regulier'); }
+      else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
+      else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
     }
     function renderPlanningViewSwitcher(data) {
@@ -1283,8 +1286,14 @@
         }
         
         allData = await response.json();
-        initPlanningView(allData);
-        renderPlanningViewSwitcher(allData);
+        try {
+          initPlanningView(allData);
+          renderPlanningViewSwitcher(allData);
+        } catch (e) {
+          console.warn('Init planning / switcher:', e);
+          activePlanningView = 'regulier';
+          document.body.classList.remove('planning-ramadan');
+        }
         console.log('Données chargées avec succès:', allData);
         var planning = getCurrentPlanning();
         console.log('Structure des données de planning:', Object.keys(planning));
@@ -1407,9 +1416,9 @@
             const studio = sortedStudios[i + j];
             console.log('Traitement du studio:', studio);
             
-            const studioCourses = todaysCourses
-              .filter(course => course.studioId === studio.id)
-              .sort((a, b) => a.startTime.localeCompare(b.startTime));
+            var studioCourses = (todaysCourses || [])
+              .filter(function(course) { return (course.studioId || '') === (studio.id || ''); })
+              .sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
             console.log('Cours du studio:', studioCourses);
             console.log('IDs des cours pour ce studio:', studioCourses.map(c => c.coursId));
             
@@ -1446,53 +1455,38 @@
               emptyMessage.textContent = 'Pas de cours';
               coursesContainer.appendChild(emptyMessage);
             } else {
-              studioCourses.forEach(course => {
-                // Récupérer les informations du cours directement depuis l'objet course
-                const courseName = course.coursId.split('-').slice(1).join(' ').toUpperCase();
+              studioCourses.forEach(function(course) {
+                var coursIdStr = (course.coursId || '').toString();
+                var courseName = coursIdStr.split('-').slice(1).join(' ').toUpperCase();
                 
                 // Récupérer tous les coachs du cours
-                const courseCoaches = course.coachIds
-                  .map(coachId => allData.coachs.find(c => c.id === coachId))
-                  .filter(coach => coach !== undefined);
+                const coachIds = course.coachIds || [];
+                const coachList = allData.coachs || [];
+                const courseCoaches = coachIds.map(function(coachId) { return coachList.find(function(c) { return c && c.id === coachId; }); }).filter(function(c) { return c !== undefined; });
                 
-                console.log('Données du cours:', { 
-                  coursId: course.coursId,
-                  courseName: courseName,
-                  coachIds: course.coachIds,
-                  course_coaches: courseCoaches
-                });
-                
+                var coachNamesText = '';
                 if (courseCoaches.length === 0) {
-                  console.error('Aucun coach trouvé pour le cours:', course.coursId);
-                  return;
-                }
-                
-                // Créer la chaîne des noms de coachs avec points de suspension si nécessaire
-                let coachNamesText = '';
-                if (courseCoaches.length === 1) {
-                  coachNamesText = courseCoaches[0].name;
+                  coachNamesText = '–';
+                } else if (courseCoaches.length === 1) {
+                  coachNamesText = courseCoaches[0].name || '–';
                 } else if (courseCoaches.length === 2) {
-                  coachNamesText = `${courseCoaches[0].name}, ${courseCoaches[1].name}`;
+                  coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '');
                 } else {
-                  // Plus de 2 coachs : afficher les 2 premiers + "..."
-                  coachNamesText = `${courseCoaches[0].name}, ${courseCoaches[1].name}...`;
+                  coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '') + '...';
                 }
                 
                 const courseCard = document.createElement('div');
                 courseCard.className = 'course-card';
-                if (course.type.toLowerCase().includes('femme')) {
+                var courseType = (course.type || '').toString().toLowerCase();
+                var studioName = (studio.name || '').toString().toLowerCase();
+                if (courseType.indexOf('femme') !== -1) {
                   courseCard.classList.add('women-only');
                 }
-                if (studio.name.toLowerCase().includes('piscine') || studio.name.toLowerCase().includes('aqua')) {
+                if (studioName.indexOf('piscine') !== -1 || studioName.indexOf('aqua') !== -1) {
                   courseCard.classList.add('pool');
                 }
                 
-                courseCard.innerHTML = `
-                  <div class="course-time">${course.startTime}</div>
-                  <div class="course-name">${courseName}</div>
-                  <div class="course-coach">${coachNamesText}</div>
-                `;
-                
+                courseCard.innerHTML = '<div class="course-time">' + (course.startTime || '') + '</div><div class="course-name">' + (courseName || '') + '</div><div class="course-coach">' + (coachNamesText || '–') + '</div>';
                 coursesContainer.appendChild(courseCard);
               });
             }
@@ -1509,22 +1503,18 @@
         
         // Gérer les coachs
         const uniqueCoachIds = [...new Set(todaysCourses
-          .flatMap(course => course.coachIds)
-          .filter(id => id !== undefined))];
+          .flatMap(function(course) { return course.coachIds || []; })
+          .filter(function(id) { return id !== undefined && id !== null; }))];
         console.log('IDs des coachs uniques:', uniqueCoachIds);
         
         const coachesSection = document.getElementById('coachesSection');
         coachesSection.innerHTML = '';
         
-        if (uniqueCoachIds.length > 0) {
-          uniqueCoachIds.forEach(coachId => {
-            const coachData = allData.coachs.find(c => c.id === coachId);
-            console.log('Données du coach:', coachData);
-            
-            if (!coachData) {
-              console.error('Données manquantes pour le coach:', coachId);
-              return;
-            }
+        var coachListForSection = allData.coachs || [];
+        if (uniqueCoachIds.length > 0 && coachListForSection.length > 0) {
+          uniqueCoachIds.forEach(function(coachId) {
+            var coachData = coachListForSection.find(function(c) { return c && c.id === coachId; });
+            if (!coachData) return;
             
             const coachCard = document.createElement('div');
             coachCard.className = 'coach-card';
@@ -1545,6 +1535,15 @@
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         document.body.setAttribute('data-daily-grid-ready', 'error');
+        var container = document.getElementById('studiosContainer');
+        if (container) {
+          container.innerHTML = '';
+          var errDiv = document.createElement('div');
+          errDiv.className = 'no-courses-container';
+          errDiv.style.cssText = 'text-align:center;padding:20px;color:#c00;font-size:0.9em;';
+          errDiv.textContent = 'Erreur de chargement: ' + (error && error.message ? error.message : String(error));
+          container.appendChild(errDiv);
+        }
       }
     }
 
