@@ -781,10 +781,14 @@
       body.puppeteer-view .content-wrapper {
         height: calc(100vh - 74px);
         margin-bottom: 48px;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       body.puppeteer-view .studios-container {
         flex: 1;
         min-height: 0;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       body.puppeteer-view .studios-row {
         flex: none;
@@ -1361,6 +1365,7 @@
           
           updateDayTitle();
           document.getElementById('coachesSection').innerHTML = '';
+          document.body.setAttribute('data-daily-grid-ready', 'true');
           return;
         }
 
@@ -1519,9 +1524,10 @@
             coachesSection.appendChild(coachCard);
           });
         }
-        
+        document.body.setAttribute('data-daily-grid-ready', 'true');
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
+        document.body.setAttribute('data-daily-grid-ready', 'error');
       }
     }
 
