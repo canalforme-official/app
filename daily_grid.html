@@ -73,7 +73,7 @@
       --shadow-medium: rgba(150, 150, 150, 0.5);
       --shadow-dark: rgba(0, 0, 0, 0.4);
     }
-    body.planning-ramadan { --primary-color: #1a472a; --primary-overlay: rgba(26, 71, 42, 0.95); --primary-light: rgba(26, 71, 42, 0.85); --secondary-color: #c9a227; position: relative; }
+    body.planning-ramadan { --primary-color: #26462d; --primary-overlay: rgba(38, 70, 45, 0.95); --primary-light: rgba(38, 70, 45, 0.85); --secondary-color: #c9a227; position: relative; }
     body.planning-ramadan::before {
       content: '';
       position: fixed;
@@ -90,13 +90,13 @@
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
     }
     body.planning-ramadan .content-wrapper { position: relative; z-index: 1; }
-    /* Icône retour à aujourd'hui en vert Ramadan (#1a472a) opaque en mode Ramadan */
+    /* Icône retour à aujourd'hui en vert Ramadan (#26462d) opaque en mode Ramadan */
     body.planning-ramadan .today-view-button::before {
-      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
-    /* Icônes des studios en vert Ramadan en mode Ramadan */
+    /* Icônes des studios en vert Ramadan (#26462d) en mode Ramadan */
     body.planning-ramadan .studio-icon {
-      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
 
     /* Bouton switch planning Ramadan — au-dessus du bouton today, mobile uniquement */
@@ -104,10 +104,9 @@
       position: fixed;
       bottom: 150px;
       right: 10px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: rgba(72, 6, 7, 0.8);
+      width: auto;
+      height: auto;
+      background: transparent;
       border: none;
       display: none;
       align-items: center;
@@ -117,42 +116,55 @@
       overflow: visible;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: all;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      backdrop-filter: blur(10px);
       opacity: 0;
       transform: translateY(20px);
+      padding: 0;
     }
     .ramadan-switch-button.loaded {
       opacity: 1;
       transform: translateY(0);
     }
     .ramadan-icon {
-      width: 30px;
-      height: 30px;
-      filter: brightness(0) invert(1);
+      width: 55px;
+      height: 55px;
+      filter: brightness(0) saturate(0%) invert(8%) sepia(94%) saturate(1352%) hue-rotate(335deg) brightness(95%) contrast(88%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
       transition: filter 0.3s;
       z-index: 10;
       position: relative;
+      display: block;
+      animation: float-icon 3s ease-in-out infinite;
+    }
+    
+    @keyframes float-icon {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
     }
     body.planning-ramadan .ramadan-switch-button {
-      background: rgba(26, 71, 42, 0.8);
+      background: transparent;
     }
     body.planning-ramadan .ramadan-icon {
-      filter: brightness(0) invert(1);
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     }
     .ramadan-switch-button:active {
-      transform: scale(0.85);
+      transform: translateY(20px) scale(0.9);
       transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ramadan-switch-button.loaded:active {
+      transform: translateY(0) scale(0.9);
     }
 
     /* Paillettes d'explosion au clic */
     .confetti-burst {
       position: absolute;
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       pointer-events: none;
-      animation: confetti-burst-anim 1s ease-out forwards;
+      animation: confetti-burst-anim 2s ease-out forwards;
     }
     @keyframes confetti-burst-anim {
       0% {
@@ -255,13 +267,25 @@
       flex: 1;
       position: relative;
     }
+    .day-title .day-name {
+      position: relative;
+      width: 100%;
+      text-align: center;
+    }
+    .planning-type-label {
+      font-family: var(--font-text);
+      font-size: 0.5em;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: none;
+      position: absolute;
+      right: 0;
+      font-style: italic;
+    }
 
     .day-name {
       line-height: 1.2;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
+      position: relative;
       text-align: center;
     }
 
@@ -1087,6 +1111,7 @@
     <h1 class="day-title" id="currentDay">
       <span class="day-name" id="dayName"></span>
       <span class="day-date" id="dayDate"></span>
+      <span class="planning-type-label" id="planningTypeLabel"></span>
     </h1>
   </div>
 
@@ -1164,10 +1189,19 @@
       else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
       else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
+      updatePlanningTypeLabel();
     }
     function renderPlanningViewSwitcher(data) {
       var ramadanButton = document.getElementById('ramadanSwitchButton');
       if (!ramadanButton || !data) return;
+      
+      // Masquer sur desktop (non mobile)
+      var isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        ramadanButton.style.display = 'none';
+        return;
+      }
+      
       var meta = data.metadata || {};
       var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
       var today = new Date().toISOString().slice(0, 10);
@@ -1185,23 +1219,35 @@
       var button = document.getElementById('ramadanSwitchButton');
       if (!button) return;
       
-      // Animation d'explosion de paillettes au clic
-      var container = button.querySelector('.confetti-container');
-      if (container) {
-        var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#1a472a';
-        for (var i = 0; i < 12; i++) {
-          var burst = document.createElement('div');
-          burst.className = 'confetti-burst';
-          burst.style.background = color;
-          burst.style.left = '50%';
-          burst.style.top = '50%';
-          var angle = (i * 30) * Math.PI / 180;
-          var distance = 60 + Math.random() * 20;
-          burst.style.setProperty('--burst-x', Math.cos(angle) * distance + 'px');
-          burst.style.setProperty('--burst-y', Math.sin(angle) * distance + 'px');
-          container.appendChild(burst);
-          setTimeout(function(el) { if (el.parentNode) el.remove(); }, 1000, burst);
-        }
+      // Animation d'explosion de paillettes sur toute la page
+      var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#26462d';
+      var pageConfettiContainer = document.getElementById('pageConfettiContainer');
+      if (!pageConfettiContainer) {
+        pageConfettiContainer = document.createElement('div');
+        pageConfettiContainer.id = 'pageConfettiContainer';
+        pageConfettiContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000; overflow: visible;';
+        document.body.appendChild(pageConfettiContainer);
+      }
+      
+      // Créer beaucoup plus de paillettes qui se répandent sur toute la page
+      var buttonRect = button.getBoundingClientRect();
+      var centerX = buttonRect.left + buttonRect.width / 2;
+      var centerY = buttonRect.top + buttonRect.height / 2;
+      
+      for (var i = 0; i < 100; i++) {
+        var burst = document.createElement('div');
+        burst.className = 'confetti-burst';
+        burst.style.cssText = 'position: absolute; width: 8px; height: 8px; border-radius: 50%; background: ' + color + '; z-index: 10000;';
+        burst.style.left = centerX + 'px';
+        burst.style.top = centerY + 'px';
+        var angle = (Math.random() * 360) * Math.PI / 180;
+        var distance = 200 + Math.random() * 400;
+        var x = Math.cos(angle) * distance;
+        var y = Math.sin(angle) * distance;
+        burst.style.setProperty('--burst-x', x + 'px');
+        burst.style.setProperty('--burst-y', y + 'px');
+        pageConfettiContainer.appendChild(burst);
+        setTimeout(function(el) { if (el && el.parentNode) el.remove(); }, 2000, burst);
       }
       
       var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
@@ -1211,7 +1257,14 @@
       activePlanningView = view;
       localStorage.setItem('planningView', view);
       document.body.classList.toggle('planning-ramadan', view === 'ramadan');
+      updatePlanningTypeLabel();
       if (allData) { renderPlanningViewSwitcher(allData); loadAndDisplayCourses(); }
+    }
+    function updatePlanningTypeLabel() {
+      var label = document.getElementById('planningTypeLabel');
+      if (label) {
+        label.textContent = activePlanningView === 'ramadan' ? 'Planning Ramadan' : 'Planning régulier';
+      }
     }
 
     function syncCurrentDateToWeekWindow() {
