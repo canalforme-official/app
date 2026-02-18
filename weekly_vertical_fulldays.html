@@ -63,7 +63,7 @@
       --overlay-light: rgba(255, 255, 255, 0.3);
       --overlay-lighter: rgba(255, 255, 255, 0.2);
     }
-    body.planning-ramadan { --primary-color: #1a472a; --primary-overlay: rgba(26, 71, 42, 0.95); --primary-light: rgba(26, 71, 42, 0.85); --secondary-color: #c9a227; position: relative; }
+    body.planning-ramadan { --primary-color: #26462d; --primary-overlay: rgba(38, 70, 45, 0.95); --primary-light: rgba(38, 70, 45, 0.85); --secondary-color: #c9a227; position: relative; }
     body.planning-ramadan::before {
       content: '';
       position: fixed;
@@ -80,9 +80,94 @@
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
     }
     body.planning-ramadan .content-wrapper { position: relative; z-index: 1; }
-    #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 2px 0; margin: 0 0 2px 0; }
-    #planningViewSwitcher button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--primary-color); background: var(--background-card); color: var(--primary-color); font-size: 0.9em; cursor: pointer; }
-    #planningViewSwitcher button.active { background: var(--primary-color); color: var(--text-light); }
+    body.planning-ramadan .rotation-view-button::before {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
+    }
+    body.planning-ramadan .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
+    }
+    body.planning-ramadan .ramadan-switch-button {
+      background: transparent;
+    }
+    body.planning-ramadan .ramadan-icon {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Bouton switch planning Ramadan — au-dessus du bouton de rotation, mobile uniquement */
+    .ramadan-switch-button {
+      position: fixed;
+      bottom: 145px;
+      right: 20px;
+      width: auto;
+      height: auto;
+      background: transparent;
+      border: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 998;
+      overflow: visible;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: all;
+      opacity: 0;
+      transform: translateY(20px);
+      padding: 0;
+    }
+    .ramadan-switch-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .ramadan-icon {
+      width: 55px;
+      height: 55px;
+      filter: brightness(0) saturate(0%) invert(8%) sepia(94%) saturate(1352%) hue-rotate(335deg) brightness(95%) contrast(88%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      transition: filter 0.3s;
+      z-index: 10;
+      position: relative;
+      display: block;
+      animation: float-icon 3s ease-in-out infinite;
+    }
+    @keyframes float-icon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .ramadan-switch-button:active {
+      transform: translateY(20px) scale(0.9);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ramadan-switch-button.loaded:active {
+      transform: translateY(0) scale(0.9);
+    }
+    .confetti-burst {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: confetti-burst-anim 2s ease-out forwards;
+    }
+    @keyframes confetti-burst-anim {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(0) rotate(720deg); opacity: 0; }
+    }
+    .confetti-container {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+    /* Vue non mobile : masquer tous les boutons */
+    @media screen and (min-width: 769px) {
+      .ramadan-switch-button,
+      .today-view-button,
+      .rotation-view-button,
+      .filters-sidebar { display: none !important; }
+    }
+
+    #planningViewSwitcher { display: none !important; }
 
     body, button, a, img {
       user-select: none;
@@ -307,155 +392,123 @@
     /* Styles pour la cellule des heures */
     .weekly-schedule th:first-child,
     .weekly-schedule td.time-cell {
-      width: 35px;
-      min-width: 30px;
-      max-width: 40px;
+      width: 38px;
+      min-width: 34px;
+      max-width: 44px;
       text-align: center;
       padding: 1px 0;
       font-weight: bold;
       color: var(--primary-color);
-      font-size: 0.92em;
+      font-size: 1.2em;
       line-height: 1;
     }
 
-    /* Alternance de couleurs pour les time-cell */
+    /* Alternance des horaires : même contraste que les lignes de cours */
     .weekly-schedule td.time-cell-white {
-      background-color: var(--background-card);
+      background-color: #fcfcfc;
       color: var(--primary-color);
       text-align: center;
     }
 
     .weekly-schedule td.time-cell-grey {
-      background-color: var(--background-main);
+      background-color: #e5e5e5;
       color: var(--primary-color);
       text-align: center;
     }
 
-    /* Ajustement des cellules des cours */
+    /* Ajustement des cellules des cours : le premier et le dernier cours ne touchent pas les bords */
     .course-cell {
       min-width: 70px;
-      text-align: center;
+      text-align: left;
       border-bottom: 1px solid var(--shadow-light);
       position: relative;
-      padding: 1px;
+      padding: 0 4px;
+      vertical-align: top;
     }
 
-    /* Styles pour les lignes blanches et grises */
+    .course-cell .course-block:first-child {
+      margin-top: 8px;
+    }
+
+    .course-cell .course-block:last-child {
+      margin-bottom: 8px;
+    }
+
+    /* Lignes d’horaires : fond bien marqué pour distinguer les créneaux */
     .course-row-white .course-cell {
-      background-color: var(--background-card);
+      background-color: #fcfcfc;
       color: var(--text-primary);
     }
 
     .course-row-grey .course-cell {
-      background-color: var(--background-main);
+      background-color: #e5e5e5;
       color: var(--text-primary);
     }
 
-    /* Ajustement des blocs de cours */
+    /* Blocs de cours : photo coach à gauche (bullet) + contenu */
     .course-block {
-      background-color: var(--background-card);
+      background: none;
       border: none;
-      border-radius: 3px;
-      padding: 4px 1px 4px 1px;
-      padding-right: 22px;
+      border-radius: 0;
+      padding: 0;
       margin: 0;
-      font-size: 0.68em;
+      font-size: 0.98em;
       position: relative;
-      box-shadow: 0px 1px 4px var(--shadow-light);
+      box-shadow: none;
       text-align: left;
+      overflow: visible;
     }
 
-    /* Petite séparation verticale entre plusieurs cours dans la même tranche horaire */
+    .course-block-inner {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* Photo coach à gauche, type bullet (diamètre 18px) */
+    .course-bullet {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .coach-bullet-img {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-content {
+      flex: 1;
+      min-width: 0;
+    }
+
     .course-block + .course-block {
-      margin-top: 3px;
+      margin-top: 8px;
     }
 
-    /* Styles pour les cours mixtes */
-    .course-block.mixte {
-      box-shadow: 0px 1px 4px var(--shadow-light);
-    }
+    .course-block.mixte,
+    .course-block.women-only,
+    .course-block.piscine { background: none; box-shadow: none; }
+    .course-block.women-only::before,
+    .course-block.piscine::before { display: none; }
+    .course-block.current { font-weight: bold; box-shadow: none; }
+    .course-block.starting-soon { animation: pulse 1.5s infinite; box-shadow: none; }
+    .course-block.past { opacity: 0.5; color: var(--state-past); }
 
-    /* Styles pour les cours femmes */
-    .course-block.women-only {
-      background-color: var(--women-color-light);
-      position: relative;
-      box-shadow: 0px 1px 4px var(--shadow-light);
-    }
-
-    .course-block.women-only::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--gradient-women);
-      opacity: 0.4;
-      border-radius: 3px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .course-block.women-only > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Styles pour les cours piscine */
-    .course-block.piscine {
-      background-color: var(--pool-color-light);
-      position: relative;
-      box-shadow: 0px 1px 4px var(--shadow-light);
-    }
-
-    .course-block.piscine::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--gradient-pool);
-      opacity: 0.4;
-      border-radius: 3px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .course-block.piscine > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Styles pour les cours en cours */
-    .course-block.current {
-      box-shadow: 0px 2px 6px var(--shadow-medium);
-      font-weight: bold;
-    }
-
-    /* Styles pour les cours qui vont bientôt démarrer */
-    .course-block.starting-soon {
-      box-shadow: 0px 2px 6px var(--shadow-medium);
-      animation: pulse 1.5s infinite;
-    }
-
-    /* Styles pour les cours passés */
-    .course-block.past {
-      opacity: 0.5;
-      color: var(--state-past);
-    }
-
-    /* Style pour le titre du cours */
+    /* Style pour le titre du cours — bien lisible */
     .course-title {
       font-weight: bold;
-      margin-bottom: 1px;
-      font-size: 0.78em;
+      margin-bottom: 3px;
+      font-size: 2.05em;
       text-align: left;
     }
 
-    /* Style pour le nom du coach (très réduit) */
+    /* Style pour le nom du coach */
     .coach-name {
-      font-size: 0.34em;
+      font-size: 0.68em;
       color: var(--text-secondary);
     }
 
@@ -481,60 +534,72 @@
       }
     }
 
-    /* Styles pour la pilule de compte à rebours */
+    /* Disque de compte à rebours : petit, en overflow en haut à droite du cours (décalé à gauche) */
     .countdown-pill {
       position: absolute;
-      top: 2px;
-      right: 0;
-      transform: translateX(0);
-      width: 25px;
-      height: 12px;
+      top: -4px;
+      right: 4px;
+      width: 14px;
+      height: 14px;
+      min-width: 14px;
+      min-height: 14px;
       background-color: var(--secondary-color);
       color: var(--primary-color);
-      border-radius: 6px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.65em;
+      font-size: 0.82em;
       font-weight: bold;
-      padding: 0 2px;
+      padding: 0;
       box-shadow: 0 1px 2px var(--shadow-medium);
       z-index: 5;
     }
 
-    /* Styles spécifiques pour les logos de cours (alignés à gauche avec le titre) */
+    /* Logos de cours : taille un peu plus grande, cohérente avec le texte */
     .logo-cours {
       max-width: 100%;
-      max-height: 104px;
+      max-height: 2.2em;
       width: auto;
       height: auto;
       object-fit: contain;
       display: block;
-      margin: 0 0 0 0;
+      margin: 0;
+      vertical-align: middle;
     }
 
-    /* Styles pour les cours (titre) – réduit et aligné à gauche */
+    /* Styles pour les cours (titre) — line-height aligné avec la hauteur max des logos */
     .course-info {
-      font-size: 0.66em;
+      font-size: 1.55em;
       font-weight: bold;
       color: var(--text-primary);
       margin-right: 0;
       padding-right: 0;
-      line-height: 1.2;
+      line-height: 1.4;
       text-align: left;
     }
 
     .course-name-text {
       text-align: left;
       display: block;
+      width: max-content;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: normal;
+      white-space: normal;
     }
 
+    .course-block .course-info .course-name-text.multiline {
+      font-size: 0.9em;
+    }
+
+    /* Nom du coach (à droite du bullet, masqué si filtre décoché) */
     .single-coach {
-      font-size: 0.3em;
+      font-size: 0.82em;
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      margin-top: 1px;
+      margin-top: 4px;
       color: var(--primary-color);
     }
 
@@ -542,12 +607,16 @@
       color: var(--primary-color);
     }
 
+    .course-content .single-coach img {
+      display: none;
+    }
+
     .single-coach img {
-      width: 15px;
-      height: 15px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      margin-right: 2px;
-      margin-left: 3px;
+      margin-right: 4px;
+      margin-left: 2px;
       margin-bottom: 0;
     }
 
@@ -560,17 +629,20 @@
       color: var(--text-light);
     }
 
-    /* Styles pour les coachs multiples avec uniquement les images */
+    /* Styles pour les coachs multiples (sous le nom du cours) */
     .multiple-coaches {
       display: flex;
-      justify-content: center;
-      gap: 1px;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
     }
 
     .coach-image {
-      width: 15px;
-      height: 15px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
+      object-fit: cover;
     }
 
     /* Cacher les coachs si le filtre est décoché */
@@ -1186,23 +1258,23 @@
 
       .weekly-schedule th:first-child,
       .weekly-schedule td.time-cell {
-        width: 30px;
-        font-size: 0.88em;
+        width: 32px;
+        font-size: 1.05em;
         line-height: 0.9;
         padding: 1px 0;
       }
 
       .course-block {
-        padding: 3px 1px 3px 1px;
-        padding-right: 18px;
-        font-size: 0.5em;
+        padding: 0;
+        font-size: 0.58em;
       }
 
       .logo-cours {
         max-width: 100%;
-        max-height: 185px;
+        max-height: 2.2em;
         width: auto;
         height: auto;
+        object-fit: contain;
       }
 
       .course-info {
@@ -1253,9 +1325,14 @@
       }
 
       .countdown-pill {
-        width: 20px;
-        height: 10px;
-        font-size: 0.55em;
+        top: -3px;
+        right: 3px;
+        width: 12px;
+        height: 12px;
+        min-width: 12px;
+        min-height: 12px;
+        border-radius: 50%;
+        font-size: 0.78em;
       }
 
       /* Réduire de 15% les éléments du filtre pour qu'ils tiennent sur une ligne */
@@ -1297,13 +1374,12 @@
       }
 
       .course-block {
-        font-size: 0.65em;
-        padding: 4px 1px 4px 1px;
-        padding-right: 22px;
+        font-size: 0.76em;
+        padding: 0;
       }
 
       .course-info {
-        font-size: 0.55em;
+        font-size: 0.62em;
         width: 100%;
         text-align: left;
       }
@@ -1313,7 +1389,7 @@
       }
 
       .logo-cours {
-        max-height: 98px;
+        max-height: 2.2em;
       }
     }
 
@@ -1327,13 +1403,12 @@
       }
 
       .course-block {
-        font-size: 0.68em;
-        padding: 4px 1px 4px 1px;
-        padding-right: 22px;
+        font-size: 0.8em;
+        padding: 0;
       }
 
       .course-info {
-        font-size: 0.64em;
+        font-size: 0.72em;
         width: 100%;
         text-align: left;
       }
@@ -1343,7 +1418,7 @@
       }
 
       .logo-cours {
-        max-height: 104px;
+        max-height: 2.2em;
       }
     }
 
@@ -1357,13 +1432,12 @@
       }
 
       .course-block {
-        font-size: 0.72em;
-        padding: 5px 1px 5px 1px;
-        padding-right: 22px;
+        font-size: 0.88em;
+        padding: 0;
       }
 
       .course-info {
-        font-size: 0.68em;
+        font-size: 0.78em;
         width: 100%;
         text-align: left;
       }
@@ -1373,27 +1447,50 @@
       }
 
       .logo-cours {
-        max-height: 111px;
+        max-height: 2.2em;
       }
     }
 
-    /* Séparation matin / après-midi : zone agrandie 50 %, sans ligne */
+    /* Séparation matin / après-midi (régulier) ou avant/après ftour (Ramadan) : motif via div interne */
     tr.noon-separator td {
       height: 60px;
       min-height: 60px;
       padding: 0;
       margin: 0;
       border: none;
-      background: rgba(72, 6, 7, 0.12);
+      background-color: rgba(72, 6, 7, 0.12);
+      position: relative;
       vertical-align: middle;
     }
 
-    tr.noon-separator td.time-cell {
-      background: rgba(72, 6, 7, 0.12);
+    .noon-separator-inner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-image: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
+      background-size: 67px 67px;
+      background-repeat: repeat;
+      opacity: 0.4;
+      pointer-events: none;
     }
 
     tr.noon-separator td.noon-separator-line {
-      background: rgba(72, 6, 7, 0.12);
+      background-color: rgba(72, 6, 7, 0.12);
+    }
+
+    /* Mode Ramadan : fond blanc (masque l’arrière-plan) + motif sur le div (bien visible) */
+    body.planning-ramadan tr.noon-separator td {
+      background-color: #FFFFFF !important;
+    }
+
+    body.planning-ramadan tr.noon-separator td.noon-separator-line {
+      background-color: #FFFFFF;
+    }
+
+    body.planning-ramadan .noon-separator-inner {
+      opacity: 0.5;
     }
 
   </style>
@@ -1416,6 +1513,12 @@
     <button type="button" aria-label="Vue horizontale du planning"></button>
   </div>
 
+  <!-- Bouton switch planning Ramadan (au-dessus du bouton de rotation, mobile uniquement) -->
+  <button id="ramadanSwitchButton" class="ramadan-switch-button" onclick="toggleRamadanPlanning()">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
+    <div class="confetti-container"></div>
+  </button>
+
   <!-- Barre de filtres en bas avec le bouton intégré -->
   <div class="filters-sidebar" id="filtersSidebar">
     <button class="filter-button" onclick="toggleFiltersSidebar(event)">
@@ -1436,7 +1539,7 @@
           Piscine
         </label>
         <label>
-          <input type="checkbox" id="filter-coach" checked>
+          <input type="checkbox" id="filter-coach">
           Coach
         </label>
         <div class="coach-dropdown">
@@ -1459,6 +1562,18 @@
     // Initialiser les variables
     var scheduleData = [];
     var activePlanningView = 'regulier';
+
+    (function initRamadanButtonResize() {
+      function update() {
+        if (scheduleData && scheduleData.planning && typeof renderPlanningViewSwitcher === 'function') renderPlanningViewSwitcher(scheduleData);
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { window.addEventListener('resize', update); });
+      } else {
+        window.addEventListener('resize', update);
+      }
+    })();
+
     function getCurrentPlanning() {
       if (!scheduleData || !scheduleData.planning) return {};
       if (activePlanningView === 'ramadan' && scheduleData.planningRamadan) {
@@ -1483,27 +1598,64 @@
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
     }
     function renderPlanningViewSwitcher(data) {
-      var container = document.getElementById('planningViewSwitcher');
-      if (!container) return;
+      var ramadanButton = document.getElementById('ramadanSwitchButton');
+      if (!ramadanButton || !data) return;
+      var isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        ramadanButton.style.display = 'none';
+        return;
+      }
       var meta = data.metadata || {};
       var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
       var today = new Date().toISOString().slice(0, 10);
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
       var daysBefore = 7;
       var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore));
-      if (!showSwitcher) { container.style.display = 'none'; container.innerHTML = ''; return; }
-      container.innerHTML = '';
-      var btn = document.createElement('button');
-      if (activePlanningView === 'ramadan') { btn.textContent = 'Voir planning régulier'; btn.classList.add('active'); btn.onclick = function() { setPlanningView('regulier'); }; }
-      else { var dateDebut = ramadanStart ? (function(s) { var p = s.split('-'); if (p.length !== 3) return ''; var mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']; return p[2] + ' ' + (mois[parseInt(p[1],10)-1] || ''); })(ramadanStart) : ''; btn.textContent = inRamadan ? 'Voir planning Ramadan' : 'Voir planning Ramadan' + (dateDebut ? ' (' + dateDebut + ')' : ' (à venir)'); btn.onclick = function() { setPlanningView('ramadan'); }; }
-      container.appendChild(btn);
-      container.style.display = 'flex';
+      if (showSwitcher) {
+        ramadanButton.style.display = 'flex';
+        setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
+      } else {
+        ramadanButton.style.display = 'none';
+      }
+    }
+    function toggleRamadanPlanning() {
+      var button = document.getElementById('ramadanSwitchButton');
+      if (!button) return;
+      var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#26462d';
+      var pageConfettiContainer = document.getElementById('pageConfettiContainer');
+      if (!pageConfettiContainer) {
+        pageConfettiContainer = document.createElement('div');
+        pageConfettiContainer.id = 'pageConfettiContainer';
+        pageConfettiContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000; overflow: visible;';
+        document.body.appendChild(pageConfettiContainer);
+      }
+      var buttonRect = button.getBoundingClientRect();
+      var centerX = buttonRect.left + buttonRect.width / 2;
+      var centerY = buttonRect.top + buttonRect.height / 2;
+      for (var i = 0; i < 100; i++) {
+        var burst = document.createElement('div');
+        burst.className = 'confetti-burst';
+        burst.style.cssText = 'position: absolute; width: 8px; height: 8px; border-radius: 50%; background: ' + color + '; z-index: 10000;';
+        burst.style.left = centerX + 'px';
+        burst.style.top = centerY + 'px';
+        var angle = (Math.random() * 360) * Math.PI / 180;
+        var distance = 200 + Math.random() * 400;
+        var x = Math.cos(angle) * distance;
+        var y = Math.sin(angle) * distance;
+        burst.style.setProperty('--burst-x', x + 'px');
+        burst.style.setProperty('--burst-y', y + 'px');
+        pageConfettiContainer.appendChild(burst);
+        setTimeout(function(el) { if (el && el.parentNode) el.remove(); }, 2000, burst);
+      }
+      var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
+      setPlanningView(currentView);
     }
     function setPlanningView(view) {
       activePlanningView = view;
       localStorage.setItem('planningView', view);
       document.body.classList.toggle('planning-ramadan', view === 'ramadan');
       refreshPlanningDisplay();
+      renderPlanningViewSwitcher(scheduleData);
     }
     function refreshPlanningDisplay() {
       if (!scheduleData || !scheduleData.planning) return;
@@ -1821,9 +1973,7 @@
 
         if (timeDiff >= 0) {
           const minutes = Math.floor(timeDiff / 60);
-          const seconds = timeDiff % 60;
-          const timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-          badge.textContent = timeString;
+          badge.textContent = minutes + "'";
           badge.setAttribute('data-time-diff', timeDiff - 1);
         } else {
           badge.parentElement.classList.remove('starting-soon');
@@ -1915,20 +2065,26 @@
 
       var isWhiteRow = true;
 
-      function isAfterNoon(timeStr) {
+      var isRamadanMode = activePlanningView === 'ramadan';
+      
+      function isAfterSeparatorTime(timeStr) {
         var parts = (timeStr || '').split(':');
         var h = parseInt(parts[0], 10) || 0;
-        return h >= 12;
+        var m = parseInt(parts[1], 10) || 0;
+        if (isRamadanMode) {
+          return h > 18 || (h === 18 && m >= 30) || h >= 19;
+        } else {
+          return h >= 12;
+        }
       }
 
       for (var t = 0; t < timesArray.length; t++) {
         var time = timesArray[t];
 
-        /* Ligne de séparation entre matinée et après-midi (avant la première heure >= 12:00), zone continue */
-        if (t > 0 && isAfterNoon(time) && !isAfterNoon(timesArray[t - 1])) {
+        /* Ligne de séparation : toute la largeur (heures + jours), matin/après-midi (régulier) ou avant/après ftour (Ramadan) */
+        if (t > 0 && isAfterSeparatorTime(time) && !isAfterSeparatorTime(timesArray[t - 1])) {
           html += '<tr class="noon-separator">';
-          html += '<td class="time-cell time-cell-grey"></td>';
-          html += '<td class="noon-separator-line course-cell" colspan="' + daysArray.length + '"></td>';
+          html += '<td class="noon-separator-line" colspan="' + (1 + daysArray.length) + '"><div class="noon-separator-inner"></div></td>';
           html += '</tr>';
         }
 
@@ -1961,19 +2117,19 @@
                 courseNameDisplay = '<div class="course-name-text">' + course.courseName + '</div>';
               }
 
-              var coachImagesHtml = '';
+              var firstCoachImageUrl = (course.coachs.length > 0 && course.coachs[0].imageUrl) ? course.coachs[0].imageUrl : 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+              var bulletHtml = '<div class="course-bullet"><img class="coach-bullet-img" src="' + firstCoachImageUrl + '" alt=""></div>';
+
+              var coachNamesHtml = '';
               if (course.coachs.length === 1) {
-                var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
-                coachImagesHtml = '<div class="single-coach">' +
-                                  '<img src="' + coachImageUrl + '" alt="' + course.coachs[0].name + '">' +
-                                  '<span>' + course.coachs[0].name + '</span></div>';
+                coachNamesHtml = '<div class="single-coach"><span>' + course.coachs[0].name + '</span></div>';
               } else if (course.coachs.length > 1) {
-                coachImagesHtml = '<div class="multiple-coaches">';
-                var coachImages = course.coachs.map(coach => coach.imageUrl).filter(Boolean);
-                coachImages.forEach(function(coachImageUrl, index) {
-                  coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
+                coachNamesHtml = '<div class="multiple-coaches">';
+                course.coachs.forEach(function(coach) {
+                  var imgUrl = coach.imageUrl;
+                  if (imgUrl) coachNamesHtml += '<img src="' + imgUrl + '" alt="" class="coach-image">';
                 });
-                coachImagesHtml += '</div>';
+                coachNamesHtml += '</div>';
               }
 
               var courseClasses = 'course-block';
@@ -2022,8 +2178,12 @@
                 courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
               }
 
+              courseDisplay += '<div class="course-block-inner">';
+              courseDisplay += bulletHtml;
+              courseDisplay += '<div class="course-content">';
               courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
-              courseDisplay += coachImagesHtml;
+              courseDisplay += coachNamesHtml;
+              courseDisplay += '</div></div>';
               courseDisplay += '</div>';
 
               html += courseDisplay;
