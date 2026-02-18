@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <style>
-    /* Variables de style réutilisées de daily.html */
+    /* Styles généraux */
     :root {
       /* Polices */
       --font-title: 'Oswald', sans-serif;
@@ -24,12 +24,6 @@
       /* Couleurs principales */
       --primary-color: #480607;
       --secondary-color: #FFA630;
-      
-      /* Dégradé rouge-bordeaux (3 niveaux) */
-      --red-center: #e42218;
-      --red-middle: #981010;
-      --bordeaux-dark: #4c000a;
-      --gradient-primary: radial-gradient(circle, var(--red-center) 0%, var(--red-middle) 50%, var(--bordeaux-dark) 100%);
       
       /* Dégradé piscine/aqua (bleu uniquement) */
       --pool-blue: #35767c;
@@ -72,13 +66,27 @@
       --shadow-light: rgba(200, 200, 200, 0.3);
       --shadow-medium: rgba(150, 150, 150, 0.5);
       --shadow-dark: rgba(0, 0, 0, 0.4);
+      
+      /* États */
+      --state-past: #aaaaaa;
+      --overlay-light: rgba(255, 255, 255, 0.3);
+      --overlay-lighter: rgba(255, 255, 255, 0.2);
     }
-    body.planning-ramadan { --primary-color: #26462d; --primary-overlay: rgba(38, 70, 45, 0.95); --primary-light: rgba(38, 70, 45, 0.85); --secondary-color: #c9a227; position: relative; }
+    body.planning-ramadan {
+      --primary-color: #26462d;
+      --primary-overlay: rgba(38, 70, 45, 0.95);
+      --primary-light: rgba(38, 70, 45, 0.85);
+      --secondary-color: #c9a227;
+      --secondary-light: rgba(201, 162, 39, 0.75);
+      position: relative;
+    }
     body.planning-ramadan::before {
       content: '';
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       min-height: 100vh;
       z-index: 0;
       pointer-events: none;
@@ -89,461 +97,516 @@
       opacity: 0.04;
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
     }
-    body.planning-ramadan .content-wrapper { position: relative; z-index: 1; }
+    /* Contenu au-dessus du fond (sans toucher aux éléments en position: fixed/absolute) */
+    body.planning-ramadan > #planningViewSwitcher,
+    body.planning-ramadan > #dayOfWeek,
+    body.planning-ramadan > #timeline {
+      position: relative;
+      z-index: 1;
+    }
     /* Icône retour à aujourd'hui en vert Ramadan (#26462d) opaque en mode Ramadan */
     body.planning-ramadan .today-view-button::before {
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
-    /* Icônes des studios en vert Ramadan (#26462d) en mode Ramadan */
-    body.planning-ramadan .studio-icon {
+    /* Icône rotation à gauche du cours en cours en vert Ramadan (#26462d) opaque en mode Ramadan */
+    body.planning-ramadan .timeline-block.current::before {
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
-
-    /* Bouton switch planning Ramadan — au-dessus du bouton today, mobile uniquement */
-    .ramadan-switch-button {
-      position: fixed;
-      bottom: 150px;
-      right: 10px;
-      width: auto;
-      height: auto;
-      background: transparent;
-      border: none;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 1000;
-      overflow: visible;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: all;
-      opacity: 0;
-      transform: translateY(20px);
-      padding: 0;
+    /* Heures de cours en vert Ramadan avec transparence équivalente */
+    body.planning-ramadan .time {
+      color: rgba(38, 70, 45, 0.7);
     }
-    .ramadan-switch-button.loaded {
-      opacity: 1;
-      transform: translateY(0);
+    /* Icônes des studios en vert Ramadan (#26462d) en mode Ramadan */
+    body.planning-ramadan .course-studio img {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
-    .ramadan-icon {
-      width: 55px;
-      height: 55px;
-      filter: brightness(0) saturate(0%) invert(8%) sepia(94%) saturate(1352%) hue-rotate(335deg) brightness(95%) contrast(88%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-      transition: filter 0.3s;
-      z-index: 10;
-      position: relative;
-      display: block;
-      animation: float-icon 3s ease-in-out infinite;
-    }
-    
-    @keyframes float-icon {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-8px);
-      }
-    }
-    body.planning-ramadan .ramadan-switch-button {
-      background: transparent;
-    }
-    body.planning-ramadan .ramadan-icon {
-      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-    }
-    .ramadan-switch-button:active {
-      transform: translateY(20px) scale(0.9);
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .ramadan-switch-button.loaded:active {
-      transform: translateY(0) scale(0.9);
-    }
-
-    /* Paillettes d'explosion au clic */
-    .confetti-burst {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: confetti-burst-anim 2s ease-out forwards;
-    }
-    @keyframes confetti-burst-anim {
-      0% {
-        transform: translate(0, 0) scale(1) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(0) rotate(720deg);
-        opacity: 0;
-      }
-    }
-    /* Container pour les paillettes */
-    .confetti-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: visible;
+    /* Garder la date en haut à droite : ne pas écraser son position: absolute, seulement z-index */
+    body.planning-ramadan > .date {
       z-index: 1;
     }
+    #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 2px 0; margin: 0 0 2px 0; }
+    #planningViewSwitcher button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--primary-color); background: var(--background-card); color: var(--primary-color); font-size: 0.9em; cursor: pointer; }
+    #planningViewSwitcher button.active { background: var(--primary-color); color: var(--text-light); }
+    #planningViewSwitcher button:not(.active):hover { background: var(--primary-lighter); color: #fff; }
 
     body {
       font-family: var(--font-text);
       background-color: var(--background-main);
       color: var(--text-primary);
       margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      overflow-x: hidden;
-      box-sizing: border-box;
-      position: relative;
-      padding-bottom: 52px;
+      padding: 20px;
+      scroll-behavior: smooth;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      overflow-x: visible;
       width: 100%;
       max-width: 100vw;
+      box-sizing: border-box;
+    }
+
+    /* Images non sélectionnables */
+    img {
+      user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
-      user-select: none;
     }
 
-    /* Empêcher la sélection sur tous les éléments */
-    * {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-
-    /* Permettre la sélection uniquement pour les inputs et textarea si nécessaire */
-    input, textarea {
+    /* Exception pour les champs de texte et les zones éditables */
+    input, textarea, [contenteditable] {
+      user-select: text;
       -webkit-user-select: text;
       -moz-user-select: text;
       -ms-user-select: text;
-      user-select: text;
     }
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 5px;
-      margin-top: 0;
-      margin-left: 0;
-      margin-right: 0;
-      position: sticky;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 100vw;
-      max-width: 100vw;
-      background: var(--gradient-primary);
-      z-index: 100;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-
-    .nav-button {
-      display: none;
-    }
-
-    .day-title {
+    h1 {
       font-family: var(--font-title);
-      color: var(--text-light);
-      font-size: 1.6em;
-      text-align: center;
+      color: var(--primary-color);
+      font-size: 2.5em;
       margin: 0;
+      padding: 20px 0 0 0;
+      padding-bottom: 0;
+      position: relative;
       font-weight: 600;
-      text-transform: uppercase;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      flex: 1;
-      position: relative;
-    }
-    .day-title .day-name {
-      position: relative;
-      width: 100%;
-      text-align: center;
+      padding-left: 18px;
     }
     .planning-type-label {
       font-family: var(--font-text);
-      font-size: 0.5em;
+      font-size: 0.95em;
       font-weight: 400;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--text-secondary);
       text-transform: none;
-      position: absolute;
-      right: 0;
+      display: block;
+      margin-top: -8px;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 15px;
+      padding-left: 18px;
       font-style: italic;
+      opacity: 0.8;
+      line-height: 1.05;
+    }
+    body.planning-ramadan .planning-type-label {
+      color: rgba(38, 70, 45, 0.8);
     }
 
-    .day-name {
-      line-height: 1.2;
-      position: relative;
-      text-align: center;
-    }
-
-    .day-date {
+    .date {
       font-family: var(--font-title);
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 0.75em;
-      font-weight: 300;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 1.2;
-      margin-left: auto;
-      display: flex;
-      align-items: center;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 1.4em;
+      color: var(--primary-color);
+      font-weight: 400;
     }
 
-    .content-wrapper {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      margin-bottom: 52px;
-      min-height: calc(100vh - 60px);
-      padding-left: 5px;
-      padding-right: 5px;
-      box-sizing: border-box;
-    }
-
-    .studios-container {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex: 1;
-      height: 100%;
-      overflow: hidden;
+    /* Styles pour la timeline */
+    .timeline {
       position: relative;
-    }
-    
-    .no-courses-container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0;
+      margin-top: 10px;
+      padding-left: 35px;
+      box-sizing: border-box;
       overflow: visible;
     }
 
-    .studios-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      height: 50%;
-      min-height: 0;
-      border: none;
+    .timeline.has-courses {
+      display: block;
+      margin-left: 15px;
     }
 
-    .studio-column {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      text-align: center;
-      background-color: var(--background-card);
-      padding: 2px;
-      height: 100%;
-      overflow: hidden;
-      border: none;
-      box-shadow: none;
+    .timeline:empty {
+      border-left: none;
     }
 
-    .studio-title {
+    /* Nouveau style pour les jours sans cours */
+    .timeline.no-courses {
+      padding-left: 0;
+    }
+
+    .timeline-block {
+      margin-bottom: 20px;
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Styles de base pour le point (cours passés, à venir, sur le point de commencer) */
+    .timeline-block::before {
+      content: '';
+      position: absolute;
+      left: -35px; /* Décalé vers la droite par rapport à l'icône */
+      top: calc(50% + 12px); /* Décalé vers le bas */
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      transform: translate(calc(-50% - 3px), calc(-50% - 4px));
+    }
+
+    /* Animation pour les cours en cours : pulse + rotation (exagéré) */
+    @keyframes rotate-icon {
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.1); /* Très petit (3px) */
+      }
+      25% {
+        transform: translate(-50%, -50%) rotate(90deg) scale(1.3); /* Plus grand que la taille normale (39px) */
+      }
+      50% {
+        transform: translate(-50%, -50%) rotate(180deg) scale(1.3); /* Plus grand que la taille normale */
+      }
+      75% {
+        transform: translate(-50%, -50%) rotate(270deg) scale(1.3); /* Plus grand que la taille normale */
+      }
+      100% {
+        transform: translate(-50%, -50%) rotate(360deg) scale(0.1); /* Retour très petit (3px) */
+      }
+    }
+
+    /* Application de l'animation pour les cours en cours */
+    .timeline-block.current::before {
+      left: -52px; /* Centre à -37px : -37px - 15px (rayon) = -52px */
+      top: 50%;
+      width: 30px;
+      height: 30px;
+      background-color: transparent;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 0;
+      transform-origin: center center;
+      animation: rotate-icon 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    /* Correction de la transparence pour le point des cours passés */
+    .timeline-block.past::before {
+      opacity: 0.5;
+    }
+
+    /* Les cours à venir et sur le point de démarrer gardent le point par défaut */
+
+    .time {
       font-family: var(--font-title);
-      color: var(--primary-color);
-      font-size: 1.4em; /* Taille de police augmentée */
-      text-align: center;
+      font-size: 1.4em;
+      color: rgba(72, 6, 7, 0.7);
+      position: relative;
+      top: 0;
+      margin-left: 0;
+      font-weight: 400;
+    }
+
+    /* Styles pour les blocs de cours */
+    .course-block {
+      position: relative;
+      background-color: var(--background-card);
+      padding: 20px 25px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 15px var(--shadow-light);
+      transition: all 0.3s ease;
+      width: calc(100% - 20px);
+      max-width: 950px;
+      box-sizing: border-box;
+      overflow: visible;
       margin: 0;
-      padding: 6px; /* Padding augmenté */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      border-bottom: 1px solid var(--primary-color);
-      background-color: var(--background-card);
-      z-index: 1;
-      order: -1;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
+      min-height: 120px;
     }
 
-    .studio-icon {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-
-    .courses-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 3px;
-      min-height: 0;
-      height: calc(100% - 30px);
-      overflow-y: auto;
-      scrollbar-width: none; /* Pour Firefox */
-      -ms-overflow-style: none; /* Pour IE et Edge */
-    }
-
-    .courses-container::-webkit-scrollbar {
-      display: none; /* Pour Chrome, Safari et Opera */
-    }
-
-    .course-card {
-      margin-bottom: 4px;
-      font-size: 1.2em;
-      border: none;
-      padding: 0;
-      width: 95%;
-      line-height: 1.2;
-      flex-shrink: 0;
-    }
-
-    .course-time {
+    /* Styles pour le titre du cours */
+    .course-title {
       font-family: var(--font-title);
-      color: white;
-      font-size: 1.1em;
+      font-size: 1.5em;
       font-weight: 500;
-      background: var(--gradient-primary);
-      padding: 2px 16px;
-      border-radius: 3px;
-      display: inline-block;
-      margin-bottom: 1px;
-      min-width: 100px;
-      text-align: center;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      min-height: 40px; /* Hauteur minimale pour le titre sans logo */
     }
 
-    .course-name {
+    .course-title h3 {
+      margin: 0;
+      padding: 0;
+    }
+
+    .course-title img {
+      max-width: 150px;
+      max-height: 55px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    /* Styles pour le type de cours */
+    .course-type {
       font-family: var(--font-title);
-      font-size: 1.3em;
-      margin: 0 0 -3px 0;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Type de cours pour "100% Femmes" */
+    .course-block.women-only {
+      background-color: var(--women-color-light);
+      position: relative;
+    }
+
+    /* Dégradé femmes - mais pas si c'est aussi piscine */
+    .course-block.women-only:not(.piscine)::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-women) !important;
+      opacity: 0.4;
+      border-radius: 15px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .course-block.women-only .course-title,
+    .course-block.women-only .course-coach,
+    .course-block.women-only .countdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-block.women-only .course-type,
+    .course-block.women-only .course-studio {
+      z-index: 1;
+    }
+
+    /* Type de cours en blanc pour 100% femmes (sans piscine) */
+    .course-block.women-only:not(.piscine) .course-type {
+      color: var(--text-light);
+    }
+
+    /* Type de cours pour "Mixte" */
+    .course-block.mixte .course-type {
+      color: var(--primary-color);
+    }
+
+    /* Type de cours pour "Piscine" - priorité sur women-only */
+    .course-block.piscine {
+      background-color: var(--pool-color-light);
+      position: relative;
+    }
+
+    .course-block.piscine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-pool) !important;
+      opacity: 0.4;
+      border-radius: 15px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .course-block.piscine .course-title,
+    .course-block.piscine .course-coach,
+    .course-block.piscine .countdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-block.piscine .course-type,
+    .course-block.piscine .course-studio {
+      z-index: 1;
+    }
+
+    /* Type de cours en blanc pour piscine/aqua */
+    .course-block.piscine .course-type {
+      color: var(--text-light);
+    }
+
+    /* Cours passés */
+    .course-block.past {
+      opacity: 0.5;
+      box-shadow: 0px 3px 10px var(--shadow-light);
+      color: var(--state-past);
+    }
+
+    /* Titre des cours aqua/piscine passés - couleur plus foncée pour la lisibilité */
+    .course-block.past.piscine .course-title h3,
+    .course-block.past.piscine .course-title {
+      color: var(--text-primary);
+      opacity: 0.8;
+    }
+
+    /* Titre des cours 100% femmes passés - couleur plus foncée pour la lisibilité */
+    .course-block.past.women-only:not(.piscine) .course-title h3,
+    .course-block.past.women-only:not(.piscine) .course-title {
+      color: var(--text-primary);
+      opacity: 0.8;
+    }
+
+    /* Cours à venir */
+    .course-block.upcoming {
+      box-shadow: 0px 6px 15px var(--shadow-medium);
+    }
+
+    /* Cours qui vont bientôt démarrer */
+    .course-block.starting-soon {
+      font-size: 1.1em;
+      padding: 20px 30px;
+      animation: heartbeat-blink 1.5s ease-in-out infinite;
+      box-shadow: 0px 6px 20px var(--shadow-dark);
+    }
+
+    .course-block.starting-soon.mixte {
+      animation: heartbeat-blink 1.5s ease-in-out infinite, blink-mixte 1.5s ease-in-out infinite;
+    }
+
+    .course-block.starting-soon.women-only {
+      animation: heartbeat-blink 1.5s ease-in-out infinite, blink-femmes 1.5s ease-in-out infinite;
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    .course-block.women-only.starting-soon:not(.piscine)::before {
+      opacity: 0.4;
+    }
+
+    /* Cours en cours */
+    .course-block.current {
+      font-size: 1.1em;
+      padding: 20px 30px;
+      box-shadow: 0px 6px 20px var(--shadow-dark);
+    }
+
+    .course-block.current.mixte {
+      background-color: var(--background-card);
+      color: var(--text-primary);
+    }
+
+    .course-block.current.women-only:not(.piscine) {
+      background-color: var(--women-color-light);
+      color: var(--text-primary);
+      box-shadow: 0px 0px 15px 5px var(--women-color-light);
+    }
+
+    /* RÈGLE CRITIQUE : Dégradé rose pour les cours 100% femmes en cours (sans piscine) - PRIORITÉ MAXIMALE */
+    .course-block.current.women-only:not(.piscine)::before,
+    .course-block.women-only.current:not(.piscine)::before {
+      background: var(--gradient-women) !important;
+      opacity: 0.4 !important;
+    }
+
+    /* RÈGLE CRITIQUE : Dégradé bleu pour les cours piscine en cours - PRIORITÉ MAXIMALE (même si aussi women-only) */
+    .course-block.piscine.current::before,
+    .course-block.current.piscine::before,
+    .course-block.piscine.current.women-only::before,
+    .course-block.current.piscine.women-only::before,
+    .course-block.women-only.piscine.current::before,
+    .course-block.women-only.current.piscine::before {
+      background: var(--gradient-pool) !important;
+      opacity: 0.4 !important;
+    }
+
+    /* Animation pour le rebond */
+    @keyframes heartbeat-blink {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.01); }
+    }
+
+    /* Clignotement pour les cours mixtes */
+    @keyframes blink-mixte {
+      0%, 100% { background-color: var(--background-card); }
+      50% { background-color: rgba(255, 255, 255, 0.9); }
+    }
+
+    /* Clignotement pour les cours "100% Femmes" */
+    @keyframes blink-femmes {
+      0%, 100% { background-color: var(--background-card); }
+      50% { background-color: rgba(228, 166, 114, 0.2); }
     }
 
     .course-coach {
+      font-size: 1em;
       color: var(--text-secondary);
-      font-size: 1.1em;
-      font-style: italic;
+      margin-bottom: 5px;
     }
 
-    .empty-message {
-      color: var(--text-secondary);
+    /* Noms des coachs en blanc pour piscine/aqua */
+    .course-block.piscine .course-coach {
+      color: var(--text-light);
+    }
+
+    /* Noms des coachs en blanc pour 100% femmes (sans piscine) */
+    .course-block.women-only:not(.piscine) .course-coach {
+      color: var(--text-light);
+    }
+
+    /* Le countdown doit toujours rester "dans" la carte (proche du bas),
+       y compris pour women-only/piscine (ne pas le repasser en flow). */
+    .course-block.women-only .countdown,
+    .course-block.piscine .countdown {
+      position: absolute;
+      z-index: 2;
+    }
+
+    .course-studio {
+      position: absolute;
+      bottom: 0;
+      right: 10px;
+      z-index: 10;
+    }
+
+    .course-studio img {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      margin: 0;
+      display: block;
+    }
+
+    /* Styles pour le compte à rebours */
+    .countdown {
+      font-family: var(--font-title);
+      position: absolute;
+      bottom: 6px;
+      left: 10px;
+      right: 10px;
+      transform: none;
       font-size: 0.9em;
-      font-style: italic;
-      margin-top: 20px;
+      font-weight: 500;
+      color: var(--primary-color);
+      background: none;
+      padding: 4px 8px;
+      text-transform: uppercase;
+      text-align: center;
+      width: auto;
+      white-space: nowrap;
     }
 
-    .no-courses-message {
-      color: var(--text-secondary);
-      font-size: 1.4em;
-      font-style: italic;
+    .focus {
+      scroll-margin-top: 50px;
+    }
+
+    .logo {
       text-align: center;
       margin-top: 40px;
-      line-height: 1.5;
-      position: relative;
-      padding: 20px 30px;
-      display: block;
-      min-height: 80px;
-      width: 100%;
-      box-sizing: border-box;
     }
 
-    .no-courses-message::before,
-    .no-courses-message::after {
-      content: '';
-      position: absolute;
-      font-size: 2.5em;
-      color: var(--secondary-color);
-      font-weight: bold;
-      line-height: 1;
-      opacity: 0.8;
-      z-index: 1;
-    }
-
-    .no-courses-message::before {
-      content: '«';
-      left: -10px;
-      top: -10px;
-    }
-
-    .no-courses-message::after {
-      content: '»';
-      right: -10px;
-      bottom: -10px;
-      top: auto;
-      line-height: 0;
-    }
-
-    .women-only .course-time {
-      background: var(--gradient-women);
-    }
-
-    .pool .course-time {
-      background: var(--gradient-pool);
-    }
-
-    .coaches-section {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--gradient-primary);
-      z-index: 100;
-      height: 52px;
-      display: flex;
-      overflow-x: auto;
-      gap: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 0 16px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .coach-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      min-width: fit-content;
-    }
-
-    .coach-image {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-      background-color: var(--background-card);
-    }
-
-    .coach-name {
-      font-family: var(--font-text);
-      font-size: 0.65em;
-      white-space: nowrap;
-      color: var(--text-light);
-      font-style: italic;
-      line-height: 1;
-      text-align: center;
-    }
-
-    /* Scrollbar styles */
-    ::-webkit-scrollbar {
-      width: 3px;
-      height: 3px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary-color);
-      border-radius: 2px;
+    .logo img {
+      width: 25%;
     }
 
     /* Styles pour les boutons de navigation */
@@ -559,6 +622,7 @@
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: none; /* Caché par défaut */
     }
 
     .navigation.loaded {
@@ -658,27 +722,674 @@
       visibility: hidden;
     }
 
-    /* Les boutons sont gérés par JavaScript selon le contexte */
+    /* Bouton switch planning Ramadan */
+    .ramadan-switch-button {
+      position: fixed;
+      top: 75%;
+      left: 10px;
+      width: auto;
+      height: auto;
+      background: transparent;
+      border: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+      overflow: visible;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: all;
+      opacity: 0;
+      transform: translateY(20px);
+      padding: 0;
+    }
 
-    @keyframes auraPulse {
+    .ramadan-switch-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ramadan-icon {
+      width: 55px;
+      height: 55px;
+      filter: brightness(0) saturate(0%) invert(8%) sepia(94%) saturate(1352%) hue-rotate(335deg) brightness(95%) contrast(88%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      transition: filter 0.3s;
+      z-index: 10;
+      position: relative;
+      display: block;
+      animation: float-icon 3s ease-in-out infinite;
+    }
+    
+    @keyframes float-icon {
       0%, 100% {
-        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+        transform: translateY(0);
       }
-      5% {
-        box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+      50% {
+        transform: translateY(-8px);
       }
-      10% {
-        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+    }
+
+    /* État actif (planning Ramadan) - icône verte */
+    body.planning-ramadan .ramadan-switch-button {
+      background: transparent;
+    }
+
+    body.planning-ramadan .ramadan-icon {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Animation élégante au clic */
+    .ramadan-switch-button:active {
+      transform: translateY(20px) scale(0.9);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ramadan-switch-button.loaded:active {
+      transform: translateY(0) scale(0.9);
+    }
+
+    .ramadan-switch-button:active::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(72, 6, 7, 0.3);
+      transform: translate(-50%, -50%);
+      animation: ripple-click 0.6s ease-out;
+    }
+
+    body.planning-ramadan .ramadan-switch-button:active::after {
+      background: rgba(38, 70, 45, 0.4);
+    }
+
+    @keyframes ripple-click {
+      0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
       }
-      15%, 100% {
-        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      100% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
       }
+    }
+
+    /* Paillettes d'explosion au clic */
+    .confetti-burst {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: confetti-burst-anim 2s ease-out forwards;
+    }
+
+    @keyframes confetti-burst-anim {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(0) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Container pour les paillettes */
+    .confetti-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    /* Paillettes */
+    .confetti-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #26462d;
+      border-radius: 50%;
+      animation: confetti-fall 3s linear infinite;
+      pointer-events: none;
+    }
+
+    /* Paillettes bordeaux en mode Ramadan */
+    body.planning-ramadan .confetti-particle {
+      background: #480607;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(250px) translateX(var(--drift, 0px)) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Masquer l'ancien bouton en haut */
+    #planningViewSwitcher {
+      display: none !important;
+    }
+
+    @media screen and (min-width: 769px) {
+      .ramadan-switch-button { display: none !important; }
+    }
+
+    @media screen and (min-width: 1025px) {
+      .navigation {
+        display: none;
+      }
+      
+      .daily-grid-view-button {
+        display: none;
+      }
+      
+      .weekly-view-button {
+        display: none;
+      }
+      
+      .ramadan-switch-button {
+        display: none !important;
+      }
+    }
+
+    /* Overlay de chargement */
+    #loadingOverlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: var(--primary-overlay) !important;
+      z-index: 999999 !important;
+      display: flex;
+      overflow: hidden !important;
+      pointer-events: all !important;
+      opacity: 1 !important;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0 !important;
+    }
+
+    /* Style du message de chargement */
+    #loadingMessage {
+      font-size: 1.2em !important;
+      color: var(--text-light) !important;
+      text-align: center !important;
+      width: 80% !important;
+      max-width: 600px !important;
+      background-color: var(--overlay-light) !important;
+      padding: 10px !important;
+      border-radius: 10px !important;
+      pointer-events: none !important;
+      margin-top: -15px !important;
+    }
+
+    /* Logo animé lors du chargement */
+    .loading-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 3px), calc(-50% - 4px));
+    }
+
+    .loading-logo img {
+      width: 80px;
+      height: auto;
+      animation: zoom-logo 2s ease-in-out infinite;
+    }
+
+    .loading-logo img {
+      width: 80px;
+      height: auto;
+      animation: zoom-logo 2s ease-in-out infinite;
+    }
+
+    @keyframes zoom-logo {
+      0% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+    }
+
+    @keyframes zoomPulse {
+      0%, 80% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+    }
+
+    /* Styles spécifiques aux cours du studio "Piscine" */
+    .course-block.piscine {
+      background-color: var(--pool-color-light);
+    }
+
+    /* Styles pour les cours en cours dans "Piscine" - garder le background et le dégradé bleu */
+    .course-block.piscine.current {
+      background-color: var(--pool-color-light);
+    }
+
+    .course-block.piscine.starting-soon {
+      animation: heartbeat-blink 1.5s ease-in-out infinite, blink-piscine 1.5s ease-in-out infinite;
+    }
+
+    /* Animation pour le clignotement des cours "Piscine" */
+    @keyframes blink-piscine {
+      0%, 100% { 
+        background-color: var(--pool-color-light);
+      }
+      50% { 
+        background-color: rgba(120, 209, 182, 0.2);
+      }
+    }
+
+    /* Styles pour les appareils mobiles */
+    @media screen and (max-width: 1024px) {
+      body {
+        padding: 10px 15px;
+        overflow-x: hidden;
+      }
+
+      .timeline {
+        padding-left: 35px;
+      }
+
+      .timeline.has-courses {
+        margin-left: 15px;
+      }
+
+      .timeline-block::before {
+        left: -35px; /* Même position que la règle de base */
+      }
+      
+      .timeline-block.current::before {
+        left: -52px; /* L'icône garde sa position originale */
+      }
+
+      .time {
+        margin-left: 0;
+      }
+
+      .timeline-block .time {
+        margin-left: 0;
+      }
+
+      .course-block {
+        width: calc(100% - 20px);
+        margin: 0;
+      }
+
+      .course-block.past .course-title,
+      .course-block.upcoming .course-title {
+        font-size: 1.2em;
+      }
+
+      .course-block.current .course-title,
+      .course-block.starting-soon .course-title {
+        font-size: 1.3em;
+      }
+
+      .course-coach {
+        font-size: 0.9em;
+      }
+
+      .course-studio img {
+        width: 56px;
+        height: 56px;
+      }
+
+      .logo img {
+        width: 50%;
+        max-height: 80px;
+        height: auto;
+      }
+
+      .navigation {
+        display: flex;
+      }
+
+      .daily-grid-view-button {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+      }
+      
+      .weekly-view-button {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+      }
+    }
+
+    .coach-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .coach-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .coach-item.single {
+      margin-right: 10px;
+    }
+
+    .coach-photo {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    .coach-photo.multiple {
+      width: 35px;
+      height: 35px;
+      margin-right: 0;
+    }
+
+    .course-coach img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    /* Style pour le bouton daily-grid-view */
+    .daily-grid-view-button {
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom-grid {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom-grid 6s ease-in-out infinite;
+    }
+
+    .daily-grid-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .daily-grid-view-button::after {
+      content: '1';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 1px), calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #8dceb9;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .daily-grid-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .daily-grid-view-button img {
+      display: none;
+    }
+
+    /* Style pour le bouton daily-grid-view */
+    .daily-grid-view-button {
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom-grid {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom-grid 6s ease-in-out infinite;
+    }
+
+    .daily-grid-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .daily-grid-view-button::after {
+      content: '1';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% - 1px), calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #8dceb9;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .daily-grid-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .daily-grid-view-button img {
+      display: none;
+    }
+
+    /* Style pour le bouton weekly-view */
+    .weekly-view-button {
+      position: fixed;
+      top: 130px;
+      right: 10px;
+      z-index: 1000;
+      background: none;
+      padding: 0;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes subtle-zoom {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .weekly-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      animation: subtle-zoom 6s ease-in-out infinite;
+    }
+
+    .weekly-view-button::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/eb3b6e4d-5f0f-8674-90ee-871bf873cc0e.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .weekly-view-button::after {
+      content: '7';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% - 2px));
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      font-weight: 600;
+      color: var(--secondary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .weekly-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
+      pointer-events: all;
+    }
+
+    .weekly-view-button img {
+      display: none;
     }
 
     /* Style pour le bouton today-view */
     .today-view-button {
       position: fixed;
-      bottom: 70px;
+      top: 55px;
       right: 10px;
       z-index: 1000;
       background: none;
@@ -721,7 +1432,6 @@
       will-change: transform;
     }
 
-    /* Point central du bouton today */
     .today-view-button::after {
       content: '';
       position: absolute;
@@ -735,18 +1445,6 @@
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       pointer-events: none;
       z-index: 2;
-    }
-
-    @keyframes rotate-icon {
-      0% {
-        transform: rotate(0deg);
-      }
-      50% {
-        transform: rotate(180deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
     }
 
     .today-view-button button {
@@ -767,339 +1465,377 @@
       pointer-events: all;
     }
 
-    /* Les boutons sont gérés par JavaScript selon le contexte */
+    @keyframes rotate-icon {
+      0% {
+        transform: rotate(0deg);
+      }
+      50% {
+        transform: rotate(180deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
-    /* Ajustements pour les écrans en orientation portrait (mobile) — compacts mais lisibles, pas de marge basse */
+    @keyframes auraPulse {
+      0%, 100% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+      5% {
+        box-shadow: 0 0 25px var(--overlay-lighter), 0 0 40px var(--overlay-lighter), 0 0 55px var(--overlay-lighter);
+      }
+      10% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+      15%, 100% {
+        box-shadow: 0 0 15px var(--overlay-light), 0 0 30px var(--overlay-lighter), 0 0 45px var(--overlay-lighter);
+      }
+    }
+
+    .sticky-day-name {
+      font-family: var(--font-title);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 80%;
+      max-width:200px;
+      padding: 10px;
+      background-color: var(--overlay-light);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.7em;
+      font-weight: 500;
+      color: var(--primary-color);
+      box-shadow: 0 2px 5px var(--shadow-light);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0px;
+      box-sizing: border-box;
+    }
+
+    .sticky-day-name .day-name {
+      font-size: 1em;
+      font-weight: 500;
+      line-height: 1.2;
+      text-align: center;
+      display: block;
+      margin: 0;
+      padding: 0;
+      width: auto;
+    }
+
+    .sticky-day-name .day-date {
+      font-size: 0.5em;
+      font-weight: 300;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      display: block;
+      margin: 0;
+      padding: 0;
+      width: auto;
+    }
+    .sticky-day-name .planning-type-label {
+      font-family: var(--font-text);
+      font-size: 0.45em;
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-transform: none;
+      font-style: italic;
+      opacity: 0.7;
+      margin: 0;
+      padding: 0;
+      line-height: 1.05;
+      text-align: center;
+      display: block;
+      width: auto;
+    }
+    body.planning-ramadan .sticky-day-name .planning-type-label {
+      color: rgba(38, 70, 45, 0.8);
+    }
+
+    /* Style pour le texte en tant que citation */
+    .quote-text {
+      font-family: var(--font-text);
+      font-size: 1.4em;
+      color: var(--primary-color);
+      line-height: 1.6em;
+      position: relative;
+      padding: 20px;
+      display: inline-block;
+      font-style: italic;
+    }
+
+    .quote-text::before,
+    .quote-text::after {
+      content: '';
+      position: absolute;
+      font-size: 2.5em;
+      color: var(--secondary-color);
+      font-weight: bold;
+      line-height: 1;
+      opacity: 0.8;
+      z-index: 1;
+    }
+
+    .quote-text::before {
+      content: '«';
+      left: -10px;
+      top: -10px;
+    }
+
+    .quote-text::after {
+      content: '»';
+      right: -10px;
+      bottom: -10px;
+      top: auto;
+      line-height: 0;
+    }
+
+    .modal-backdrop {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: var(--primary-overlay) !important;
+      z-index: 999999 !important;
+      display: none;
+      overflow: hidden !important;
+      pointer-events: all !important;
+    }
+
+    .timeline-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--primary-color);
+      transform: translateX(-50%);
+    }
+
+    .time-marker {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .time-marker.start {
+      top: 0;
+    }
+
+    .time-marker.end {
+      bottom: 0;
+    }
+
+    /* Style par défaut pour mobile */
+    .modal-center-container img {
+      width: 100px !important;
+      height: auto !important;
+      animation: zoom-logo 2s infinite !important;
+      pointer-events: none !important;
+    }
+
+    /* Style pour tablettes */
+    @media screen and (min-width: 768px) {
+      .modal-center-container img {
+        width: 140px !important;
+      }
+    }
+
+    /* Style pour desktop */
+    @media screen and (min-width: 1024px) {
+      .modal-center-container img {
+        width: 170px !important;
+      }
+    }
+
+    /* Styles pour le bouton weekly-view */
+    .daily-grid-view-button {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .daily-grid-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .weekly-view-button {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .weekly-view-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animation d'apparition du contenu */
+    .content-wrapper {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    body:not(.loading) .content-wrapper {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Styles pour l'overlay de chargement */
+    #loadingOverlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: var(--primary-overlay) !important;
+      z-index: 999999 !important;
+      display: flex;
+      overflow: hidden !important;
+      pointer-events: all !important;
+      opacity: 1 !important;
+      transition: opacity 0.5s ease;
+    }
+
+    #loadingOverlay.fade-out {
+      opacity: 0 !important;
+    }
+
+    .modal-center-container {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      height: auto !important;
+      pointer-events: none !important;
+      gap: 50px !important;
+      background-color: transparent !important;
+    }
+
+    .upcoming-class {
+      position: relative;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      animation: subtlePulse 5s ease-in-out infinite;
+    }
+
+    @keyframes subtlePulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0.03);
+      }
+      50% {
+        transform: scale(1.001);
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.05);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0.03);
+      }
+    }
+
+    /* Désactivation temporaire de l'overlay de chargement pour mobile uniquement */
     @media screen and (max-width: 768px) {
-      body {
-        padding-bottom: 0;
-      }
-
-      .header {
-        padding: 2px 12px;
-        background: var(--primary-color);
-        min-height: 35px;
-      }
-
-      .content-wrapper {
-        height: calc(100vh - 74px);
-        min-height: 0;
-        padding-left: 5px;
-        padding-right: 5px;
-        margin-bottom: 0;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .studios-container {
-        gap: 6px;
-        flex: 1;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .studios-row {
-        gap: 6px;
-        flex: 1;
-        min-height: 0;
-        height: auto;
-      }
-
-      .studio-column {
-        padding: 2px;
-      }
-
-      .studio-title {
-        font-size: 1.05em;
-        padding: 4px 5px;
-        gap: 8px;
-      }
-
-      .studio-icon {
-        width: 26px;
-        height: 26px;
-      }
-
-      .courses-container {
-        padding-top: 3px;
-        height: calc(100% - 28px);
-      }
-
-      .course-card {
-        margin-bottom: 3px;
-        padding: 0;
-        font-size: 0.92em;
-        width: 98%;
-        line-height: 1.2;
-      }
-
-      .course-time {
-        font-size: 0.82em;
-        padding: 2px 10px;
-        min-width: 62px;
-        margin-bottom: 1px;
-      }
-
-      .course-name {
-        font-size: 1.02em;
-        margin: 0 0 -2px 0;
-      }
-
-      .course-coach {
-        font-size: 0.82em;
-      }
-
-      .empty-message {
-        font-size: 0.85em;
-        margin-top: 10px;
-      }
-
-      .coaches-section {
-        height: 48px;
-        flex-shrink: 0;
-        gap: 12px;
-        padding: 0 12px;
-      }
-
-      .coach-image {
-        width: 26px;
-        height: 26px;
-      }
-
-      .coach-name {
-        font-size: 0.6em;
-      }
-
-      .day-title {
-        font-size: 1.25em;
-        gap: 8px;
-        min-height: 26px;
-        align-items: center;
+      #loadingOverlay {
+        display: none !important;
       }
       
-      .day-name {
-        line-height: 1.3;
-      }
-
-      .day-date {
-        font-size: 0.65em;
-        letter-spacing: 0.4px;
-      }
-
-      /* Puppeteer (viewport ≤768px) : mêmes dimensions qu’avant les changements mobile (dégradé, marge basse, rows 50 %) */
-      body.puppeteer-view .ramadan-switch-button { display: none !important; }
-      body.puppeteer-view .header {
-        background: var(--gradient-primary);
-      }
-      body.puppeteer-view .content-wrapper {
-        height: calc(100vh - 74px);
-        margin-bottom: 48px;
-        visibility: visible !important;
+      body.loading {
         opacity: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-      }
-      body.puppeteer-view .studios-container {
-        flex: 1 1 auto;
-        min-height: 50vh;
-        visibility: visible !important;
-        opacity: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        overflow: visible;
-      }
-      body.puppeteer-view .studios-row {
-        flex: 1 1 auto;
-        min-height: 180px;
-        height: auto;
-      }
-    }
-
-    /* Mobile très petit : un peu plus compact qu'au-dessus */
-    @media screen and (max-width: 380px) {
-      .header {
-        padding: 5px 8px;
-      }
-
-      .studio-title {
-        font-size: 0.95em;
-        padding: 3px 4px;
-      }
-
-      .studio-icon {
-        width: 22px;
-        height: 22px;
-      }
-
-      .course-time {
-        font-size: 0.78em;
-        padding: 1px 8px;
-        min-width: 54px;
-      }
-
-      .course-name {
-        font-size: 0.95em;
-      }
-
-      .course-coach {
-        font-size: 0.75em;
-      }
-
-      .day-title {
-        font-size: 1.1em;
-      }
-
-      .day-date {
-        font-size: 0.6em;
-      }
-
-      .coaches-section {
-        height: 44px;
-        gap: 10px;
-      }
-
-      .coach-image {
-        width: 24px;
-        height: 24px;
-      }
-
-      .coach-name {
-        font-size: 0.55em;
-      }
-    }
-
-    /* Styles pour les écrans plus grands (tablettes et desktop) */
-    @media screen and (min-width: 769px) {
-      .content-wrapper {
-        height: calc(100vh - 80px);
-      }
-
-      .studios-row {
-        height: 50%;
-        border: none;
-      }
-
-      .studio-column {
-        border: none;
-        box-shadow: none;
-        padding: 2px;
-      }
-
-      .courses-container {
-        overflow-y: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-
-      .courses-container::-webkit-scrollbar {
-        display: none;
-      }
-
-      .course-card {
-        margin-bottom: 6px;
-        padding: 2px;
-        font-size: 1.2em;
-        border: none;
-        flex-shrink: 0;
-      }
-
-      .course-time {
-        font-size: 1.1em;
-        padding: 2px 16px;
-        min-width: 100px;
-      }
-
-      .course-name {
-        font-size: 1.3em;
-      }
-
-      .course-coach {
-        font-size: 1.1em;
-      }
-
-      .studio-title {
-        font-size: 1.4em;
-        padding: 4px;
-        border-bottom: 1px solid var(--primary-color);
-        gap: 12px;
-      }
-
-      .studio-icon {
-        width: 32px;
-        height: 32px;
-      }
-
-      .coach-image {
-        width: 28px;
-        height: 28px;
-      }
-
-      .coach-name {
-        font-size: 0.65em;
-      }
-    }
-
-    /* Masquer les boutons de navigation sur les écrans 32 pouces et supérieurs en orientation portrait (rotation 90°) */
-    @media screen and (min-height: 1920px) and (orientation: portrait) {
-      .navigation {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-
-      .today-view-button {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-    }
-
-    /* Masquer les boutons sur les écrans plus grands que mobile (desktop/tablette) */
-    @media screen and (min-width: 769px) {
-      .navigation {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-
-      .today-view-button {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
       }
       
-      .ramadan-switch-button {
+      .modal-center-container {
         display: none !important;
       }
     }
 
-    /* Masquer les boutons en format téléviseur inversé (paysage, écran large) */
-    @media screen and (min-width: 1920px) and (orientation: landscape) {
-      .navigation {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-
-      .today-view-button {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
+    @media (min-width: 768px) {
+      .loading-logo img {
+        width: 100px;
       }
     }
+
+    @media (min-width: 1024px) {
+      .loading-logo img {
+        width: 140px;
+      }
+    }
+
   </style>
 </head>
-<body>
+<body onload="initializePage();" class="loading">
+  <!-- Bloc de texte collant pour le nom du jour -->
+  <div id="stickyDayName" class="sticky-day-name">
+    <span class="day-name"></span>
+    <span class="day-date"></span>
+    <span class="planning-type-label" id="stickyPlanningTypeLabel"></span>
+  </div>
+
+  <!-- Bouton Daily Grid view -->
+  <div class="daily-grid-view-button">
+    <a href="./daily_grid.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb81e2ef-51c6-9062-55f8-2f317e6974da.png" alt="Vue Grille">
+    </a>
+  </div>
+
+  <!-- Bouton Weekly view -->
+  <div class="weekly-view-button">
+    <a href="./weekly_vertical.html">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8f9d5808-3db0-84ba-a4c9-24d99ec7043b.png" alt="Vue Hebdomadaire">
+    </a>
+  </div>
+
+  <!-- Bouton pour revenir à aujourd'hui -->
+  <div class="today-view-button" id="todayViewButton">
+    <button onclick="returnToToday()">
+    </button>
+  </div>
+
   <!-- Boutons de navigation -->
   <div class="navigation">
-    <button id="prevDay" onclick="navigateDay(-1)" class="nav-button prev-button">
+    <button id="prevDay" onclick="changeDay(-1)" class="nav-button prev-button">
       <div class="nav-segments">
         <div class="segment segment-1"></div>
         <div class="segment segment-2"></div>
       </div>
     </button>
-    <button id="nextDay" onclick="navigateDay(1)" class="nav-button next-button">
+    <button id="nextDay" onclick="changeDay(1)" class="nav-button next-button">
       <div class="nav-segments">
         <div class="segment segment-1"></div>
         <div class="segment segment-2"></div>
@@ -1107,61 +1843,32 @@
     </button>
   </div>
 
-  <div class="header">
-    <h1 class="day-title" id="currentDay">
-      <span class="day-name" id="dayName"></span>
-      <span class="day-date" id="dayDate"></span>
-      <span class="planning-type-label" id="planningTypeLabel"></span>
-    </h1>
-  </div>
-
-  <!-- Script inline pour initialiser la date immédiatement -->
-  <script>
-    (function() {
-      const today = new Date();
-      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-      const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-      
-      const dayName = document.getElementById('dayName');
-      const dayDate = document.getElementById('dayDate');
-      
-      if (dayName) {
-        dayName.textContent = days[today.getDay()].toUpperCase();
-      }
-      if (dayDate) {
-        dayDate.textContent = '';
-      }
-    })();
-  </script>
-
-  <div class="content-wrapper">
-    <div class="studios-container" id="studiosContainer">
-      <!-- Les rangées de studios seront générées ici -->
-    </div>
-
-    <div class="coaches-section" id="coachesSection">
-      <!-- Les cartes de coach seront injectées ici -->
-    </div>
-  </div>
-
-  <!-- Bouton switch planning Ramadan (mobile uniquement, masqué en vue Puppeteer) -->
+  <!-- Bouton switch planning Ramadan -->
   <button id="ramadanSwitchButton" class="ramadan-switch-button" onclick="toggleRamadanPlanning()">
     <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
     <div class="confetti-container"></div>
   </button>
 
-  <!-- Bouton pour revenir à daily.html -->
-  <div class="today-view-button" id="todayViewButton">
-    <button onclick="returnToDaily()"></button>
+  <h1 id="dayOfWeek"></h1>
+  <span class="planning-type-label" id="planningTypeLabel"></span>
+  <div class="date" id="dateStr"></div>
+  <div id="planningViewSwitcher" style="display: none;"></div>
+  <div class="timeline" id="timeline">
+    <!-- Les cours seront injectés ici -->
+  </div>
+
+  <!-- Overlay de chargement -->
+  <div id="loadingOverlay">
+    <div class="modal-center-container">
+      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
+    </div>
   </div>
 
   <script>
-    // Navigation "à la daily.html" : on boucle sur 7 jours (0..6) au lieu de faire défiler une date infiniment
     let currentDayIndex = new Date().getDay();
-    let currentDate = new Date();
-    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-    let allData = null;
+  const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
+  //const apiUrl = './planning-v2.json';
+    let allData = [];
     var activePlanningView = 'regulier';
     function getCurrentPlanning() {
       if (!allData || !allData.planning) return {};
@@ -1173,27 +1880,28 @@
       return allData.planning;
     }
     function initPlanningView(data) {
-      if (!data) return;
-      var urlView = '', stored = '';
-      try {
-        var params = new URLSearchParams(window.location.search);
-        urlView = params.get('planning') || '';
-        stored = (typeof localStorage !== 'undefined' && localStorage.getItem) ? localStorage.getItem('planningView') || '' : '';
-      } catch (e) { urlView = ''; stored = ''; }
+      var params = new URLSearchParams(window.location.search);
+      var urlView = params.get('planning');
+      var stored = localStorage.getItem('planningView');
       var today = new Date().toISOString().slice(0, 10);
       var ramadanStart = data.metadata && data.metadata.ramadanStart;
       var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; try { localStorage.setItem('planningView', urlView); } catch (e) {} }
+      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; localStorage.setItem('planningView', urlView); }
       else if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
-      else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
-      else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
+      else if (inRamadan) { activePlanningView = 'ramadan'; localStorage.setItem('planningView', 'ramadan'); }
+      else { activePlanningView = 'regulier'; localStorage.setItem('planningView', 'regulier'); }
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
       updatePlanningTypeLabel();
     }
     function renderPlanningViewSwitcher(data) {
+      // Ancien bouton masqué, on utilise maintenant le bouton flottant
+      var container = document.getElementById('planningViewSwitcher');
+      if (container) container.style.display = 'none';
+      
+      // Afficher/masquer le bouton flottant selon les conditions
       var ramadanButton = document.getElementById('ramadanSwitchButton');
-      if (!ramadanButton || !data) return;
+      if (!ramadanButton) return;
       
       // Masquer sur desktop (non mobile)
       var isMobile = window.innerWidth <= 768;
@@ -1208,6 +1916,7 @@
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
       var daysBefore = 7;
       var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore));
+      
       if (showSwitcher) {
         ramadanButton.style.display = 'flex';
         setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
@@ -1215,6 +1924,22 @@
         ramadanButton.style.display = 'none';
       }
     }
+    function setPlanningView(view) {
+      activePlanningView = view;
+      localStorage.setItem('planningView', view);
+      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
+      updatePlanningTypeLabel();
+      displaySchedule(currentDayIndex);
+      renderPlanningViewSwitcher(allData);
+    }
+    function updatePlanningTypeLabel() {
+      var label = document.getElementById('planningTypeLabel');
+      var stickyLabel = document.getElementById('stickyPlanningTypeLabel');
+      var labelText = activePlanningView === 'ramadan' ? 'Planning Ramadan' : 'Planning régulier';
+      if (label) label.textContent = labelText;
+      if (stickyLabel) stickyLabel.textContent = labelText;
+    }
+    
     function toggleRamadanPlanning() {
       var button = document.getElementById('ramadanSwitchButton');
       if (!button) return;
@@ -1253,179 +1978,454 @@
       var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
       setPlanningView(currentView);
     }
-    function setPlanningView(view) {
-      activePlanningView = view;
-      localStorage.setItem('planningView', view);
-      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
-      updatePlanningTypeLabel();
-      if (allData) { renderPlanningViewSwitcher(allData); loadAndDisplayCourses(); }
-    }
-    function updatePlanningTypeLabel() {
-      var label = document.getElementById('planningTypeLabel');
-      if (label) {
-        label.textContent = activePlanningView === 'ramadan' ? 'Planning Ramadan' : 'Planning régulier';
-      }
-    }
 
-    function syncCurrentDateToWeekWindow() {
-      // Même logique que dans daily.html:
-      // on mappe un index de jour vers la prochaine occurrence de ce jour sur les 7 jours à venir
-      const base = new Date();
-      const baseDay = base.getDay();
-      base.setDate(base.getDate() + (currentDayIndex - baseDay + 7) % 7);
-      currentDate = base;
-    }
-    
-    // Détection automatique de Puppeteer/navigateur automatisé
-    function isAutomatedBrowser() {
-      // Vérifier plusieurs indicateurs de navigateur automatisé
-      // Mais exclure les vrais mobiles même s'ils ont certains indicateurs
-      const isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      // Si c'est un vrai mobile, ce n'est pas Puppeteer
-      if (isRealMobile && 'ontouchstart' in window) {
-        return false;
-      }
-      
-      // Sinon, vérifier les indicateurs de navigateur automatisé
-      return (
-        navigator.webdriver === true ||
-        window.navigator.webdriver === true ||
-        (navigator.platform === 'Linux x86_64' && navigator.userAgent.includes('HeadlessChrome')) ||
-        (navigator.userAgent.includes('HeadlessChrome') && !isRealMobile)
-      );
-    }
+    // Option pour afficher/masquer les images des cours
+    const SHOW_COURSE_IMAGES = true; // Mettre à true pour afficher les images, false pour n'afficher que les noms
 
-    function updateButtonVisibility() {
-      const isMobile = window.innerWidth <= 768;
-      const isAutomated = isAutomatedBrowser();
-      if (isAutomated) {
-        document.body.classList.add('puppeteer-view');
-      } else {
-        document.body.classList.remove('puppeteer-view');
-      }
-      const isLargeScreen = window.innerHeight > 1920 || window.innerWidth > 1920; // Écran 32 pouces ou plus
-      const isLargePortrait = window.innerHeight >= 1920 && window.innerHeight > window.innerWidth; // Écran 32 pouces en portrait (rotation 90°)
-      const isLargeLandscape = window.innerWidth >= 1920 && window.innerWidth > window.innerHeight; // Format téléviseur inversé (paysage)
-      const navigation = document.querySelector('.navigation');
+    function updateTodayButtonPosition() {
+      const weeklyButton = document.querySelector('.weekly-view-button');
       const todayButton = document.querySelector('.today-view-button');
-      const ramadanButton = document.getElementById('ramadanSwitchButton');
-      const coachesSection = document.querySelector('.coaches-section');
       
-      console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen, 'isLargePortrait:', isLargePortrait, 'isLargeLandscape:', isLargeLandscape);
-      
-      // Bouton Ramadan : visible uniquement sur mobile réel (pas Puppeteer, pas desktop)
-      if (ramadanButton) {
-        if (isAutomated || !isMobile || isLargePortrait || isLargeLandscape) {
-          ramadanButton.style.display = 'none';
-        } else if (allData) {
-          renderPlanningViewSwitcher(allData);
-        }
+      if (weeklyButton && todayButton && todayButton.style.display !== 'none') {
+        const weeklyButtonRect = weeklyButton.getBoundingClientRect();
+        const spacing = 15;
+        todayButton.style.top = `${weeklyButtonRect.bottom + spacing}px`;
       }
+    }
+
+    function handleResize() {
+      const isMobile = window.innerWidth <= 1024;
+      const dailyGridButton = document.querySelector('.daily-grid-view-button');
+      const weeklyButton = document.querySelector('.weekly-view-button');
+      const todayButton = document.querySelector('.today-view-button');
+      const navigation = document.querySelector('.navigation');
       
-      // Masquer la barre en bas uniquement sur mobile réel (pas Puppeteer, pas grand écran)
-      if (coachesSection) {
-        if (isMobile && !isAutomated && !isLargeScreen) {
-          // Mobile réel : masquer la barre
-          coachesSection.style.display = 'none';
-          document.body.style.paddingBottom = '0';
-        } else {
-          // Puppeteer ou grand écran : afficher la barre
-          coachesSection.style.display = 'flex';
-          document.body.style.paddingBottom = '52px';
+      if (isMobile) {
+        if (dailyGridButton) {
+          dailyGridButton.style.display = 'block';
+          dailyGridButton.classList.add('loaded');
         }
-      }
-      
-      // Si c'est un grand écran en portrait (32 pouces, rotation 90°) ou en paysage (format téléviseur inversé), masquer les boutons
-      if (isLargePortrait || isLargeLandscape) {
-        console.log(isLargePortrait ? 'Grand écran en portrait (rotation 90°)' : 'Format téléviseur inversé (paysage)', '- masquage des boutons');
+        if (weeklyButton) {
+          weeklyButton.style.display = 'block';
+          weeklyButton.classList.add('loaded');
+        }
+        if (todayButton) {
+          todayButton.style.display = 'block';
+        }
         if (navigation) {
-          navigation.style.display = 'none';
-          navigation.style.opacity = '0';
-          navigation.style.pointerEvents = 'none';
-          navigation.classList.remove('loaded');
+          navigation.style.display = 'flex';
+        }
+      } else {
+        if (dailyGridButton) {
+          dailyGridButton.style.display = 'none';
+          dailyGridButton.classList.remove('loaded');
+        }
+        if (weeklyButton) {
+          weeklyButton.style.display = 'none';
+          weeklyButton.classList.remove('loaded');
         }
         if (todayButton) {
           todayButton.style.display = 'none';
-          todayButton.style.opacity = '0';
-          todayButton.style.pointerEvents = 'none';
           todayButton.classList.remove('visible');
         }
+        if (navigation) {
+          navigation.style.display = 'none';
+        }
+      }
+      
+      updateTodayButtonPosition();
+    }
+
+    function hideLoadingOverlay() {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const modalContainer = document.querySelector('.modal-center-container');
+
+      if (modalContainer) {
+        modalContainer.style.display = 'none';
+      }
+
+      loadingOverlay.classList.add('fade-out');
+
+      const isMobile = window.innerWidth <= 1024;
+      const navigation = document.querySelector('.navigation');
+      const dailyGridButton = document.querySelector('.daily-grid-view-button');
+      const weeklyButton = document.querySelector('.weekly-view-button');
+      
+      if (isMobile) {
+        if (navigation) navigation.classList.add('loaded');
+        if (dailyGridButton) {
+          dailyGridButton.classList.add('loaded');
+          dailyGridButton.style.opacity = '1';
+          dailyGridButton.style.transform = 'translateY(0)';
+          dailyGridButton.style.pointerEvents = 'all';
+        }
+        if (weeklyButton) {
+          weeklyButton.classList.add('loaded');
+          weeklyButton.style.opacity = '1';
+          weeklyButton.style.transform = 'translateY(0)';
+          weeklyButton.style.pointerEvents = 'all';
+        }
+      }
+
+      document.body.classList.remove('loading');
+
+      updateTodayButtonPosition();
+
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 300);
+    }
+
+    async function fetchAllData() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        allData = data;
+        initPlanningView(data);
+        renderPlanningViewSwitcher(data);
+
+        localStorage.setItem('planningData', JSON.stringify(allData));
+        localStorage.setItem('lastUpdate', new Date().toISOString());
+
+        displaySchedule(currentDayIndex);
+        hideLoadingOverlay();
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        // En cas d'erreur, essayer d'utiliser les données en cache
+        const cachedData = localStorage.getItem('planningData');
+        if (cachedData) {
+          allData = JSON.parse(cachedData);
+          initPlanningView(allData);
+          renderPlanningViewSwitcher(allData);
+          displaySchedule(currentDayIndex);
+          hideLoadingOverlay();
+        }
+      }
+    }
+
+    function displaySchedule(dayIndex) {
+      const scheduleContainer = document.getElementById('timeline');
+      if (!scheduleContainer) return;
+
+      const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+      const dayOfWeek = days[dayIndex];
+      
+      // Mettre à jour le titre du jour
+      const dayOfWeekElement = document.getElementById('dayOfWeek');
+      const displayDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+      dayOfWeekElement.innerText = displayDayOfWeek;
+
+      // Mettre à jour la date (supprimé : plus d'affichage de date)
+      const dateStrEl = document.getElementById('dateStr');
+      if (dateStrEl) {
+        dateStrEl.innerText = '';
+      }
+      
+      // Mettre à jour le sticky header avec le jour et la date
+      const stickyDayName = document.getElementById('stickyDayName');
+      const stickyDayNameSpan = stickyDayName.querySelector('.day-name');
+      const stickyDayDateSpan = stickyDayName.querySelector('.day-date');
+      if (stickyDayNameSpan) {
+        stickyDayNameSpan.innerText = displayDayOfWeek;
+      }
+      updatePlanningTypeLabel();
+      if (stickyDayDateSpan) {
+        stickyDayDateSpan.innerText = '';
+      }
+      
+      const planning = getCurrentPlanning();
+      if (!planning || !planning[dayOfWeek]) {
+        console.error('Pas de planning pour le jour:', dayOfWeek);
+        scheduleContainer.className = 'timeline no-courses';
+        scheduleContainer.innerHTML = displayNoCourseMessage();
         return;
       }
+
+      const courses = planning[dayOfWeek];
       
-      // Si c'est Puppeteer/navigateur automatisé, masquer tous les boutons (dont Ramadan)
-      if (isAutomated) {
-        console.log('Navigateur automatisé détecté - masquage des boutons');
-        if (navigation) {
-          navigation.style.display = 'none';
-          navigation.classList.remove('loaded');
-        }
-        if (todayButton) {
-          todayButton.style.display = 'none';
-          todayButton.classList.remove('visible');
-        }
-        if (ramadanButton) ramadanButton.style.display = 'none';
-        return; // Ne pas continuer, on masque tout
+      if (courses.length === 0) {
+        scheduleContainer.className = 'timeline no-courses';
+        scheduleContainer.innerHTML = displayNoCourseMessage();
+        return;
       }
+
+      scheduleContainer.className = 'timeline has-courses';
       
-      // Sinon, comportement normal selon la taille d'écran
-      if (isMobile) {
-        // Sur mobile réel : afficher les boutons
-        console.log('Mobile détecté - affichage des boutons');
-        if (navigation) {
-          navigation.style.display = 'flex';
-          navigation.style.opacity = '1';
-          navigation.style.transform = 'translateY(0)';
-          navigation.style.pointerEvents = 'all';
-          navigation.classList.add('loaded');
+      let scheduleHTML = '';
+
+      courses.forEach(course => {
+        const cours = allData.cours.find(c => c.id === course.coursId);
+        const coachs = course.coachIds.map(coachId => allData.coachs.find(c => c.id === coachId)).filter(Boolean);
+        const isMultipleCoachs = coachs.length > 1;
+        const studio = allData.studios.find(s => s.id === course.studioId);
+
+        if (!cours || !coachs.length) {
+          console.error('Données manquantes pour le cours:', course);
+          return;
         }
-        if (todayButton) {
-          todayButton.style.display = 'block';
-          todayButton.style.opacity = '1';
-          todayButton.style.transform = 'translateY(0)';
-          todayButton.style.pointerEvents = 'all';
-          setTimeout(() => {
-            todayButton.classList.add('visible');
-          }, 100);
+
+        // Déterminer le type de cours depuis le planning
+        let courseTypeClass = '';
+        let courseTypeText = course.type || 'Mixte'; // Utiliser le type du cours depuis le planning
+
+        if (courseTypeText === '100% Femmes') {
+          courseTypeClass = 'women-only';
+        } else if (courseTypeText === 'Mixte') {
+          courseTypeClass = 'mixte';
         }
+
+        // Studio "Piscine" ou "AQUA"
+        if (studio.name.toLowerCase().includes('piscine') || studio.name.toLowerCase().includes('aqua')) {
+          courseTypeClass += ' piscine';
+        }
+
+        // Déterminer l'état du cours
+        let courseStatusClass = '';
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const [startHour, startMinute] = course.startTime.split(':').map(Number);
+        const [endHour, endMinute] = course.endTime.split(':').map(Number);
+        const courseStartTime = startHour * 60 + startMinute;
+        const courseEndTime = endHour * 60 + endMinute;
+
+        if (isToday(dayIndex)) {
+          if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+            courseStatusClass = 'current focus';
+          } else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15) {
+            courseStatusClass = 'starting-soon focus';
+          } else if (currentTime < courseStartTime) {
+            courseStatusClass = 'upcoming';
+          } else {
+            courseStatusClass = 'past';
+          }
+        } else {
+          courseStatusClass = 'upcoming';
+        }
+
+        const coachImagesHTML = coachs.map(coach => `
+          <div class="coach-item ${isMultipleCoachs ? '' : 'single'}">
+            <img class="coach-photo ${isMultipleCoachs ? 'multiple' : ''}" 
+                 src="${coach.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png'}" 
+                 alt="${coach.name}">
+            ${!isMultipleCoachs ? `<span>${coach.name}</span>` : ''}
+          </div>
+        `).join('');
+
+        scheduleHTML += `
+          <div class="timeline-block ${courseStatusClass.includes('past') ? 'past' : ''} ${courseStatusClass.includes('current') ? 'current' : ''}" data-start-time="${course.startTime}" data-end-time="${course.endTime}">
+            <div class="time">${course.startTime} - ${course.endTime}</div>
+            <div class="course-block ${courseTypeClass} ${courseStatusClass}" id="${courseStatusClass.includes('focus') ? 'focus-course' : ''}">
+              <div class="course-studio">
+                ${studio.imageUrl 
+                  ? `<img src="${studio.imageUrl}" alt="${studio.name}">`
+                  : ''}
+              </div>
+              <div class="course-type">${courseTypeText}</div>
+              <div class="course-title">
+                ${SHOW_COURSE_IMAGES && cours.logo 
+                  ? `<img src="${cours.logo}" alt="${cours.name}" style="max-width: 150px; max-height: 55px;" />`
+                  : `<h3>${cours.name}</h3>`}
+              </div>
+              <div class="course-coach">
+                <div class="coach-images">
+                  ${coachImagesHTML}
+                </div>
+              </div>
+              ${courseStatusClass.includes('starting-soon') ? `<div class="countdown" data-start-time="${course.startTime}"></div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      scheduleContainer.innerHTML = scheduleHTML;
+      toggleTodayButton(currentDayIndex);
+
+      if (isToday(currentDayIndex)) {
+        if (areAllCoursesInThePast(courses)) {
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+          });
+        } else {
+          scrollToNextUpcomingCourse();
+        }
+        initializeCountdowns();
       } else {
-        // Sur desktop : afficher les boutons
-        console.log('Desktop détecté - affichage des boutons');
-        if (navigation) {
-          navigation.style.display = 'flex';
-          navigation.style.opacity = '1';
-          navigation.style.transform = 'translateY(0)';
-          navigation.style.pointerEvents = 'all';
-          navigation.classList.add('loaded');
-        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      updateTodayButtonPosition();
+    }
+
+    function isToday(dayIndex) {
+      const today = new Date();
+      const currentDay = today.getDay();
+      return dayIndex === currentDay;
+    }
+
+    function getDayName(dayIndex) {
+      const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+      return days[dayIndex];
+    }
+
+    function returnToToday() {
+      const todayIndex = new Date().getDay();
+
+      if (currentDayIndex !== todayIndex) {
+        // Masquer d'abord le bouton avec animation
+        const todayButton = document.getElementById('todayViewButton');
         if (todayButton) {
-          todayButton.style.display = 'block';
-          todayButton.style.opacity = '1';
-          todayButton.style.transform = 'translateY(0)';
-          todayButton.style.pointerEvents = 'all';
+          todayButton.classList.remove('visible');
           setTimeout(() => {
-            todayButton.classList.add('visible');
-          }, 100);
+            todayButton.style.display = 'none';
+            // Une fois le bouton masqué, changer la page
+            currentDayIndex = todayIndex;
+            displaySchedule(currentDayIndex);
+            
+            // S'assurer qu'il n'y a pas de défilement horizontal
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+            });
+
+            // Mettre à jour la position du bouton today-view après le retour à aujourd'hui
+            updateTodayButtonPosition();
+
+            // Ajouter un délai pour s'assurer que le DOM est complètement chargé
+            setTimeout(() => {
+              scrollToNextUpcomingCourse();
+            }, 100);
+          }, 300);
         }
       }
     }
 
-    function formatDate(date) {
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = months[date.getMonth()];
-      return `${day} ${month}`;
+    function toggleTodayButton(dayIndex) {
+      const todayIndex = new Date().getDay();
+      const todayButton = document.getElementById('todayViewButton');
+      const scheduleContainer = document.getElementById('timeline');
+      
+      // Vérifier si on est sur un jour sans cours
+      const isNoCourses = scheduleContainer.classList.contains('no-courses');
+      
+      if (dayIndex === todayIndex) {
+        // S'assurer que le bouton est visible avant de le masquer
+        todayButton.style.display = 'block';
+        todayButton.classList.add('visible');
+        
+        // Attendre le prochain frame pour l'animation de disparition
+        requestAnimationFrame(() => {
+          todayButton.classList.remove('visible');
+          setTimeout(() => {
+            todayButton.style.display = 'none';
+          }, 300);
+        });
+      } else {
+        // Afficher le bouton si on est sur un jour différent ou s'il n'y a pas de cours
+        todayButton.style.display = 'block';
+        // Attendre le prochain frame pour calculer la position
+        requestAnimationFrame(() => {
+          updateTodayButtonPosition();
+          // Attendre que la position soit mise à jour pour rendre le bouton visible
+          requestAnimationFrame(() => {
+            todayButton.classList.add('visible');
+          });
+        });
+      }
     }
 
-    function updateDayTitle() {
-      const dayName = document.getElementById('dayName');
-      const dayDate = document.getElementById('dayDate');
+    function changeDay(direction) {
+      const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
       
-      if (dayName) {
-        dayName.textContent = days[currentDate.getDay()].toUpperCase();
+      currentDayIndex = (currentDayIndex + direction + 7) % 7;
+      
+      // Vérifier si on retourne au jour actuel
+      const todayIndex = new Date().getDay();
+      const todayButton = document.getElementById('todayViewButton');
+      
+      if (currentDayIndex === todayIndex && todayButton) {
+        // Si on retourne au jour actuel, masquer le bouton avec animation
+        todayButton.classList.remove('visible');
+        setTimeout(() => {
+          todayButton.style.display = 'none';
+        }, 300); // Attendre la fin de l'animation de fade-out
       }
-      if (dayDate) {
-        dayDate.textContent = '';
+      
+      displaySchedule(currentDayIndex);
+      
+      // S'assurer qu'il n'y a pas de défilement horizontal
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    function areAllCoursesInThePast(courses) {
+      const now = new Date();
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+
+      return courses.every(course => {
+        const [endHour, endMinute] = course.endTime.split(':').map(Number);
+        const courseEndTime = endHour * 60 + endMinute;
+        return courseEndTime < currentTime;
+      });
+    }
+
+    function scrollToNextUpcomingCourse() {
+      const now = new Date();
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+      let firstCurrentCourse = null;
+      let nextUpcomingCourse = null;
+      let allPast = true;
+      let earliestStartTime = Infinity;
+
+      const courseBlocks = document.querySelectorAll('.timeline-block');
+
+      courseBlocks.forEach((block) => {
+        const timeElement = block.querySelector('.time');
+        const [startTime, endTime] = timeElement.innerText.split(" - ");
+        const [startHour, startMin] = startTime.split(":").map(Number);
+        const [endHour, endMin] = endTime.split(":").map(Number);
+        const courseStartTime = startHour * 60 + startMin;
+        const courseEndTime = endHour * 60 + endMin;
+
+        if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
+          if (!firstCurrentCourse || courseStartTime < earliestStartTime) {
+            firstCurrentCourse = block;
+            earliestStartTime = courseStartTime;
+          }
+          allPast = false;
+        }
+        else if (currentTime < courseStartTime) {
+          if (!nextUpcomingCourse || courseStartTime < earliestStartTime) {
+            nextUpcomingCourse = block;
+            earliestStartTime = courseStartTime;
+          }
+          allPast = false;
+        }
+      });
+
+      if (firstCurrentCourse) {
+        firstCurrentCourse.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      } else if (nextUpcomingCourse) {
+        nextUpcomingCourse.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      } else if (allPast) {
+        window.scrollTo({ 
+          top: document.body.scrollHeight, 
+          behavior: 'smooth',
+          left: 0
+        });
       }
     }
 
@@ -1445,7 +2445,7 @@
       "https://mcusercontent.com/74abea872abd45d46efed5d41/images/5a6492bf-169c-0807-fa9b-fbc2cc5bfaa8.png"
     ];
 
-    function getNoCourseMessage() {
+    function displayNoCourseMessage() {
       const today = new Date().toLocaleDateString('fr-FR');
       const cachedDate = localStorage.getItem('noCourseMessageDate');
       const cachedMessage = localStorage.getItem('noCourseMessage');
@@ -1466,332 +2466,155 @@
         localStorage.setItem('noCourseImage', image);
       }
 
-      return { message, image };
+      return `
+        <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px;">
+          <img src="${image}" alt="Image de repos" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
+          <p class="quote-text">${message}</p>
+        </div>
+      `;
     }
 
-    function navigateDay(offset) {
-      currentDayIndex = (currentDayIndex + offset + 7) % 7;
-      syncCurrentDateToWeekWindow();
-      loadAndDisplayCourses();
+    function initializeCountdowns() {
+      updateCountdowns();
+      setInterval(updateCountdowns, 1000);
     }
 
-    async function loadAndDisplayCourses() {
-      try {
-        syncCurrentDateToWeekWindow();
-        console.log('Début du chargement des données...');
-        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
+    function updateCountdowns() {
+      const countdownElements = document.querySelectorAll('.countdown');
+      countdownElements.forEach(el => {
+        const startTimeStr = el.getAttribute('data-start-time');
+        const [startHour, startMinute] = startTimeStr.split(':').map(Number);
+        const startTime = new Date();
+        startTime.setHours(startHour, startMinute, 0, 0);
+        const now = new Date();
+        const diff = startTime - now;
         
-        if (!response.ok) {
-          console.error('Erreur fetch:', response.status, response.statusText);
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
+        // Récupérer le bloc parent du cours
+        const courseBlock = el.closest('.timeline-block');
         
-        allData = await response.json();
-        try {
-          initPlanningView(allData);
-          renderPlanningViewSwitcher(allData);
-        } catch (e) {
-          console.warn('Init planning / switcher:', e);
-          activePlanningView = 'regulier';
-          document.body.classList.remove('planning-ramadan');
-        }
-        console.log('Données chargées avec succès:', allData);
-        var planning = getCurrentPlanning();
-        console.log('Structure des données de planning:', Object.keys(planning));
-
-        const today = currentDate.toISOString().split('T')[0];
-        const dayName = days[currentDate.getDay()].toLowerCase();
-        
-        let todaysCourses = planning[dayName] || [];
-        if (todaysCourses.length === 0) {
-          todaysCourses = planning[today] || [];
-        }
-        console.log('Cours du jour:', todaysCourses);
-        if (allData.studios) console.log('Liste des studios disponibles:', allData.studios.map(s => ({ id: s.id, name: s.name })));
-
-        const studiosContainer = document.getElementById('studiosContainer');
-        studiosContainer.innerHTML = '';
-
-        // Si aucun cours pour ce jour
-        if (todaysCourses.length === 0) {
-          console.log('Aucun cours trouvé pour ce jour');
-          
-          // Récupérer message et image de manière synchrone et simple
-          let message, image;
-          try {
-            const result = getNoCourseMessage();
-            message = result.message;
-            image = result.image;
-            console.log('Message et image récupérés:', message, image);
-          } catch (err) {
-            console.error('Erreur getNoCourseMessage:', err);
-            // Fallback si getNoCourseMessage échoue
-            message = 'Profitez de votre journée de repos !';
-            image = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/70a8506a-23ce-3fc3-0e6d-2bc78a5b13d6.png';
-          }
-          
-          // Créer le conteneur de manière simple et directe
-          const noCoursesContainer = document.createElement('div');
-          noCoursesContainer.className = 'no-courses-container';
-          noCoursesContainer.style.textAlign = 'center';
-          noCoursesContainer.style.padding = '20px';
-          
-          // Créer l'image de manière explicite (pas innerHTML)
-          const img = document.createElement('img');
-          img.src = image;
-          img.alt = 'Image de repos';
-          img.style.maxWidth = '100%';
-          img.style.height = 'auto';
-          img.style.marginBottom = '20px';
-          img.style.borderRadius = '10px';
-          
-          // Fallback si l'image ne charge pas
-          const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-          img.onerror = function() {
-            console.log('Image principale échouée, utilisation du fallback');
-            this.src = defaultImage;
-          };
-          
-          // Créer le message
-          const messageP = document.createElement('p');
-          messageP.className = 'no-courses-message';
-          messageP.style.fontStyle = 'italic';
-          messageP.style.fontSize = '1.4em';
-          messageP.style.color = 'var(--text-secondary)';
-          messageP.style.textAlign = 'center';
-          messageP.style.marginTop = '20px';
-          messageP.style.width = '100%';
-          messageP.style.lineHeight = '1.5';
-          messageP.textContent = message;
-          
-          console.log('Message créé:', message);
-          console.log('Texte du messageP:', messageP.textContent);
-          
-          // Assembler le tout
-          noCoursesContainer.appendChild(img);
-          noCoursesContainer.appendChild(messageP);
-          studiosContainer.appendChild(noCoursesContainer);
-          
-          console.log('Conteneur no-courses créé et ajouté au DOM');
-          console.log('Image src:', img.src);
-          console.log('Message texte:', messageP.textContent);
-          console.log('Nombre d\'enfants dans noCoursesContainer:', noCoursesContainer.children.length);
-          console.log('Nombre d\'enfants dans studiosContainer:', studiosContainer.children.length);
-          
-          updateDayTitle();
-          document.getElementById('coachesSection').innerHTML = '';
-          document.body.setAttribute('data-daily-grid-ready', 'true');
-          return;
-        }
-
-        // Trier les studios par rang (utiliser 'rang' ou 'rank' selon ce qui existe)
-        if (!allData.studios || !Array.isArray(allData.studios) || allData.studios.length === 0) {
-          console.warn('Aucun studio dans les données');
-          const studiosContainer = document.getElementById('studiosContainer');
-          const fallback = document.createElement('div');
-          fallback.className = 'no-courses-container';
-          fallback.style.cssText = 'text-align:center;padding:20px;color:var(--text-secondary);';
-          fallback.textContent = 'Aucun studio configuré.';
-          studiosContainer.appendChild(fallback);
-          updateDayTitle();
-          document.body.setAttribute('data-daily-grid-ready', 'true');
-          return;
-        }
-        console.log('Studios avant tri:', allData.studios.map(s => ({ name: s.name, rank: s.rank, rang: s.rang })));
-        const sortedStudios = allData.studios
-          .sort((a, b) => {
-            const rankA = a.rank !== undefined ? a.rank : (a.rang !== undefined ? a.rang : 0);
-            const rankB = b.rank !== undefined ? b.rank : (b.rang !== undefined ? b.rang : 0);
-            return rankA - rankB;
-          });
-        console.log('Studios triés par rang:', sortedStudios.map(s => ({ name: s.name, rank: s.rank, rang: s.rang })));
-        console.log('Liste des IDs de studios:', sortedStudios.map(s => s.id));
-
-        // Créer des rangées de 3 studios
-        for (let i = 0; i < sortedStudios.length; i += 3) {
-          const row = document.createElement('div');
-          row.className = 'studios-row';
-          
-          // Ajouter les studios de cette rangée
-          for (let j = 0; j < 3 && i + j < sortedStudios.length; j++) {
-            const studio = sortedStudios[i + j];
-            console.log('Traitement du studio:', studio);
-            
-            var studioCourses = (todaysCourses || [])
-              .filter(function(course) { return (course.studioId || '') === (studio.id || ''); })
-              .sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
-            console.log('Cours du studio:', studioCourses);
-            console.log('IDs des cours pour ce studio:', studioCourses.map(c => c.coursId));
-            
-            const studioColumn = document.createElement('div');
-            studioColumn.className = 'studio-column';
-            
-            const studioTitle = document.createElement('h2');
-            studioTitle.className = 'studio-title';
-            
-            // Ajouter l'icône du studio si elle existe
-            if (studio.imageUrl) {
-              const studioIcon = document.createElement('img');
-              studioIcon.className = 'studio-icon';
-              studioIcon.src = studio.imageUrl;
-              studioIcon.alt = `${studio.name} icon`;
-              studioIcon.onerror = function() {
-                // Si l'image ne charge pas, la masquer
-                this.style.display = 'none';
-              };
-              studioTitle.appendChild(studioIcon);
+        if (diff > 0) {
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
+          el.innerHTML = `Démarrage dans&nbsp;<span style="display: inline-block; min-width: 45px; text-align: center;">${minutes}:${seconds.toString().padStart(2, '0')}</span>`;
+        } else if (diff > -60 * 1000) {
+          el.innerHTML = 'Démarrage imminent';
+        } else {
+          el.remove();
+          if (!courseBlock.classList.contains('current')) {
+            courseBlock.classList.add('current', 'focus');
+            courseBlock.classList.remove('starting-soon');
+            // Retirer la classe starting-soon du course-block aussi
+            const courseBlockElement = courseBlock.querySelector('.course-block');
+            if (courseBlockElement) {
+              courseBlockElement.classList.remove('starting-soon');
             }
-            
-            // Ajouter le texte du nom du studio
-            const studioNameText = document.createElement('span');
-            studioNameText.textContent = studio.name;
-            studioTitle.appendChild(studioNameText);
-            
-            const coursesContainer = document.createElement('div');
-            coursesContainer.className = 'courses-container';
-            
-            if (studioCourses.length === 0) {
-              const emptyMessage = document.createElement('div');
-              emptyMessage.className = 'empty-message';
-              emptyMessage.textContent = 'Pas de cours';
-              coursesContainer.appendChild(emptyMessage);
-            } else {
-              studioCourses.forEach(function(course) {
-                var coursIdStr = (course.coursId || '').toString();
-                var courseName = coursIdStr.split('-').slice(1).join(' ').toUpperCase();
-                
-                // Récupérer tous les coachs du cours
-                const coachIds = course.coachIds || [];
-                const coachList = allData.coachs || [];
-                const courseCoaches = coachIds.map(function(coachId) { return coachList.find(function(c) { return c && c.id === coachId; }); }).filter(function(c) { return c !== undefined; });
-                
-                var coachNamesText = '';
-                if (courseCoaches.length === 0) {
-                  coachNamesText = '–';
-                } else if (courseCoaches.length === 1) {
-                  coachNamesText = courseCoaches[0].name || '–';
-                } else if (courseCoaches.length === 2) {
-                  coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '');
-                } else {
-                  coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '') + '...';
-                }
-                
-                const courseCard = document.createElement('div');
-                courseCard.className = 'course-card';
-                var courseType = (course.type || '').toString().toLowerCase();
-                var studioName = (studio.name || '').toString().toLowerCase();
-                if (courseType.indexOf('femme') !== -1) {
-                  courseCard.classList.add('women-only');
-                }
-                if (studioName.indexOf('piscine') !== -1 || studioName.indexOf('aqua') !== -1) {
-                  courseCard.classList.add('pool');
-                }
-                
-                courseCard.innerHTML = '<div class="course-time">' + (course.startTime || '') + '</div><div class="course-name">' + (courseName || '') + '</div><div class="course-coach">' + (coachNamesText || '–') + '</div>';
-                coursesContainer.appendChild(courseCard);
-              });
-            }
-            
-            studioColumn.appendChild(studioTitle);
-            studioColumn.appendChild(coursesContainer);
-            row.appendChild(studioColumn);
           }
-          
-          studiosContainer.appendChild(row);
         }
-        
-        updateDayTitle();
-        
-        // Gérer les coachs
-        const uniqueCoachIds = [...new Set(todaysCourses
-          .flatMap(function(course) { return course.coachIds || []; })
-          .filter(function(id) { return id !== undefined && id !== null; }))];
-        console.log('IDs des coachs uniques:', uniqueCoachIds);
-        
-        const coachesSection = document.getElementById('coachesSection');
-        coachesSection.innerHTML = '';
-        
-        var coachListForSection = allData.coachs || [];
-        if (uniqueCoachIds.length > 0 && coachListForSection.length > 0) {
-          uniqueCoachIds.forEach(function(coachId) {
-            var coachData = coachListForSection.find(function(c) { return c && c.id === coachId; });
-            if (!coachData) return;
-            
-            const coachCard = document.createElement('div');
-            coachCard.className = 'coach-card';
-            
-            // Utiliser directement l'imageUrl du coach
-            const coachImage = coachData.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-            console.log('URL de l\'image du coach:', coachImage);
-            
-            coachCard.innerHTML = `
-              <img src="${coachImage}" alt="${coachData.name}" class="coach-image" onerror="this.src='https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png'">
-              <div class="coach-name">${coachData.name}</div>
-            `;
-            
-            coachesSection.appendChild(coachCard);
-          });
-        }
-        document.body.setAttribute('data-daily-grid-ready', 'true');
-      } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
-        document.body.setAttribute('data-daily-grid-ready', 'error');
-        var container = document.getElementById('studiosContainer');
-        if (container) {
-          container.innerHTML = '';
-          var errDiv = document.createElement('div');
-          errDiv.className = 'no-courses-container';
-          errDiv.style.cssText = 'text-align:center;padding:20px;color:#c00;font-size:0.9em;';
-          errDiv.textContent = 'Erreur de chargement: ' + (error && error.message ? error.message : String(error));
-          container.appendChild(errDiv);
-        }
-      }
+      });
     }
 
-    // Fonction pour initialiser la page
     function initializePage() {
-      // Charger les cours
-      if (typeof loadAndDisplayCourses === 'function') {
-        loadAndDisplayCourses();
+      document.body.classList.add('loading');
+      
+      const todayButton = document.getElementById('todayViewButton');
+      if (todayButton) {
+        todayButton.style.display = 'none';
+        todayButton.classList.remove('visible');
       }
       
-      // Attendre un peu pour que le DOM soit prêt
-      setTimeout(() => {
-        updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
-      }, 100);
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+      }
+
+      fetchAllData().then(() => {
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Appel initial pour configurer l'état correct
+        updateButtonVisibility(); // Appliquer le masquage si nécessaire
+      });
     }
-    
-    // Appeler dès que possible (si le DOM est déjà chargé)
-    if (document.readyState === 'loading') {
-      // Le DOM est encore en cours de chargement
-      document.addEventListener('DOMContentLoaded', initializePage);
-    } else {
-      // Le DOM est déjà chargé
-      initializePage();
-    }
-    
-    // Au load : ne pas rappeler loadAndDisplayCourses (évite de vider la grille puis refetch = capture Puppeteer blanche)
-    window.addEventListener('load', function() {
-      updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Observer pour le titre sticky
+      const dayOfWeekElement = document.getElementById('dayOfWeek');
+      const stickyDayNameElement = document.getElementById('stickyDayName');
+
+      const observerOptions = {
+        root: null,
+        threshold: 0,
+      };
+
+      // Utiliser requestAnimationFrame pour optimiser les mises à jour visuelles
+      const observer = new IntersectionObserver(function(entries) {
+        requestAnimationFrame(() => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+              stickyDayNameElement.style.cssText = 'opacity: 1; transform: translateY(0);';
+            } else {
+              stickyDayNameElement.style.cssText = 'opacity: 0; transform: translateY(-100%);';
+            }
+          });
+        });
+      }, observerOptions);
+
+      observer.observe(dayOfWeekElement);
     });
-    
-    setInterval(loadAndDisplayCourses, 60000);
 
-    // Fonction pour rediriger vers daily.html
-    function returnToDaily() {
-      window.location.href = 'daily.html';
-    }
+    // Ajout d'un gestionnaire d'événements pour empêcher le défilement horizontal
+    document.addEventListener('DOMContentLoaded', function() {
+      // Empêcher le défilement horizontal
+      window.addEventListener('scroll', function() {
+        if (window.scrollX !== 0) {
+          window.scrollTo(0, window.scrollY);
+        }
+      });
 
-    function handleResize() {
-      if (typeof updateTodayButtonPosition === 'function') {
-        updateTodayButtonPosition();
-      }
+      // Empêcher le défilement horizontal lors du redimensionnement
+      window.addEventListener('resize', function() {
+        if (window.scrollX !== 0) {
+          window.scrollTo(0, window.scrollY);
+        }
+      });
+    });
+
+    // Animation de paillettes pour le bouton Ramadan
+    function createConfetti() {
+      const button = document.getElementById('ramadanSwitchButton');
+      if (!button) return;
       
-      updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+      const container = button.querySelector('.confetti-container');
+      if (!container) return;
+      
+      // Créer une nouvelle paillette toutes les 200-400ms
+      setInterval(function() {
+        if (!button.offsetParent) return; // Bouton masqué
+        
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-particle';
+        confetti.style.left = (25 + Math.random() * 50) + 'px'; // Entre 25px et 75px (centre du container)
+        confetti.style.top = '50px'; // Commencer au niveau du bouton
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        confetti.style.setProperty('--drift', (Math.random() * 40 - 20) + 'px');
+        container.appendChild(confetti);
+        
+        // Supprimer après l'animation
+        setTimeout(function() {
+          if (confetti.parentNode) confetti.remove();
+        }, 4000);
+      }, 300);
     }
-    
-    // Appeler handleResize au redimensionnement de la fenêtre
-    window.addEventListener('resize', handleResize);
+
+    // Initialiser les paillettes au chargement
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createConfetti, 500);
+      });
+    } else {
+      setTimeout(createConfetti, 500);
+    }
   </script>
+
+  <footer></footer>
 </body>
 </html> 
