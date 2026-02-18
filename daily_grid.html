@@ -1569,11 +1569,8 @@
       initializePage();
     }
     
-    // Aussi appeler au chargement complet de la page (pour être sûr)
+    // Au load : ne pas rappeler loadAndDisplayCourses (évite de vider la grille puis refetch = capture Puppeteer blanche)
     window.addEventListener('load', function() {
-      if (typeof loadAndDisplayCourses === 'function') {
-        loadAndDisplayCourses();
-      }
       updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
     });
     
