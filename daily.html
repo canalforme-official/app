@@ -78,8 +78,37 @@
       --primary-light: rgba(26, 71, 42, 0.85);
       --secondary-color: #c9a227;
       --secondary-light: rgba(201, 162, 39, 0.75);
+      position: relative;
     }
-    #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 8px 0; margin: 0 0 8px 0; }
+    body.planning-ramadan::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');
+      background-repeat: repeat;
+      background-size: 40px 40px;
+      background-position: 0 0;
+      opacity: 0.04;
+      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+    /* Contenu au-dessus du fond (sans toucher aux éléments en position: fixed/absolute) */
+    body.planning-ramadan > #planningViewSwitcher,
+    body.planning-ramadan > #dayOfWeek,
+    body.planning-ramadan > #timeline {
+      position: relative;
+      z-index: 1;
+    }
+    /* Garder la date en haut à droite : ne pas écraser son position: absolute, seulement z-index */
+    body.planning-ramadan > .date {
+      z-index: 1;
+    }
+    #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 2px 0; margin: 0 0 2px 0; }
     #planningViewSwitcher button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--primary-color); background: var(--background-card); color: var(--primary-color); font-size: 0.9em; cursor: pointer; }
     #planningViewSwitcher button.active { background: var(--primary-color); color: var(--text-light); }
     #planningViewSwitcher button:not(.active):hover { background: var(--primary-lighter); color: #fff; }
