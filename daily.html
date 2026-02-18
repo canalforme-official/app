@@ -104,6 +104,22 @@
       position: relative;
       z-index: 1;
     }
+    /* Icône retour à aujourd'hui en vert Ramadan (#1a472a) opaque en mode Ramadan */
+    body.planning-ramadan .today-view-button::before {
+      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+    }
+    /* Icône rotation à gauche du cours en cours en vert Ramadan (#1a472a) opaque en mode Ramadan */
+    body.planning-ramadan .timeline-block.current::before {
+      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%);
+    }
+    /* Heures de cours en vert Ramadan avec transparence équivalente */
+    body.planning-ramadan .time {
+      color: rgba(26, 71, 42, 0.7);
+    }
+    /* Icônes des studios en vert Ramadan en mode Ramadan */
+    body.planning-ramadan .course-studio img {
+      filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(1352%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+    }
     /* Garder la date en haut à droite : ne pas écraser son position: absolute, seulement z-index */
     body.planning-ramadan > .date {
       z-index: 1;
@@ -676,6 +692,154 @@
       visibility: hidden;
     }
 
+    /* Bouton switch planning Ramadan */
+    .ramadan-switch-button {
+      position: fixed;
+      top: 75%;
+      left: 10px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(72, 6, 7, 0.8);
+      border: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+      overflow: visible;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: all;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .ramadan-switch-button.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ramadan-icon {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0) invert(1);
+      transition: filter 0.3s;
+      z-index: 10;
+      position: relative;
+    }
+
+    /* État actif (planning Ramadan) - fond vert avec opacité */
+    body.planning-ramadan .ramadan-switch-button {
+      background: rgba(26, 71, 42, 0.8);
+    }
+
+    body.planning-ramadan .ramadan-icon {
+      filter: brightness(0) invert(1);
+    }
+
+    /* Animation élégante au clic */
+    .ramadan-switch-button:active {
+      transform: scale(0.85);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ramadan-switch-button:active::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(72, 6, 7, 0.3);
+      transform: translate(-50%, -50%);
+      animation: ripple-click 0.6s ease-out;
+    }
+
+    body.planning-ramadan .ramadan-switch-button:active::after {
+      background: rgba(26, 71, 42, 0.4);
+    }
+
+    @keyframes ripple-click {
+      0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+      }
+      100% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+      }
+    }
+
+    /* Paillettes d'explosion au clic */
+    .confetti-burst {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: confetti-burst-anim 1s ease-out forwards;
+    }
+
+    @keyframes confetti-burst-anim {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--burst-x, 0), var(--burst-y, 0)) scale(0) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Container pour les paillettes */
+    .confetti-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    /* Paillettes */
+    .confetti-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #1a472a;
+      border-radius: 50%;
+      animation: confetti-fall 3s linear infinite;
+      pointer-events: none;
+    }
+
+    /* Paillettes bordeaux en mode Ramadan */
+    body.planning-ramadan .confetti-particle {
+      background: #480607;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(250px) translateX(var(--drift, 0px)) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Masquer l'ancien bouton en haut */
+    #planningViewSwitcher {
+      display: none !important;
+    }
+
     @media screen and (min-width: 1025px) {
       .navigation {
         display: none;
@@ -687,6 +851,10 @@
       
       .weekly-view-button {
         display: none;
+      }
+      
+      .ramadan-switch-button {
+        display: none !important;
       }
     }
 
@@ -1598,6 +1766,12 @@
     </button>
   </div>
 
+  <!-- Bouton switch planning Ramadan -->
+  <button id="ramadanSwitchButton" class="ramadan-switch-button" onclick="toggleRamadanPlanning()">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
+    <div class="confetti-container"></div>
+  </button>
+
   <h1 id="dayOfWeek"></h1>
   <div class="date" id="dateStr"></div>
   <div id="planningViewSwitcher" style="display: none;"></div>
@@ -1642,21 +1816,27 @@
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
     }
     function renderPlanningViewSwitcher(data) {
+      // Ancien bouton masqué, on utilise maintenant le bouton flottant
       var container = document.getElementById('planningViewSwitcher');
-      if (!container) return;
+      if (container) container.style.display = 'none';
+      
+      // Afficher/masquer le bouton flottant selon les conditions
+      var ramadanButton = document.getElementById('ramadanSwitchButton');
+      if (!ramadanButton) return;
+      
       var meta = data.metadata || {};
       var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
       var today = new Date().toISOString().slice(0, 10);
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
       var daysBefore = 7;
       var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore));
-      if (!showSwitcher) { container.style.display = 'none'; container.innerHTML = ''; return; }
-      container.innerHTML = '';
-      var btn = document.createElement('button');
-      if (activePlanningView === 'ramadan') { btn.textContent = 'Voir planning régulier'; btn.classList.add('active'); btn.onclick = function() { setPlanningView('regulier'); }; }
-      else { var dateDebut = ramadanStart ? (function(s) { var p = s.split('-'); if (p.length !== 3) return ''; var mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']; return p[2] + ' ' + (mois[parseInt(p[1],10)-1] || ''); })(ramadanStart) : ''; btn.textContent = inRamadan ? 'Voir planning Ramadan' : 'Voir planning Ramadan' + (dateDebut ? ' (' + dateDebut + ')' : ' (à venir)'); btn.onclick = function() { setPlanningView('ramadan'); }; }
-      container.appendChild(btn);
-      container.style.display = 'flex';
+      
+      if (showSwitcher) {
+        ramadanButton.style.display = 'flex';
+        setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
+      } else {
+        ramadanButton.style.display = 'none';
+      }
     }
     function setPlanningView(view) {
       activePlanningView = view;
@@ -1664,6 +1844,33 @@
       document.body.classList.toggle('planning-ramadan', view === 'ramadan');
       displaySchedule(currentDayIndex);
       renderPlanningViewSwitcher(allData);
+    }
+    
+    function toggleRamadanPlanning() {
+      var button = document.getElementById('ramadanSwitchButton');
+      if (!button) return;
+      
+      // Animation d'explosion de paillettes au clic
+      var container = button.querySelector('.confetti-container');
+      if (container) {
+        var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#1a472a';
+        for (var i = 0; i < 12; i++) {
+          var burst = document.createElement('div');
+          burst.className = 'confetti-burst';
+          burst.style.background = color;
+          burst.style.left = '50%';
+          burst.style.top = '50%';
+          var angle = (i * 30) * Math.PI / 180;
+          var distance = 60 + Math.random() * 20;
+          burst.style.setProperty('--burst-x', Math.cos(angle) * distance + 'px');
+          burst.style.setProperty('--burst-y', Math.sin(angle) * distance + 'px');
+          container.appendChild(burst);
+          setTimeout(function(el) { if (el.parentNode) el.remove(); }, 1000, burst);
+        }
+      }
+      
+      var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
+      setPlanningView(currentView);
     }
 
     // Option pour afficher/masquer les images des cours
@@ -1803,11 +2010,11 @@
       const displayDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
       dayOfWeekElement.innerText = displayDayOfWeek;
 
-      // Mettre à jour la date
-      const today = new Date();
-      today.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
-      const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-      document.getElementById('dateStr').innerText = dateStr;
+      // Mettre à jour la date (supprimé : plus d'affichage de date)
+      const dateStrEl = document.getElementById('dateStr');
+      if (dateStrEl) {
+        dateStrEl.innerText = '';
+      }
       
       // Mettre à jour le sticky header avec le jour et la date
       const stickyDayName = document.getElementById('stickyDayName');
@@ -1817,9 +2024,7 @@
         stickyDayNameSpan.innerText = displayDayOfWeek;
       }
       if (stickyDayDateSpan) {
-        const day = String(today.getDate()).padStart(2, '0');
-        const month = today.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase();
-        stickyDayDateSpan.innerText = `${day} ${month}`;
+        stickyDayDateSpan.innerText = '';
       }
       
       const planning = getCurrentPlanning();
@@ -2264,6 +2469,43 @@
         }
       });
     });
+
+    // Animation de paillettes pour le bouton Ramadan
+    function createConfetti() {
+      const button = document.getElementById('ramadanSwitchButton');
+      if (!button) return;
+      
+      const container = button.querySelector('.confetti-container');
+      if (!container) return;
+      
+      // Créer une nouvelle paillette toutes les 200-400ms
+      setInterval(function() {
+        if (!button.offsetParent) return; // Bouton masqué
+        
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-particle';
+        confetti.style.left = (25 + Math.random() * 50) + 'px'; // Entre 25px et 75px (centre du container)
+        confetti.style.top = '50px'; // Commencer au niveau du bouton
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        confetti.style.setProperty('--drift', (Math.random() * 40 - 20) + 'px');
+        container.appendChild(confetti);
+        
+        // Supprimer après l'animation
+        setTimeout(function() {
+          if (confetti.parentNode) confetti.remove();
+        }, 4000);
+      }, 300);
+    }
+
+    // Initialiser les paillettes au chargement
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createConfetti, 500);
+      });
+    } else {
+      setTimeout(createConfetti, 500);
+    }
   </script>
 
   <footer></footer>
