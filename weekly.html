@@ -64,6 +64,45 @@
       --overlay-lighter: rgba(255, 255, 255, 0.2);
     }
 
+    /* Thème Ramadan (couleurs modifiées quand planning Ramadan affiché) */
+    body.planning-ramadan {
+      --primary-color: #1a472a;
+      --primary-overlay: rgba(26, 71, 42, 0.95);
+      --primary-light: rgba(26, 71, 42, 0.85);
+      --secondary-color: #c9a227;
+      --secondary-light: rgba(201, 162, 39, 0.75);
+    }
+
+    body.planning-ramadan .course-block { border-left-color: var(--primary-color); }
+    body.planning-ramadan .weekly-schedule th { background: var(--primary-light); color: #fff; }
+
+    /* Conteneur des boutons Ramadan / Régulier */
+    #planningViewSwitcher {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 8px 0;
+      margin: 0 0 8px 0;
+    }
+    #planningViewSwitcher button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--primary-color);
+      background: var(--background-card);
+      color: var(--primary-color);
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+    #planningViewSwitcher button.active {
+      background: var(--primary-color);
+      color: var(--text-light);
+    }
+    #planningViewSwitcher button:not(.active):hover {
+      background: var(--primary-lighter);
+      color: #fff;
+    }
+
     body, button, a, img {
       user-select: none;
       -webkit-user-select: none;
@@ -1854,6 +1893,9 @@
       </div>
     </div>
 
+    <!-- Boutons Planning Ramadan / Régulier (affichés selon période) -->
+    <div id="planningViewSwitcher" style="display: none;"></div>
+
     <!-- Le planning hebdomadaire sera inséré ici -->
     <div id="weeklySchedule"></div>
 
@@ -1901,6 +1943,136 @@
     
     // Initialiser les variables
     var scheduleData = [];
+    var activePlanningView = 'regulier'; // 'regulier' | 'ramadan'
+
+    /** Retourne le planning actuellement affiché (régulier ou Ramadan). Si Ramadan vide, affiche le régulier. */
+    function getCurrentPlanning() {
+      if (!scheduleData || !scheduleData.planning) return {};
+      if (activePlanningView === 'ramadan' && scheduleData.planningRamadan) {
+        var pr = scheduleData.planningRamadan;
+        var hasCourses = Object.keys(pr).some(function(day) { return pr[day] && pr[day].length > 0; });
+        if (hasCourses) return pr;
+      }
+      return scheduleData.planning;
+    }
+
+    /** Initialise activePlanningView depuis URL, localStorage ou période (ramadanStart/ramadanEnd). */
+    function initPlanningView(data) {
+      var params = new URLSearchParams(window.location.search);
+      var urlView = params.get('planning');
+      var stored = localStorage.getItem('planningView');
+      var today = new Date().toISOString().slice(0, 10);
+      var ramadanStart = data.metadata && data.metadata.ramadanStart;
+      var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
+      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var daysBeforeRamadan = 7;
+      var showRamadanButton = ramadanStart && data.planningRamadan && today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBeforeRamadan;
+
+      if (urlView === 'ramadan' || urlView === 'regulier') {
+        activePlanningView = urlView;
+        localStorage.setItem('planningView', urlView);
+      } else if (stored === 'ramadan' || stored === 'regulier') {
+        activePlanningView = stored;
+      } else if (inRamadan) {
+        activePlanningView = 'ramadan';
+        localStorage.setItem('planningView', 'ramadan');
+      } else {
+        activePlanningView = 'regulier';
+        localStorage.setItem('planningView', 'regulier');
+      }
+      document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
+    }
+
+    /** Un seul bouton qui bascule : affiche "Voir planning Ramadan" ou "Voir planning régulier" selon la vue actuelle. */
+    function renderPlanningViewSwitcher(data) {
+      var container = document.getElementById('planningViewSwitcher');
+      if (!container) return;
+      var meta = data.metadata || {};
+      var ramadanStart = meta.ramadanStart;
+      var ramadanEnd = meta.ramadanEnd;
+      var today = new Date().toISOString().slice(0, 10);
+      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var daysBefore = 7;
+      var showSwitcher = (data.planningRamadan && ramadanStart) && (
+        inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore)
+      );
+      if (!showSwitcher) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = '';
+      var btn = document.createElement('button');
+      if (activePlanningView === 'ramadan') {
+        btn.textContent = 'Voir planning régulier';
+        btn.classList.add('active');
+        btn.onclick = function() { setPlanningView('regulier'); };
+      } else {
+        var dateDebut = ramadanStart ? (function(s) { var p = s.split('-'); if (p.length !== 3) return ''; var mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']; return p[2] + ' ' + (mois[parseInt(p[1],10)-1] || ''); })(ramadanStart) : '';
+        btn.textContent = inRamadan ? 'Voir planning Ramadan' : 'Voir planning Ramadan' + (dateDebut ? ' (' + dateDebut + ')' : ' (à venir)');
+        btn.classList.toggle('active', false);
+        btn.onclick = function() { setPlanningView('ramadan'); };
+      }
+      container.appendChild(btn);
+      container.style.display = 'flex';
+    }
+
+    /** Bascule l’affichage vers planning Ramadan ou régulier et rafraîchit. */
+    function setPlanningView(view) {
+      activePlanningView = view;
+      localStorage.setItem('planningView', view);
+      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
+      refreshPlanningDisplay();
+    }
+
+    /** Re-génère le planning et met à jour la liste des coachs (sidebar). */
+    function refreshPlanningDisplay() {
+      if (!scheduleData || !scheduleData.planning) return;
+      document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+      markMultilineCourseNames();
+      var planningData = getCurrentPlanning();
+      var coachsData = scheduleData.coachs;
+      var defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
+      var uniqueCoachesMap = new Map();
+      Object.values(planningData).forEach(dayCourses => {
+        (dayCourses || []).forEach(course => {
+          if (course.coachIds) {
+            course.coachIds.forEach(coachId => {
+              var coach = coachsData.find(c => c.id === coachId);
+              if (coach && !uniqueCoachesMap.has(coach.name)) uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
+            });
+          }
+        });
+      });
+      var coachDropdownContent = document.querySelector('#filtersSidebar .coach-dropdown-content');
+      var coachDropdownText = document.querySelector('#filtersSidebar #coachDropdownText');
+      if (coachDropdownContent) {
+        coachDropdownContent.innerHTML = '';
+        Array.from(uniqueCoachesMap.values()).sort((a,b) => a.name.localeCompare(b.name)).forEach(function(coachObj) {
+          var option = document.createElement('div');
+          option.className = 'coach-dropdown-option';
+          var label = document.createElement('label');
+          label.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;cursor:pointer';
+          var img = document.createElement('img');
+          img.className = 'coach-dropdown-option-photo';
+          img.src = coachObj.imageUrl;
+          img.alt = coachObj.name;
+          var span = document.createElement('span');
+          span.textContent = coachObj.name;
+          span.style.flex = '1';
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = coachObj.name;
+          label.appendChild(img);
+          label.appendChild(span);
+          label.appendChild(cb);
+          option.appendChild(label);
+          coachDropdownContent.appendChild(option);
+        });
+      }
+      renderPlanningViewSwitcher(scheduleData);
+      applyFilters();
+    }
 
     // Paramètre pour activer/désactiver l'overlay de chargement
     const SHOW_LOADING_OVERLAY = false; // Mettre à true pour réactiver l'overlay
@@ -1943,28 +2115,15 @@
       const delay = SHOW_LOADING_OVERLAY ? 2000 : 0;
       setTimeout(() => {
         fetchWeeklyData().then(data => {
-          // Logs pour vérifier la structure des données
+          scheduleData = data;
+          initPlanningView(data);
+          renderPlanningViewSwitcher(data);
+
           console.group('Traitement des données');
           console.log('Données reçues:', data);
-          
-          // Préparer les données pour le traitement
-          const planningData = data.planning;
-          const coursData = data.cours;
-          const coachsData = data.coachs;
-          const studiosData = data.studios;
-
-          // Vérification des données
-          console.log('Planning:', planningData);
-          console.log('Cours:', coursData);
-          console.log('Coachs:', coachsData);
-          console.log('Studios:', studiosData);
-          
+          console.log('Planning actif:', activePlanningView, 'Planning:', getCurrentPlanning());
           console.groupEnd();
 
-          // Assigner les données à la variable globale scheduleData
-          scheduleData = data;
-
-          // Générer le contenu HTML pour le planning hebdomadaire
           document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
           markMultilineCourseNames();
 
@@ -1988,10 +2147,12 @@
           }
 
           // Récupérer la liste unique de coachs (nom -> { name, imageUrl }) pour le menu déroulant
+          var planningData = getCurrentPlanning();
+          var coachsData = scheduleData.coachs;
           let uniqueCoachesMap = new Map();
           const defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
           Object.values(planningData).forEach(dayCourses => {
-            dayCourses.forEach(course => {
+            (dayCourses || []).forEach(course => {
               if (course.coachIds) {
                 course.coachIds.forEach(coachId => {
                   const coach = coachsData.find(c => c.id === coachId);
@@ -2209,11 +2370,12 @@
           });
 
           // Validation des jours du planning
-          const jours = Object.keys(data.planning);
+          const jours = Object.keys(data.planning || {});
           console.log('Jours avec planning:', jours);
+          if (data.planningRamadan) console.log('Planning Ramadan: présent');
 
           // Validation d'un échantillon de données
-          if (jours.length > 0) {
+          if (jours.length > 0 && data.planning) {
             const premierJour = jours[0];
             console.log(`Exemple de cours pour ${premierJour}:`, data.planning[premierJour][0]);
           }
@@ -2326,8 +2488,8 @@
       var todayIndex = new Date().getDay();
       var todayName = weekDays[todayIndex];
 
-      // Récupération des données nécessaires
-      const planning = scheduleData.planning;
+      // Récupération des données nécessaires (planning actif = régulier ou Ramadan)
+      const planning = getCurrentPlanning();
       const cours = scheduleData.cours;
       const coachs = scheduleData.coachs;
       const studios = scheduleData.studios;
