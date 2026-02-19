@@ -1,1 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Horaires de Prière - Ramadan</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Meta viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <style>
+    /* Variables de style */
+    :root {
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      --primary-color: #26462d;
+      --secondary-color: #c9a227;
+      --background-main: #F5F5F5;
+      --background-card: #FFFFFF;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-light: #FFFFFF;
+      --shadow-light: rgba(200, 200, 200, 0.3);
+      --shadow-medium: rgba(150, 150, 150, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-text);
+      background-color: var(--background-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');
+      background-repeat: repeat;
+      background-size: 40px 40px;
+      opacity: 0.04;
+      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: var(--background-card);
+      border-radius: 15px;
+      box-shadow: 0 4px 6px var(--shadow-light);
+    }
+
+    .header h1 {
+      font-family: var(--font-title);
+      font-size: 2.5em;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .header .subtitle {
+      font-size: 1.1em;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .source-reference {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-top: 15px;
+      font-style: italic;
+    }
+
+    .source-reference a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .source-reference a:hover {
+      text-decoration: underline;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: var(--primary-color);
+      color: var(--text-light);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: var(--font-title);
+      font-size: 1em;
+      cursor: pointer;
+      z-index: 1000;
+      transition: background 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-button:hover {
+      background: #1e3523;
+    }
+
+    .today-info {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #1e3523 100%);
+      color: var(--text-light);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      text-align: center;
+      box-shadow: 0 4px 6px var(--shadow-medium);
+    }
+
+    .today-info h2 {
+      font-family: var(--font-title);
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+
+    .today-maghrib {
+      font-size: 2.5em;
+      font-weight: 600;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .prayer-table {
+      background: var(--background-card);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px var(--shadow-light);
+      margin-bottom: 30px;
+    }
+
+    .table-header {
+      background: var(--primary-color);
+      color: var(--text-light);
+      padding: 15px;
+      font-family: var(--font-title);
+      font-size: 1.3em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .table-content {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: rgba(38, 70, 45, 0.1);
+    }
+
+    th {
+      font-family: var(--font-title);
+      padding: 15px 10px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      font-size: 0.9em;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    td {
+      padding: 12px 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    tbody tr:hover {
+      background: rgba(38, 70, 45, 0.05);
+    }
+
+    tbody tr.today {
+      background: rgba(201, 162, 39, 0.15);
+      font-weight: 600;
+    }
+
+    .day-number {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .observation-badge {
+      font-size: 0.75em;
+      font-weight: 500;
+      color: var(--secondary-color);
+      font-style: italic;
+      display: inline-block;
+      padding: 2px 6px;
+      background: rgba(201, 162, 39, 0.1);
+      border-radius: 4px;
+    }
+
+    .day-name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .prayer-time {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .prayer-time.maghrib {
+      color: var(--secondary-color);
+      font-size: 1.1em;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2em;
+      color: var(--text-secondary);
+    }
+
+    .error {
+      text-align: center;
+      padding: 40px;
+      background: #ffebee;
+      color: #c62828;
+      border-radius: 15px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .today-maghrib {
+        font-size: 2em;
+      }
+
+      th, td {
+        padding: 10px 5px;
+        font-size: 0.85em;
+      }
+
+      .back-button {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 20px;
+        display: block;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      th, td {
+        padding: 8px 3px;
+        font-size: 0.75em;
+      }
+
+      .day-name {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="./daily_grid.html" class="back-button">← Retour</a>
+
+  <div class="content-wrapper">
+    <div class="header">
+      <h1>Horaires de Prière</h1>
+      <div class="subtitle" id="ramadanYear">Ramadan</div>
+      <div class="source-reference">
+        Source : <a href="https://www.habous.gov.ma/fr/horaires-de-pri%C3%A8re.html" target="_blank" rel="noopener noreferrer">Ministère des Habous et des Affaires Islamiques</a> - Marrakech
+      </div>
+    </div>
+
+    <div class="today-info" id="todayInfo" style="display: none;">
+      <h2>Aujourd'hui</h2>
+      <div class="today-maghrib" id="todayMaghrib"></div>
+    </div>
+
+    <div class="prayer-table">
+      <div class="table-header">Calendrier Complet</div>
+      <div class="table-content">
+        <div class="loading" id="loading">Chargement des horaires...</div>
+        <div class="error" id="error" style="display: none;"></div>
+        <table id="prayerTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>Jour</th>
+              <th>Date</th>
+              <th>Fajr</th>
+              <th>Chourouq</th>
+              <th>Dhuhr</th>
+              <th>Asr</th>
+              <th>Maghrib</th>
+              <th>Isha</th>
+            </tr>
+          </thead>
+          <tbody id="prayerTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+    async function loadPrayerTimes() {
+      const loadingEl = document.getElementById('loading');
+      const errorEl = document.getElementById('error');
+      const tableEl = document.getElementById('prayerTable');
+      const tableBody = document.getElementById('prayerTableBody');
+      const todayInfoEl = document.getElementById('todayInfo');
+      const todayMaghribEl = document.getElementById('todayMaghrib');
+      const ramadanYearEl = document.getElementById('ramadanYear');
+
+      try {
+        // Essayer d'abord le fichier local, puis GitHub en fallback
+        let response = null;
+        let data = null;
+        
+        try {
+          // Tentative 1 : Fichier local (fonctionne si servi par un serveur local)
+          response = await fetch('./prayer-times.json');
+          if (response.ok) {
+            data = await response.json();
+            console.log('✅ Données chargées depuis le fichier local');
+          } else {
+            throw new Error('Fichier local non disponible');
+          }
+        } catch (localError) {
+          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+          // Tentative 2 : GitHub (fallback)
+          response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+          if (!response.ok) {
+            throw new Error('Impossible de charger les horaires de prière depuis GitHub');
+          }
+          data = await response.json();
+          console.log('✅ Données chargées depuis GitHub');
+        }
+        
+        if (!data.prayerTimes || Object.keys(data.prayerTimes).length === 0) {
+          throw new Error('Aucune donnée d\'horaires disponible');
+        }
+
+        // Afficher l'année du Ramadan
+        if (data.metadata && data.metadata.year) {
+          ramadanYearEl.textContent = `Ramadan ${data.metadata.year}`;
+        }
+
+        // Obtenir la date d'aujourd'hui
+        const today = new Date().toISOString().slice(0, 10);
+        const todayPrayer = data.prayerTimes[today];
+
+        // Afficher l'info d'aujourd'hui si disponible
+        if (todayPrayer && todayPrayer.maghrib) {
+          todayInfoEl.style.display = 'block';
+          todayMaghribEl.innerHTML = `Maghrib: 🌙 ${todayPrayer.maghrib}`;
+        }
+
+        // Trier les dates
+        const sortedDates = Object.keys(data.prayerTimes).sort();
+
+        // Remplir le tableau
+        tableBody.innerHTML = '';
+        sortedDates.forEach(dateStr => {
+          const prayer = data.prayerTimes[dateStr];
+          const date = new Date(dateStr + 'T12:00:00');
+          const isToday = dateStr === today;
+
+          const row = document.createElement('tr');
+          if (isToday) {
+            row.classList.add('today');
+          }
+
+          const dayOfWeek = daysOfWeek[date.getDay()];
+          const dayNumber = date.getDate();
+          const month = months[date.getMonth()];
+
+          const dayDisplay = prayer.isObservation 
+            ? `<span class="observation-badge">Selon l'observation</span>` 
+            : `<span class="day-number">${prayer.day || ''}</span>`;
+          
+          row.innerHTML = `
+            <td>
+              ${dayDisplay}
+              <br>
+              <span class="day-name">${dayOfWeek}</span>
+            </td>
+            <td>${dayNumber} ${month}</td>
+            <td class="prayer-time">${prayer.fajr || '-'}</td>
+            <td class="prayer-time">${prayer.chourouq || '-'}</td>
+            <td class="prayer-time">${prayer.dhuhr || '-'}</td>
+            <td class="prayer-time">${prayer.asr || '-'}</td>
+            <td class="prayer-time maghrib">${prayer.maghrib || '-'}</td>
+            <td class="prayer-time">${prayer.isha || '-'}</td>
+          `;
+
+          tableBody.appendChild(row);
+        });
+
+        loadingEl.style.display = 'none';
+        tableEl.style.display = 'table';
+
+      } catch (error) {
+        console.error('Erreur:', error);
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Erreur lors du chargement des horaires de prière. Veuillez réessayer plus tard.';
+      }
+    }
+
+    // Charger les données au chargement de la page
+    loadPrayerTimes();
+  </script>
+</body>
+</html>
 
