@@ -162,16 +162,23 @@
       -ms-user-select: text;
     }
 
+    .day-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px 0 0 0;
+      padding-left: 18px;
+    }
+
     h1 {
       font-family: var(--font-title);
       color: var(--primary-color);
       font-size: 2.5em;
       margin: 0;
-      padding: 20px 0 0 0;
-      padding-bottom: 0;
+      padding: 0;
       position: relative;
       font-weight: 600;
-      padding-left: 18px;
     }
     .planning-type-label {
       font-family: var(--font-text);
@@ -1566,6 +1573,58 @@
       color: rgba(38, 70, 45, 0.8);
     }
 
+    /* Badge Maghrib : à droite du titre, plus grand, centré verticalement, visible uniquement en vue Ramadan */
+    .maghrib-badge {
+      font-family: var(--font-text);
+      font-size: 1.1em;
+      color: var(--secondary-color);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: opacity 0.2s ease, background 0.2s ease;
+      text-transform: none;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(201, 162, 39, 0.12);
+      border: 1px solid rgba(201, 162, 39, 0.35);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .maghrib-badge:hover {
+      opacity: 0.9;
+      background: rgba(201, 162, 39, 0.2);
+    }
+
+    .maghrib-badge:active {
+      background: rgba(201, 162, 39, 0.25);
+    }
+
+    body.planning-ramadan .maghrib-badge {
+      color: var(--secondary-color);
+    }
+
+    .maghrib-badge.hidden {
+      display: none !important;
+    }
+
+    .maghrib-badge-hint {
+      font-size: 0.85em;
+      opacity: 0.9;
+    }
+
+    .sticky-day-name .maghrib-badge {
+      font-size: 0.75em;
+      padding: 4px 10px;
+      gap: 4px;
+    }
+
+    .sticky-day-name .maghrib-badge-hint {
+      display: none;
+    }
+
     /* Style pour le texte en tant que citation */
     .quote-text {
       font-family: var(--font-text);
@@ -1803,6 +1862,11 @@
   <!-- Bloc de texte collant pour le nom du jour -->
   <div id="stickyDayName" class="sticky-day-name">
     <span class="day-name"></span>
+    <a href="./prayer-times.html" class="maghrib-badge hidden" id="stickyMaghribBadge" title="Voir les horaires de prière">
+      <span class="maghrib-badge-icon">🌙</span>
+      <span class="maghrib-badge-time"></span>
+      <span class="maghrib-badge-hint">Horaires</span>
+    </a>
     <span class="day-date"></span>
     <span class="planning-type-label" id="stickyPlanningTypeLabel"></span>
   </div>
@@ -1849,7 +1913,14 @@
     <div class="confetti-container"></div>
   </button>
 
-  <h1 id="dayOfWeek"></h1>
+  <div class="day-title-row">
+    <h1 id="dayOfWeek"></h1>
+    <a href="./prayer-times.html" class="maghrib-badge hidden" id="maghribBadge" title="Voir les horaires de prière">
+      <span class="maghrib-badge-icon">🌙</span>
+      <span class="maghrib-badge-time"></span>
+      <span class="maghrib-badge-hint">Horaires</span>
+    </a>
+  </div>
   <span class="planning-type-label" id="planningTypeLabel"></span>
   <div class="date" id="dateStr"></div>
   <div id="planningViewSwitcher" style="display: none;"></div>
@@ -1929,6 +2000,7 @@
       localStorage.setItem('planningView', view);
       document.body.classList.toggle('planning-ramadan', view === 'ramadan');
       updatePlanningTypeLabel();
+      updateMaghribBadge(); // Afficher ou masquer le badge selon la vue
       displaySchedule(currentDayIndex);
       renderPlanningViewSwitcher(allData);
     }
@@ -2090,6 +2162,9 @@
 
         displaySchedule(currentDayIndex);
         hideLoadingOverlay();
+        
+        // Charger les horaires de prière après le chargement des données principales
+        await loadPrayerTimes();
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         // En cas d'erreur, essayer d'utiliser les données en cache
@@ -2100,7 +2175,96 @@
           renderPlanningViewSwitcher(allData);
           displaySchedule(currentDayIndex);
           hideLoadingOverlay();
+          await loadPrayerTimes();
         }
+      }
+    }
+
+    /**
+     * Charge les horaires de prière et affiche le badge Maghrib si on est en période Ramadan
+     */
+    async function loadPrayerTimes() {
+      try {
+        // Vérifier si on est en période Ramadan
+        if (!allData || !allData.metadata) return;
+        
+        const ramadanStart = allData.metadata.ramadanStart;
+        const ramadanEnd = allData.metadata.ramadanEnd;
+        const today = new Date().toISOString().slice(0, 10);
+        
+        const inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+        
+        if (!inRamadan) {
+          const badge = document.getElementById('maghribBadge');
+          const stickyBadge = document.getElementById('stickyMaghribBadge');
+          if (badge) badge.classList.add('hidden');
+          if (stickyBadge) stickyBadge.classList.add('hidden');
+          return;
+        }
+        
+        // Afficher le badge uniquement en vue Ramadan
+        if (activePlanningView !== 'ramadan') {
+          const badge = document.getElementById('maghribBadge');
+          const stickyBadge = document.getElementById('stickyMaghribBadge');
+          if (badge) badge.classList.add('hidden');
+          if (stickyBadge) stickyBadge.classList.add('hidden');
+          return;
+        }
+        
+        // Charger les horaires de prière
+        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+        if (!response.ok) {
+          console.warn('Impossible de charger les horaires de prière');
+          return;
+        }
+        
+        const prayerData = await response.json();
+        window.prayerTimesData = prayerData; // Stocker pour utilisation ultérieure
+        
+        // Mettre à jour les badges
+        updateMaghribBadge();
+      } catch (error) {
+        console.warn('Erreur lors du chargement des horaires de prière:', error);
+      }
+    }
+
+    /**
+     * Met à jour l'affichage du badge Maghrib avec l'heure du jour actuel
+     */
+    function updateMaghribBadge() {
+      const badge = document.getElementById('maghribBadge');
+      const stickyBadge = document.getElementById('stickyMaghribBadge');
+      
+      // Afficher le badge uniquement en vue Ramadan
+      if (activePlanningView !== 'ramadan') {
+        if (badge) badge.classList.add('hidden');
+        if (stickyBadge) stickyBadge.classList.add('hidden');
+        return;
+      }
+      
+      if (!window.prayerTimesData || !window.prayerTimesData.prayerTimes) {
+        if (badge) badge.classList.add('hidden');
+        if (stickyBadge) stickyBadge.classList.add('hidden');
+        return;
+      }
+      
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      const prayerTimes = window.prayerTimesData.prayerTimes;
+      const todayPrayer = prayerTimes[todayStr];
+      
+      if (todayPrayer && todayPrayer.maghrib) {
+        const setBadgeContent = function(el) {
+          if (!el) return;
+          var timeEl = el.querySelector('.maghrib-badge-time');
+          if (timeEl) timeEl.textContent = todayPrayer.maghrib;
+          el.classList.remove('hidden');
+        };
+        setBadgeContent(badge);
+        setBadgeContent(stickyBadge);
+      } else {
+        if (badge) badge.classList.add('hidden');
+        if (stickyBadge) stickyBadge.classList.add('hidden');
       }
     }
 
@@ -2133,6 +2297,9 @@
       if (stickyDayDateSpan) {
         stickyDayDateSpan.innerText = '';
       }
+      
+      // Mettre à jour le badge Maghrib
+      updateMaghribBadge();
       
       const planning = getCurrentPlanning();
       if (!planning || !planning[dayOfWeek]) {

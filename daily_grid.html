@@ -289,6 +289,43 @@
       text-align: center;
     }
 
+    /* Badge Maghrib : même ligne que "Planning Ramadan", à gauche, visible uniquement en vue Ramadan */
+    .maghrib-badge {
+      font-family: var(--font-text);
+      font-size: 0.8em;
+      color: var(--secondary-color);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+      text-transform: none;
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .maghrib-badge:hover {
+      opacity: 0.9;
+    }
+
+    body.planning-ramadan .maghrib-badge {
+      color: var(--secondary-color);
+    }
+
+    .maghrib-badge.hidden {
+      display: none !important;
+    }
+
+    body.puppeteer-view .maghrib-badge {
+      display: none !important;
+    }
+
     .day-date {
       font-family: var(--font-title);
       color: rgba(255, 255, 255, 0.6);
@@ -342,7 +379,7 @@
       flex-direction: column;
       min-width: 0;
       text-align: center;
-      background-color: var(--background-card);
+      background-color: rgba(255, 255, 255, 0.5);
       padding: 2px;
       height: 100%;
       overflow: hidden;
@@ -892,6 +929,15 @@
       body.puppeteer-view .header {
         background: var(--gradient-primary);
       }
+      body.puppeteer-view.planning-ramadan .header {
+        background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
+      }
+      body.puppeteer-view .coaches-section {
+        background: var(--gradient-primary);
+      }
+      body.puppeteer-view.planning-ramadan .coaches-section {
+        background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
+      }
       body.puppeteer-view .content-wrapper {
         height: calc(100vh - 74px);
         margin-bottom: 48px;
@@ -1108,6 +1154,7 @@
   </div>
 
   <div class="header">
+    <span class="maghrib-badge hidden" id="maghribBadge" onclick="window.location.href='./prayer-times.html'" title="Voir les horaires de prière">🌙 <span class="maghrib-time"></span></span>
     <h1 class="day-title" id="currentDay">
       <span class="day-name" id="dayName"></span>
       <span class="day-date" id="dayDate"></span>
@@ -1195,19 +1242,12 @@
       var ramadanButton = document.getElementById('ramadanSwitchButton');
       if (!ramadanButton || !data) return;
       
-      // Masquer sur desktop (non mobile)
-      var isMobile = window.innerWidth <= 768;
-      if (!isMobile) {
-        ramadanButton.style.display = 'none';
-        return;
-      }
-      
       var meta = data.metadata || {};
       var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
       var today = new Date().toISOString().slice(0, 10);
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
       var daysBefore = 7;
-      var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore));
+      var showSwitcher = !!(data.planningRamadan && ramadanStart);
       if (showSwitcher) {
         ramadanButton.style.display = 'flex';
         setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
@@ -1258,6 +1298,7 @@
       localStorage.setItem('planningView', view);
       document.body.classList.toggle('planning-ramadan', view === 'ramadan');
       updatePlanningTypeLabel();
+      updateMaghribBadge(); // Afficher ou masquer le badge selon la vue
       if (allData) { renderPlanningViewSwitcher(allData); loadAndDisplayCourses(); }
     }
     function updatePlanningTypeLabel() {
@@ -1314,9 +1355,9 @@
       
       console.log('updateButtonVisibility - isMobile:', isMobile, 'isAutomated:', isAutomated, 'isLargeScreen:', isLargeScreen, 'isLargePortrait:', isLargePortrait, 'isLargeLandscape:', isLargeLandscape);
       
-      // Bouton Ramadan : visible uniquement sur mobile réel (pas Puppeteer, pas desktop)
+      // Bouton Ramadan : masquer seulement en Puppeteer ou très grand écran ; sinon laisser renderPlanningViewSwitcher décider (mobile + desktop)
       if (ramadanButton) {
-        if (isAutomated || !isMobile || isLargePortrait || isLargeLandscape) {
+        if (isAutomated || isLargePortrait || isLargeLandscape) {
           ramadanButton.style.display = 'none';
         } else if (allData) {
           renderPlanningViewSwitcher(allData);
@@ -1427,6 +1468,85 @@
       if (dayDate) {
         dayDate.textContent = '';
       }
+      
+      // Mettre à jour le badge Maghrib
+      updateMaghribBadge();
+    }
+
+    /**
+     * Charge les horaires de prière et affiche le badge Maghrib si on est en période Ramadan
+     */
+    async function loadPrayerTimes() {
+      try {
+        // Vérifier si on est en période Ramadan
+        if (!allData || !allData.metadata) return;
+        
+        const ramadanStart = allData.metadata.ramadanStart;
+        const ramadanEnd = allData.metadata.ramadanEnd;
+        const today = new Date().toISOString().slice(0, 10);
+        
+        const inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+        
+        if (!inRamadan) {
+          const badge = document.getElementById('maghribBadge');
+          if (badge) badge.classList.add('hidden');
+          return;
+        }
+        
+        // Charger les horaires seulement si on est en vue Ramadan
+        if (activePlanningView !== 'ramadan') {
+          const badge = document.getElementById('maghribBadge');
+          if (badge) badge.classList.add('hidden');
+          return;
+        }
+        
+        // Charger les horaires de prière
+        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+        if (!response.ok) {
+          console.warn('Impossible de charger les horaires de prière');
+          return;
+        }
+        
+        const prayerData = await response.json();
+        window.prayerTimesData = prayerData; // Stocker pour utilisation ultérieure
+        
+        // Mettre à jour le badge
+        updateMaghribBadge();
+      } catch (error) {
+        console.warn('Erreur lors du chargement des horaires de prière:', error);
+      }
+    }
+
+    /**
+     * Met à jour l'affichage du badge Maghrib avec l'heure du jour actuel
+     */
+    function updateMaghribBadge() {
+      const badge = document.getElementById('maghribBadge');
+      if (!badge) return;
+      
+      // Afficher le badge uniquement en vue Ramadan
+      if (activePlanningView !== 'ramadan') {
+        badge.classList.add('hidden');
+        return;
+      }
+      
+      if (!window.prayerTimesData || !window.prayerTimesData.prayerTimes) {
+        badge.classList.add('hidden');
+        return;
+      }
+      
+      const today = currentDate.toISOString().slice(0, 10);
+      const prayerTimes = window.prayerTimesData.prayerTimes;
+      const todayPrayer = prayerTimes[today];
+      
+      if (todayPrayer && todayPrayer.maghrib) {
+        var timeEl = badge.querySelector('.maghrib-time');
+        if (timeEl) timeEl.textContent = todayPrayer.maghrib;
+        else badge.textContent = '🌙 ' + todayPrayer.maghrib;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
     }
 
     const noCourseMessages = [
@@ -1472,6 +1592,7 @@
     function navigateDay(offset) {
       currentDayIndex = (currentDayIndex + offset + 7) % 7;
       syncCurrentDateToWeekWindow();
+      updateDayTitle(); // Mettre à jour le titre et le badge Maghrib
       loadAndDisplayCourses();
     }
 
@@ -1496,6 +1617,9 @@
           document.body.classList.remove('planning-ramadan');
         }
         console.log('Données chargées avec succès:', allData);
+        
+        // Charger les horaires de prière après le chargement des données principales
+        await loadPrayerTimes();
         var planning = getCurrentPlanning();
         console.log('Structure des données de planning:', Object.keys(planning));
 
