@@ -1084,6 +1084,14 @@
       .coach-name {
         font-size: 0.65em;
       }
+
+      /* Mode Ramadan : header et footer verts sur desktop (non mobile, non tablette, non puppeteer) */
+      body.planning-ramadan:not(.puppeteer-view) .header {
+        background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
+      }
+      body.planning-ramadan:not(.puppeteer-view) .coaches-section {
+        background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
+      }
     }
 
     /* Masquer les boutons de navigation sur les écrans 32 pouces et supérieurs en orientation portrait (rotation 90°) */
@@ -1219,6 +1227,9 @@
       }
       return allData.planning;
     }
+    function isNonMobileView() {
+      return typeof window !== 'undefined' && window.innerWidth > 768;
+    }
     function initPlanningView(data) {
       if (!data) return;
       var urlView = '', stored = '';
@@ -1231,10 +1242,19 @@
       var ramadanStart = data.metadata && data.metadata.ramadanStart;
       var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-      if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; try { localStorage.setItem('planningView', urlView); } catch (e) {} }
-      else if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
-      else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
-      else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
+      if (urlView === 'ramadan' || urlView === 'regulier') {
+        activePlanningView = urlView;
+        try { localStorage.setItem('planningView', urlView); } catch (e) {}
+      } else if (isNonMobileView() || isAutomatedBrowser()) {
+        // Non-mobile ou Puppeteer : bascule prioritaire selon la période (Ramadan → ramadan, hors Ramadan → régulier)
+        activePlanningView = inRamadan ? 'ramadan' : 'regulier';
+        try { localStorage.setItem('planningView', activePlanningView); } catch (e) {}
+      } else {
+        // Mobile uniquement : URL > localStorage > période > régulier
+        if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
+        else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
+        else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
+      }
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
       updatePlanningTypeLabel();
     }

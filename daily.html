@@ -167,8 +167,11 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      padding: 20px 0 0 0;
+      padding: 8px 0 0 0;
       padding-left: 18px;
+    }
+    .day-title-row .maghrib-badge {
+      align-self: center;
     }
 
     h1 {
@@ -187,10 +190,10 @@
       color: var(--text-secondary);
       text-transform: none;
       display: block;
-      margin-top: -8px;
+      margin-top: -4px;
       margin-bottom: 0;
       padding-top: 0;
-      padding-bottom: 15px;
+      padding-bottom: 8px;
       padding-left: 18px;
       font-style: italic;
       opacity: 0.8;
@@ -1503,34 +1506,38 @@
       font-family: var(--font-title);
       position: fixed;
       top: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
-      width: 80%;
-      max-width:200px;
-      padding: 10px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100%);
+      padding: 6px 10px;
       background-color: var(--overlay-light);
       backdrop-filter: blur(5px);
       border-radius: 10px;
-      text-align: center;
-      font-size: 1.7em;
+      font-size: 1.5em;
       font-weight: 500;
       color: var(--primary-color);
       box-shadow: 0 2px 5px var(--shadow-light);
       z-index: 1000;
       opacity: 0;
-      transform: translateY(-100%);
       transition: opacity 0.3s ease, transform 0.3s ease;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 0px;
+      gap: 8px;
+      flex-wrap: nowrap;
       box-sizing: border-box;
+      white-space: nowrap;
+      min-width: 200px;
+    }
+    body:not(.planning-ramadan) .sticky-day-name {
+      min-width: 280px;
+    }
+    .sticky-day-name.visible {
+      transform: translateX(-50%) translateY(0);
     }
 
     .sticky-day-name .day-name {
-      font-size: 1em;
+      font-size: 0.95em;
       font-weight: 500;
       line-height: 1.2;
       text-align: center;
@@ -1541,7 +1548,7 @@
     }
 
     .sticky-day-name .day-date {
-      font-size: 0.5em;
+      font-size: 0.45em;
       font-weight: 300;
       color: var(--text-secondary);
       opacity: 0.7;
@@ -1556,7 +1563,7 @@
     }
     .sticky-day-name .planning-type-label {
       font-family: var(--font-text);
-      font-size: 0.45em;
+      font-size: 0.4em;
       font-weight: 400;
       color: var(--text-secondary);
       text-transform: none;
@@ -1573,6 +1580,19 @@
       color: rgba(38, 70, 45, 0.8);
     }
 
+    /* Sticky : jour et badge accolés, centrés ensemble */
+    .sticky-day-name .sticky-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      flex: 0 0 auto;
+    }
+    .sticky-day-name .sticky-right {
+      margin-left: 8px;
+      flex: 0 0 auto;
+    }
+
     /* Badge Maghrib : à droite du titre, plus grand, centré verticalement, visible uniquement en vue Ramadan */
     .maghrib-badge {
       font-family: var(--font-text);
@@ -1586,7 +1606,7 @@
       transition: opacity 0.2s ease, background 0.2s ease;
       text-transform: none;
       text-decoration: none;
-      padding: 8px 14px;
+      padding: 4px 12px;
       border-radius: 8px;
       background: rgba(201, 162, 39, 0.12);
       border: 1px solid rgba(201, 162, 39, 0.35);
@@ -1861,14 +1881,16 @@
 <body onload="initializePage();" class="loading">
   <!-- Bloc de texte collant pour le nom du jour -->
   <div id="stickyDayName" class="sticky-day-name">
-    <span class="day-name"></span>
-    <a href="./prayer-times.html" class="maghrib-badge hidden" id="stickyMaghribBadge" title="Voir les horaires de prière">
+    <div class="sticky-left">
+      <span class="day-name"></span>
+      <span class="day-date"></span>
+      <span class="planning-type-label" id="stickyPlanningTypeLabel"></span>
+    </div>
+    <a href="./prayer-times.html" class="maghrib-badge hidden sticky-right" id="stickyMaghribBadge" title="Voir les horaires de prière">
       <span class="maghrib-badge-icon">🌙</span>
       <span class="maghrib-badge-time"></span>
       <span class="maghrib-badge-hint">Horaires</span>
     </a>
-    <span class="day-date"></span>
-    <span class="planning-type-label" id="stickyPlanningTypeLabel"></span>
   </div>
 
   <!-- Bouton Daily Grid view -->
@@ -2716,9 +2738,11 @@
         requestAnimationFrame(() => {
           entries.forEach(entry => {
             if (!entry.isIntersecting) {
-              stickyDayNameElement.style.cssText = 'opacity: 1; transform: translateY(0);';
+              stickyDayNameElement.style.cssText = 'opacity: 1; transform: translateX(-50%) translateY(0);';
+              stickyDayNameElement.classList.add('visible');
             } else {
-              stickyDayNameElement.style.cssText = 'opacity: 0; transform: translateY(-100%);';
+              stickyDayNameElement.style.cssText = 'opacity: 0; transform: translateX(-50%) translateY(-100%);';
+              stickyDayNameElement.classList.remove('visible');
             }
           });
         });
