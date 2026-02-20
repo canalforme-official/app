@@ -126,6 +126,7 @@
       transition: background 0.3s ease;
       text-decoration: none;
       display: inline-block;
+      opacity: 0.9;
     }
 
     .back-button:hover {
@@ -243,9 +244,10 @@
     thead th:nth-child(2) { z-index: 7; left: 72px; width: 90px; min-width: 90px; }
     tbody td:nth-child(1) { width: 72px; min-width: 72px; }
     tbody td:nth-child(2) { width: 90px; min-width: 90px; left: 72px; }
-    /* Ligne aujourd'hui avec fond jaune */
+    /* Ligne aujourd'hui avec fond jaune - z-index plus élevé pour passer au-dessus des colonnes figées */
     tbody tr.today td:nth-child(1), tbody tr.today td:nth-child(3), tbody tr.today td:nth-child(5), tbody tr.today td:nth-child(7) { background: rgba(201, 162, 39, 0.2); }
     tbody tr.today td:nth-child(2), tbody tr.today td:nth-child(4), tbody tr.today td:nth-child(6), tbody tr.today td:nth-child(8) { background: rgba(201, 162, 39, 0.18); }
+    tbody tr.today td:nth-child(1), tbody tr.today td:nth-child(2) { z-index: 3; }
 
     td {
       padding: 8px 6px;
@@ -309,6 +311,9 @@
     .day-name {
       font-weight: 500;
       color: var(--text-primary);
+    }
+    .day-name-short {
+      display: none;
     }
 
     .prayer-time {
@@ -422,8 +427,8 @@
       }
 
       th, td {
-        padding: 10px 5px;
-        font-size: 0.85em;
+        padding: 8px 4px;
+        font-size: 0.8em;
       }
 
       .back-button {
@@ -433,6 +438,33 @@
         padding: 10px 16px;
         font-size: 0.9em;
         z-index: 1000;
+        opacity: 0.85;
+      }
+
+      /* Colonnes 1 et 2 avec largeur minimale en mobile */
+      thead th:nth-child(1), tbody td:nth-child(1) { 
+        width: 50px; 
+        min-width: 50px; 
+      }
+      thead th:nth-child(2), tbody td:nth-child(2) { 
+        width: 60px; 
+        min-width: 60px; 
+        left: 50px;
+      }
+
+      /* Réduire la largeur des autres colonnes pour voir toutes les colonnes */
+      th, td {
+        white-space: nowrap;
+      }
+      thead th:nth-child(3), tbody td:nth-child(3),
+      thead th:nth-child(4), tbody td:nth-child(4),
+      thead th:nth-child(5), tbody td:nth-child(5),
+      thead th:nth-child(6), tbody td:nth-child(6),
+      thead th:nth-child(7), tbody td:nth-child(7),
+      thead th:nth-child(8), tbody td:nth-child(8) {
+        width: auto;
+        min-width: 55px;
+        padding: 8px 3px;
       }
     }
 
@@ -454,18 +486,41 @@
 
     @media (max-width: 480px) {
       th, td {
-        padding: 8px 3px;
-        font-size: 0.75em;
+        padding: 8px 2px;
+        font-size: 0.7em;
       }
 
-      .day-name {
+      .day-name-full {
         display: none;
+      }
+      .day-name-short {
+        display: inline;
+      }
+
+      /* Colonnes encore plus compactes pour très petits écrans */
+      thead th:nth-child(1), tbody td:nth-child(1) { 
+        width: 45px; 
+        min-width: 45px; 
+      }
+      thead th:nth-child(2), tbody td:nth-child(2) { 
+        width: 55px; 
+        min-width: 55px; 
+        left: 45px;
+      }
+      thead th:nth-child(3), tbody td:nth-child(3),
+      thead th:nth-child(4), tbody td:nth-child(4),
+      thead th:nth-child(5), tbody td:nth-child(5),
+      thead th:nth-child(6), tbody td:nth-child(6),
+      thead th:nth-child(7), tbody td:nth-child(7),
+      thead th:nth-child(8), tbody td:nth-child(8) {
+        min-width: 48px;
+        padding: 8px 2px;
       }
     }
   </style>
 </head>
 <body>
-  <a href="./daily_grid.html" class="back-button">← Retour</a>
+  <a href="./daily.html" class="back-button">← Retour</a>
 
   <!-- Bouton pour revenir à aujourd'hui (daily.html) -->
   <div class="today-view-button" id="todayViewButton">
@@ -515,6 +570,7 @@
 
   <script>
     const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const daysOfWeekShort = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
     const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     const monthsShort = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
 
@@ -587,6 +643,7 @@
           }
 
           const dayOfWeek = daysOfWeek[date.getDay()];
+          const dayOfWeekShort = daysOfWeekShort[date.getDay()];
           const dayNumber = date.getDate();
           const month = months[date.getMonth()];
           const monthShort = monthsShort[date.getMonth()];
@@ -599,7 +656,8 @@
             <td>
               ${dayDisplay}
               <br>
-              <span class="day-name">${dayOfWeek}</span>
+              <span class="day-name day-name-full">${dayOfWeek}</span>
+              <span class="day-name day-name-short">${dayOfWeekShort}</span>
             </td>
             <td class="date-cell" data-day-number="${dayNumber}"><span class="date-full"><strong>${dayNumber}</strong> ${month}</span><span class="date-short"><strong>${dayNumber}</strong> ${monthShort}</span></td>
             <td class="prayer-time">${prayer.fajr || '-'}</td>
