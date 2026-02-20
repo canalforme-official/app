@@ -1084,6 +1084,14 @@
       .coach-name {
         font-size: 0.65em;
       }
+
+      /* Mode Ramadan : header et footer verts sur desktop (non mobile, non tablette, non puppeteer) */
+      body.planning-ramadan:not(.puppeteer-view) .header {
+        background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
+      }
+      body.planning-ramadan:not(.puppeteer-view) .coaches-section {
+        background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
+      }
     }
 
     /* Masquer les boutons de navigation sur les écrans 32 pouces et supérieurs en orientation portrait (rotation 90°) */
