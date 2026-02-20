@@ -45,6 +45,11 @@
       min-height: 100vh;
       position: relative;
     }
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+    }
 
     body::before {
       content: '';
@@ -67,6 +72,11 @@
       z-index: 1;
       max-width: 900px;
       margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+      .content-wrapper {
+        max-width: 100%;
+      }
     }
 
     .header {
@@ -195,11 +205,22 @@
       position: relative;
       max-height: calc(100vh - 250px);
     }
+    @media (max-width: 768px) {
+      .table-content {
+        overflow-x: visible;
+      }
+    }
 
     table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
+    }
+    @media (max-width: 768px) {
+      table {
+        width: 100%;
+        table-layout: fixed;
+      }
     }
 
     thead {
@@ -233,17 +254,18 @@
       text-transform: uppercase;
       font-size: 0.85em;
       border-bottom: 2px solid var(--primary-color);
+      letter-spacing: -0.3px;
     }
     /* Alternance gris clair / blanc pour toutes les colonnes */
     th:nth-child(1), th:nth-child(3), th:nth-child(5), th:nth-child(7), td:nth-child(1), td:nth-child(3), td:nth-child(5), td:nth-child(7) { background: #fafafa; }
     th:nth-child(2), th:nth-child(4), th:nth-child(6), th:nth-child(8), td:nth-child(2), td:nth-child(4), td:nth-child(6), td:nth-child(8) { background: #fff; }
     /* Colonnes 1 et 2 figées au défilement horizontal */
-    th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 2; box-shadow: 2px 0 4px rgba(0,0,0,0.06); }
+    th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 2; box-shadow: 2px 0 4px rgba(0,0,0,0.06); white-space: nowrap; }
     th:nth-child(2), td:nth-child(2) { position: sticky; left: 0; z-index: 2; box-shadow: 2px 0 4px rgba(0,0,0,0.06); }
-    thead th:nth-child(1) { z-index: 7; width: 72px; min-width: 72px; }
-    thead th:nth-child(2) { z-index: 7; left: 72px; width: 90px; min-width: 90px; }
-    tbody td:nth-child(1) { width: 72px; min-width: 72px; }
-    tbody td:nth-child(2) { width: 90px; min-width: 90px; left: 72px; }
+    thead th:nth-child(1) { z-index: 7; width: 55px; min-width: 55px; }
+    thead th:nth-child(2) { z-index: 7; left: 55px; width: 70px; min-width: 70px; }
+    tbody td:nth-child(1) { width: 55px; min-width: 55px; }
+    tbody td:nth-child(2) { width: 70px; min-width: 70px; left: 55px; }
     /* Ligne aujourd'hui avec fond jaune - z-index plus élevé pour passer au-dessus des colonnes figées */
     tbody tr.today td:nth-child(1), tbody tr.today td:nth-child(3), tbody tr.today td:nth-child(5), tbody tr.today td:nth-child(7) { background: rgba(201, 162, 39, 0.2); }
     tbody tr.today td:nth-child(2), tbody tr.today td:nth-child(4), tbody tr.today td:nth-child(6), tbody tr.today td:nth-child(8) { background: rgba(201, 162, 39, 0.18); }
@@ -255,7 +277,7 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.08);
       font-size: 0.9em;
       font-family: var(--font-text);
-      letter-spacing: -0.3px;
+      letter-spacing: -0.5px;
     }
 
     tbody tr:hover td:nth-child(n+3) {
@@ -296,6 +318,16 @@
     td:nth-child(1) .day-name {
       font-weight: 400;
     }
+    /* Première colonne : jour ramadan et jour de la semaine sur une ligne */
+    td:nth-child(1) {
+      white-space: nowrap;
+    }
+    td:nth-child(1) br {
+      display: none;
+    }
+    td:nth-child(1) .day-name {
+      margin-left: 4px;
+    }
 
     .observation-badge {
       font-size: 0.75em;
@@ -324,7 +356,7 @@
 
     .prayer-time.maghrib {
       color: var(--secondary-color);
-      font-size: 1.1em;
+      font-size: 1em;
       font-weight: 600;
     }
 
@@ -427,8 +459,12 @@
       }
 
       th, td {
-        padding: 8px 4px;
-        font-size: 0.8em;
+        padding: 8px 3px;
+        font-size: 0.75em;
+      }
+      th {
+        padding: 8px 2px;
+        letter-spacing: -0.5px;
       }
 
       .back-button {
@@ -443,18 +479,19 @@
 
       /* Colonnes 1 et 2 avec largeur minimale en mobile */
       thead th:nth-child(1), tbody td:nth-child(1) { 
-        width: 50px; 
-        min-width: 50px; 
+        width: 45px; 
+        min-width: 45px; 
       }
       thead th:nth-child(2), tbody td:nth-child(2) { 
-        width: 60px; 
-        min-width: 60px; 
-        left: 50px;
+        width: 55px; 
+        min-width: 55px; 
+        left: 45px;
       }
 
       /* Réduire la largeur des autres colonnes pour voir toutes les colonnes */
       th, td {
         white-space: nowrap;
+        letter-spacing: -0.6px;
       }
       thead th:nth-child(3), tbody td:nth-child(3),
       thead th:nth-child(4), tbody td:nth-child(4),
@@ -462,9 +499,14 @@
       thead th:nth-child(6), tbody td:nth-child(6),
       thead th:nth-child(7), tbody td:nth-child(7),
       thead th:nth-child(8), tbody td:nth-child(8) {
-        width: auto;
-        min-width: 55px;
-        padding: 8px 3px;
+        width: calc((100% - 100px) / 6);
+        min-width: 48px;
+        padding: 8px 2px;
+      }
+      
+      /* Réduire la taille du texte maghrib en mobile */
+      td:nth-child(7).prayer-time.maghrib {
+        font-size: 0.95em;
       }
     }
 
@@ -499,13 +541,13 @@
 
       /* Colonnes encore plus compactes pour très petits écrans */
       thead th:nth-child(1), tbody td:nth-child(1) { 
-        width: 45px; 
-        min-width: 45px; 
+        width: 40px; 
+        min-width: 40px; 
       }
       thead th:nth-child(2), tbody td:nth-child(2) { 
-        width: 55px; 
-        min-width: 55px; 
-        left: 45px;
+        width: 50px; 
+        min-width: 50px; 
+        left: 40px;
       }
       thead th:nth-child(3), tbody td:nth-child(3),
       thead th:nth-child(4), tbody td:nth-child(4),
@@ -513,8 +555,15 @@
       thead th:nth-child(6), tbody td:nth-child(6),
       thead th:nth-child(7), tbody td:nth-child(7),
       thead th:nth-child(8), tbody td:nth-child(8) {
-        min-width: 48px;
-        padding: 8px 2px;
+        width: calc((100% - 90px) / 6);
+        min-width: 42px;
+        padding: 8px 1px;
+        letter-spacing: -0.7px;
+      }
+      
+      /* Réduire encore plus la taille du texte maghrib sur très petits écrans */
+      td:nth-child(7).prayer-time.maghrib {
+        font-size: 0.9em;
       }
     }
   </style>
@@ -654,10 +703,7 @@
           
           row.innerHTML = `
             <td>
-              ${dayDisplay}
-              <br>
-              <span class="day-name day-name-full">${dayOfWeek}</span>
-              <span class="day-name day-name-short">${dayOfWeekShort}</span>
+              ${dayDisplay}<span class="day-name day-name-full"> ${dayOfWeek}</span><span class="day-name day-name-short"> ${dayOfWeekShort}</span>
             </td>
             <td class="date-cell" data-day-number="${dayNumber}"><span class="date-full"><strong>${dayNumber}</strong> ${month}</span><span class="date-short"><strong>${dayNumber}</strong> ${monthShort}</span></td>
             <td class="prayer-time">${prayer.fajr || '-'}</td>
