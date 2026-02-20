@@ -71,8 +71,8 @@
 
     .header {
       text-align: center;
-      margin-bottom: 30px;
-      padding: 20px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
       background: var(--background-card);
       border-radius: 15px;
       box-shadow: 0 4px 6px var(--shadow-light);
@@ -80,23 +80,23 @@
 
     .header h1 {
       font-family: var(--font-title);
-      font-size: 2.5em;
+      font-size: 2em;
       color: var(--primary-color);
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       text-transform: uppercase;
     }
 
     .header .subtitle {
-      font-size: 1.1em;
+      font-size: 0.95em;
       color: var(--text-secondary);
       font-style: italic;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     .source-reference {
-      font-size: 0.9em;
+      font-size: 0.75em;
       color: var(--text-secondary);
-      margin-top: 15px;
+      margin-top: 8px;
       font-style: italic;
     }
 
@@ -135,23 +135,23 @@
     .today-info {
       background: linear-gradient(135deg, var(--primary-color) 0%, #1e3523 100%);
       color: var(--text-light);
-      padding: 20px;
+      padding: 14px 16px;
       border-radius: 15px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       text-align: center;
       box-shadow: 0 4px 6px var(--shadow-medium);
     }
 
     .today-info h2 {
       font-family: var(--font-title);
-      font-size: 1.8em;
-      margin-bottom: 10px;
+      font-size: 1.5em;
+      margin-bottom: 8px;
     }
 
     .today-maghrib {
-      font-size: 2.5em;
+      font-size: 2em;
       font-weight: 600;
-      margin-top: 10px;
+      margin-top: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -161,63 +161,138 @@
     .prayer-table {
       background: var(--background-card);
       border-radius: 15px;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 0 4px 6px var(--shadow-light);
       margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
     }
 
     .table-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
       background: var(--primary-color);
       color: var(--text-light);
-      padding: 15px;
+      padding: 12px 15px;
       font-family: var(--font-title);
-      font-size: 1.3em;
+      font-size: 1.2em;
       text-align: center;
       text-transform: uppercase;
+      line-height: 1.4;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .table-content {
       overflow-x: auto;
+      overflow-y: auto;
+      flex: 1;
+      position: relative;
+      max-height: calc(100vh - 250px);
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
     }
 
     thead {
-      background: rgba(38, 70, 45, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      display: table-header-group;
+    }
+    
+    /* S'assurer que le thead a un background opaque pour chaque th */
+    thead th {
+      background: #e8e8e8;
+    }
+    thead th:nth-child(1), thead th:nth-child(3), thead th:nth-child(5), thead th:nth-child(7) {
+      background: #fafafa;
+    }
+    thead th:nth-child(2), thead th:nth-child(4), thead th:nth-child(6), thead th:nth-child(8) {
+      background: #fff;
+    }
+    
+    tbody {
+      display: table-row-group;
     }
 
     th {
       font-family: var(--font-title);
-      padding: 15px 10px;
+      padding: 10px 8px;
       text-align: center;
       font-weight: 600;
       color: var(--primary-color);
       text-transform: uppercase;
-      font-size: 0.9em;
+      font-size: 0.85em;
       border-bottom: 2px solid var(--primary-color);
     }
+    /* Alternance gris clair / blanc pour toutes les colonnes */
+    th:nth-child(1), th:nth-child(3), th:nth-child(5), th:nth-child(7), td:nth-child(1), td:nth-child(3), td:nth-child(5), td:nth-child(7) { background: #fafafa; }
+    th:nth-child(2), th:nth-child(4), th:nth-child(6), th:nth-child(8), td:nth-child(2), td:nth-child(4), td:nth-child(6), td:nth-child(8) { background: #fff; }
+    /* Colonnes 1 et 2 figées au défilement horizontal */
+    th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 2; box-shadow: 2px 0 4px rgba(0,0,0,0.06); }
+    th:nth-child(2), td:nth-child(2) { position: sticky; left: 0; z-index: 2; box-shadow: 2px 0 4px rgba(0,0,0,0.06); }
+    thead th:nth-child(1) { z-index: 7; width: 72px; min-width: 72px; }
+    thead th:nth-child(2) { z-index: 7; left: 72px; width: 90px; min-width: 90px; }
+    tbody td:nth-child(1) { width: 72px; min-width: 72px; }
+    tbody td:nth-child(2) { width: 90px; min-width: 90px; left: 72px; }
+    /* Ligne aujourd'hui avec fond jaune */
+    tbody tr.today td:nth-child(1), tbody tr.today td:nth-child(3), tbody tr.today td:nth-child(5), tbody tr.today td:nth-child(7) { background: rgba(201, 162, 39, 0.2); }
+    tbody tr.today td:nth-child(2), tbody tr.today td:nth-child(4), tbody tr.today td:nth-child(6), tbody tr.today td:nth-child(8) { background: rgba(201, 162, 39, 0.18); }
 
     td {
-      padding: 12px 10px;
+      padding: 8px 6px;
       text-align: center;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      font-size: 0.9em;
+      font-family: var(--font-text);
+      letter-spacing: -0.3px;
     }
 
-    tbody tr:hover {
-      background: rgba(38, 70, 45, 0.05);
+    tbody tr:hover td:nth-child(n+3) {
+      background: rgba(38, 70, 45, 0.06) !important;
     }
 
     tbody tr.today {
-      background: rgba(201, 162, 39, 0.15);
       font-weight: 600;
     }
 
     .day-number {
       font-weight: 600;
       color: var(--primary-color);
+    }
+    /* Chiffres en gras pour colonnes jour, date et maghrib uniquement */
+    td:nth-child(1) .day-number {
+      font-weight: 600;
+    }
+    /* Colonne date : le chiffre est déjà en gras via <strong> dans le HTML */
+    td:nth-child(2) {
+      font-weight: 400;
+    }
+    td:nth-child(2) strong {
+      font-weight: 600;
+    }
+    td:nth-child(7).prayer-time.maghrib {
+      font-weight: 600;
+    }
+    /* Les autres colonnes ne sont pas en gras */
+    td:nth-child(3).prayer-time,
+    td:nth-child(4).prayer-time,
+    td:nth-child(5).prayer-time,
+    td:nth-child(6).prayer-time,
+    td:nth-child(8).prayer-time {
+      font-weight: 400;
+    }
+    /* Le jour de la semaine n'est pas en gras */
+    td:nth-child(1) .day-name {
+      font-weight: 400;
     }
 
     .observation-badge {
@@ -238,13 +313,87 @@
 
     .prayer-time {
       font-family: 'Courier New', monospace;
-      font-weight: 600;
+      font-weight: 400;
       color: var(--text-primary);
     }
 
     .prayer-time.maghrib {
       color: var(--secondary-color);
       font-size: 1.1em;
+      font-weight: 600;
+    }
+
+    /* Bouton retour à aujourd'hui (comme daily.html) */
+    .today-view-button {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 1000;
+      width: 55px;
+      height: 55px;
+      background: none;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: all;
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .today-view-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+    .today-view-button::before {
+      content: '';
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/d983712e-5b70-9ebc-9696-6a677290a963.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotate-icon-prayer 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: center;
+      pointer-events: none;
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%);
+    }
+    .today-view-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background-color: var(--background-main);
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .today-view-button a {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+    }
+    .today-view-button button {
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: block;
+      position: relative;
+    }
+    @keyframes rotate-icon-prayer {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .loading {
@@ -278,12 +427,28 @@
       }
 
       .back-button {
-        position: relative;
-        top: 0;
-        left: 0;
-        margin-bottom: 20px;
-        display: block;
-        text-align: center;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        padding: 10px 16px;
+        font-size: 0.9em;
+        z-index: 1000;
+      }
+    }
+
+    /* Vue mobile : pas de retour à la ligne, date courte (3 lettres) */
+    .date-cell .date-short {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .date-cell {
+        white-space: nowrap;
+      }
+      .date-cell .date-full {
+        display: none;
+      }
+      .date-cell .date-short {
+        display: inline;
       }
     }
 
@@ -302,6 +467,13 @@
 <body>
   <a href="./daily_grid.html" class="back-button">← Retour</a>
 
+  <!-- Bouton pour revenir à aujourd'hui (daily.html) -->
+  <div class="today-view-button" id="todayViewButton">
+    <a href="./daily.html" title="Revenir à aujourd'hui">
+      <button type="button"></button>
+    </a>
+  </div>
+
   <div class="content-wrapper">
     <div class="header">
       <h1>Horaires de Prière</h1>
@@ -317,7 +489,7 @@
     </div>
 
     <div class="prayer-table">
-      <div class="table-header">Calendrier Complet</div>
+      <div class="table-header" id="tableHeader">Calendrier Complet</div>
       <div class="table-content">
         <div class="loading" id="loading">Chargement des horaires...</div>
         <div class="error" id="error" style="display: none;"></div>
@@ -344,6 +516,7 @@
   <script>
     const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const monthsShort = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
 
     async function loadPrayerTimes() {
       const loadingEl = document.getElementById('loading');
@@ -383,9 +556,9 @@
           throw new Error('Aucune donnée d\'horaires disponible');
         }
 
-        // Afficher l'année du Ramadan
-        if (data.metadata && data.metadata.year) {
-          ramadanYearEl.textContent = `Ramadan ${data.metadata.year}`;
+        // Nom de la période tel quel depuis Sheets (ex. Ramadan 2026, Ramadan 1447-2026)
+        if (data.metadata) {
+          ramadanYearEl.textContent = data.metadata.periodName || data.metadata.period || (data.metadata.year ? `Ramadan ${data.metadata.year}` : 'Ramadan');
         }
 
         // Obtenir la date d'aujourd'hui
@@ -416,6 +589,7 @@
           const dayOfWeek = daysOfWeek[date.getDay()];
           const dayNumber = date.getDate();
           const month = months[date.getMonth()];
+          const monthShort = monthsShort[date.getMonth()];
 
           const dayDisplay = prayer.isObservation 
             ? `<span class="observation-badge">Selon l'observation</span>` 
@@ -427,7 +601,7 @@
               <br>
               <span class="day-name">${dayOfWeek}</span>
             </td>
-            <td>${dayNumber} ${month}</td>
+            <td class="date-cell" data-day-number="${dayNumber}"><span class="date-full"><strong>${dayNumber}</strong> ${month}</span><span class="date-short"><strong>${dayNumber}</strong> ${monthShort}</span></td>
             <td class="prayer-time">${prayer.fajr || '-'}</td>
             <td class="prayer-time">${prayer.chourouq || '-'}</td>
             <td class="prayer-time">${prayer.dhuhr || '-'}</td>
@@ -442,6 +616,34 @@
         loadingEl.style.display = 'none';
         tableEl.style.display = 'table';
 
+        // S'assurer que le thead sticky fonctionne correctement
+        // Le problème était que border-collapse: collapse empêchait le sticky de fonctionner
+        // On utilise maintenant border-collapse: separate avec border-spacing: 0
+        // Le thead devrait maintenant prendre sa place dans le flux et être sticky correctement
+        requestAnimationFrame(() => {
+          const thead = tableEl.querySelector('thead');
+          const tbody = tableEl.querySelector('tbody');
+          if (thead && tbody) {
+            // S'assurer que le thead garde sa position dans le flux
+            thead.style.position = 'sticky';
+            thead.style.top = '0';
+            thead.style.zIndex = '4';
+            // Forcer un reflow
+            void thead.offsetHeight;
+            void tbody.offsetHeight;
+          }
+        });
+
+        // Défilement automatique vers la ligne du jour après 5 secondes
+        setTimeout(function() {
+          const todayRow = tableEl.querySelector('tbody tr.today');
+          if (todayRow) {
+            todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 5000);
+
+        // Le bouton est toujours visible maintenant, pas besoin d'observer
+
       } catch (error) {
         console.error('Erreur:', error);
         loadingEl.style.display = 'none';
@@ -450,9 +652,9 @@
       }
     }
 
+
     // Charger les données au chargement de la page
     loadPrayerTimes();
   </script>
 </body>
 </html>
-
