@@ -1520,14 +1520,26 @@
           return;
         }
         
-        // Charger les horaires de prière
-        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
-        if (!response.ok) {
-          console.warn('Impossible de charger les horaires de prière');
-          return;
+        // Charger les horaires de prière (local puis distant)
+        let prayerData = null;
+        try {
+          const localResp = await fetch('./prayer-times.json');
+          if (localResp.ok) {
+            prayerData = await localResp.json();
+            console.log('✅ Horaires de prière chargés depuis le fichier local');
+          } else {
+            throw new Error('Fichier local non disponible');
+          }
+        } catch (localError) {
+          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+          const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+          if (!remoteResp.ok) {
+            console.warn('Impossible de charger les horaires de prière');
+            return;
+          }
+          prayerData = await remoteResp.json();
+          console.log('✅ Horaires de prière chargés depuis GitHub');
         }
-        
-        const prayerData = await response.json();
         window.prayerTimesData = prayerData; // Stocker pour utilisation ultérieure
         
         // Mettre à jour le badge
@@ -1620,14 +1632,28 @@
       try {
         syncCurrentDateToWeekWindow();
         console.log('Début du chargement des données...');
-        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
-        
-        if (!response.ok) {
-          console.error('Erreur fetch:', response.status, response.statusText);
-          throw new Error(`Erreur HTTP: ${response.status}`);
+        let response = null;
+        let data = null;
+        try {
+          response = await fetch('./planning-v2.json');
+          if (response.ok) {
+            data = await response.json();
+            console.log('✅ Données planning chargées depuis le fichier local');
+          } else {
+            throw new Error('Fichier local non disponible');
+          }
+        } catch (localError) {
+          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+          response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
+          if (!response.ok) {
+            console.error('Erreur fetch:', response.status, response.statusText);
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          data = await response.json();
+          console.log('✅ Données planning chargées depuis GitHub');
         }
-        
-        allData = await response.json();
+
+        allData = data;
         try {
           initPlanningView(allData);
           renderPlanningViewSwitcher(allData);

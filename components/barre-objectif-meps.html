@@ -83,29 +83,43 @@
   <div id="progressInfo" class="progress-info">0% (0 / 120,000)</div>
 
   <script>
-    // Charger les données JSON depuis le fichier
-    fetch('./leaderboard.json')
-      .then(response => response.json())
-      .then(data => {
-        const maleMEPs = data.current.total_meps_by_gender.male || 0;
-        const femaleMEPs = data.current.total_meps_by_gender.female || 0;
-        const totalMEPs = maleMEPs + femaleMEPs;
-        const goalMEPs = 120000; // Objectif total
-        const percentage = Math.min((totalMEPs / goalMEPs) * 100, 100); // Calcul du pourcentage
+    (async function() {
+      let data = null;
+      try {
+        const localResp = await fetch('./leaderboard.json');
+        if (localResp.ok) {
+          data = await localResp.json();
+          console.log('✅ Données leaderboard chargées depuis le fichier local');
+        } else {
+          throw new Error('Fichier local non disponible');
+        }
+      } catch (localError) {
+        console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+        const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json');
+        if (!remoteResp.ok) {
+          console.error("Erreur lors du chargement des données JSON :", remoteResp.status);
+          return;
+        }
+        data = await remoteResp.json();
+        console.log('✅ Données leaderboard chargées depuis GitHub');
+      }
+      const maleMEPs = data.current.total_meps_by_gender.male || 0;
+      const femaleMEPs = data.current.total_meps_by_gender.female || 0;
+      const totalMEPs = maleMEPs + femaleMEPs;
+      const goalMEPs = 120000; // Objectif total
+      const percentage = Math.min((totalMEPs / goalMEPs) * 100, 100); // Calcul du pourcentage
 
-        // Mettre à jour la barre et le texte
-        const progressFill = document.getElementById('progressFill');
-        const progressInfo = document.getElementById('progressInfo');
-        const remainingMEPs = goalMEPs - totalMEPs;
+      const progressFill = document.getElementById('progressFill');
+      const progressInfo = document.getElementById('progressInfo');
+      const remainingMEPs = goalMEPs - totalMEPs;
 
-        setTimeout(() => {
-          progressFill.style.width = `${percentage}%`;
-          progressInfo.innerHTML = `<strong>${percentage.toFixed(0)}%</strong> - ${remainingMEPs.toLocaleString('fr-FR')} MEPS restants pour atteindre l'objectif`;
-        }, 100);
-      })
-      .catch(error => {
-        console.error("Erreur lors du chargement des données JSON :", error);
-      });
+      setTimeout(() => {
+        progressFill.style.width = `${percentage}%`;
+        progressInfo.innerHTML = `<strong>${percentage.toFixed(0)}%</strong> - ${remainingMEPs.toLocaleString('fr-FR')} MEPS restants pour atteindre l'objectif`;
+      }, 100);
+    })().catch(error => {
+      console.error("Erreur lors du chargement des données JSON :", error);
+    });
   </script>
 </body>
 </html>

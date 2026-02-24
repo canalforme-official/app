@@ -240,14 +240,29 @@
     </div>
 
     <script>
-        //const jsonUrl = './alltime-leaderboard.json?timestamp=' + Date.now();
-
-        const jsonUrl = `https://raw.githubusercontent.com/canalforme-official/app-data/main/alltime-leaderboard.json?timestamp=${Date.now()}`;
-
+        async function fetchLeaderboardData() {
+            try {
+                const localResp = await fetch('./alltime-leaderboard.json?timestamp=' + Date.now());
+                if (localResp.ok) {
+                    const data = await localResp.json();
+                    console.log('✅ Données palmarès chargées depuis le fichier local');
+                    return data;
+                }
+                throw new Error('Fichier local non disponible');
+            } catch (localError) {
+                console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+                const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/alltime-leaderboard.json?timestamp=' + Date.now());
+                if (!remoteResp.ok) {
+                    throw new Error('Impossible de charger le palmarès depuis GitHub');
+                }
+                const data = await remoteResp.json();
+                console.log('✅ Données palmarès chargées depuis GitHub');
+                return data;
+            }
+        }
 
         async function fetchLeaderboard(year) {
-            const response = await fetch(jsonUrl);
-            const data = await response.json();
+            const data = await fetchLeaderboardData();
             return data.years[year] ? data.years[year].user_medal_rankings : [];
         }
 

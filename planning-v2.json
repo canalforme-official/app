@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "lastUpdated": "2026-02-17T23:46:22.580Z",
-    "weekNumber": 7,
+    "lastUpdated": "2026-02-20T14:28:31.677Z",
+    "weekNumber": 8,
     "ramadanStart": "2026-02-19",
     "ramadanEnd": "2026-03-19",
     "periods": [
@@ -9,7 +9,7 @@
         "start": "2026-02-19",
         "end": "2026-03-19",
         "type": "ramadan",
-        "name": "Ramadan 2026",
+        "name": "Ramadan 1447 / 2026",
         "planning": "ramadan"
       },
       {
@@ -23,24 +23,9 @@
   },
   "coachs": [
     {
-      "id": "coach-youssef",
-      "name": "Youssef",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/667b496e-0581-ac46-3a3b-9730e6d9e1b7.png"
-    },
-    {
-      "id": "coach-maroua",
-      "name": "Maroua",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/962a317f-4725-628a-3e1b-5548f497a604.png"
-    },
-    {
-      "id": "coach-fatima",
-      "name": "Fatima",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/94b1c2fa-02ab-d158-6dd6-2823c6d3bab9.png"
-    },
-    {
-      "id": "coach-zakaria",
-      "name": "Zakaria",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/4e931efb-7514-c772-73b4-649eb0e90d1c.png"
+      "id": "coach-adiba",
+      "name": "Adiba",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/3e0fe5fd-1f51-a5f9-b5af-2dd80f6fe670.png"
     },
     {
       "id": "coach-fayza",
@@ -48,19 +33,19 @@
       "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/3a11b343-4516-c9db-7e5c-a9fc370f6471.png"
     },
     {
-      "id": "coach-nihad",
-      "name": "Nihad",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/4aa5309b-7b50-5549-b166-1445dee92717.png"
+      "id": "coach-hasna",
+      "name": "Hasna",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/9f3e4e37-21b9-78b2-829d-3ef178000fc7.png"
     },
     {
-      "id": "coach-rabie",
-      "name": "Rabie",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/61ceb6e2-97c6-3b65-9ca9-e2739a85a62c.png"
+      "id": "coach-karima",
+      "name": "Karima",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/a288ae59-7bce-6df3-2a26-4c53368408c7.png"
     },
     {
-      "id": "coach-hicham",
-      "name": "Hicham",
-      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/95d53251-b842-28f9-2054-b503a08ce4a8.png"
+      "id": "coach-maroua",
+      "name": "Maroua",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/962a317f-4725-628a-3e1b-5548f497a604.png"
     },
     {
       "id": "coach-nouredine",
@@ -68,9 +53,74 @@
       "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/9a253880-cf5f-b3cf-65f0-fcf3c39451bb.png"
     },
     {
+      "id": "coach-rabie",
+      "name": "Rabie",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/61ceb6e2-97c6-3b65-9ca9-e2739a85a62c.png"
+    },
+    {
+      "id": "coach-rachid",
+      "name": "Rachid",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/1e3529f7-c945-4c84-083a-57d17c5bbac8.png"
+    },
+    {
+      "id": "coach-soufiane",
+      "name": "Soufiane",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/f4d7fe39-995c-fa7b-474e-00fcf19d2d61.png"
+    },
+    {
+      "id": "coach-youssef",
+      "name": "Youssef",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/667b496e-0581-ac46-3a3b-9730e6d9e1b7.png"
+    },
+    {
+      "id": "coach-zakaria",
+      "name": "Zakaria",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/4e931efb-7514-c772-73b4-649eb0e90d1c.png"
+    },
+    {
+      "id": "coach-abdallah",
+      "name": "Abdallah",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/a33b2ec7-16d7-7695-06c0-bfa9fbadcca9.png"
+    },
+    {
+      "id": "coach-hicham",
+      "name": "Hicham",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/95d53251-b842-28f9-2054-b503a08ce4a8.png"
+    },
+    {
+      "id": "coach-hafsa",
+      "name": "Hafsa",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/6b7e2055-6a6f-b435-48ca-3ca904e4fc79.png"
+    },
+    {
+      "id": "coach-fatima",
+      "name": "Fatima",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/94b1c2fa-02ab-d158-6dd6-2823c6d3bab9.png"
+    },
+    {
+      "id": "coach-sultan",
+      "name": "Sultan",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/1fa7479c-73ff-3cb5-d49f-acd7871401eb.png"
+    },
+    {
       "id": "coach-yassir",
       "name": "Yassir",
       "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/581f70f0-8885-04ed-d4a1-b3cc40b4813e.png"
+    },
+    {
+      "id": "coach-nihad",
+      "name": "Nihad",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/4aa5309b-7b50-5549-b166-1445dee92717.png"
+    },
+    {
+      "id": "coach-hajar",
+      "name": "Hajar",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/d085150e-5227-4009-df3a-fa1b5483b78e.png"
+    },
+    {
+      "id": "coach-zoubir",
+      "name": "Zoubir",
+      "imageUrl": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/44208457-cb4d-b573-863d-9e7b093783e8.png"
     }
   ],
   "studios": [
@@ -1603,7 +1653,7 @@
         "endTime": "15:00",
         "duration": 60,
         "coachIds": [
-          "coach-maroua"
+          "coach-fatima"
         ],
         "studioId": "studio-hergym",
         "type": "100% Femmes"
@@ -1614,7 +1664,7 @@
         "endTime": "16:00",
         "duration": 60,
         "coachIds": [
-          "coach-fatima"
+          "coach-maroua"
         ],
         "studioId": "studio-hergym",
         "type": "100% Femmes"
@@ -1874,7 +1924,7 @@
         "coachIds": [
           "coach-zakaria"
         ],
-        "studioId": "studio-100-femmes",
+        "studioId": "studio-infinity",
         "type": "Mixte"
       },
       {
@@ -1907,7 +1957,7 @@
         "coachIds": [
           "coach-nouredine"
         ],
-        "studioId": "studio-piscine",
+        "studioId": "studio-infinity",
         "type": "100% Hommes"
       }
     ],

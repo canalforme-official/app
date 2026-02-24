@@ -1530,14 +1530,14 @@
       min-width: 200px;
     }
     body:not(.planning-ramadan) .sticky-day-name {
-      min-width: 280px;
+      min-width: 200px; /* même largeur qu'en vue Ramadan */
     }
     .sticky-day-name.visible {
       transform: translateX(-50%) translateY(0);
     }
 
     .sticky-day-name .day-name {
-      font-size: 0.95em;
+      font-size: 1.15em;
       font-weight: 500;
       line-height: 1.2;
       text-align: center;
@@ -1548,7 +1548,7 @@
     }
 
     .sticky-day-name .day-date {
-      font-size: 0.45em;
+      font-size: 0.55em;
       font-weight: 300;
       color: var(--text-secondary);
       opacity: 0.7;
@@ -1563,7 +1563,7 @@
     }
     .sticky-day-name .planning-type-label {
       font-family: var(--font-text);
-      font-size: 0.4em;
+      font-size: 0.5em;
       font-weight: 400;
       color: var(--text-secondary);
       text-transform: none;
@@ -1959,8 +1959,6 @@
 
   <script>
     let currentDayIndex = new Date().getDay();
-  const apiUrl = 'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json';
-  //const apiUrl = './planning-v2.json';
     let allData = [];
     var activePlanningView = 'regulier';
     function getCurrentPlanning() {
@@ -2172,9 +2170,26 @@
 
     async function fetchAllData() {
       try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        
+        let response = null;
+        let data = null;
+        try {
+          response = await fetch('./planning-v2.json');
+          if (response.ok) {
+            data = await response.json();
+            console.log('✅ Données planning chargées depuis le fichier local');
+          } else {
+            throw new Error('Fichier local non disponible');
+          }
+        } catch (localError) {
+          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+          response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
+          if (!response.ok) {
+            throw new Error('Impossible de charger le planning depuis GitHub');
+          }
+          data = await response.json();
+          console.log('✅ Données planning chargées depuis GitHub');
+        }
+
         allData = data;
         initPlanningView(data);
         renderPlanningViewSwitcher(data);
@@ -2233,14 +2248,26 @@
           return;
         }
         
-        // Charger les horaires de prière
-        const response = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
-        if (!response.ok) {
-          console.warn('Impossible de charger les horaires de prière');
-          return;
+        // Charger les horaires de prière (local puis distant)
+        let prayerData = null;
+        try {
+          const localResp = await fetch('./prayer-times.json');
+          if (localResp.ok) {
+            prayerData = await localResp.json();
+            console.log('✅ Horaires de prière chargés depuis le fichier local');
+          } else {
+            throw new Error('Fichier local non disponible');
+          }
+        } catch (localError) {
+          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+          const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+          if (!remoteResp.ok) {
+            console.warn('Impossible de charger les horaires de prière');
+            return;
+          }
+          prayerData = await remoteResp.json();
+          console.log('✅ Horaires de prière chargés depuis GitHub');
         }
-        
-        const prayerData = await response.json();
         window.prayerTimesData = prayerData; // Stocker pour utilisation ultérieure
         
         // Mettre à jour les badges
@@ -2265,6 +2292,13 @@
       }
       
       if (!window.prayerTimesData || !window.prayerTimesData.prayerTimes) {
+        if (badge) badge.classList.add('hidden');
+        if (stickyBadge) stickyBadge.classList.add('hidden');
+        return;
+      }
+      
+      // Badge Maghrib uniquement pour le jour d'aujourd'hui (pas quand on consulte un autre jour)
+      if (typeof currentDayIndex !== 'undefined' && !isToday(currentDayIndex)) {
         if (badge) badge.classList.add('hidden');
         if (stickyBadge) stickyBadge.classList.add('hidden');
         return;

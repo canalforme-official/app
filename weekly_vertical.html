@@ -2205,14 +2205,27 @@
         return Promise.resolve(JSON.parse(cachedData));
       }
 
-      return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
+      return (async () => {
+        let data = null;
+        try {
+          const localResp = await fetch('./planning-v2.json');
+          if (localResp.ok) {
+            data = await localResp.json();
+            console.log('✅ Données planning chargées depuis le fichier local');
+          } else {
+            throw new Error('Fichier local non disponible');
           }
-          return response.json();
-        })
-        .then(data => {
+        } catch (localError) {
+          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+          const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
+          if (!remoteResp.ok) {
+            throw new Error(`Erreur HTTP: ${remoteResp.status}`);
+          }
+          data = await remoteResp.json();
+          console.log('✅ Données planning chargées depuis GitHub');
+        }
+        return data;
+      })().then(data => {
           console.group('Validation des données');
           
           console.log('Structure de base:', {

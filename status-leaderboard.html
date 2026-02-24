@@ -934,16 +934,33 @@
     </div>
 
     <script>
-        const jsonUrl = `https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=${Date.now()}`;
-        //const jsonUrl = `./Leaderboard.json?timestamp=${Date.now()}`;
-
         let medalAnimationInterval = null;
         let medalUrls = [];
 
+        async function fetchLeaderboardData() {
+            try {
+                const localResp = await fetch(`./leaderboard.json?timestamp=${Date.now()}`);
+                if (localResp.ok) {
+                    const data = await localResp.json();
+                    console.log('✅ Données leaderboard chargées depuis le fichier local');
+                    return data;
+                }
+                throw new Error('Fichier local non disponible');
+            } catch (localError) {
+                console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+                const remoteResp = await fetch(`https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=${Date.now()}`);
+                if (!remoteResp.ok) {
+                    throw new Error('Impossible de charger le leaderboard depuis GitHub');
+                }
+                const data = await remoteResp.json();
+                console.log('✅ Données leaderboard chargées depuis GitHub');
+                return data;
+            }
+        }
+
         async function fetchLeaderboard() {
-            const response = await fetch(jsonUrl);
-            const data = await response.json();
-            console.log('Données reçues:', data.current.data[0]); // Afficher la structure d'un utilisateur
+            const data = await fetchLeaderboardData();
+            console.log('Données reçues:', data.current.data[0]);
             return data.current.data;
         }
 
@@ -1177,8 +1194,7 @@
 
         async function fetchMedals() {
             try {
-                const response = await fetch(jsonUrl);
-                const data = await response.json();
+                const data = await fetchLeaderboardData();
                 medalUrls = [...new Set(data.current.data.map(user => user.iconLink))];
                 return medalUrls;
             } catch (error) {
