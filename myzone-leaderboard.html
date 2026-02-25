@@ -15,10 +15,10 @@
       --primary-light: #8a1212;
       --primary-rgb: 110, 12, 12;
       --pattern-url: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
-      /* Dégradé rouge → bordeaux (aligné sur daily_grid) */
+      /* Dégradé rouge → bordeaux clair (R 0,555 V 0,071 B 0,068) */
       --leaderboard-red: #e42218;
       --leaderboard-middle: #981010;
-      --leaderboard-bordeaux: #4c000a;
+      --leaderboard-bordeaux: rgb(142, 18, 17);
       --leaderboard-gradient: linear-gradient(90deg, var(--leaderboard-red) 0%, var(--leaderboard-middle) 50%, var(--leaderboard-bordeaux) 100%);
       --leaderboard-gradient-even: linear-gradient(90deg, var(--leaderboard-bordeaux) 0%, var(--leaderboard-middle) 50%, var(--leaderboard-red) 100%);
     }
@@ -161,7 +161,7 @@
       height: auto;
     }
 
-    /* Titre du mois */
+    /* Titre du mois — même largeur que les blocs */
     .month-title {
       font-size: 1.2em;
       font-weight: bold;
@@ -171,9 +171,13 @@
       background-color: transparent;
       position: relative;
       z-index: 4;
+      width: 98%;
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    /* Bloc du mois — translucide, dépasse le tableau */
+    /* Bloc du mois — translucide, englobe countdown + lignes de classement */
     .month-block {
       background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.22) 0%, rgba(var(--primary-rgb), 0.1) 100%);
       color: #ffffff;
@@ -182,15 +186,28 @@
       padding-bottom: 20px;
       padding-left: 20px;
       border-radius: 16px;
-      width: 95%;
-      max-width: 600px;
+      width: 98%;
+      max-width: 620px;
       box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.25);
       border: 1px solid rgba(var(--primary-rgb), 0.3);
       margin-top: -20px;
       position: relative;
       z-index: 3;
       margin-bottom: 30px;
-      overflow: visible;
+      overflow: hidden;
+    }
+
+    /* Vue non mobile : plus de largeur, lignes moins hautes (padding vertical réduit) */
+    @media (min-width: 601px) {
+      .month-block,
+      .month-title,
+      .competition-container {
+        max-width: 900px;
+      }
+      .leaderboard-row {
+        padding: 2px 24px;
+        gap: 8px;
+      }
     }
 
     .last-update {
@@ -202,11 +219,11 @@
       display: none;
     }
 
-    /* Styles du leaderboard — lignes allongées sur les côtés, contenu dans le bloc (le bloc dépasse en haut/bas via son padding) */
+    /* Leaderboard contenu dans le bloc translucide (sans dépassement) */
     .leaderboard {
-      width: calc(100% + 48px);
-      margin-left: -24px;
-      margin-right: -24px;
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
       position: relative;
     }
 
@@ -228,8 +245,8 @@
     .leaderboard-row {
       display: flex;
       align-items: center;
-      padding: 12px 48px;
-      gap: 12px;
+      padding: 8px 24px;
+      gap: 8px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       font-size: 16px;
       box-sizing: border-box;
@@ -424,28 +441,25 @@
         padding-left: 15px;
       }
 
-      /* Pas d'extension des lignes sur mobile, largeur normale */
-      .leaderboard {
-        width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-      }
-
       .leaderboard::before {
         height: 10px;
       }
 
-      /* Lignes moins hautes, padding réduit comme avant (classement proche du bord gauche) */
+      /* Rapprocher classement et nom pour garder plus d'espace pour le nom */
       .leaderboard-row {
         font-size: 14px;
         padding: 6px 16px;
-        gap: 8px;
+        gap: 4px;
       }
 
       .rank {
-        width: 28px;
-        min-width: 28px;
+        width: 24px;
+        min-width: 24px;
         padding-left: 0;
+      }
+
+      .nickname {
+        padding: 0 4px;
       }
 
       .leaderboard-meps {
@@ -490,8 +504,8 @@
       position: relative;
       z-index: 2;
       margin: 0 auto;
-      width: 95%;
-      max-width: 600px;
+      width: 98%;
+      max-width: 620px;
       padding: 18px 20px;
       border-radius: 16px;
       background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.18) 0%, rgba(var(--primary-rgb), 0.08) 100%);
@@ -925,8 +939,33 @@
       position: absolute;
       right: -20px;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-50%) scale(0);
       font-size: 0.8rem;
+      animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
+    }
+
+    @keyframes trophy-grow {
+      0% {
+        transform: translateY(-50%) scale(0);
+        opacity: 0;
+      }
+      70% {
+        transform: translateY(-50%) scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes trophy-pulse {
+      0%, 100% {
+        transform: translateY(-50%) scale(1);
+      }
+      50% {
+        transform: translateY(-50%) scale(1.15);
+      }
     }
 
     /* Suppression des styles de tooltip et hover */
@@ -963,6 +1002,12 @@
     }
 
     /* Segments Homme/Femme — même dégradé rouge→bordeaux que le tableau */
+    .progress-bar .male,
+    .progress-bar .female {
+      position: relative;
+      overflow: visible;
+    }
+
     .progress-bar .male {
       border-radius: 15px 0 0 5px;
       background: var(--leaderboard-gradient);
@@ -992,7 +1037,19 @@
       white-space: nowrap;
     }
 
-    /* Animation discrète pour l'équipe gagnante (léger halo doré) */
+    .progress-bar .male strong,
+    .progress-bar .female strong {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Séparateur de milliers plus visible dans la zone challenge Hommes/Femmes */
+    .progress-bar .male strong .challenge-meps-number,
+    .progress-bar .female strong .challenge-meps-number {
+      letter-spacing: 0.1em;
+    }
+
+    /* Animation halo pour l'équipe gagnante */
     @keyframes winner-pulse {
       0%, 100% {
         box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 215, 0, 0.25);
@@ -1357,11 +1414,14 @@
         });
     }
 
-    // Dans ton script principal (celui où tu as déjà loadLeaderboard() etc.)
     function updateMenWomenBar(data) {
-      const maleMEPs = parseFloat(data.current.meps_averages.male);
-      const femaleMEPs = parseFloat(data.current.meps_averages.female);
-      const totalMEPs = maleMEPs + femaleMEPs;
+      if (!data || !data.current || !data.current.meps_averages) {
+        console.warn('updateMenWomenBar: données manquantes (current.meps_averages)');
+        return;
+      }
+      const maleMEPs = parseFloat(data.current.meps_averages.male) || 0;
+      const femaleMEPs = parseFloat(data.current.meps_averages.female) || 0;
+      const totalMEPs = maleMEPs + femaleMEPs || 1;
       const maleUsers = data.current.active_users.male;
       const femaleUsers = data.current.active_users.female;
       const maleInactiveUsers = data.current.inactive_users.male;
@@ -1393,6 +1453,13 @@
       } else if (femaleMEPs > maleMEPs) {
         womenLabel.classList.add('winner');
         femaleBarEl.classList.add('winner');
+      } else {
+        /* Égalité ou données manquantes : on met en valeur le segment le plus large (confettis visibles) */
+        if (malePercentage >= 50) {
+          maleBarEl.classList.add('winner');
+        } else {
+          femaleBarEl.classList.add('winner');
+        }
       }
 
       // Gestion du pluriel/singulier pour les hommes
@@ -1404,9 +1471,10 @@
       menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}`;
       womenLabel.innerHTML = `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
 
-      // Affiche les MEPs dans la barre
-      document.getElementById('maleBar').innerHTML = `<strong>${Math.round(maleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
-      document.getElementById('femaleBar').innerHTML = `<strong>${Math.round(femaleMEPs).toLocaleString('fr-FR')} MEPs</strong>`;
+      // Affiche les MEPs dans la barre avec séparateur de milliers (classe pour style letter-spacing)
+      const formatMEPs = (n) => Math.round(n).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
+      document.getElementById('maleBar').innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(maleMEPs)}</span> MEPs</strong>`;
+      document.getElementById('femaleBar').innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(femaleMEPs)}</span> MEPs</strong>`;
 
       // Choix icône
       let iconUrl = '';
