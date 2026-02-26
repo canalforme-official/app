@@ -1,7 +1,6 @@
 # Ignorer les fichiers JSON de données générés (seront dans app-data repo)
 # Mais garder les fichiers de configuration et structure
-# *.json
-
+*.json
 node_modules/
 .DS_Store
-*.log 
+*.log
