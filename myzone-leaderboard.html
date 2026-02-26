@@ -15,12 +15,11 @@
       --primary-light: #8a1212;
       --primary-rgb: 110, 12, 12;
       --pattern-url: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
-      /* Dégradé rouge → bordeaux clair (R 0,555 V 0,071 B 0,068) */
+      /* Dégradé rouge → bordeaux */
       --leaderboard-red: #e42218;
-      --leaderboard-middle: #981010;
-      --leaderboard-bordeaux: rgb(142, 18, 17);
-      --leaderboard-gradient: linear-gradient(90deg, var(--leaderboard-red) 0%, var(--leaderboard-middle) 50%, var(--leaderboard-bordeaux) 100%);
-      --leaderboard-gradient-even: linear-gradient(90deg, var(--leaderboard-bordeaux) 0%, var(--leaderboard-middle) 50%, var(--leaderboard-red) 100%);
+      --leaderboard-bordeaux: #6e0c0c;
+      --leaderboard-gradient: linear-gradient(90deg, var(--leaderboard-red) 0%, var(--leaderboard-bordeaux) 100%);
+      --leaderboard-gradient-even: linear-gradient(90deg, var(--leaderboard-bordeaux) 0%, var(--leaderboard-red) 100%);
     }
 
     /* Réinitialisation des marges et des paddings */
@@ -471,6 +470,17 @@
       .leaderboard-meps .status-icon {
         width: 20px;
         height: 20px;
+      }
+
+      /* Photos des coachs légèrement réduites sur mobile */
+      .coach-photo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .coach-podium-photo {
+        width: 32px;
+        height: 32px;
       }
     }
 
@@ -994,7 +1004,7 @@
       position: relative;
       display: flex;
       height: 28px;
-      background: linear-gradient(90deg, var(--leaderboard-bordeaux) 0%, var(--leaderboard-middle) 100%);
+      background: linear-gradient(90deg, var(--leaderboard-bordeaux) 0%, var(--leaderboard-red) 100%);
       border-radius: 15px;
       overflow: visible;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
