@@ -2505,7 +2505,7 @@
           }
 
           // Vérifier l'état des cours toutes les minutes
-          setInterval(checkCourseStates, 60000);
+          setInterval(checkCourseStates, 3000);
           
           // Vérifier immédiatement après le chargement
           setTimeout(checkCourseStates, 1000);
@@ -2891,7 +2891,7 @@
                 courseClasses += ' current';
               }
 
-              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '">';
+              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '" data-start-time="' + (course.startTime || '') + '" data-end-time="' + (course.endTime || '') + '">';
 
               if (isStartingSoon) {
                 courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
@@ -3122,26 +3122,26 @@
           
           // Ne vérifier que les cours du jour actuel
           if (dayName === currentDayName) {
-            const timeCell = block.closest('tr')?.querySelector('.time-cell');
-            if (!timeCell) return;
-
-            const startTime = timeCell.textContent?.trim();
+            const startTime = block.getAttribute('data-start-time') || block.closest('tr')?.querySelector('.time-cell')?.textContent?.trim();
+            const endTimeStr = block.getAttribute('data-end-time');
             if (!startTime) return;
 
             const [startHour, startMinute] = startTime.split(':').map(Number);
             const startTimeInMinutes = startHour * 60 + startMinute;
+            let endTimeInMinutes = startTimeInMinutes + 60;
+            if (endTimeStr) {
+              const [endHour, endMinute] = endTimeStr.split(':').map(Number);
+              endTimeInMinutes = endHour * 60 + endMinute;
+            }
             
-            // Calculer la différence de temps
             const timeDifference = startTimeInMinutes - currentTimeInMinutes;
-            
-            // Vérifier si le cours est en cours ou sur le point de démarrer
             const isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
-            const isInProgress = timeDifference < 0 && timeDifference > -60;
+            const isInProgress = currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
             
             // Mettre à jour les classes en conséquence
             if (isStartingSoon) {
               block.classList.add('starting-soon');
-              block.classList.remove('current');
+              block.classList.remove('current', 'past');
               // Ajouter ou mettre à jour la pilule de compte à rebours
               let countdownPill = block.querySelector('.countdown-pill');
               if (!countdownPill) {
@@ -3152,7 +3152,7 @@
               countdownPill.setAttribute('data-time-diff', timeDifference * 60);
             } else if (isInProgress) {
               block.classList.add('current');
-              block.classList.remove('starting-soon');
+              block.classList.remove('starting-soon', 'past');
               // Supprimer la pilule de compte à rebours si elle existe
               const countdownPill = block.querySelector('.countdown-pill');
               if (countdownPill) {
@@ -3160,15 +3160,15 @@
               }
             } else {
               block.classList.remove('starting-soon', 'current');
-              // Supprimer la pilule de compte à rebours si elle existe
+              block.classList.add('past');
               const countdownPill = block.querySelector('.countdown-pill');
               if (countdownPill) {
                 countdownPill.remove();
               }
             }
           } else {
-            // Pour les autres jours, supprimer toutes les animations
             block.classList.remove('starting-soon', 'current');
+            block.classList.remove('past');
             const countdownPill = block.querySelector('.countdown-pill');
             if (countdownPill) {
               countdownPill.remove();

@@ -1,7 +1,7 @@
 # Canal Forme - Application Web
 
 ## Description
-Application web pour la gestion et l'affichage des données Canal Forme, incluant les plannings de cours et les classements Myzone.
+Application web pour la gestion et l'affichage des données Canal Forme, incluant les plannings de cours et les classements Myzone etc.
 
 ## Repositories GitHub
 ### Frontend (Pages HTML)

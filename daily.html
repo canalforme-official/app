@@ -144,6 +144,28 @@
       width: 100%;
       max-width: 100vw;
       box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Motif de fond global (même pattern que le leaderboard Myzone, hors mode Ramadan) */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-color: rgba(72, 6, 7, 0.08);
+      z-index: 0;
+      pointer-events: none;
     }
 
     /* Images non sélectionnables */
@@ -2718,13 +2740,15 @@
     }
 
     function updateCountdowns() {
+      const now = new Date();
+      const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+
       const countdownElements = document.querySelectorAll('.countdown');
       countdownElements.forEach(el => {
         const startTimeStr = el.getAttribute('data-start-time');
         const [startHour, startMinute] = startTimeStr.split(':').map(Number);
         const startTime = new Date();
         startTime.setHours(startHour, startMinute, 0, 0);
-        const now = new Date();
         const diff = startTime - now;
         
         // Récupérer le bloc parent du cours
@@ -2746,6 +2770,24 @@
             if (courseBlockElement) {
               courseBlockElement.classList.remove('starting-soon');
             }
+          }
+        }
+      });
+
+      // Passer les blocs "en cours" en "passés" dès que l'heure de fin est dépassée (icône rotation, etc.)
+      const currentBlocks = document.querySelectorAll('.timeline-block.current');
+      currentBlocks.forEach(block => {
+        const endTimeStr = block.getAttribute('data-end-time');
+        if (!endTimeStr) return;
+        const [endHour, endMinute] = endTimeStr.split(':').map(Number);
+        const endTimeMinutes = endHour * 60 + endMinute;
+        if (currentTimeMinutes > endTimeMinutes) {
+          block.classList.remove('current', 'focus');
+          block.classList.add('past');
+          const courseBlockEl = block.querySelector('.course-block');
+          if (courseBlockEl) {
+            courseBlockEl.classList.remove('current', 'starting-soon');
+            courseBlockEl.classList.add('past');
           }
         }
       });
