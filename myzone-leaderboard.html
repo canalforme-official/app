@@ -271,14 +271,33 @@
       border-radius: 0 0 16px 16px;
     }
 
+    .rank-cell {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      width: 44px;
+      min-width: 44px;
+      flex-shrink: 0;
+    }
+
     .rank {
       font-weight: bold;
-      width: 36px;
-      min-width: 36px;
+      width: 28px;
+      min-width: 28px;
       text-align: left;
-      flex-shrink: 0;
       color: #ffffff;
       padding-left: 4px;
+    }
+
+    .rank-change-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rank-change-icon svg {
+      display: block;
     }
 
     .nickname {
@@ -325,6 +344,51 @@
       color: rgba(255, 255, 255, 0.7);
       /* Texte blanc avec transparence */
       text-align: right;
+    }
+
+    /* Barre MyZone : 5 segments (zone1 gris, zone2 bleu, zone3 vert, zone4 jaune, zone5 rouge) */
+    .zone-bar-wrap {
+      flex-shrink: 0;
+      width: 200px;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+
+    .zone-bar {
+      display: flex;
+      width: 100%;
+      height: 7px;
+      border-radius: 0;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .zone-bar-empty {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .zone-seg {
+      min-width: 0;
+      height: 100%;
+      box-shadow: none;
+      border: none;
+    }
+
+    .zone-seg.zone-1 { background: rgba(108, 109, 111, 0.75); }
+    .zone-seg.zone-2 { background: rgba(12, 93, 231, 0.75); }
+    .zone-seg.zone-3 { background: rgba(0, 178, 66, 0.75); }
+    .zone-seg.zone-4 { background: rgba(250, 233, 28, 0.75); }
+    .zone-seg.zone-5 { background: rgba(224, 0, 0, 0.75); }
+
+    /* Camembert (mobile uniquement) : masqué en desktop */
+    .zone-pie {
+      display: none;
+    }
+
+    .zone-pie-empty {
+      background: rgba(255, 255, 255, 0.1);
     }
 
     /* Countdown dans le bloc translucide — petit, bordeaux, centré */
@@ -451,14 +515,49 @@
         gap: 4px;
       }
 
+      .rank-cell {
+        width: 32px;
+        min-width: 32px;
+      }
+
       .rank {
-        width: 24px;
-        min-width: 24px;
+        width: 22px;
+        min-width: 22px;
         padding-left: 0;
+      }
+
+      .rank-change-icon svg {
+        width: 12px;
+        height: 12px;
       }
 
       .nickname {
         padding: 0 4px;
+      }
+
+      /* En mobile : barre horizontale masquée, camembert affiché */
+      .zone-bar-wrap {
+        width: 24px;
+        min-width: 24px;
+        margin-right: 8px;
+      }
+
+      .zone-bar-wrap .zone-bar {
+        display: none;
+      }
+
+      .zone-bar-wrap .zone-pie {
+        display: block;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .zone-bar-wrap .zone-pie-empty {
+        background: rgba(255, 255, 255, 0.15);
       }
 
       .leaderboard-meps {
@@ -467,9 +566,10 @@
         padding: 4px 8px;
       }
 
+      /* Icône user réduite de 15 % en mobile (20px -> 17px) */
       .leaderboard-meps .status-icon {
-        width: 20px;
-        height: 20px;
+        width: 17px;
+        height: 17px;
       }
 
       /* Photos des coachs légèrement réduites sur mobile */
@@ -659,6 +759,18 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
+    }
+
+    .podium-rank-change {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 4px 0;
+    }
+
+    .podium-rank-change .rank-change-icon svg {
+      width: 20px;
+      height: 20px;
     }
 
     .podium-meps {
@@ -1328,6 +1440,8 @@
     let isFirstLoad = true;
     let countdownInterval;
     let previousData = {};
+    /** Dernier classement du mois actuel (entre deux mises à jour JSON) : usrGUID -> position */
+    let lastCurrentMonthRankByGuid = {};
     let isInitialAnimationDone = false; // Pour contrôler l'animation du podium
 
     /**
@@ -1551,8 +1665,27 @@
         const currentMonthTitle = formatMonthTitle(data.current.month);
         document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
 
-        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current');
-        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current');
+        // Comparaison avec le dernier classement affiché (entre deux mises à jour du même mois)
+        const rankChangeMap = {};
+        data.current.data.forEach(function (user) {
+          const guid = user.usrGUID;
+          const newPos = user.position;
+          const oldPos = lastCurrentMonthRankByGuid[guid];
+          if (oldPos != null) {
+            if (newPos < oldPos) rankChangeMap[guid] = 'up';
+            else if (newPos > oldPos) rankChangeMap[guid] = 'down';
+            else rankChangeMap[guid] = 'same';
+          }
+        });
+
+        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current', rankChangeMap);
+        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current', rankChangeMap);
+
+        // Mémoriser le classement actuel pour la prochaine comparaison
+        lastCurrentMonthRankByGuid = {};
+        data.current.data.forEach(function (u) {
+          lastCurrentMonthRankByGuid[u.usrGUID] = u.position;
+        });
 
         // Affiche toujours le conteneur du mois actuel
         document.getElementById('currentMonthContainer').style.display = 'flex';
@@ -1664,10 +1797,12 @@
      * @param {Array} topThree Les trois premiers utilisateurs
      * @param {string} podiumWrapperId ID du conteneur du podium
      * @param {string} period Période (current ou previous)
+     * @param {Object} rankChangeMap Map usrGUID -> 'up'|'down'|'same' (pour le mois actuel)
      */
-    function displayPodium(topThree, podiumWrapperId, period) {
+    function displayPodium(topThree, podiumWrapperId, period, rankChangeMap) {
       const podiumWrapper = document.getElementById(podiumWrapperId);
       podiumWrapper.innerHTML = '';
+      rankChangeMap = rankChangeMap || {};
 
       const positions = ['second', 'first', 'third'];
       const orders = [1, 0, 2];
@@ -1712,6 +1847,14 @@
         nameDiv.classList.add('name');
         nameDiv.textContent = user.nickname;
         profileDiv.appendChild(nameDiv);
+
+        const rankChange = rankChangeMap[user.usrGUID];
+        if (rankChange) {
+          const rankChangeWrap = document.createElement('div');
+          rankChangeWrap.classList.add('podium-rank-change');
+          rankChangeWrap.innerHTML = getRankChangeSvg(rankChange);
+          profileDiv.appendChild(rankChangeWrap);
+        }
 
         const mepsDiv = document.createElement('div');
         mepsDiv.classList.add('podium-meps', positionClass);
@@ -1773,8 +1916,9 @@
      * @param {Array} data Données du leaderboard
      * @param {string} leaderboardId ID du conteneur du leaderboard
      * @param {string} period Période (current ou previous)
+     * @param {Object} rankChangeMap Map usrGUID -> 'up'|'down'|'same' (uniquement pour current, entre deux mises à jour)
      */
-    function displayLeaderboard(data, leaderboardId, period) {
+    function displayLeaderboard(data, leaderboardId, period, rankChangeMap) {
       const leaderboardContainer = document.getElementById(leaderboardId);
 
       const today = new Date();
@@ -1783,28 +1927,81 @@
 
       const leaderboardData = data.slice(3, 3 + topEntries);
 
-      leaderboardContainer.innerHTML = createLeaderboardTable(leaderboardData, period);
+      leaderboardContainer.innerHTML = createLeaderboardTable(leaderboardData, period, rankChangeMap || {});
+    }
+
+    function getRankChangeSvg(type) {
+      if (type === 'up') {
+        return '<span class="rank-change-icon rank-up" title="Gain de position"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></span>';
+      }
+      if (type === 'down') {
+        return '<span class="rank-change-icon rank-down" title="Perte de position"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>';
+      }
+      if (type === 'same') {
+        return '<span class="rank-change-icon rank-same" title="Même position"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></span>';
+      }
+      return '';
+    }
+
+    function getZoneBarHtml(user) {
+      const z1 = Number(user.zone1MEPs) || 0;
+      const z2 = Number(user.zone2MEPs) || 0;
+      const z3 = Number(user.zone3MEPs) || 0;
+      const z4 = Number(user.zone4MEPs) || 0;
+      const z5 = Number(user.zone5MEPs) || 0;
+      const total = z1 + z2 + z3 + z4 + z5;
+      if (total <= 0) {
+        return '<div class="zone-bar zone-bar-empty"></div><div class="zone-pie zone-pie-empty"></div>';
+      }
+      const p1 = (z1 / total) * 100;
+      const p2 = (z2 / total) * 100;
+      const p3 = (z3 / total) * 100;
+      const p4 = (z4 / total) * 100;
+      const p5 = (z5 / total) * 100;
+      var barHtml = '<div class="zone-bar">' +
+        '<span class="zone-seg zone-1" style="width:' + p1 + '%"></span>' +
+        '<span class="zone-seg zone-2" style="width:' + p2 + '%"></span>' +
+        '<span class="zone-seg zone-3" style="width:' + p3 + '%"></span>' +
+        '<span class="zone-seg zone-4" style="width:' + p4 + '%"></span>' +
+        '<span class="zone-seg zone-5" style="width:' + p5 + '%"></span>' +
+        '</div>';
+      var cone = 'rgba(108,109,111,0.75) 0% ' + p1 + '%, ' +
+        'rgba(12,93,231,0.75) ' + p1 + '% ' + (p1 + p2) + '%, ' +
+        'rgba(0,178,66,0.75) ' + (p1 + p2) + '% ' + (p1 + p2 + p3) + '%, ' +
+        'rgba(250,233,28,0.75) ' + (p1 + p2 + p3) + '% ' + (p1 + p2 + p3 + p4) + '%, ' +
+        'rgba(224,0,0,0.75) ' + (p1 + p2 + p3 + p4) + '% 100%';
+      var pieHtml = '<div class="zone-pie" style="background: conic-gradient(' + cone + ')"></div>';
+      return barHtml + pieHtml;
     }
 
     /**
      * Crée le tableau du leaderboard
      * @param {Array} leaderboardData Données du leaderboard
      * @param {string} period Période (current ou previous)
+     * @param {Object} rankChangeMap Map usrGUID -> 'up'|'down'|'same'
      * @returns {string} HTML du tableau
      */
-    function createLeaderboardTable(leaderboardData) {
+    function createLeaderboardTable(leaderboardData, period, rankChangeMap) {
+      rankChangeMap = rankChangeMap || {};
       var tableHtml = '<div class="leaderboard">';
       leaderboardData.forEach(function (user) {
         const isPodium = user.position === 1 || user.position === 2 || user.position === 3;
+        const rankChange = rankChangeMap[user.usrGUID];
+        const rankChangeSvg = getRankChangeSvg(rankChange);
+        const zoneBarHtml = getZoneBarHtml(user);
 
         tableHtml += `
             <div class="leaderboard-row">
-                <span class="rank">${user.position}</span>
+                <span class="rank-cell">
+                    <span class="rank">${user.position}</span>
+                    ${rankChangeSvg}
+                </span>
 
                 <!-- Photo du coach si le type est Coach -->
                 ${user.type === 'Coach' ? `<img class="coach-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo de ${user.nickname}" />` : ''}
                 
                 <span class="nickname">${user.nickname}</span>
+                <div class="zone-bar-wrap">${zoneBarHtml}</div>
                 <span class="leaderboard-meps">
                     <span class="status-icon" style="background-image: url(${user.iconLink || ''});"></span>
                     <span class="meps-value">${formatNumber(user.meps)}</span>
