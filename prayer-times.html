@@ -339,6 +339,15 @@
       background: rgba(201, 162, 39, 0.1);
       border-radius: 4px;
     }
+    /* Mobile : afficher uniquement l'icône œil pour observation */
+    @media (max-width: 768px) {
+      .observation-badge .observation-text {
+        display: none;
+      }
+      .observation-badge {
+        padding: 2px 4px;
+      }
+    }
 
     .day-name {
       font-weight: 500;
@@ -698,7 +707,7 @@
           const monthShort = monthsShort[date.getMonth()];
 
           const dayDisplay = prayer.isObservation 
-            ? `<span class="observation-badge">Obs. 👁</span>` 
+            ? `<span class="observation-badge"><span class="observation-text">Obs. </span>👁</span>` 
             : `<span class="day-number">${prayer.day || ''}</span>`;
           
           row.innerHTML = `

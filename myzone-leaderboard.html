@@ -497,22 +497,35 @@
         margin: 0 !important;
       }
 
+      /* Bloc classement même largeur que le bloc challenge homme/femme (98 %) */
+      .container {
+        width: 98%;
+        max-width: 620px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1%;
+        padding-right: 1%;
+        box-sizing: border-box;
+      }
+
       .month-block {
         padding-top: 12px;
         padding-right: 15px;
         padding-bottom: 12px;
         padding-left: 15px;
+        width: 100%;
+        max-width: none;
       }
 
       .leaderboard::before {
         height: 10px;
       }
 
-      /* Rapprocher classement et nom pour garder plus d'espace pour le nom */
+      /* Rapprocher classement et nom ; gap réduit pour rapprocher le nom de la photo coach */
       .leaderboard-row {
         font-size: 14px;
         padding: 6px 16px;
-        gap: 4px;
+        gap: 2px;
       }
 
       .rank-cell {
@@ -533,6 +546,7 @@
 
       .nickname {
         padding: 0 4px;
+        padding-left: 2px;
       }
 
       /* En mobile : barre horizontale masquée, camembert affiché */
@@ -572,15 +586,15 @@
         height: 17px;
       }
 
-      /* Photos des coachs légèrement réduites sur mobile */
+      /* Photo coach (coachLink) réduite de 20 % sur mobile (32px -> 26px) */
       .coach-photo {
-        width: 32px;
-        height: 32px;
+        width: 26px;
+        height: 26px;
       }
 
       .coach-podium-photo {
-        width: 32px;
-        height: 32px;
+        width: 26px;
+        height: 26px;
       }
     }
 
