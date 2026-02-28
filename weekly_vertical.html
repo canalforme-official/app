@@ -668,7 +668,7 @@
       z-index: 0;
     }
 
-    .course-block.women-only > * {
+    .course-block.women-only > *:not(.countdown-pill) {
       position: relative;
       z-index: 1;
     }
@@ -694,7 +694,7 @@
       z-index: 0;
     }
 
-    .course-block.piscine > * {
+    .course-block.piscine > *:not(.countdown-pill) {
       position: relative;
       z-index: 1;
     }
@@ -753,11 +753,12 @@
       }
     }
 
-    /* Styles pour la pilule de compte à rebours */
+    /* Styles pour la pilule de compte à rebours — toujours en haut à droite du bloc */
     .countdown-pill {
       position: absolute;
       top: 2px;
-      right: 0;
+      right: 4px;
+      left: auto;
       transform: translateX(0);
       width: 25px;
       height: 12px;
@@ -1560,6 +1561,8 @@
       }
 
       .countdown-pill {
+        right: 4px;
+        left: auto;
         width: 20px;
         height: 10px;
         font-size: 0.55em;

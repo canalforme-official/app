@@ -534,11 +534,12 @@
       }
     }
 
-    /* Disque de compte à rebours : petit, en overflow en haut à droite du cours (décalé à gauche) */
+    /* Pilule compte à rebours : toujours en haut à droite du bloc de cours */
     .countdown-pill {
       position: absolute;
       top: -4px;
       right: 4px;
+      left: auto;
       width: 14px;
       height: 14px;
       min-width: 14px;
@@ -1327,6 +1328,7 @@
       .countdown-pill {
         top: -3px;
         right: 3px;
+        left: auto;
         width: 12px;
         height: 12px;
         min-width: 12px;
