@@ -73,6 +73,25 @@
       --shadow-medium: rgba(150, 150, 150, 0.5);
       --shadow-dark: rgba(0, 0, 0, 0.4);
     }
+    /* Motif de fond en planning régulier (même que daily.html) */
+    body:not(.planning-ramadan)::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body:not(.planning-ramadan)::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-color: rgba(72, 6, 7, 0.08);
+      z-index: 0;
+      pointer-events: none;
+    }
     body.planning-ramadan { --primary-color: #26462d; --primary-overlay: rgba(38, 70, 45, 0.95); --primary-light: rgba(38, 70, 45, 0.85); --secondary-color: #c9a227; position: relative; }
     body.planning-ramadan::before {
       content: '';
@@ -365,6 +384,8 @@
       padding-left: 5px;
       padding-right: 5px;
       box-sizing: border-box;
+      position: relative;
+      z-index: 1;
     }
 
     .studios-container {
@@ -414,7 +435,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       border-bottom: 1px solid var(--primary-color);
-      background-color: var(--background-card);
+      background-color: rgba(255, 255, 255, 0.6);
       z-index: 1;
       order: -1;
       text-transform: uppercase;
