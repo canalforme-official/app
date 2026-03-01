@@ -115,8 +115,14 @@
     #currentMonthContainer,
     #previousMonthContainer,
     .podium-wrapper,
-    .competition-container {
+    .competition-container,
+    #previousPodiumWithConfetti {
       display: none;
+    }
+
+    /* Quand on affiche le mois précédent, le podium à l'intérieur doit rester visible */
+    #previousPodiumWithConfetti .podium-wrapper {
+      display: flex !important;
     }
 
     .container {
@@ -226,21 +232,6 @@
       position: relative;
     }
 
-    /* Bande supérieure : dépasse du bloc en haut */
-    .leaderboard::before {
-      content: '';
-      display: block;
-      height: 14px;
-      background: var(--leaderboard-gradient);
-      border-radius: 16px 16px 0 0;
-    }
-
-    /* Plus de bande en bas pour éviter la ligne vide apparente sous le tableau */
-    .leaderboard::after {
-      content: none;
-      display: none;
-    }
-
     .leaderboard-row {
       display: flex;
       align-items: center;
@@ -250,6 +241,7 @@
       font-size: 16px;
       box-sizing: border-box;
       min-width: 0;
+      min-height: 44px;
     }
 
     /* Dégradé rouge → bordeaux (alternance de sens pour varier) */
@@ -263,7 +255,7 @@
     }
 
     .leaderboard-row:first-child {
-      border-radius: 0;
+      border-radius: 16px 16px 0 0;
     }
 
     .leaderboard-row:last-child {
@@ -389,6 +381,18 @@
 
     .zone-pie-empty {
       background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Message quand aucun classement (mois en cours sans MEPs) */
+    .leaderboard-empty-state {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      padding: 28px 20px;
+      background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.2) 0%, rgba(var(--primary-rgb), 0.08) 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 0;
     }
 
     /* Countdown dans le bloc translucide — petit, bordeaux, centré */
@@ -517,10 +521,6 @@
         max-width: none;
       }
 
-      .leaderboard::before {
-        height: 10px;
-      }
-
       /* Rapprocher classement et nom ; gap réduit pour rapprocher le nom de la photo coach */
       .leaderboard-row {
         font-size: 14px;
@@ -591,10 +591,10 @@
         height: 17px;
       }
 
-      /* Photo coach (coachLink) réduite de 20 % sur mobile (32px -> 26px) */
+      /* Photo coach dans les lignes, plus petite sur mobile */
       .coach-photo {
-        width: 26px;
-        height: 26px;
+        width: 22px;
+        height: 22px;
       }
 
       .coach-podium-photo {
@@ -626,6 +626,57 @@
     #previousPodiumWrapper {
       margin-top: 20px;
       /* Restauré à 20px */
+    }
+
+    /* Podium du mois précédent : wrapper pour confettis */
+    .previous-podium-with-confetti {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    /* Largeur = 3 podiums (130×3 + 12×2) + 30px à gauche + 30px à droite = 474px */
+    .confetti-layer {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 474px;
+      max-width: calc(100% - 20px);
+      bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: 16px;
+      z-index: 5;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 1px;
+      animation: confetti-fall 3.5s linear forwards;
+      opacity: 0.85;
+    }
+
+    .confetti-piece.sparkle {
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      box-shadow: 0 0 4px currentColor;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.95;
+      }
+      100% {
+        transform: translateY(320px) rotate(720deg);
+        opacity: 0.2;
+      }
     }
 
     /* Ajuster l'espacement du conteneur de compétition */
@@ -1013,12 +1064,12 @@
       height: 0 !important;
     }
 
-    /* Photo des coachs dans le tableau */
+    /* Photo des coachs dans le tableau (lignes du leaderboard) */
     .coach-photo {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      margin-right: 10px;
+      margin-right: 8px;
       object-fit: cover;
       vertical-align: middle;
     }
@@ -1380,15 +1431,19 @@
   <div class="container" id="currentMonthContainer">
     <div class="month-block current-month-block">
       <div id="countdown" class="countdown-in-block" aria-live="polite"></div>
+      <div id="currentMonthEmptyState" class="leaderboard-empty-state" style="display: none;" aria-live="polite">En attente du premier entraînement Myzone du mois</div>
       <div id="currentMonthLeaderboard"></div>
     </div>
   </div>
 
-  <!-- Podium du mois précédent -->
-  <div class="podium-wrapper" id="previousPodiumWrapper">
-    <!-- Photo du coach en haut à gauche pour les podiums -->
-    <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;"
-      alt="Photo du coach podium précédent">
+  <!-- Podium du mois précédent (avec confettis / paillettes) -->
+  <div class="previous-podium-with-confetti" id="previousPodiumWithConfetti">
+    <div class="podium-wrapper" id="previousPodiumWrapper">
+      <!-- Photo du coach en haut à gauche pour les podiums -->
+      <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;"
+        alt="Photo du coach podium précédent">
+    </div>
+    <div class="confetti-layer" id="previousPodiumConfetti" aria-hidden="true"></div>
   </div>
 
   <!-- Titre du mois précédent -->
@@ -1409,24 +1464,26 @@
 
     /* Afficher ou masquer la barre « Prochaine mise à jour » (true = affichée, false = masquée) */
     const SHOW_COUNTDOWN = true;
+    /* Durée du compte à rebours et mise à jour automatique (en secondes) */
+    const COUNTDOWN_SECONDS = 300;
 
     /* code pour mise à jour avec tirage*/
     let startY = 0;
     let isPulling = false;
     const pullThreshold = 120;
-    let timer = 60;
+    let timer = COUNTDOWN_SECONDS;
 
     const loadingOverlay = document.getElementById('loadingOverlay');
 
     // Fonction pour redémarrer le compteur de rafraîchissement automatique
     function resetCountdown() {
       clearInterval(countdownInterval);
-      timer = 60;
+      timer = COUNTDOWN_SECONDS;
       countdownInterval = setInterval(() => {
         timer--;
         if (timer <= 0) {
-          refreshLeaderboard(); // Utilise refreshLeaderboard au lieu de loadLeaderboard
-          timer = 60;
+          refreshLeaderboard();
+          timer = COUNTDOWN_SECONDS;
         }
       }, 1000);
     }
@@ -1462,6 +1519,8 @@
     /** Dernier classement du mois actuel (entre deux mises à jour JSON) : usrGUID -> position */
     let lastCurrentMonthRankByGuid = {};
     let isInitialAnimationDone = false; // Pour contrôler l'animation du podium
+    let previousPodiumConfettiInterval = null;
+    let previousPodiumConfettiTimeout = null;
 
     /**
      * Affiche l'overlay de chargement (uniquement si SHOW_LOADING_OVERLAY est true)
@@ -1483,8 +1542,7 @@
         document.body.classList.remove('loading');
         document.querySelectorAll('.container').forEach(el => el.style.display = 'flex');
         document.querySelectorAll('.month-block').forEach(el => el.style.display = 'block');
-        document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'flex');
-        document.querySelector('.competition-container').style.display = 'block';
+        /* Podiums et challenge homme/femme sont gérés par updateLeaderboard (hasRanking) */
         isFirstLoad = false;
       }
 
@@ -1535,7 +1593,7 @@
             setTimeout(hideLoadingOverlay, 2000); // Délai minimum de 2 secondes pour le premier chargement
             isFirstLoad = false;
           }
-          startCountdown(60);
+          startCountdown(COUNTDOWN_SECONDS);
         })
         .catch(error => {
           console.error("Erreur lors du chargement du leaderboard:", error);
@@ -1551,9 +1609,11 @@
           console.log('Données rafraîchies:', data);
           updateLeaderboard(data);
           updateMenWomenBar(data);
+          startCountdown(COUNTDOWN_SECONDS);
         })
         .catch(error => {
           console.error("Erreur lors du rafraîchissement du leaderboard:", error);
+          startCountdown(COUNTDOWN_SECONDS);
         });
     }
 
@@ -1667,6 +1727,58 @@
     }
 
     /**
+     * Ajoute quelques confettis (chute en continu, plus aléatoire qu'en rafales)
+     */
+    function spawnPreviousPodiumConfetti() {
+      const container = document.getElementById('previousPodiumConfetti');
+      if (!container) return;
+      const colors = ['#FFD700', '#FFA500', '#e42218', '#6e0c0c', '#ffffff', '#fff8dc', '#ffebcd'];
+      const count = 6 + Math.floor(Math.random() * 15);
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece' + (Math.random() > 0.4 ? ' sparkle' : '');
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.animationDelay = (Math.random() * 0.05) + 's';
+        piece.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.color = piece.style.backgroundColor;
+        container.appendChild(piece);
+        setTimeout(function () {
+          if (piece.parentNode) piece.remove();
+        }, 4200);
+      }
+    }
+
+    function scheduleNextConfetti() {
+      previousPodiumConfettiTimeout = setTimeout(function () {
+        spawnPreviousPodiumConfetti();
+        scheduleNextConfetti();
+      }, 180 + Math.random() * 420);
+    }
+
+    function startPreviousPodiumConfetti() {
+      stopPreviousPodiumConfetti();
+      const container = document.getElementById('previousPodiumConfetti');
+      if (!container) return;
+      container.innerHTML = '';
+      spawnPreviousPodiumConfetti();
+      scheduleNextConfetti();
+    }
+
+    function stopPreviousPodiumConfetti() {
+      if (previousPodiumConfettiInterval) {
+        clearInterval(previousPodiumConfettiInterval);
+        previousPodiumConfettiInterval = null;
+      }
+      if (previousPodiumConfettiTimeout) {
+        clearTimeout(previousPodiumConfettiTimeout);
+        previousPodiumConfettiTimeout = null;
+      }
+      const container = document.getElementById('previousPodiumConfetti');
+      if (container) container.innerHTML = '';
+    }
+
+    /**
      * Met à jour le leaderboard avec les nouvelles données
      * @param {Object} data Données du leaderboard
      */
@@ -1675,49 +1787,63 @@
       const today = new Date();
       const dayOfMonth = today.getDate();
 
-      // Afficher le competition-container en premier
-      document.querySelector('.competition-container').style.display = 'block';
+      // Challenge homme/femme : affiché uniquement s'il y a un classement (entraînements) pour le mois en cours
+      const hasRanking = data.current && data.current.data && data.current.data.length > 0 && !allMepsZero(data.current.data);
+      document.querySelector('.competition-container').style.display = hasRanking ? 'block' : 'none';
 
       // Vérifie si le mois actuel doit être affiché
-      if (data.current && data.current.data) {
-        console.log('Données du mois actuel:', data.current.data);
+      if (data.current) {
         const currentMonthTitle = formatMonthTitle(data.current.month);
         document.getElementById('currentMonthTitle').textContent = currentMonthTitle;
-
-        // Comparaison avec le dernier classement affiché (entre deux mises à jour du même mois)
-        const rankChangeMap = {};
-        data.current.data.forEach(function (user) {
-          const guid = user.usrGUID;
-          const newPos = user.position;
-          const oldPos = lastCurrentMonthRankByGuid[guid];
-          if (oldPos != null) {
-            if (newPos < oldPos) rankChangeMap[guid] = 'up';
-            else if (newPos > oldPos) rankChangeMap[guid] = 'down';
-            else rankChangeMap[guid] = 'same';
-          }
-        });
-
-        displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current', rankChangeMap);
-        displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current', rankChangeMap);
-
-        // Mémoriser le classement actuel pour la prochaine comparaison
-        lastCurrentMonthRankByGuid = {};
-        data.current.data.forEach(function (u) {
-          lastCurrentMonthRankByGuid[u.usrGUID] = u.position;
-        });
-
-        // Affiche toujours le conteneur du mois actuel
         document.getElementById('currentMonthContainer').style.display = 'flex';
-        document.getElementById('podiumWrapper').style.display = 'flex';
         document.getElementById('currentMonthTitle').style.display = 'block';
-        if (SHOW_COUNTDOWN) {
-          document.getElementById('countdown').style.display = 'block';
-        } else {
-          document.getElementById('countdown').style.display = 'none';
-        }
-
-        // S'assurer que le month-block est visible
         document.querySelector('.current-month-block').style.display = 'block';
+
+        if (hasRanking) {
+          console.log('Données du mois actuel:', data.current.data);
+          document.getElementById('currentMonthEmptyState').style.display = 'none';
+          document.getElementById('currentMonthLeaderboard').style.display = 'block';
+          document.getElementById('podiumWrapper').style.display = 'flex';
+
+          // Comparaison avec le dernier classement affiché (entre deux mises à jour du même mois)
+          const rankChangeMap = {};
+          data.current.data.forEach(function (user) {
+            const guid = user.usrGUID;
+            const newPos = user.position;
+            const oldPos = lastCurrentMonthRankByGuid[guid];
+            if (oldPos != null) {
+              if (newPos < oldPos) rankChangeMap[guid] = 'up';
+              else if (newPos > oldPos) rankChangeMap[guid] = 'down';
+              else rankChangeMap[guid] = 'same';
+            }
+          });
+
+          displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current', rankChangeMap);
+          displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current', rankChangeMap);
+
+          lastCurrentMonthRankByGuid = {};
+          data.current.data.forEach(function (u) {
+            lastCurrentMonthRankByGuid[u.usrGUID] = u.position;
+          });
+
+          if (SHOW_COUNTDOWN) {
+            document.getElementById('countdown').style.display = 'block';
+          } else {
+            document.getElementById('countdown').style.display = 'none';
+          }
+        } else {
+          // Aucun MEP encore : afficher le message d'attente
+          document.getElementById('currentMonthEmptyState').style.display = 'block';
+          document.getElementById('currentMonthLeaderboard').style.display = 'none';
+          document.getElementById('currentMonthLeaderboard').innerHTML = '';
+          document.getElementById('podiumWrapper').style.display = 'none';
+          document.getElementById('podiumWrapper').innerHTML = '';
+          if (SHOW_COUNTDOWN) {
+            document.getElementById('countdown').style.display = 'block';
+          } else {
+            document.getElementById('countdown').style.display = 'none';
+          }
+        }
       } else {
         console.log('Pas de données pour le mois actuel');
       }
@@ -1730,17 +1856,23 @@
 
         displayPodium(data.previous.data.slice(0, 3), 'previousPodiumWrapper', 'previous');
         displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
+        startPreviousPodiumConfetti();
 
-        // Restaurer les éléments du mois précédent
+        // Restaurer les éléments du mois précédent (wrapper + podium visible)
+        const previousPodiumWrap = document.getElementById('previousPodiumWithConfetti');
+        const previousPodiumEl = document.getElementById('previousPodiumWrapper');
+        if (previousPodiumWrap) previousPodiumWrap.style.display = 'block';
+        if (previousPodiumEl) previousPodiumEl.style.display = 'flex';
+
         const previousElements = [
           document.getElementById('previousMonthContainer'),
-          document.getElementById('previousPodiumWrapper'),
+          document.getElementById('previousPodiumWithConfetti'),
           document.getElementById('previousMonthTitle')
         ];
 
         previousElements.forEach(element => {
           if (element) {
-            element.style.display = '';
+            element.style.display = element.id === 'previousPodiumWithConfetti' ? 'block' : '';
             element.style.visibility = '';
             element.style.opacity = '';
             element.style.height = '';
@@ -1755,11 +1887,12 @@
         if (previousMonthBlock) {
           previousMonthBlock.style.display = 'block';
         }
-      } else {
+      } else if (dayOfMonth > 7) {
+        stopPreviousPodiumConfetti();
         // Masquer complètement le mois précédent après le 7
         const previousElements = [
           document.getElementById('previousMonthContainer'),
-          document.getElementById('previousPodiumWrapper'),
+          document.getElementById('previousPodiumWithConfetti'),
           document.getElementById('previousMonthTitle')
         ];
 
@@ -1774,8 +1907,7 @@
             element.style.position = 'absolute';
           }
         });
-        
-        // Masquer explicitement le month-block du mois précédent
+
         const previousMonthBlock = document.querySelector('#previousMonthContainer .month-block');
         if (previousMonthBlock) {
           previousMonthBlock.style.display = 'none';
@@ -1786,6 +1918,7 @@
           previousMonthBlock.style.margin = '0';
         }
       }
+      /* Si dayOfMonth <= 7 mais pas de data.previous : on ne touche pas au bloc mois précédent (évite disparition pendant la mise à jour) */
 
       previousData = data;
     }
