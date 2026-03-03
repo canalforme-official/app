@@ -116,7 +116,8 @@
     #previousMonthContainer,
     .podium-wrapper,
     .competition-container,
-    #previousPodiumWithConfetti {
+    #previousPodiumWithConfetti,
+    #previousMonthSection {
       display: none;
     }
 
@@ -1436,24 +1437,27 @@
     </div>
   </div>
 
-  <!-- Podium du mois précédent (avec confettis / paillettes) -->
-  <div class="previous-podium-with-confetti" id="previousPodiumWithConfetti">
-    <div class="podium-wrapper" id="previousPodiumWrapper">
-      <!-- Photo du coach en haut à gauche pour les podiums -->
-      <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;"
-        alt="Photo du coach podium précédent">
+  <!-- Section mois précédent (tout masqué après le 7) -->
+  <div id="previousMonthSection">
+    <!-- Podium du mois précédent (avec confettis / paillettes) -->
+    <div class="previous-podium-with-confetti" id="previousPodiumWithConfetti">
+      <div class="podium-wrapper" id="previousPodiumWrapper">
+        <!-- Photo du coach en haut à gauche pour les podiums -->
+        <img class="coach-podium-photo" id="previousCoachPodiumPhoto" style="display: none;"
+          alt="Photo du coach podium précédent">
+      </div>
+      <div class="confetti-layer" id="previousPodiumConfetti" aria-hidden="true"></div>
     </div>
-    <div class="confetti-layer" id="previousPodiumConfetti" aria-hidden="true"></div>
-  </div>
 
-  <!-- Titre du mois précédent -->
-  <div id="previousMonthTitle" class="month-title"></div>
+    <!-- Titre du mois précédent -->
+    <div id="previousMonthTitle" class="month-title"></div>
 
-  <!-- Section du mois précédent -->
-  <div class="container" id="previousMonthContainer">
-    <div class="month-block">
-      <!-- Leaderboard du mois précédent -->
-      <div id="previousMonthLeaderboard"></div>
+    <!-- Section du mois précédent -->
+    <div class="container" id="previousMonthContainer">
+      <div class="month-block">
+        <!-- Leaderboard du mois précédent -->
+        <div id="previousMonthLeaderboard"></div>
+      </div>
     </div>
   </div>
 
@@ -1858,7 +1862,16 @@
         displayLeaderboard(data.previous.data, 'previousMonthLeaderboard', 'previous');
         startPreviousPodiumConfetti();
 
-        // Restaurer les éléments du mois précédent (wrapper + podium visible)
+        // Afficher toute la section mois précédent
+        const previousSection = document.getElementById('previousMonthSection');
+        if (previousSection) {
+          previousSection.style.display = 'block';
+          previousSection.style.visibility = '';
+          previousSection.style.height = '';
+          previousSection.style.overflow = '';
+          previousSection.style.padding = '';
+          previousSection.style.margin = '';
+        }
         const previousPodiumWrap = document.getElementById('previousPodiumWithConfetti');
         const previousPodiumEl = document.getElementById('previousPodiumWrapper');
         if (previousPodiumWrap) previousPodiumWrap.style.display = 'block';
@@ -1869,10 +1882,11 @@
           document.getElementById('previousPodiumWithConfetti'),
           document.getElementById('previousMonthTitle')
         ];
-
         previousElements.forEach(element => {
           if (element) {
-            element.style.display = element.id === 'previousPodiumWithConfetti' ? 'block' : '';
+            if (element.id === 'previousPodiumWithConfetti') element.style.display = 'block';
+            else if (element.id === 'previousMonthContainer') element.style.display = 'flex';
+            else if (element.id === 'previousMonthTitle') element.style.display = 'block';
             element.style.visibility = '';
             element.style.opacity = '';
             element.style.height = '';
@@ -1881,41 +1895,21 @@
             element.style.position = '';
           }
         });
-
-        // S'assurer que le month-block est visible
         const previousMonthBlock = document.querySelector('#previousMonthContainer .month-block');
         if (previousMonthBlock) {
           previousMonthBlock.style.display = 'block';
         }
       } else if (dayOfMonth > 7) {
         stopPreviousPodiumConfetti();
-        // Masquer complètement le mois précédent après le 7
-        const previousElements = [
-          document.getElementById('previousMonthContainer'),
-          document.getElementById('previousPodiumWithConfetti'),
-          document.getElementById('previousMonthTitle')
-        ];
-
-        previousElements.forEach(element => {
-          if (element) {
-            element.style.display = 'none';
-            element.style.visibility = 'hidden';
-            element.style.opacity = '0';
-            element.style.height = '0';
-            element.style.padding = '0';
-            element.style.margin = '0';
-            element.style.position = 'absolute';
-          }
-        });
-
-        const previousMonthBlock = document.querySelector('#previousMonthContainer .month-block');
-        if (previousMonthBlock) {
-          previousMonthBlock.style.display = 'none';
-          previousMonthBlock.style.visibility = 'hidden';
-          previousMonthBlock.style.opacity = '0';
-          previousMonthBlock.style.height = '0';
-          previousMonthBlock.style.padding = '0';
-          previousMonthBlock.style.margin = '0';
+        // Masquer toute la section mois précédent (aucun résidu, plus de bloc translucide)
+        const previousSection = document.getElementById('previousMonthSection');
+        if (previousSection) {
+          previousSection.style.display = 'none';
+          previousSection.style.visibility = 'hidden';
+          previousSection.style.height = '0';
+          previousSection.style.overflow = 'hidden';
+          previousSection.style.padding = '0';
+          previousSection.style.margin = '0';
         }
       }
       /* Si dayOfMonth <= 7 mais pas de data.previous : on ne touche pas au bloc mois précédent (évite disparition pendant la mise à jour) */
@@ -2077,7 +2071,7 @@
       const dayOfMonth = today.getDate();
       const topEntries = dayOfMonth <= 7 ? 10 : 17;
 
-      const leaderboardData = data.slice(3, 3 + topEntries);
+      const leaderboardData = data.slice(3, topEntries);
 
       leaderboardContainer.innerHTML = createLeaderboardTable(leaderboardData, period, rankChangeMap || {});
     }
