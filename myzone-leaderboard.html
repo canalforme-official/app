@@ -203,12 +203,15 @@
       overflow: hidden;
     }
 
-    /* Vue non mobile : plus de largeur, lignes moins hautes (padding vertical réduit) */
+    /* Vue non mobile : plus de largeur, moins de padding au-dessus du countdown */
     @media (min-width: 601px) {
       .month-block,
       .month-title,
       .competition-container {
         max-width: 900px;
+      }
+      .month-block {
+        padding-top: 10px;
       }
       .leaderboard-row {
         padding: 2px 24px;
@@ -236,13 +239,13 @@
     .leaderboard-row {
       display: flex;
       align-items: center;
-      padding: 8px 24px;
-      gap: 8px;
+      padding: 3px 16px;
+      gap: 6px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       font-size: 16px;
       box-sizing: border-box;
       min-width: 0;
-      min-height: 44px;
+      min-height: 0;
     }
 
     /* Dégradé rouge → bordeaux (alternance de sens pour varier) */
@@ -306,40 +309,64 @@
 
     .leaderboard-meps {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
       font-weight: bold;
       background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      padding: 6px 12px;
+      border-radius: 8px;
+      padding: 3px 8px;
       width: 150px;
       min-width: 150px;
       flex-shrink: 0;
-      justify-content: space-between;
       transition: transform 0.3s ease;
       box-sizing: border-box;
       margin-left: auto;
+      gap: 2px;
+    }
+
+    .leaderboard-meps .zone-bar-wrap {
+      width: 100%;
+      min-width: 0;
+      margin: 0;
+      order: 0;
+    }
+
+    .leaderboard-meps .zone-bar {
+      height: 5px;
+    }
+
+    .leaderboard-meps .zone-pie {
+      display: none !important;
+    }
+
+    .leaderboard-meps-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      order: 1;
     }
 
     .leaderboard-meps .status-icon {
-      width: 22px;
-      height: 22px;
-      margin-right: 5px;
+      width: 20px;
+      height: 20px;
+      margin-right: 2px;
+      flex-shrink: 0;
     }
 
     .leaderboard-meps .meps-value {
-      margin-right: 5px;
+      margin-right: 2px;
       color: #ffffff;
-      /* Texte blanc */
+      font-size: 0.95em;
     }
 
     .leaderboard-meps .meps-label {
-      font-size: 0.8em;
+      font-size: 0.75em;
       color: rgba(255, 255, 255, 0.7);
-      /* Texte blanc avec transparence */
       text-align: right;
     }
 
-    /* Barre MyZone : 5 segments (zone1 gris, zone2 bleu, zone3 vert, zone4 jaune, zone5 rouge) */
+    /* Barre MyZone standalone (hors bloc MEPs) : masquée quand la barre est dans le bloc */
     .zone-bar-wrap {
       flex-shrink: 0;
       width: 200px;
@@ -353,7 +380,7 @@
       display: flex;
       width: 100%;
       height: 7px;
-      border-radius: 0;
+      border-radius: 999px;
       overflow: hidden;
       background: rgba(255, 255, 255, 0.08);
     }
@@ -522,11 +549,11 @@
         max-width: none;
       }
 
-      /* Rapprocher classement et nom ; gap réduit pour rapprocher le nom de la photo coach */
+      /* Rapprocher classement et nom ; padding au minimum pour limiter la hauteur des lignes */
       .leaderboard-row {
         font-size: 14px;
-        padding: 6px 16px;
-        gap: 2px;
+        padding: 2px 12px;
+        gap: 4px;
       }
 
       .rank-cell {
@@ -555,35 +582,16 @@
         padding-left: 2px;
       }
 
-      /* En mobile : barre horizontale masquée, camembert affiché */
-      .zone-bar-wrap {
-        width: 24px;
-        min-width: 24px;
-        margin-right: 8px;
-      }
-
-      .zone-bar-wrap .zone-bar {
-        display: none;
-      }
-
+      /* En mobile : même barre horizontale que la vue non mobile (pas de camembert) */
       .zone-bar-wrap .zone-pie {
-        display: block;
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
-        min-height: 24px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-
-      .zone-bar-wrap .zone-pie-empty {
-        background: rgba(255, 255, 255, 0.15);
+        display: none !important;
       }
 
       .leaderboard-meps {
-        width: 130px;
-        min-width: 130px;
-        padding: 4px 8px;
+        width: 120px;
+        min-width: 120px;
+        padding: 2px 6px;
+        gap: 1px;
       }
 
       /* Icône user réduite de 15 % en mobile (20px -> 17px) */
@@ -844,6 +852,24 @@
       height: 20px;
     }
 
+    /* Bloc unique : barre Myzone + nombre MEPs sur le podium */
+    .podium-meps-block {
+      width: 100%;
+      background: rgba(var(--primary-rgb), 0.1);
+      padding: 6px 8px;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    .podium-meps-block .podium-zone-bar {
+      margin: 0 0 6px;
+    }
+
+    .podium-meps-block .podium-meps {
+      background: none;
+      padding: 0;
+    }
+
     .podium-meps {
       color: white;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -882,6 +908,22 @@
 
     .podium-meps.third {
       font-size: 1.4rem;
+    }
+
+    /* Barre Myzone sur le podium (toujours horizontale) */
+    .podium-zone-bar {
+      width: 100%;
+      margin: 4px 0 6px;
+    }
+
+    .podium-zone-bar .zone-bar {
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .podium-zone-bar .zone-pie {
+      display: none !important;
     }
 
     .meps-label {
@@ -1182,14 +1224,14 @@
       margin-right: 5px;
     }
 
-    /* Barre de progression — fond en dégradé bordeaux pour cohérence */
+    /* Barre de progression — fond neutre (pas de bande rouge derrière) */
     .progress-bar {
       position: relative;
       display: flex;
       height: 28px;
-      background: linear-gradient(90deg, var(--leaderboard-bordeaux) 0%, var(--leaderboard-red) 100%);
+      background: transparent;
       border-radius: 15px;
-      overflow: visible;
+      overflow: hidden;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
       margin-top: 8px;
     }
@@ -1198,7 +1240,8 @@
     .progress-bar .male,
     .progress-bar .female {
       position: relative;
-      overflow: visible;
+      overflow: hidden;
+      min-width: 0;
     }
 
     .progress-bar .male {
@@ -2002,16 +2045,27 @@
           profileDiv.appendChild(rankChangeWrap);
         }
 
+        // Bloc unique : barre Myzone + MEPs (barre dans le même bloc que le nombre)
+        const mepsBlock = document.createElement('div');
+        mepsBlock.classList.add('podium-meps-block');
+
+        const podiumZoneBar = document.createElement('div');
+        podiumZoneBar.classList.add('podium-zone-bar');
+        podiumZoneBar.innerHTML = getZoneBarHtml(user);
+        mepsBlock.appendChild(podiumZoneBar);
+
         const mepsDiv = document.createElement('div');
         mepsDiv.classList.add('podium-meps', positionClass);
         mepsDiv.textContent = formatNumber(user.meps);
         mepsDiv.setAttribute('data-meps', user.meps);
-        profileDiv.appendChild(mepsDiv);
+        mepsBlock.appendChild(mepsDiv);
 
         const mepsLabelDiv = document.createElement('div');
         mepsLabelDiv.classList.add('meps-label');
         mepsLabelDiv.textContent = 'MEPs';
-        profileDiv.appendChild(mepsLabelDiv);
+        mepsBlock.appendChild(mepsLabelDiv);
+
+        profileDiv.appendChild(mepsBlock);
 
         stepDiv.appendChild(profileDiv);
 
@@ -2147,11 +2201,13 @@
                 ${user.type === 'Coach' ? `<img class="coach-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo de ${user.nickname}" />` : ''}
                 
                 <span class="nickname">${user.nickname}</span>
-                <div class="zone-bar-wrap">${zoneBarHtml}</div>
                 <span class="leaderboard-meps">
-                    <span class="status-icon" style="background-image: url(${user.iconLink || ''});"></span>
-                    <span class="meps-value">${formatNumber(user.meps)}</span>
-                    <span class="meps-label">MEPs</span>
+                    <div class="zone-bar-wrap">${zoneBarHtml}</div>
+                    <div class="leaderboard-meps-row">
+                        <span class="status-icon" style="background-image: url(${user.iconLink || ''});"></span>
+                        <span class="meps-value">${formatNumber(user.meps)}</span>
+                        <span class="meps-label">MEPs</span>
+                    </div>
                 </span>
 
                 <!-- Ajout de la photo du coach sur le podium -->
