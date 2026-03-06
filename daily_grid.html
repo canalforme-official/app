@@ -479,6 +479,7 @@
     }
 
     .course-card {
+      position: relative;
       margin-bottom: 4px;
       font-size: 1.2em;
       border: none;
@@ -512,6 +513,66 @@
       color: var(--text-secondary);
       font-size: 1.1em;
       font-style: italic;
+    }
+
+    /* Pilule « démarre bientôt » — discrète, style weekly */
+    .course-card .countdown-pill {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      left: auto;
+      min-width: 28px;
+      height: 18px;
+      padding: 0 6px;
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-title);
+      font-size: 0.7em;
+      font-weight: 600;
+      box-shadow: 0 1px 3px var(--shadow-medium);
+      z-index: 2;
+    }
+
+    body.planning-ramadan .course-card .countdown-pill {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+
+    /* Cours sur le point de commencer — léger surlignage */
+    .course-card.starting-soon {
+      box-shadow: 0 2px 12px var(--shadow-medium);
+      outline: 1px solid rgba(255, 166, 48, 0.4);
+    }
+
+    /* Cours en cours — discret : bordure gauche + léger fond */
+    .course-card.current {
+      border-left: 3px solid var(--primary-color);
+      background-color: rgba(72, 6, 7, 0.04);
+      box-shadow: 0 2px 10px var(--shadow-light);
+    }
+
+    body.planning-ramadan .course-card.current {
+      border-left-color: var(--primary-color);
+      background-color: rgba(38, 70, 45, 0.06);
+    }
+
+    .course-card.pool.current {
+      border-left-color: var(--pool-blue);
+      background-color: rgba(53, 118, 124, 0.06);
+    }
+
+    .course-card.women-only.current {
+      border-left-color: var(--women-middle);
+      background-color: rgba(158, 97, 135, 0.06);
+    }
+
+    /* Cours passés — légère atténuation */
+    .course-card.past {
+      opacity: 0.65;
     }
 
     .empty-message {
@@ -1683,6 +1744,56 @@
       loadAndDisplayCourses();
     }
 
+    /**
+     * Met à jour l'état des cartes (à venir / démarre bientôt / en cours / passés) et la pilule.
+     * Ne s'applique qu'au jour affiché = aujourd'hui. Appelée au rendu et à intervalle régulier.
+     */
+    function updateCourseCardsState() {
+      var todayStr = new Date().toISOString().slice(0, 10);
+      var displayedStr = currentDate.toISOString().slice(0, 10);
+      var isViewingToday = (todayStr === displayedStr);
+      var now = new Date();
+      var currentMinutes = now.getHours() * 60 + now.getMinutes();
+      var cards = document.querySelectorAll('#studiosContainer .course-card');
+      cards.forEach(function(card) {
+        var startStr = card.getAttribute('data-start-time');
+        var endStr = card.getAttribute('data-end-time');
+        if (!startStr) return;
+        var startParts = startStr.split(':');
+        var startMinutes = (parseInt(startParts[0], 10) || 0) * 60 + (parseInt(startParts[1], 10) || 0);
+        var endMinutes = startMinutes + 60;
+        if (endStr) {
+          var endParts = endStr.split(':');
+          endMinutes = (parseInt(endParts[0], 10) || 0) * 60 + (parseInt(endParts[1], 10) || 0);
+        }
+        var timeDiff = startMinutes - currentMinutes;
+        var isStartingSoon = isViewingToday && timeDiff >= 0 && timeDiff <= 15;
+        var isInProgress = isViewingToday && currentMinutes >= startMinutes && currentMinutes < endMinutes;
+        var isPast = isViewingToday && currentMinutes >= endMinutes;
+        var pill = card.querySelector('.countdown-pill');
+        if (isStartingSoon) {
+          card.classList.add('starting-soon');
+          card.classList.remove('current', 'past');
+          if (!pill) {
+            pill = document.createElement('div');
+            pill.className = 'countdown-pill';
+            card.insertBefore(pill, card.firstChild);
+          }
+          if (timeDiff < 1) pill.textContent = 'Imminent';
+          else pill.textContent = 'Dans ' + Math.ceil(timeDiff) + ' min';
+        } else if (isInProgress) {
+          card.classList.add('current');
+          card.classList.remove('starting-soon', 'past');
+          if (pill) pill.remove();
+        } else {
+          card.classList.remove('starting-soon', 'current');
+          if (isViewingToday && isPast) card.classList.add('past');
+          else card.classList.remove('past');
+          if (pill) pill.remove();
+        }
+      });
+    }
+
     async function loadAndDisplayCourses() {
       try {
         syncCurrentDateToWeekWindow();
@@ -1901,8 +2012,21 @@
                   coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '') + '...';
                 }
                 
+                var startTimeStr = course.startTime || '';
+                var endTimeStr = course.endTime || '';
+                if (!endTimeStr && startTimeStr) {
+                  var parts = startTimeStr.split(':');
+                  var h = parseInt(parts[0], 10) || 0;
+                  var m = parseInt(parts[1], 10) || 0;
+                  m += 60;
+                  h += Math.floor(m / 60);
+                  m = m % 60;
+                  endTimeStr = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+                }
                 const courseCard = document.createElement('div');
                 courseCard.className = 'course-card';
+                courseCard.setAttribute('data-start-time', startTimeStr);
+                courseCard.setAttribute('data-end-time', endTimeStr);
                 var courseType = (course.type || '').toString().toLowerCase();
                 var studioName = (studio.name || '').toString().toLowerCase();
                 if (courseType.indexOf('femme') !== -1) {
@@ -1925,6 +2049,7 @@
           studiosContainer.appendChild(row);
         }
         
+        updateCourseCardsState();
         updateDayTitle();
         
         // Gérer les coachs
@@ -2001,6 +2126,7 @@
     });
     
     setInterval(loadAndDisplayCourses, 60000);
+    setInterval(updateCourseCardsState, 5000);
 
     // Fonction pour rediriger vers daily.html
     function returnToDaily() {
