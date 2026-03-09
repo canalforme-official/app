@@ -490,6 +490,7 @@
     }
 
     .course-time {
+      position: relative;
       font-family: var(--font-title);
       color: white;
       font-size: 1.1em;
@@ -515,37 +516,32 @@
       font-style: italic;
     }
 
-    /* Pilule « démarre bientôt » — discrète, style weekly */
-    .course-card .countdown-pill {
+    /* Petit disque compte à rebours — en haut à droite du bloc heure de début (.course-time) */
+    .course-time .countdown-pill {
       position: absolute;
-      top: 4px;
-      right: 4px;
+      top: -5px;
+      right: -5px;
       left: auto;
-      min-width: 28px;
-      height: 18px;
-      padding: 0 6px;
+      width: 16px;
+      height: 16px;
+      padding: 0;
       background-color: var(--secondary-color);
       color: var(--primary-color);
-      border-radius: 9px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--font-title);
-      font-size: 0.7em;
-      font-weight: 600;
-      box-shadow: 0 1px 3px var(--shadow-medium);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
+      box-shadow: 0 1px 2px var(--shadow-medium);
       z-index: 2;
     }
 
-    body.planning-ramadan .course-card .countdown-pill {
+    body.planning-ramadan .course-time .countdown-pill {
       background-color: var(--secondary-color);
       color: var(--primary-color);
-    }
-
-    /* Cours sur le point de commencer — léger surlignage */
-    .course-card.starting-soon {
-      box-shadow: 0 2px 12px var(--shadow-medium);
-      outline: 1px solid rgba(255, 166, 48, 0.4);
     }
 
     /* Cours en cours — discret : bordure gauche + léger fond */
@@ -1753,7 +1749,7 @@
       var displayedStr = currentDate.toISOString().slice(0, 10);
       var isViewingToday = (todayStr === displayedStr);
       var now = new Date();
-      var currentMinutes = now.getHours() * 60 + now.getMinutes();
+      var currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
       var cards = document.querySelectorAll('#studiosContainer .course-card');
       cards.forEach(function(card) {
         var startStr = card.getAttribute('data-start-time');
@@ -1761,15 +1757,17 @@
         if (!startStr) return;
         var startParts = startStr.split(':');
         var startMinutes = (parseInt(startParts[0], 10) || 0) * 60 + (parseInt(startParts[1], 10) || 0);
+        var startSeconds = startMinutes * 60;
         var endMinutes = startMinutes + 60;
         if (endStr) {
           var endParts = endStr.split(':');
           endMinutes = (parseInt(endParts[0], 10) || 0) * 60 + (parseInt(endParts[1], 10) || 0);
         }
-        var timeDiff = startMinutes - currentMinutes;
-        var isStartingSoon = isViewingToday && timeDiff >= 0 && timeDiff <= 15;
-        var isInProgress = isViewingToday && currentMinutes >= startMinutes && currentMinutes < endMinutes;
-        var isPast = isViewingToday && currentMinutes >= endMinutes;
+        var endSeconds = endMinutes * 60;
+        var diffSeconds = startSeconds - currentSeconds;
+        var isStartingSoon = isViewingToday && diffSeconds > 0 && diffSeconds <= 15 * 60;
+        var isInProgress = isViewingToday && diffSeconds <= 0 && currentSeconds < endSeconds;
+        var isPast = isViewingToday && currentSeconds >= endSeconds;
         var pill = card.querySelector('.countdown-pill');
         if (isStartingSoon) {
           card.classList.add('starting-soon');
@@ -1777,10 +1775,15 @@
           if (!pill) {
             pill = document.createElement('div');
             pill.className = 'countdown-pill';
-            card.insertBefore(pill, card.firstChild);
+            var timeBlock = card.querySelector('.course-time');
+            (timeBlock || card).appendChild(pill);
           }
-          if (timeDiff < 1) pill.textContent = 'Imminent';
-          else pill.textContent = 'Dans ' + Math.ceil(timeDiff) + ' min';
+          if (diffSeconds <= 60) {
+            pill.textContent = diffSeconds + '"';
+          } else {
+            var mins = Math.ceil(diffSeconds / 60);
+            pill.textContent = mins + "'";
+          }
         } else if (isInProgress) {
           card.classList.add('current');
           card.classList.remove('starting-soon', 'past');
@@ -2126,7 +2129,7 @@
     });
     
     setInterval(loadAndDisplayCourses, 60000);
-    setInterval(updateCourseCardsState, 5000);
+    setInterval(updateCourseCardsState, 1000);
 
     // Fonction pour rediriger vers daily.html
     function returnToDaily() {
