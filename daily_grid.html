@@ -1378,7 +1378,7 @@
       var today = new Date().toISOString().slice(0, 10);
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
       var daysBefore = 7;
-      var showSwitcher = !!(data.planningRamadan && ramadanStart);
+      var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBefore));
       if (showSwitcher) {
         ramadanButton.style.display = 'flex';
         setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
