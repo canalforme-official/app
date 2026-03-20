@@ -1834,8 +1834,15 @@
       var ramadanStart = data.metadata && data.metadata.ramadanStart;
       var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var daysBeforeRamadan = 7;
+      var preRamadanWindow = !!(ramadanStart && today < ramadanStart &&
+        (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBeforeRamadan);
+      var allowStoredRamadan = !!(inRamadan || preRamadanWindow);
       if (urlView === 'ramadan' || urlView === 'regulier') { activePlanningView = urlView; localStorage.setItem('planningView', urlView); }
-      else if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
+      else if (stored === 'ramadan' || stored === 'regulier') {
+        if (stored === 'ramadan' && !allowStoredRamadan) { activePlanningView = 'regulier'; localStorage.setItem('planningView', 'regulier'); }
+        else { activePlanningView = stored; }
+      }
       else if (inRamadan) { activePlanningView = 'ramadan'; localStorage.setItem('planningView', 'ramadan'); }
       else { activePlanningView = 'regulier'; localStorage.setItem('planningView', 'regulier'); }
       document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');

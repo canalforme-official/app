@@ -1346,6 +1346,10 @@
       var ramadanStart = data.metadata && data.metadata.ramadanStart;
       var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
       var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var daysBeforeRamadan = 7;
+      var preRamadanWindow = !!(ramadanStart && today < ramadanStart &&
+        (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBeforeRamadan);
+      var allowStoredRamadan = !!(inRamadan || preRamadanWindow);
       if (urlView === 'ramadan' || urlView === 'regulier') {
         activePlanningView = urlView;
         try { localStorage.setItem('planningView', urlView); } catch (e) {}
@@ -1354,8 +1358,11 @@
         activePlanningView = inRamadan ? 'ramadan' : 'regulier';
         try { localStorage.setItem('planningView', activePlanningView); } catch (e) {}
       } else {
-        // Mobile uniquement : URL > localStorage > période > régulier
-        if (stored === 'ramadan' || stored === 'regulier') { activePlanningView = stored; }
+        // Mobile uniquement : URL > localStorage (Ramadan seulement si période / fenêtre avant Ramadan) > période > régulier
+        if (stored === 'ramadan' || stored === 'regulier') {
+          if (stored === 'ramadan' && !allowStoredRamadan) { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
+          else { activePlanningView = stored; }
+        }
         else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
         else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
       }
