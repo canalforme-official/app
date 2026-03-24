@@ -473,6 +473,16 @@
     body.planning-ferie .indetermine-title {
       color: #b8860b;
     }
+    .indetermine-holiday {
+      margin: 0 0 12px 0;
+      font-size: 1.08em;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+    body.planning-ferie .indetermine-holiday {
+      color: #b45309;
+    }
 
     .timeline.no-courses .timeline-message--closed {
       width: 100%;
@@ -2778,10 +2788,13 @@
       var colors = palettes[paletteKey] || palettes.regulier;
       spawnConfettiBurst(colors);
     }
-    function displayIndetermineMessage() {
+    function displayIndetermineMessage(rv) {
+      var name = rv && rv.periodName ? escapeHtml(rv.periodName) : '';
+      var holidayLine = name ? '<p class="indetermine-holiday">' + name + '</p>' : '';
       return '<div class="timeline-message timeline-message--indetermine" role="status">' +
         '<div class="indetermine-card">' +
         '<strong class="indetermine-title">Planning à déterminer</strong>' +
+        holidayLine +
         '<p class="indetermine-text">Un planning sera publié prochainement. Vous serez averti par notification ; il s’affichera ici dès la mise à jour.</p>' +
         '</div></div>';
     }
@@ -2883,7 +2896,7 @@
 
       if (rv.indetermine) {
         scheduleContainer.className = 'timeline no-courses';
-        scheduleContainer.innerHTML = displayIndetermineMessage();
+        scheduleContainer.innerHTML = displayIndetermineMessage(rv);
         toggleTodayButton();
         if (!skipAutoScroll) window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         updateNavButtonsState();

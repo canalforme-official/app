@@ -205,7 +205,9 @@
           if (rv.periodName) msgInner += '<br><span>' + PR.escapeHtml(rv.periodName) + '</span>';
           msgInner += '</div>';
         } else {
-          msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>À déterminer</strong><br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
+          msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>À déterminer</strong>';
+          if (rv.periodName) msgInner += '<br><span class="weekly-msg-holiday">' + PR.escapeHtml(rv.periodName) + '</span>';
+          msgInner += '<br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
         }
         var tr = '<div class="weekly-msg-tranche"><div class="weekly-msg-tranche-inner">' + msgInner + '</div></div>';
         return '<div class="weekly-msg-column" role="status">' + tr + tr + tr + '</div>';

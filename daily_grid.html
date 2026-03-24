@@ -533,6 +533,16 @@
     body.planning-ferie .indetermine-title {
       color: #b8860b;
     }
+    .indetermine-holiday {
+      margin: 0 0 12px 0;
+      font-size: 1.08em;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+    body.planning-ferie .indetermine-holiday {
+      color: #b45309;
+    }
     .timeline-message--closed {
       display: flex;
       justify-content: center;
@@ -1712,10 +1722,13 @@
         '<p class="closed-text">Aucun cours prévu pour cette journée.</p>' +
         '</div></div>';
     }
-    function displayIndetermineMessage() {
+    function displayIndetermineMessage(rv) {
+      var name = rv && rv.periodName ? escapeHtml(rv.periodName) : '';
+      var holidayLine = name ? '<p class="indetermine-holiday">' + name + '</p>' : '';
       return '<div class="timeline-message timeline-message--indetermine" role="status">' +
         '<div class="indetermine-card">' +
         '<strong class="indetermine-title">Planning à déterminer</strong>' +
+        holidayLine +
         '<p class="indetermine-text">Un planning sera publié prochainement. Vous serez averti par notification ; il s’affichera ici dès la mise à jour.</p>' +
         '</div></div>';
     }
@@ -2184,7 +2197,7 @@
         return;
       }
       if (rv.indetermine) {
-        studiosContainer.innerHTML = displayIndetermineMessage();
+        studiosContainer.innerHTML = displayIndetermineMessage(rv);
         document.getElementById('coachesSection').innerHTML = '';
         updateNavButtonsState();
         document.body.setAttribute('data-daily-grid-ready', 'true');
