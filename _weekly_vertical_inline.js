@@ -207,7 +207,8 @@
         } else {
           msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>À déterminer</strong><br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
         }
-        return '<div class="weekly-msg-column" role="status"><div class="weekly-msg-column-inner">' + msgInner + '</div></div>';
+        var tr = '<div class="weekly-msg-tranche"><div class="weekly-msg-tranche-inner">' + msgInner + '</div></div>';
+        return '<div class="weekly-msg-column" role="status">' + tr + tr + tr + '</div>';
       }
 
       function emitRowspanCell(ci) {
