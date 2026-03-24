@@ -100,19 +100,22 @@
     body.planning-ramadan .today-view-button::before {
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
-    body.planning-ramadan .ramadan-switch-button {
-      background: rgba(38, 70, 45, 1);
+    /* Horaires de prière : fond transparent, icône verte Ramadan */
+    a.ramadan-switch-button {
+      text-decoration: none;
+      color: inherit;
     }
-
-    /* Bouton switch planning Ramadan — au-dessus du bouton de rotation, mobile uniquement */
     .ramadan-switch-button {
       position: fixed;
       bottom: 145px;
       right: 20px;
       width: auto;
       height: auto;
-      background: transparent;
+      background: transparent !important;
       border: none;
+      border-radius: 50%;
+      padding: 6px;
+      box-shadow: none;
       display: none;
       align-items: center;
       justify-content: center;
@@ -123,16 +126,15 @@
       pointer-events: auto;
       opacity: 0;
       transform: translateY(20px);
-      padding: 0;
     }
     .ramadan-switch-button.loaded {
       opacity: 1;
       transform: translateY(0);
     }
-    .ramadan-icon {
+    .ramadan-switch-button .ramadan-icon {
       width: 55px;
       height: 55px;
-      filter: brightness(0) saturate(0%) invert(8%) sepia(94%) saturate(1352%) hue-rotate(335deg) brightness(95%) contrast(88%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2)) !important;
       transition: filter 0.3s;
       z-index: 10;
       position: relative;
@@ -147,12 +149,6 @@
       50% {
         transform: translateY(-8px);
       }
-    }
-    body.planning-ramadan .ramadan-switch-button {
-      background: transparent;
-    }
-    body.planning-ramadan .ramadan-icon {
-      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     }
     .ramadan-switch-button:active {
       transform: translateY(20px) scale(0.9);
@@ -1938,7 +1934,97 @@
     }
   }
 
+    .navigation {
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: none;
+    }
+    .navigation.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+    .nav-button {
+      background: rgba(255, 255, 255, 0.35);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      pointer-events: all;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(10px);
+    }
+    .nav-segments { position: relative; width: 20px; height: 20px; }
+    .segment { position: absolute; background: var(--primary-color); border-radius: 1px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .prev-button .segment-1 { width: 16px; height: 3px; top: 8px; right: 1px; transform: rotate(45deg); transform-origin: left center; }
+    .prev-button .segment-2 { width: 16px; height: 3px; top: 10px; right: 1px; transform: rotate(-45deg); transform-origin: left center; }
+    .next-button .segment-1 { width: 16px; height: 3px; top: 8px; left: 1px; transform: rotate(-45deg); transform-origin: right center; }
+    .next-button .segment-2 { width: 16px; height: 3px; top: 10px; left: 1px; transform: rotate(45deg); transform-origin: right center; }
+    @media (hover: hover) {
+      .nav-button:hover { background: var(--primary-color); transform: scale(1.05); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+      .nav-button:hover .segment { background: white; }
+    }
+    .nav-button:active { transform: scale(0.95); }
+    .nav-button:disabled { visibility: hidden; }
+    .weekly-day-title { font-weight: 700; font-size: 0.95em; }
+    .weekly-day-date { font-size: 0.78em; font-weight: 500; opacity: 0.9; margin-top: 2px; }
+    .weekly-schedule thead th[data-planning-key="ramadan"] { background: rgba(38, 70, 45, 0.92) !important; color: #fff !important; }
+    .weekly-schedule thead th[data-planning-key="ferie"],
+    .weekly-schedule thead th[data-planning-key="ferme"] {
+      background: #fff3cd !important;
+      color: #1a1a1a !important;
+    }
+    .weekly-msg { padding: 8px 6px; text-align: center; font-size: 0.8em; line-height: 1.3; }
+    .weekly-msg--closed strong { color: var(--primary-color); }
+    .weekly-msg--indetermine strong { color: var(--text-secondary); }
+    .weekly-schedule td.course-cell--status-msg {
+      vertical-align: stretch;
+      padding: 0;
+    }
+    .weekly-msg-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 100%;
+      height: 100%;
+      min-height: 220px;
+      box-sizing: border-box;
+    }
+    .weekly-msg-column-inner {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 6px;
+    }
+    .weekly-msg-sub {
+      font-size: 0.88em;
+      display: block;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
 </style>
+  <script src="./planning-resolve.js"></script>
 </head>
 <body onload="initializeWeeklyPage();">
   <!-- Nouveau système de modal -->
@@ -1960,6 +2046,21 @@
     <!-- Bouton pour revenir à aujourd'hui -->
     <div class="today-view-button" id="todayViewButton">
       <button onclick="returnToToday()">
+      </button>
+    </div>
+
+    <div class="navigation" id="weekNavigation">
+      <button type="button" id="prevWeek" onclick="changeWeek(-1)" class="nav-button prev-button" aria-label="Semaine précédente">
+        <div class="nav-segments">
+          <div class="segment segment-1"></div>
+          <div class="segment segment-2"></div>
+        </div>
+      </button>
+      <button type="button" id="nextWeek" onclick="changeWeek(1)" class="nav-button next-button" aria-label="Semaine suivante">
+        <div class="nav-segments">
+          <div class="segment segment-1"></div>
+          <div class="segment segment-2"></div>
+        </div>
       </button>
     </div>
 
@@ -1991,11 +2092,9 @@
 
   </div>
 
-  <!-- Bouton switch planning Ramadan (au-dessus du bouton de rotation, mobile uniquement) -->
-  <button id="ramadanSwitchButton" class="ramadan-switch-button">
-    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
-    <div class="confetti-container"></div>
-  </button>
+  <a href="./prayer-times.html" id="ramadanSwitchButton" class="ramadan-switch-button" title="Horaires de prière" aria-label="Horaires de prière">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Horaires de prière" class="ramadan-icon">
+  </a>
 
   <!-- Barre de filtres en bas avec le bouton intégré -->
   <div class="filters-sidebar" id="filtersSidebar">
@@ -2034,623 +2133,716 @@
   </div>
 
   <script>
-    // Option pour afficher/masquer les logos de cours
     const SHOW_COURSE_IMAGES = true;
-    
-    // Initialiser les variables
-    var scheduleData = [];
-    var activePlanningView = 'regulier'; // 'regulier' | 'ramadan'
+    var scheduleData = null;
+    var weekMondayYmd = '';
 
-    // Mise à jour de la visibilité du bouton Ramadan au resize et attacher l'event listener
-    (function initRamadanButtonResize() {
-      function update() {
-        if (scheduleData && typeof renderPlanningViewSwitcher === 'function') renderPlanningViewSwitcher(scheduleData);
-      }
-      function attachListener() {
-        var ramadanButton = document.getElementById('ramadanSwitchButton');
-        if (ramadanButton) {
-          // Retirer l'ancien listener s'il existe et en ajouter un nouveau
-          ramadanButton.removeEventListener('click', toggleRamadanPlanning);
-          ramadanButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Clic détecté sur le bouton Ramadan');
-            toggleRamadanPlanning();
-          });
-          console.log('Event listener attaché au bouton Ramadan');
-        } else {
-          console.warn('Bouton ramadanSwitchButton non trouvé lors de l\'initialisation');
-        }
-        window.addEventListener('resize', update);
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', attachListener);
-      } else {
-        attachListener();
-      }
-    })();
-
-    /** Retourne le planning actuellement affiché (régulier ou Ramadan). Si Ramadan vide, affiche le régulier. */
-    function getCurrentPlanning() {
-      if (!scheduleData || !scheduleData.planning) return {};
-      if (activePlanningView === 'ramadan' && scheduleData.planningRamadan) {
-        var pr = scheduleData.planningRamadan;
-        var hasCourses = Object.keys(pr).some(function(day) { return pr[day] && pr[day].length > 0; });
-        if (hasCourses) return pr;
-      }
-      return scheduleData.planning;
+    function getPR() {
+      return window.PlanningResolve;
     }
 
-    /** Initialise activePlanningView depuis URL, localStorage ou période (ramadanStart/ramadanEnd). */
-    function initPlanningView(data) {
+    function parseWeekFromUrl() {
+      var PR = getPR();
       var params = new URLSearchParams(window.location.search);
-      var urlView = params.get('planning');
-      var stored = localStorage.getItem('planningView');
-      var today = new Date().toISOString().slice(0, 10);
-      var ramadanStart = data.metadata && data.metadata.ramadanStart;
-      var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
-      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-      var daysBeforeRamadan = 7;
-      var showRamadanButton = ramadanStart && data.planningRamadan && today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBeforeRamadan;
-      var preRamadanWindow = !!(ramadanStart && today < ramadanStart &&
-        (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBeforeRamadan);
-      var allowStoredRamadan = !!(inRamadan || preRamadanWindow);
-
-      if (urlView === 'ramadan' || urlView === 'regulier') {
-        activePlanningView = urlView;
-        localStorage.setItem('planningView', urlView);
-      } else if (stored === 'ramadan' || stored === 'regulier') {
-        if (stored === 'ramadan' && !allowStoredRamadan) {
-          activePlanningView = 'regulier';
-          localStorage.setItem('planningView', 'regulier');
-        } else {
-          activePlanningView = stored;
-        }
-      } else if (inRamadan) {
-        activePlanningView = 'ramadan';
-        localStorage.setItem('planningView', 'ramadan');
-      } else {
-        activePlanningView = 'regulier';
-        localStorage.setItem('planningView', 'regulier');
+      var w = params.get('week');
+      if (w && /^\d{4}-\d{2}-\d{2}$/.test(w)) {
+        var mon = PR.mondayOfWeekContaining(w);
+        return PR.clampWeekMonday(mon);
       }
-      document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
+      return PR.clampWeekMonday(PR.mondayOfWeekContaining(PR.ymdFromDate(new Date())));
     }
 
-    /** Affiche ou masque le bouton flottant Ramadan selon période et contexte (mobile uniquement). */
+    function updateUrlWeekParam() {
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set('week', weekMondayYmd);
+        history.replaceState({}, '', url);
+      } catch (e) {}
+    }
+
+    function changeWeek(delta) {
+      var PR = getPR();
+      weekMondayYmd = PR.addDaysToYmd(weekMondayYmd, delta * 7);
+      weekMondayYmd = PR.clampWeekMonday(weekMondayYmd);
+      updateUrlWeekParam();
+      refreshPlanningDisplay();
+    }
+
+    function updateNavButtonsStateWeek() {
+      var PR = getPR();
+      var today = PR.ymdFromDate(new Date());
+      var min = PR.addDaysToYmd(today, -PR.NAV_DAYS_LIMIT);
+      var max = PR.addDaysToYmd(today, PR.NAV_DAYS_LIMIT);
+      var maxMonday = PR.mondayOfWeekContaining(PR.addDaysToYmd(max, -6));
+      var minMonday = PR.firstMondayOnOrAfter(min);
+      var prevBtn = document.getElementById('prevWeek');
+      var nextBtn = document.getElementById('nextWeek');
+      if (prevBtn) prevBtn.disabled = weekMondayYmd <= minMonday;
+      if (nextBtn) nextBtn.disabled = weekMondayYmd >= maxMonday;
+    }
+
+    function weekHasRamadanWeek() {
+      var PR = getPR();
+      if (!scheduleData || !weekMondayYmd) return false;
+      for (var i = 0; i < 7; i++) {
+        var ymd = PR.addDaysToYmd(weekMondayYmd, i);
+        var rv = PR.resolveDailyView(ymd, scheduleData);
+        if (rv.planningKey === 'ramadan') return true;
+      }
+      return false;
+    }
+
     function renderPlanningViewSwitcher(data) {
       var ramadanButton = document.getElementById('ramadanSwitchButton');
-      if (!ramadanButton) {
-        console.warn('renderPlanningViewSwitcher: bouton ramadanSwitchButton non trouvé');
-        return;
-      }
-      if (!data) {
-        console.warn('renderPlanningViewSwitcher: pas de données');
-        return;
-      }
+      if (!ramadanButton || !data) return;
       var isMobile = window.innerWidth <= 768;
-      console.log('renderPlanningViewSwitcher: isMobile=', isMobile, 'window.innerWidth=', window.innerWidth);
       if (!isMobile) {
         ramadanButton.style.display = 'none';
+        ramadanButton.classList.remove('loaded');
         return;
       }
-      var meta = data.metadata || {};
-      var ramadanStart = meta.ramadanStart;
-      var ramadanEnd = meta.ramadanEnd;
-      var today = new Date().toISOString().slice(0, 10);
-      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-      var daysBefore = 7;
-      var showSwitcher = (data.planningRamadan && ramadanStart) && (
-        inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24*60*60*1000) <= daysBefore)
-      );
-      console.log('renderPlanningViewSwitcher: showSwitcher=', showSwitcher, 'ramadanStart=', ramadanStart, 'planningRamadan présent=', !!data.planningRamadan);
-      if (showSwitcher) {
+      if (weekHasRamadanWeek()) {
         ramadanButton.style.display = 'flex';
-        ramadanButton.style.pointerEvents = 'auto';
         setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
-        console.log('Bouton Ramadan affiché');
       } else {
         ramadanButton.style.display = 'none';
-        console.log('Bouton Ramadan masqué');
-      }
-    }
-    function toggleRamadanPlanning() {
-      console.log('toggleRamadanPlanning appelé, activePlanningView actuel:', activePlanningView);
-      var button = document.getElementById('ramadanSwitchButton');
-      if (!button) {
-        console.error('Bouton ramadanSwitchButton non trouvé');
-        return;
-      }
-      
-      // Animation d'explosion de paillettes sur toute la page
-      var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#26462d';
-      var pageConfettiContainer = document.getElementById('pageConfettiContainer');
-      if (!pageConfettiContainer) {
-        pageConfettiContainer = document.createElement('div');
-        pageConfettiContainer.id = 'pageConfettiContainer';
-        pageConfettiContainer.style.cssText = 'position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2147483647; overflow: visible;';
-        (document.documentElement || document.body).appendChild(pageConfettiContainer);
-      }
-      
-      // Créer beaucoup plus de paillettes qui se répandent sur toute la page
-      var buttonRect = button.getBoundingClientRect();
-      var centerX = buttonRect.left + buttonRect.width / 2;
-      var centerY = buttonRect.top + buttonRect.height / 2;
-      
-      for (var i = 0; i < 100; i++) {
-        var burst = document.createElement('div');
-        burst.className = 'confetti-burst';
-        burst.style.cssText = 'position: absolute; width: 8px; height: 8px; border-radius: 50%; background: ' + color + '; z-index: 2147483647;';
-        burst.style.left = centerX + 'px';
-        burst.style.top = centerY + 'px';
-        var angle = (Math.random() * 360) * Math.PI / 180;
-        var distance = 200 + Math.random() * 400;
-        var x = Math.cos(angle) * distance;
-        var y = Math.sin(angle) * distance;
-        burst.style.setProperty('--burst-x', x + 'px');
-        burst.style.setProperty('--burst-y', y + 'px');
-        pageConfettiContainer.appendChild(burst);
-        setTimeout(function(el) { if (el && el.parentNode) el.remove(); }, 2000, burst);
-      }
-      
-      var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
-      console.log('Basculement vers:', currentView);
-      setPlanningView(currentView);
-    }
-
-    /** Bascule l’affichage vers planning Ramadan ou régulier et rafraîchit. */
-    function setPlanningView(view) {
-      console.log('setPlanningView appelé avec view:', view, 'scheduleData:', scheduleData ? 'présent' : 'absent');
-      activePlanningView = view;
-      try {
-        localStorage.setItem('planningView', view);
-      } catch(e) {
-        console.warn('Erreur localStorage:', e);
-      }
-      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
-      refreshPlanningDisplay();
-      if (scheduleData) {
-        renderPlanningViewSwitcher(scheduleData);
+        ramadanButton.classList.remove('loaded');
       }
     }
 
-    /** Re-génère le planning et met à jour la liste des coachs (sidebar). */
-    function refreshPlanningDisplay() {
-      if (!scheduleData || !scheduleData.planning) return;
-      document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
-      markMultilineCourseNames();
-      var planningData = getCurrentPlanning();
-      var coachsData = scheduleData.coachs;
-      var defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
-      var uniqueCoachesMap = new Map();
-      Object.values(planningData).forEach(dayCourses => {
-        (dayCourses || []).forEach(course => {
-          if (course.coachIds) {
-            course.coachIds.forEach(coachId => {
-              var coach = coachsData.find(c => c.id === coachId);
-              if (coach && !uniqueCoachesMap.has(coach.name)) uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
-            });
-          }
+    function handleResize() {
+      var isMobile = window.innerWidth <= 1024;
+      var nav = document.getElementById('weekNavigation');
+      if (nav) {
+        nav.style.display = isMobile ? 'flex' : 'none';
+        if (isMobile) nav.classList.add('loaded');
+        else nav.classList.remove('loaded');
+      }
+      if (scheduleData) renderPlanningViewSwitcher(scheduleData);
+    }
+
+    function isAfterNoon(timeStr) {
+      var parts = (timeStr || '').split(':');
+      var h = parseInt(parts[0], 10) || 0;
+      return h >= 12;
+    }
+
+    function generateWeeklyScheduleHtml() {
+      var PR = getPR();
+      var data = scheduleData;
+      if (!data || !data.planning) return '<div class="weekly-empty">Chargement…</div>';
+
+      var weekDaysOrder = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+      var weekDaysCap = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+      var columns = [];
+      var i, ymd, dayLower, listed, rv;
+      for (i = 0; i < 7; i++) {
+        ymd = PR.addDaysToYmd(weekMondayYmd, i);
+        dayLower = weekDaysOrder[i];
+        listed = PR.isWeekdayListedInBasePlannings(data, dayLower);
+        if (!listed) continue;
+        rv = PR.resolveDailyView(ymd, data);
+        columns.push({
+          ymd: ymd,
+          dayKey: dayLower,
+          label: weekDaysCap[i],
+          dateLabel: PR.formatDateJjMmmm(ymd),
+          rv: rv,
+          pk: rv.planningKey
+        });
+      }
+
+      if (!columns.length) {
+        return '<div class="weekly-empty">Aucun jour à afficher pour cette semaine.</div>';
+      }
+
+      var scheduleByTimeAndDay = {};
+      var cours = data.cours || [];
+      var coachs = data.coachs || [];
+      var studios = data.studios || [];
+
+      columns.forEach(function(col) {
+        var r = col.rv;
+        if (r.closed || r.indetermine) return;
+        var courses = r.courses || [];
+        courses.forEach(function(course) {
+          var startTime = course.startTime;
+          if (!scheduleByTimeAndDay[startTime]) scheduleByTimeAndDay[startTime] = {};
+          if (!scheduleByTimeAndDay[startTime][col.ymd]) scheduleByTimeAndDay[startTime][col.ymd] = [];
+          var courseInfo = cours.find(function(c) { return c.id === course.coursId; });
+          var studioInfo = studios.find(function(s) { return s.id === course.studioId; });
+          var coachsInfo = (course.coachIds || []).map(function(coachId) {
+            return coachs.find(function(c) { return c.id === coachId; });
+          });
+          scheduleByTimeAndDay[startTime][col.ymd].push({
+            courseName: courseInfo ? courseInfo.name : 'Cours inconnu',
+            logo: courseInfo ? courseInfo.logo : '',
+            studio: studioInfo ? studioInfo.name : 'Studio inconnu',
+            endTime: course.endTime,
+            startTime: course.startTime,
+            duration: course.duration,
+            type: course.type,
+            coachs: coachsInfo.map(function(coach) {
+              return {
+                name: coach ? coach.name : 'Coach inconnu',
+                imageUrl: PR.coachPhotoUrl(coach) || (coach && coach.imageUrl) || ''
+              };
+            })
+          });
         });
       });
-      var coachDropdownContent = document.querySelector('#filtersSidebar .coach-dropdown-content');
-      var coachDropdownText = document.querySelector('#filtersSidebar #coachDropdownText');
-      if (coachDropdownContent) {
-        coachDropdownContent.innerHTML = '';
-        Array.from(uniqueCoachesMap.values()).sort((a,b) => a.name.localeCompare(b.name)).forEach(function(coachObj) {
-          var option = document.createElement('div');
-          option.className = 'coach-dropdown-option';
-          var label = document.createElement('label');
-          label.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;cursor:pointer';
-          var img = document.createElement('img');
-          img.className = 'coach-dropdown-option-photo';
-          img.src = coachObj.imageUrl;
-          img.alt = coachObj.name;
-          var span = document.createElement('span');
-          span.textContent = coachObj.name;
-          span.style.flex = '1';
-          var cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.value = coachObj.name;
-          label.appendChild(img);
-          label.appendChild(span);
-          label.appendChild(cb);
-          option.appendChild(label);
-          coachDropdownContent.appendChild(option);
-        });
-      }
-      renderPlanningViewSwitcher(scheduleData);
-      applyFilters();
-    }
 
-    // Paramètre pour activer/désactiver l'overlay de chargement
-    const SHOW_LOADING_OVERLAY = false; // Mettre à true pour réactiver l'overlay
-    
-    function initializeWeeklyPage() {
-      // Ajouter la classe loading au body seulement si l'overlay est activé
-      if (SHOW_LOADING_OVERLAY) {
-        document.body.classList.add('loading');
+      var timesArray = Object.keys(scheduleByTimeAndDay).sort();
+      var bodyRows = [];
+      var t, time;
+      for (t = 0; t < timesArray.length; t++) {
+        time = timesArray[t];
+        if (t > 0 && isAfterNoon(time) && !isAfterNoon(timesArray[t - 1])) {
+          bodyRows.push({ kind: 'noon' });
+        }
+        bodyRows.push({ kind: 'time', time: time });
       }
-      
-      // Masquer le bouton today-view au démarrage
-      const todayButton = document.getElementById('todayViewButton');
-      if (todayButton) {
-        todayButton.style.display = 'none';
-        todayButton.classList.remove('visible');
-      }
-      
-      // Afficher l'overlay de chargement seulement si activé
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      if (loadingOverlay && SHOW_LOADING_OVERLAY) {
-        loadingOverlay.style.display = 'flex';
-      } else if (loadingOverlay) {
-        loadingOverlay.style.display = 'none';
+      if (!bodyRows.length) {
+        bodyRows.push({ kind: 'placeholder' });
       }
 
-      // Afficher le modal de chargement seulement si activé
-      const modalBackdrop = document.querySelector('.modal-backdrop');
-      const modalContent = document.querySelector('.modal-content');
-      
-      if (modalBackdrop && modalContent && SHOW_LOADING_OVERLAY) {
-        modalBackdrop.style.display = 'block';
-        modalContent.style.display = 'block';
-        document.getElementById('loadingMessage').innerHTML = 'Chargement du planning hebdomadaire';
-      } else if (modalBackdrop && modalContent) {
-        modalBackdrop.style.display = 'none';
-        modalContent.style.display = 'none';
+      var numBodyRows = bodyRows.length;
+      var rowspanCols = columns.map(function(col) {
+        return (col.rv.closed || col.rv.indetermine) ? numBodyRows : 0;
+      });
+
+      var html = '<table class="weekly-schedule">';
+      html += '<colgroup><col class="col-hours">';
+      columns.forEach(function() { html += '<col class="col-day">'; });
+      html += '</colgroup><thead><tr><th></th>';
+      columns.forEach(function(col) {
+        var today = PR.ymdFromDate(new Date()) === col.ymd;
+        var cls = (today ? 'today ' : '') + 'weekly-th-inner';
+        html += '<th class="' + cls + '" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '">';
+        html += '<div class="weekly-day-title">' + PR.escapeHtml(col.label) + '</div>';
+        html += '<div class="weekly-day-date">' + PR.escapeHtml(col.dateLabel) + '</div>';
+        html += '</th>';
+      });
+      html += '</tr></thead><tbody>';
+
+      var todayYmdGen = PR.ymdFromDate(new Date());
+      var nowGen = new Date();
+
+      var isWhiteRow = true;
+      var ri, row, ci, col;
+      var rowspanDone = columns.map(function() { return false; });
+
+      function weeklyStatusColumnHtml(rv) {
+        var msgInner;
+        if (rv.closed) {
+          msgInner = '<div class="weekly-msg weekly-msg--closed"><strong>Fermé</strong>';
+          if (rv.periodName) msgInner += '<br><span>' + PR.escapeHtml(rv.periodName) + '</span>';
+          msgInner += '</div>';
+        } else {
+          msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>À déterminer</strong><br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
+        }
+        return '<div class="weekly-msg-column" role="status"><div class="weekly-msg-column-inner">' + msgInner + '</div></div>';
       }
 
-      // Ajouter un délai artificiel de 2 secondes seulement si l'overlay est activé
-      const delay = SHOW_LOADING_OVERLAY ? 2000 : 0;
-      setTimeout(() => {
-        fetchWeeklyData().then(data => {
-          scheduleData = data;
-          initPlanningView(data);
-          
-          // Attacher l'event listener AVANT renderPlanningViewSwitcher
-          var ramadanButton = document.getElementById('ramadanSwitchButton');
-          if (ramadanButton) {
-            // Cloner le bouton pour retirer tous les anciens listeners
-            var newButton = ramadanButton.cloneNode(true);
-            ramadanButton.parentNode.replaceChild(newButton, ramadanButton);
-            ramadanButton = newButton;
-            
-            ramadanButton.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Clic détecté sur le bouton Ramadan');
-              toggleRamadanPlanning();
-            });
-            
-            console.log('Event listener attaché au bouton Ramadan');
+      function emitRowspanCell(ci) {
+        col = columns[ci];
+        var inner = weeklyStatusColumnHtml(col.rv);
+        return '<td class="course-cell course-cell--status-msg" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '" rowspan="' + rowspanCols[ci] + '">' + inner + '</td>';
+      }
+
+      for (ri = 0; ri < bodyRows.length; ri++) {
+        row = bodyRows[ri];
+        if (row.kind === 'noon') {
+          html += '<tr class="noon-separator">';
+          html += '<td class="time-cell time-cell-grey"></td>';
+          for (ci = 0; ci < columns.length; ci++) {
+            if (rowspanCols[ci] > 0) {
+              if (!rowspanDone[ci]) {
+                rowspanDone[ci] = true;
+                html += emitRowspanCell(ci);
+              }
+              continue;
+            }
+            col = columns[ci];
+            html += '<td class="noon-separator-line course-cell" data-planning-key="' + PR.escapeHtml(col.pk) + '"></td>';
           }
-          
-          renderPlanningViewSwitcher(data);
+          html += '</tr>';
+          continue;
+        }
 
-
-          console.group('Traitement des données');
-          console.log('Données reçues:', data);
-          console.log('Planning actif:', activePlanningView, 'Planning:', getCurrentPlanning());
-          console.groupEnd();
-
-          document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
-          markMultilineCourseNames();
-
-          // Cacher le modal de chargement et retirer la classe loading seulement si activé
-          if (modalBackdrop && modalContent && SHOW_LOADING_OVERLAY) {
-            modalBackdrop.style.display = 'none';
-            modalContent.style.display = 'none';
-            modalBackdrop.style.opacity = '0';
-            modalContent.style.opacity = '0';
+        if (row.kind === 'placeholder') {
+          html += '<tr class="course-row-white">';
+          html += '<td class="time-cell time-cell-white"></td>';
+          for (ci = 0; ci < columns.length; ci++) {
+            col = columns[ci];
+            html += '<td class="course-cell' + (col.rv.closed || col.rv.indetermine ? ' course-cell--status-msg' : '') + '" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '">';
+            if (col.rv.closed || col.rv.indetermine) {
+              html += weeklyStatusColumnHtml(col.rv);
+            } else {
+              html += '<span class="weekly-msg">—</span>';
+            }
+            html += '</td>';
           }
-          
-          // Retirer la classe loading du body seulement si activé
-          if (SHOW_LOADING_OVERLAY) {
-            document.body.classList.remove('loading');
-          }
-          
-          // S'assurer que l'overlay est bien caché
-          if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-            loadingOverlay.style.opacity = '0';
+          html += '</tr>';
+          break;
+        }
+
+        time = row.time;
+        var rowClass = isWhiteRow ? 'course-row-white' : 'course-row-grey';
+        var timeCellClass = isWhiteRow ? 'time-cell-white' : 'time-cell-grey';
+        isWhiteRow = !isWhiteRow;
+
+        html += '<tr class="' + rowClass + '">';
+        html += '<td class="time-cell ' + timeCellClass + '">' + PR.escapeHtml(time) + '</td>';
+
+        for (ci = 0; ci < columns.length; ci++) {
+          if (rowspanCols[ci] > 0) {
+            if (!rowspanDone[ci]) {
+              rowspanDone[ci] = true;
+              html += emitRowspanCell(ci);
+            }
+            continue;
           }
 
-          // Récupérer la liste unique de coachs (nom -> { name, imageUrl }) pour le menu déroulant
-          var planningData = getCurrentPlanning();
-          var coachsData = scheduleData.coachs;
-          let uniqueCoachesMap = new Map();
-          const defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
-          Object.values(planningData).forEach(dayCourses => {
-            (dayCourses || []).forEach(course => {
-              if (course.coachIds) {
-                course.coachIds.forEach(coachId => {
-                  const coach = coachsData.find(c => c.id === coachId);
-                  if (coach && !uniqueCoachesMap.has(coach.name)) {
-                    uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
+          col = columns[ci];
+          html += '<td class="course-cell" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '">';
+          var courses = scheduleByTimeAndDay[time] && scheduleByTimeAndDay[time][col.ymd];
+          if (courses && courses.length > 0) {
+            var c, course, courseDisplay, logoUrl, courseNameDisplay, coachImagesHtml, courseClasses;
+            for (c = 0; c < courses.length; c++) {
+              course = courses[c];
+              courseDisplay = '';
+              logoUrl = course.logo || '';
+              if (SHOW_COURSE_IMAGES && logoUrl) {
+                courseNameDisplay = '<img class="logo-cours" src="' + PR.escapeHtml(logoUrl) + '" alt="' + PR.escapeHtml(course.courseName) + ' Logo">';
+              } else {
+                courseNameDisplay = '<div class="course-name-text">' + PR.escapeHtml(course.courseName) + '</div>';
+              }
+              coachImagesHtml = '';
+              if (course.coachs.length === 1) {
+                var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+                coachImagesHtml = '<div class="single-coach">' +
+                  '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(course.coachs[0].name) + '">' +
+                  '<span>' + PR.escapeHtml(course.coachs[0].name) + '</span></div>';
+              } else if (course.coachs.length > 1) {
+                coachImagesHtml = '<div class="multiple-coaches">';
+                course.coachs.forEach(function(coach) {
+                  if (coach.imageUrl) {
+                    coachImagesHtml += '<img src="' + PR.escapeHtml(coach.imageUrl) + '" alt="" class="coach-image">';
                   }
                 });
+                coachImagesHtml += '</div>';
               }
-            });
-          });
-          let uniqueCoaches = new Set(uniqueCoachesMap.keys());
+              courseClasses = 'course-block';
+              if (course.type === '100% Femmes') courseClasses += ' women-only';
+              else courseClasses += ' mixte';
+              if (course.studio.toLowerCase().indexOf('piscine') !== -1 || course.studio.toLowerCase().indexOf('aqua') !== -1) {
+                courseClasses += ' piscine';
+              }
 
-          // Cibler spécifiquement la liste déroulante dans la filters-sidebar
-          let coachDropdownContent = document.querySelector('#filtersSidebar .coach-dropdown-content');
-          let coachDropdownButton = document.querySelector('#filtersSidebar .coach-dropdown-button');
-          let coachDropdownText = document.querySelector('#filtersSidebar #coachDropdownText');
-          
-          if (!coachDropdownContent || !coachDropdownButton || !coachDropdownText) {
-            console.error('Éléments de la liste déroulante des coachs non trouvés');
-            return;
-          }
-          
-          let selectedCoaches = new Set(); // Aucun sélectionné par défaut
-          
-          // Créer les options avec photo + checkboxes
-          Array.from(uniqueCoachesMap.values()).sort((a, b) => a.name.localeCompare(b.name)).forEach(function(coachObj) {
-            let option = document.createElement('div');
-            option.className = 'coach-dropdown-option';
-            
-            let label = document.createElement('label');
-            label.style.display = 'flex';
-            label.style.justifyContent = 'space-between';
-            label.style.alignItems = 'center';
-            label.style.width = '100%';
-            label.style.cursor = 'pointer';
-            
-            let img = document.createElement('img');
-            img.className = 'coach-dropdown-option-photo';
-            img.src = coachObj.imageUrl;
-            img.alt = coachObj.name;
-            
-            let span = document.createElement('span');
-            span.textContent = coachObj.name;
-            span.style.flex = '1';
-            
-            let checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = coachObj.name;
-            checkbox.checked = false; // Aucun sélectionné par défaut
-            checkbox.style.display = 'none';
-            
-            let checkmark = document.createElement('span');
-            checkmark.className = 'checkmark';
-            checkmark.textContent = '✓';
-            checkmark.style.display = 'none'; // Masqué par défaut
-            
-            checkbox.addEventListener('change', function() {
-              if (checkbox.checked) {
-                selectedCoaches.add(coachObj.name);
+              var targetD = PR.parseYmdLocal(col.ymd);
+              var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
+              var startHour = parseInt(startTimeParts[0], 10) || 0;
+              var startMinute = parseInt(startTimeParts[1], 10) || 0;
+              var courseStartMs = new Date(targetD.getFullYear(), targetD.getMonth(), targetD.getDate(), startHour, startMinute, 0, 0).getTime();
+              var endMs;
+              if (course.endTime) {
+                var ep = course.endTime.split(':');
+                endMs = new Date(targetD.getFullYear(), targetD.getMonth(), targetD.getDate(), parseInt(ep[0], 10) || 0, parseInt(ep[1], 10) || 0, 0, 0).getTime();
               } else {
-                selectedCoaches.delete(coachObj.name);
+                endMs = courseStartMs + (course.duration || 60) * 60 * 1000;
               }
-              checkmark.style.display = checkbox.checked ? 'inline' : 'none';
-              updateCoachDropdownText();
-              applyFilters();
-            });
-            
-            option.addEventListener('click', function(e) {
-              if (e.target !== checkbox) {
-                e.preventDefault();
-                checkbox.checked = !checkbox.checked;
-                checkbox.dispatchEvent(new Event('change'));
+              var isPastDay = col.ymd < todayYmdGen;
+              var isPastToday = col.ymd === todayYmdGen && nowGen.getTime() >= endMs;
+              var isPastCourse = isPastDay || isPastToday;
+              var timeDifference = Math.floor((courseStartMs - nowGen.getTime()) / 1000);
+              var isInProgress = !isPastCourse && col.ymd === todayYmdGen && nowGen.getTime() >= courseStartMs && nowGen.getTime() < endMs;
+              var isStartingSoon = !isPastCourse && !isInProgress && col.ymd === todayYmdGen && timeDifference >= 0 && timeDifference <= 900;
+              if (isPastCourse) courseClasses += ' past';
+              else if (isStartingSoon) courseClasses += ' starting-soon';
+              else if (isInProgress) courseClasses += ' current';
+
+              courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
+              if (isStartingSoon) {
+                courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
               }
-            });
-            
-            label.appendChild(img);
-            label.appendChild(span);
-            label.appendChild(checkmark);
-            label.appendChild(checkbox);
-            option.appendChild(label);
-            coachDropdownContent.appendChild(option);
-          });
-          
-          function updateCoachDropdownText() {
-            if (selectedCoaches.size === 0) {
-              coachDropdownText.textContent = 'Sélection coach';
-            } else if (selectedCoaches.size === uniqueCoaches.size) {
-              coachDropdownText.textContent = 'Sélection coach';
-            } else {
-              coachDropdownText.textContent = selectedCoaches.size === 1 ? '1 coach' : selectedCoaches.size + ' coachs';
+              courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
+              courseDisplay += coachImagesHtml;
+              courseDisplay += '</div>';
+              html += courseDisplay;
             }
           }
-          
-          // Mettre à jour le texte initial du bouton
-          updateCoachDropdownText();
-          
-          coachDropdownButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdown = coachDropdownButton.closest('.coach-dropdown');
-            const content = coachDropdownContent;
-            
-            dropdown.classList.toggle('open');
-          });
-          
-          document.addEventListener('click', function(e) {
-            if (!e.target.closest('.coach-dropdown')) {
-              document.querySelectorAll('.coach-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('open');
-              });
-            }
-          });
+          html += '</td>';
+        }
+        html += '</tr>';
+      }
 
-          // Ajouter des écouteurs d'événements pour les filtres de cases à cocher et le filtre de coachs
-          function addFilterListeners(name) {
-            const header = document.getElementById('filter-' + name);
-            const sidebar = document.getElementById('filter-' + name + '-sidebar');
-            function onChange() {
-              if (header && sidebar) sidebar.checked = header.checked;
-              applyFilters();
-            }
-            function onSidebarChange() {
-              if (header && sidebar) header.checked = sidebar.checked;
-              applyFilters();
-            }
-            if (header) header.addEventListener('change', onChange);
-            if (sidebar) sidebar.addEventListener('change', onSidebarChange);
-          }
-          addFilterListeners('mixte');
-          addFilterListeners('women-only');
-          addFilterListeners('piscine');
-          addFilterListeners('coach');
-
-          // Appliquer les filtres initiaux
-          applyFilters();
-          
-          // Attendre que le contenu soit complètement chargé avant de faire défiler
-          setTimeout(() => {
-            scrollToCurrentTime();
-          }, 1000);
-          
-          updateCountdownCircles();
-
-          // Mettre à jour les cercles de compte à rebours toutes les secondes
-          setInterval(updateCountdownCircles, 1000);
-
-          // Afficher les boutons immédiatement
-          const todayButton = document.getElementById('todayViewButton');
-          if (todayButton) {
-            todayButton.style.display = 'block';
-            todayButton.classList.add('visible');
-          }
-
-          // Vérifier l'état des cours toutes les minutes
-          setInterval(checkCourseStates, 3000);
-          
-          // Vérifier immédiatement après le chargement
-          setTimeout(checkCourseStates, 1000);
-        }).catch(error => {
-          console.error('Erreur lors de la récupération des données :', error);
-          document.getElementById('loadingMessage').innerHTML = 'Erreur lors du chargement des données';
-          
-          // En cas d'erreur, s'assurer que l'overlay est caché seulement si activé
-          if (modalBackdrop && modalContent && SHOW_LOADING_OVERLAY) {
-            modalBackdrop.style.display = 'none';
-            modalContent.style.display = 'none';
-            modalBackdrop.style.opacity = '0';
-            modalContent.style.opacity = '0';
-          }
-          if (SHOW_LOADING_OVERLAY) {
-            document.body.classList.remove('loading');
-          }
-          if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-            loadingOverlay.style.opacity = '0';
-          }
-        });
-      }, delay); // Délai conditionnel selon SHOW_LOADING_OVERLAY
+      html += '</tbody></table>';
+      return html;
     }
 
-    // Fonction pour récupérer les données avec mise en cache via localStorage
+    function refreshPlanningDisplay() {
+      var el = document.getElementById('weeklySchedule');
+      if (!el) return;
+      el.innerHTML = generateWeeklyScheduleHtml();
+      document.body.classList.remove('planning-ramadan');
+      document.body.classList.remove('planning-ferie');
+      updateNavButtonsStateWeek();
+      if (scheduleData) renderPlanningViewSwitcher(scheduleData);
+
+      var mainTable = document.querySelector('#weeklySchedule .weekly-schedule');
+      var thead = mainTable && mainTable.querySelector('thead');
+      var stickyContent = document.getElementById('stickyHeaderContent');
+      var scheduleWrapper = document.getElementById('scheduleScrollWrapper');
+      if (stickyContent) stickyContent.innerHTML = '';
+      if (!thead || !stickyContent || !scheduleWrapper) {
+        applyFilters();
+        return;
+      }
+      var colgroup = mainTable.querySelector('colgroup');
+      var headerTable = document.createElement('table');
+      headerTable.className = 'weekly-schedule weekly-schedule-header';
+      headerTable.setAttribute('aria-hidden', 'true');
+      if (colgroup) headerTable.appendChild(colgroup.cloneNode(true));
+      headerTable.appendChild(thead.cloneNode(true));
+      stickyContent.appendChild(headerTable);
+      thead.remove();
+
+      var rafId = null;
+      var lastScrollLeft = -1;
+      var lastApplied = -1;
+      var sameCount = 0;
+      function tick() {
+        var current = scheduleWrapper.scrollLeft;
+        if (current !== lastApplied) {
+          lastApplied = current;
+          stickyContent.style.transform = 'translate3d(' + (-current) + 'px,0,0)';
+        }
+        if (current === lastScrollLeft) {
+          sameCount++;
+          if (sameCount >= 3) {
+            rafId = null;
+            return;
+          }
+        } else {
+          sameCount = 0;
+          lastScrollLeft = current;
+        }
+        rafId = requestAnimationFrame(tick);
+      }
+      function onScroll() {
+        if (rafId === null) {
+          lastScrollLeft = scheduleWrapper.scrollLeft;
+          lastApplied = -1;
+          sameCount = 0;
+          rafId = requestAnimationFrame(tick);
+        }
+      }
+      scheduleWrapper.removeEventListener('scroll', onScroll);
+      scheduleWrapper.addEventListener('scroll', onScroll, { passive: true });
+      stickyContent.style.transform = 'translate3d(0,0,0)';
+      scheduleWrapper.style.webkitOverflowScrolling = 'touch';
+
+      applyFilters();
+      markMultilineCourseNames();
+    }
+
+    function initializeWeeklyPage() {
+      if (!window.PlanningResolve) {
+        console.error('planning-resolve.js manquant');
+        return;
+      }
+      weekMondayYmd = parseWeekFromUrl();
+      updateUrlWeekParam();
+
+      fetchWeeklyData().then(function(data) {
+        scheduleData = data;
+        var mb = document.querySelector('.modal-backdrop');
+        var mc = document.querySelector('.modal-content');
+        if (mb) mb.style.display = 'none';
+        if (mc) mc.style.display = 'none';
+
+        document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+
+        (function setupStickyDaysBar() {
+          var mainTable = document.querySelector('#weeklySchedule .weekly-schedule');
+          var thead = mainTable && mainTable.querySelector('thead');
+          var stickyContent = document.getElementById('stickyHeaderContent');
+          var scheduleWrapper = document.getElementById('scheduleScrollWrapper');
+          if (!thead || !stickyContent || !scheduleWrapper) return;
+          var colgroup = mainTable.querySelector('colgroup');
+          var headerTable = document.createElement('table');
+          headerTable.className = 'weekly-schedule weekly-schedule-header';
+          headerTable.setAttribute('aria-hidden', 'true');
+          if (colgroup) headerTable.appendChild(colgroup.cloneNode(true));
+          headerTable.appendChild(thead.cloneNode(true));
+          stickyContent.appendChild(headerTable);
+          thead.remove();
+          var rafId = null;
+          var lastScrollLeft = -1;
+          var lastApplied = -1;
+          var sameCount = 0;
+          function tick() {
+            var current = scheduleWrapper.scrollLeft;
+            if (current !== lastApplied) {
+              lastApplied = current;
+              stickyContent.style.transform = 'translate3d(' + (-current) + 'px,0,0)';
+            }
+            if (current === lastScrollLeft) {
+              sameCount++;
+              if (sameCount >= 3) {
+                rafId = null;
+                return;
+              }
+            } else {
+              sameCount = 0;
+              lastScrollLeft = current;
+            }
+            rafId = requestAnimationFrame(tick);
+          }
+          function onScroll() {
+            if (rafId === null) {
+              lastScrollLeft = scheduleWrapper.scrollLeft;
+              lastApplied = -1;
+              sameCount = 0;
+              rafId = requestAnimationFrame(tick);
+            }
+          }
+          scheduleWrapper.addEventListener('scroll', onScroll, { passive: true });
+          stickyContent.style.transform = 'translate3d(0,0,0)';
+          scheduleWrapper.style.webkitOverflowScrolling = 'touch';
+        })();
+
+        markMultilineCourseNames();
+        renderPlanningViewSwitcher(data);
+        updateNavButtonsStateWeek();
+
+        (function setupScrollShadow() {
+          var wrapper = document.getElementById('scheduleScrollWrapper');
+          var shadowRight = document.getElementById('scrollShadowRight');
+          var shadowLeft = document.getElementById('scrollShadowLeft');
+          if (!wrapper || !shadowRight) return;
+          function updateShadows() {
+            var scrollLeft = wrapper.scrollLeft;
+            if (scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 2) {
+              shadowRight.classList.add('at-end');
+            } else {
+              shadowRight.classList.remove('at-end');
+            }
+            if (shadowLeft) {
+              var timeCell = document.querySelector('#weeklySchedule .weekly-schedule td.time-cell');
+              var firstCellSticky = document.querySelector('.sticky-days-bar .weekly-schedule-header th:first-child');
+              if (timeCell) {
+                var rect = timeCell.getBoundingClientRect();
+                shadowLeft.style.left = rect.right + 'px';
+              }
+              if (firstCellSticky) {
+                var topRect = firstCellSticky.getBoundingClientRect();
+                shadowLeft.style.top = topRect.bottom + 'px';
+              } else {
+                shadowLeft.style.top = '0';
+              }
+              if (scrollLeft > 0) shadowLeft.classList.add('visible');
+              else shadowLeft.classList.remove('visible');
+            }
+          }
+          wrapper.addEventListener('scroll', updateShadows, { passive: true });
+          window.addEventListener('resize', updateShadows);
+          updateShadows();
+        })();
+
+        var filterIds = ['filter-mixte', 'filter-women-only', 'filter-piscine', 'filter-coach'];
+        filterIds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.addEventListener('change', applyFilters);
+          var el2 = document.getElementById(id + '-sidebar');
+          if (el2) el2.addEventListener('change', applyFilters);
+        });
+
+        populateCoachDropdown();
+
+        applyFilters();
+        setTimeout(function() { scrollToCurrentTime(); }, 500);
+        updateCountdownCircles();
+        setInterval(updateCountdownCircles, 1000);
+        setInterval(checkCourseStates, 3000);
+        setTimeout(checkCourseStates, 1000);
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        document.addEventListener('click', function(e) {
+          var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
+          if (!a || !a.getAttribute('href')) return;
+          try {
+            sessionStorage.setItem('planning_return_url', window.location.href);
+            sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
+          } catch (err) {}
+        }, true);
+      }).catch(function(error) {
+        console.error('Erreur lors de la récupération des données :', error);
+      });
+    }
+
+    var selectedCoachesSet = null;
+
+    function populateCoachDropdown() {
+      var data = scheduleData;
+      var coachDropdownContent = document.getElementById('coachDropdownContent');
+      var coachDropdownButton = document.getElementById('coachDropdownButton');
+      var coachDropdownText = document.getElementById('coachDropdownText');
+      if (!data || !coachDropdownContent) return;
+
+      var defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
+      var coachsData = data.coachs || [];
+      var uniqueCoachesMap = new Map();
+
+      function scanPlanning(planning) {
+        if (!planning) return;
+        Object.values(planning).forEach(function(dayCourses) {
+          (dayCourses || []).forEach(function(course) {
+            (course.coachIds || []).forEach(function(coachId) {
+              var coach = coachsData.find(function(c) { return c.id === coachId; });
+              if (coach && !uniqueCoachesMap.has(coach.name)) {
+                uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
+              }
+            });
+          });
+        });
+      }
+      scanPlanning(data.planning);
+      scanPlanning(data.planningRamadan);
+
+      coachDropdownContent.innerHTML = '';
+      selectedCoachesSet = new Set();
+
+      function updateCoachDropdownText() {
+        if (!coachDropdownText) return;
+        var n = selectedCoachesSet.size;
+        var total = uniqueCoachesMap.size;
+        if (n === 0 || n === total) coachDropdownText.textContent = 'Sélection coach';
+        else coachDropdownText.textContent = n === 1 ? '1 coach' : n + ' coachs';
+      }
+
+      Array.from(uniqueCoachesMap.values()).sort(function(a, b) { return a.name.localeCompare(b.name); }).forEach(function(coachObj) {
+        var option = document.createElement('div');
+        option.className = 'coach-dropdown-option';
+        var label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.justifyContent = 'space-between';
+        label.style.alignItems = 'center';
+        label.style.width = '100%';
+        label.style.cursor = 'pointer';
+        var img = document.createElement('img');
+        img.className = 'coach-dropdown-option-photo';
+        img.src = coachObj.imageUrl;
+        img.alt = coachObj.name;
+        var span = document.createElement('span');
+        span.textContent = coachObj.name;
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = coachObj.name;
+        checkbox.checked = false;
+        var checkmark = document.createElement('span');
+        checkmark.className = 'checkmark';
+        checkmark.textContent = '✓';
+        checkmark.style.display = 'none';
+        checkbox.addEventListener('change', function() {
+          if (checkbox.checked) selectedCoachesSet.add(coachObj.name);
+          else selectedCoachesSet.delete(coachObj.name);
+          checkmark.style.display = checkbox.checked ? 'inline' : 'none';
+          updateCoachDropdownText();
+          applyFilters();
+        });
+        option.addEventListener('click', function(e) {
+          if (e.target !== checkbox) {
+            e.preventDefault();
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+        label.appendChild(img);
+        label.appendChild(span);
+        label.appendChild(checkmark);
+        label.appendChild(checkbox);
+        option.appendChild(label);
+        coachDropdownContent.appendChild(option);
+      });
+
+      updateCoachDropdownText();
+
+      if (coachDropdownButton && !coachDropdownButton.dataset.bound) {
+        coachDropdownButton.dataset.bound = '1';
+        coachDropdownButton.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var dropdown = coachDropdownButton.closest('.coach-dropdown');
+          var content = document.getElementById('coachDropdownContent');
+          dropdown.classList.toggle('open');
+          if (dropdown.classList.contains('open')) {
+            var buttonRect = coachDropdownButton.getBoundingClientRect();
+            var spaceBelow = window.innerHeight - buttonRect.bottom;
+            var spaceAbove = buttonRect.top;
+            var contentHeight = 200;
+            if (spaceBelow < contentHeight && spaceAbove > spaceBelow) content.classList.add('open-up');
+            else content.classList.remove('open-up');
+          } else {
+            content.classList.remove('open-up');
+          }
+        });
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.coach-dropdown')) {
+            document.querySelectorAll('.coach-dropdown').forEach(function(dropdown) {
+              dropdown.classList.remove('open');
+            });
+          }
+        });
+      }
+    }
+
     function fetchWeeklyData() {
       const cacheKey = 'weeklyData';
       const cacheExpirationKey = 'weeklyDataExpiration';
-      
-      // Vérifie si les données sont déjà en cache et si elles ne sont pas expirées
       const cachedData = localStorage.getItem(cacheKey);
       const cacheExpiration = localStorage.getItem(cacheExpirationKey);
       const now = new Date().getTime();
 
-      if (cachedData && cacheExpiration && now < cacheExpiration) {
-        console.log('Utilisation des données en cache');
+      if (cachedData && cacheExpiration && now < parseInt(cacheExpiration, 10)) {
         return Promise.resolve(JSON.parse(cachedData));
       }
 
-      // Récupération : fichier local puis GitHub en fallback
-      return (async () => {
+      return (async function() {
         let data = null;
         try {
           const localResp = await fetch('./planning-v2.json');
           if (localResp.ok) {
             data = await localResp.json();
-            console.log('✅ Données planning chargées depuis le fichier local');
           } else {
             throw new Error('Fichier local non disponible');
           }
         } catch (localError) {
-          console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
           const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
-          if (!remoteResp.ok) {
-            throw new Error(`Erreur HTTP: ${remoteResp.status}`);
-          }
+          if (!remoteResp.ok) throw new Error('Erreur HTTP: ' + remoteResp.status);
           data = await remoteResp.json();
-          console.log('✅ Données planning chargées depuis GitHub');
         }
         return data;
-      })().then(data => {
-          // Logs détaillés de validation
-          console.group('Validation des données');
-          
-          // Validation de la structure de base
-          console.log('Structure de base:', {
-            metadata: data.metadata ? '✅ Présent' : '❌ Manquant',
-            coachs: data.coachs ? `✅ ${data.coachs.length} coachs` : '❌ Manquant',
-            studios: data.studios ? `✅ ${data.studios.length} studios` : '❌ Manquant',
-            cours: data.cours ? `✅ ${data.cours.length} cours` : '❌ Manquant',
-            planning: data.planning ? `✅ ${Object.keys(data.planning).length} jours` : '❌ Manquant'
-          });
-
-          // Validation des jours du planning
-          const jours = Object.keys(data.planning || {});
-          console.log('Jours avec planning:', jours);
-          if (data.planningRamadan) console.log('Planning Ramadan: présent');
-
-          // Validation d'un échantillon de données
-          if (jours.length > 0 && data.planning) {
-            const premierJour = jours[0];
-            console.log(`Exemple de cours pour ${premierJour}:`, data.planning[premierJour][0]);
-          }
-
-          console.groupEnd();
-
-          // Stockage en cache
-          localStorage.setItem(cacheKey, JSON.stringify(data));
-          localStorage.setItem(cacheExpirationKey, now + 360000);
-          console.log('✅ Données récupérées et stockées dans le cache');
-          
-          return data;
-        })
-        .catch(error => {
-          console.error('❌ Erreur lors de la récupération des données:', error);
-          throw error;
-        });
+      })().then(function(data) {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheExpirationKey, String(now + 360000));
+        return data;
+      });
     }
 
-    // Optimisation du rendu et de la mémoire
-    function optimizeRender() {
-      const blocks = document.querySelectorAll('.course-block');
-      const viewportHeight = window.innerHeight;
-
-      for (const block of blocks) {
-        const rect = block.getBoundingClientRect();
-        const isVisible = rect.top < viewportHeight && rect.bottom > 0;
-        
-        if (isVisible) {
-          block.style.willChange = 'transform';
-          block.style.transform = 'translateZ(0)';
-        } else {
-          block.style.willChange = 'auto';
-          block.style.transform = 'none';
-        }
-      }
-    }
-
-    // Gestionnaire de scroll simplifié
-    function handleScroll() {
-      requestAnimationFrame(optimizeRender);
-    }
-
-    // Ajouter l'écouteur d'événements avec l'option passive
-    document.querySelector('.content-wrapper').addEventListener('scroll', handleScroll, { passive: true });
-
-    // Optimisation de la fonction applyFilters (lit sidebar ou header pour éviter IDs dupliqués)
     function applyFilters() {
-      const showMixte = (document.getElementById('filter-mixte-sidebar') || document.getElementById('filter-mixte')).checked;
-      const showWomenOnly = (document.getElementById('filter-women-only-sidebar') || document.getElementById('filter-women-only')).checked;
-      const showPiscine = (document.getElementById('filter-piscine-sidebar') || document.getElementById('filter-piscine')).checked;
-      const showCoachImages = (document.getElementById('filter-coach-sidebar') || document.getElementById('filter-coach')).checked;
-      
-      // Récupérer tous les coachs sélectionnés
-      const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"]');
+      function chk(id) {
+        var el = document.getElementById(id + '-sidebar') || document.getElementById(id);
+        return el ? el.checked : true;
+      }
+      const showMixte = chk('filter-mixte');
+      const showWomenOnly = chk('filter-women-only');
+      const showPiscine = chk('filter-piscine');
+      const showCoachImages = chk('filter-coach');
+      const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"], #coachDropdownContent input[type="checkbox"]');
       const selectedCoaches = Array.from(coachCheckboxes)
         .filter(cb => cb.checked)
         .map(cb => cb.value);
@@ -2661,9 +2853,7 @@
       for (const block of blocks) {
         const dataCoaches = block.getAttribute('data-coaches') || '';
         const courseCoaches = dataCoaches.split(',').map(coach => coach.trim());
-        
-        // Vérifier si au moins un des coachs du cours est dans la liste des coachs sélectionnés
-        const showByCoach = selectedCoaches.length === 0 || 
+        const showByCoach = selectedCoaches.length === 0 ||
           courseCoaches.some(coach => selectedCoaches.includes(coach));
         const isPiscine = block.classList.contains('piscine');
         const courseType = block.classList;
@@ -2682,13 +2872,10 @@
       }
     }
 
-    // Optimisation de la fonction updateCountdownCircles
     function updateCountdownCircles() {
       const badges = document.querySelectorAll('.countdown-pill');
-      
       for (const badge of badges) {
-        const timeDiff = parseInt(badge.getAttribute('data-time-diff'));
-
+        const timeDiff = parseInt(badge.getAttribute('data-time-diff'), 10);
         if (timeDiff >= 0) {
           const minutes = Math.floor(timeDiff / 60);
           const seconds = timeDiff % 60;
@@ -2702,270 +2889,39 @@
       }
     }
 
-    // Fonction pour générer le planning hebdomadaire
-    function generateWeeklyScheduleHtml() {
-      var weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-      var todayIndex = new Date().getDay();
-      var todayName = weekDays[todayIndex];
-
-      // Récupération des données nécessaires (planning actif = régulier ou Ramadan)
-      const planning = getCurrentPlanning();
-      const cours = scheduleData.cours;
-      const coachs = scheduleData.coachs;
-      const studios = scheduleData.studios;
-
-      // Création d'un objet pour stocker les cours par jour et heure
-      var scheduleByTimeAndDay = {};
-
-      // Parcours de chaque jour du planning
-      Object.entries(planning).forEach(([day, courses]) => {
-        // Conversion du nom du jour en français
-        const dayIndex = weekDays.findIndex(d => d.toLowerCase() === day);
-        const frenchDay = weekDays[dayIndex];
-
-        courses.forEach(course => {
-          const startTime = course.startTime;
-          
-          // Initialisation de la structure si nécessaire
-          if (!scheduleByTimeAndDay[startTime]) {
-            scheduleByTimeAndDay[startTime] = {};
-          }
-          if (!scheduleByTimeAndDay[startTime][frenchDay]) {
-            scheduleByTimeAndDay[startTime][frenchDay] = [];
-          }
-
-          // Recherche des informations complémentaires
-          const courseInfo = cours.find(c => c.id === course.coursId);
-          const studioInfo = studios.find(s => s.id === course.studioId);
-          const coachsInfo = course.coachIds.map(coachId => 
-            coachs.find(c => c.id === coachId)
-          );
-
-          // Ajout du cours avec toutes les informations
-          scheduleByTimeAndDay[startTime][frenchDay].push({
-            courseName: courseInfo ? courseInfo.name : 'Cours inconnu',
-            logo: courseInfo ? courseInfo.logo : '',
-            studio: studioInfo ? studioInfo.name : 'Studio inconnu',
-            endTime: course.endTime,
-            startTime: course.startTime,
-            duration: course.duration,
-            type: course.type,
-            coachs: coachsInfo.map(coach => ({
-              name: coach ? coach.name : 'Coach inconnu',
-              imageUrl: coach ? coach.imageUrl : ''
-            }))
-          });
-        });
-      });
-
-      var daysWithCourses = new Set();
-      var timesWithCourses = new Set();
-
-      for (var time in scheduleByTimeAndDay) {
-        for (var day in scheduleByTimeAndDay[time]) {
-          daysWithCourses.add(day);
-          timesWithCourses.add(time);
-        }
-      }
-
-      var daysArray = Array.from(daysWithCourses);
-      var timesArray = Array.from(timesWithCourses);
-
-      daysArray.sort(function(a, b) {
-        return weekDays.indexOf(a) - weekDays.indexOf(b);
-      });
-
-      timesArray.sort();
-
-      var numDays = daysArray.length;
-      var html = '<table class="weekly-schedule">';
-      html += '<colgroup><col class="col-hours">';
-      for (var c = 0; c < numDays; c++) {
-        html += '<col class="col-day">';
-      }
-      html += '</colgroup>';
-      html += '<thead><tr><th></th>';
-      for (var i = 0; i < daysArray.length; i++) {
-        var dayClass = '';
-        if (daysArray[i] === todayName) {
-          dayClass = 'today';
-        }
-        html += '<th class="' + dayClass + '">' + daysArray[i] + '</th>';
-      }
-      html += '</tr></thead>';
-
-      html += '<tbody>';
-
-      var isWhiteRow = true;
-
-      function isAfterNoon(timeStr) {
-        var parts = (timeStr || '').split(':');
-        var h = parseInt(parts[0], 10) || 0;
-        return h >= 12;
-      }
-
-      for (var t = 0; t < timesArray.length; t++) {
-        var time = timesArray[t];
-
-        /* Ligne de séparation entre matinée et après-midi (avant la première heure >= 12:00) */
-        if (t > 0 && isAfterNoon(time) && !isAfterNoon(timesArray[t - 1])) {
-          html += '<tr class="noon-separator">';
-          html += '<td class="noon-separator-line" colspan="' + (daysArray.length + 1) + '"></td>';
-          html += '</tr>';
-        }
-
-        // Détermine la classe pour la couleur de la ligne (blanche ou grise)
-        var rowClass = isWhiteRow ? 'course-row-white' : 'course-row-grey';
-        var timeCellClass = isWhiteRow ? 'time-cell-white' : 'time-cell-grey';
-
-        isWhiteRow = !isWhiteRow;
-
-        html += '<tr class="' + rowClass + '">';
-
-        html += '<td class="time-cell ' + timeCellClass + '">' + time + '</td>';
-
-        for (var d = 0; d < daysArray.length; d++) {
-          var day = daysArray[d];
-          var courses = scheduleByTimeAndDay[time][day];
-
-          html += '<td class="course-cell">';
-          if (courses && courses.length > 0) {
-            for (var c = 0; c < courses.length; c++) {
-              var course = courses[c];
-              var courseDisplay = '';
-
-              var logoUrl = course.logo || '';
-              var courseNameDisplay = '';
-
-              // Affichage selon la présence du logo et la constante SHOW_COURSE_IMAGES
-              if (SHOW_COURSE_IMAGES && logoUrl) {
-                courseNameDisplay = '<img class="logo-cours" src="' + logoUrl + '" alt="' + course.courseName + ' Logo">';
-              } else {
-                courseNameDisplay = '<div class="course-name-text">' + course.courseName + '</div>';
-              }
-
-              var coachImagesHtml = '';
-              if (course.coachs.length === 1) {
-                var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
-                coachImagesHtml = '<div class="single-coach">' +
-                                  '<img src="' + coachImageUrl + '" alt="' + course.coachs[0].name + '">' +
-                                  '<span>' + course.coachs[0].name + '</span></div>';
-              } else if (course.coachs.length > 1) {
-                coachImagesHtml = '<div class="multiple-coaches">';
-                var coachImages = course.coachs.map(coach => coach.imageUrl).filter(Boolean);
-                coachImages.forEach(function(coachImageUrl, index) {
-                  coachImagesHtml += '<img src="' + coachImageUrl + '" alt="Coach Image" class="coach-image">';
-                });
-                coachImagesHtml += '</div>';
-              }
-
-              var courseClasses = 'course-block';
-              if (course.type === '100% Femmes') {
-                courseClasses += ' women-only';
-              } else {
-                courseClasses += ' mixte';
-              }
-
-              if (course.studio.toLowerCase().includes('piscine') || course.studio.toLowerCase().includes('aqua')) {
-                courseClasses += ' piscine';
-              }
-
-              // Vérifier si le cours commence dans moins de 15 minutes
-              var now = new Date();
-              var courseDate = new Date();
-              
-              var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
-              var startHour = parseInt(startTimeParts[0]) || 0;
-              var startMinute = parseInt(startTimeParts[1]) || 0;
-              
-              var currentDay = now.getDay();
-              var targetDay = weekDays.indexOf(day);
-              
-              var dayDiff = targetDay - currentDay;
-              if (dayDiff < 0) {
-                dayDiff += 7;
-              }
-              
-              courseDate.setDate(now.getDate() + dayDiff);
-              courseDate.setHours(startHour, startMinute, 0, 0);
-              
-              var timeDifference = Math.floor((courseDate - now) / 1000);
-              
-              var isStartingSoon = timeDifference >= 0 && timeDifference <= 900;
-              var isInProgress = timeDifference < 0 && timeDifference > -course.duration * 60;
-              
-              if (isStartingSoon) {
-                courseClasses += ' starting-soon';
-              } else if (isInProgress) {
-                courseClasses += ' current';
-              }
-
-              courseDisplay += '<div class="' + courseClasses + '" data-coaches="' + course.coachs.map(coach => coach.name).join(',') + '" data-start-time="' + (course.startTime || '') + '" data-end-time="' + (course.endTime || '') + '">';
-
-              if (isStartingSoon) {
-                courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
-              }
-
-              courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
-              courseDisplay += coachImagesHtml;
-              courseDisplay += '</div>';
-
-              html += courseDisplay;
-            }
-          }
-          html += '</td>';
-        }
-
-        html += '</tr>';
-      }
-      html += '</tbody>';
-      html += '</table>';
-
-      return html;
-    }
-
-    /** Si le nom de cours est sur 2+ lignes, ajoute .multiline pour réduire la taille et tenir sur une ligne */
     function markMultilineCourseNames() {
       requestAnimationFrame(function() {
         var els = document.querySelectorAll('.course-info .course-name-text');
-        var lineHeightPx = 18;
+        var lineHeightPx = 14;
         els.forEach(function(el) {
-          if (el.scrollHeight > lineHeightPx + 4) {
-            el.classList.add('multiline');
-          } else {
-            el.classList.remove('multiline');
-          }
+          if (el.scrollHeight > lineHeightPx + 4) el.classList.add('multiline');
+          else el.classList.remove('multiline');
         });
       });
     }
 
-    // Optimisation de la fonction scrollToCurrentTime
     function scrollToCurrentTime() {
-      // Attendre que le DOM soit complètement chargé
-      setTimeout(() => {
-        requestAnimationFrame(() => {
+      setTimeout(function() {
+        requestAnimationFrame(function() {
           const contentWrapper = document.querySelector('.content-wrapper');
+          const scrollWrapper = document.getElementById('scheduleScrollWrapper');
           if (!contentWrapper) return;
 
-          // Recherche d'abord un cours en cours
           let targetRow = document.querySelector('.course-block.current')?.closest('tr');
-          
-          // Si aucun cours en cours, cherche un cours qui va bientôt commencer
           if (!targetRow) {
             targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
           }
-          
-          // Si toujours rien, cherche la ligne de l'heure actuelle
           if (!targetRow) {
             const now = new Date();
             const currentHour = now.getHours();
             const currentMinutes = now.getMinutes();
             const times = document.querySelectorAll('.time-cell');
-            
             for (let i = 0; i < times.length; i++) {
               const timeText = times[i].textContent.trim();
-              const [hour, minute] = timeText.split(':').map(Number);
-              
+              if (!timeText) continue;
+              const parts = timeText.split(':').map(Number);
+              const hour = parts[0];
+              const minute = parts[1] || 0;
               if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
                 targetRow = times[i].parentElement;
                 break;
@@ -2974,94 +2930,138 @@
           }
 
           if (targetRow) {
-            const headerWrapper = document.querySelector('.header-wrapper');
             const thead = document.querySelector('.weekly-schedule thead');
-            
-            const headerHeight = headerWrapper ? headerWrapper.offsetHeight : 0;
             const theadHeight = thead ? thead.offsetHeight : 0;
-            
-            // Calcul de la position avec un petit décalage pour une meilleure visibilité
-            const targetPosition = targetRow.offsetTop - headerHeight - theadHeight - 10;
-            
-            // Forcer le défilement avec un délai supplémentaire
-            setTimeout(() => {
-              contentWrapper.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-              });
+            const targetPosition = targetRow.offsetTop - theadHeight - 10;
+            setTimeout(function() {
+              contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
             }, 100);
           }
+
+          if (scrollWrapper) {
+            var todayTh = document.querySelector('.weekly-schedule thead th.today');
+            if (todayTh) {
+              var targetLeft = todayTh.offsetLeft - (scrollWrapper.clientWidth / 2) + (todayTh.offsetWidth / 2);
+              if (targetLeft < 0) targetLeft = 0;
+              var maxLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
+              if (targetLeft > maxLeft) targetLeft = maxLeft;
+              setTimeout(function() {
+                scrollWrapper.scrollTo({ left: targetLeft, behavior: 'smooth' });
+              }, 300);
+            }
+          }
         });
-      }, 500); // Délai initial pour s'assurer que le contenu est chargé
-    }
-
-    // Exécute la fonction de scroll à chaque 15 minutes (900 000 ms)
-    setInterval(scrollToCurrentTime, 900000);
-
-    // Rafraîchit la page toutes les heures (3600 000 millisecondes = 1 heure)
-    setInterval(function() {
-      location.reload();
-    }, 3600000);  // 1 heure = 60 minutes * 60 secondes * 1000 millisecondes
-
-    function hideLoadingOverlay() {
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      
-      // Ajouter la classe fade-out à l'overlay
-      loadingOverlay.classList.add('fade-out');
-
-      // Attendre que l'animation de fade-out soit terminée
-      setTimeout(() => {
-        loadingOverlay.style.display = 'none';
-        document.body.classList.remove('loading');
-
-        // Rétablir l'affichage des conteneurs
-        document.querySelectorAll('.container').forEach(el => el.style.display = 'flex');
-        document.querySelectorAll('.month-block').forEach(el => el.style.display = 'block');
-        document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'flex');
-        document.querySelector('.competition-container').style.display = 'block';
       }, 500);
     }
 
-    // Ajout de la classe loading au body au chargement seulement si activé
-    document.addEventListener('DOMContentLoaded', function() {
-      if (SHOW_LOADING_OVERLAY) {
-        document.body.classList.add('loading');
-        
-        // Suppression de la classe loading une fois l'overlay prêt
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) {
-          loadingOverlay.addEventListener('transitionend', function() {
-            if (loadingOverlay.classList.contains('fade-out')) {
-              document.body.classList.remove('loading');
+    setInterval(scrollToCurrentTime, 900000);
+    setInterval(function() { location.reload(); }, 3600000);
+
+    function checkCourseStates() {
+      const now = new Date();
+      const PR = getPR();
+      const todayYmd = PR.ymdFromDate(now);
+      const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+
+      document.querySelectorAll('.course-block').forEach(function(block) {
+        try {
+          const ymd = block.getAttribute('data-ymd');
+          if (!ymd) return;
+
+          if (ymd < todayYmd) {
+            block.classList.add('past');
+            block.classList.remove('starting-soon', 'current');
+            const cp = block.querySelector('.countdown-pill');
+            if (cp) cp.remove();
+            return;
+          }
+
+          if (ymd > todayYmd) {
+            block.classList.remove('past', 'starting-soon', 'current');
+            const cp = block.querySelector('.countdown-pill');
+            if (cp) cp.remove();
+            return;
+          }
+
+          const startTime = block.getAttribute('data-start-time') || '';
+          const endTimeStr = block.getAttribute('data-end-time');
+          if (!startTime) return;
+
+          const startParts = startTime.split(':').map(Number);
+          const startTimeInMinutes = startParts[0] * 60 + (startParts[1] || 0);
+          let endTimeInMinutes = startTimeInMinutes + 60;
+          if (endTimeStr) {
+            const endParts = endTimeStr.split(':').map(Number);
+            endTimeInMinutes = endParts[0] * 60 + (endParts[1] || 0);
+          }
+
+          const isPast = currentTimeInMinutes >= endTimeInMinutes;
+          const isInProgress = !isPast && currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
+          const timeDifferenceMin = startTimeInMinutes - currentTimeInMinutes;
+          const isStartingSoon = !isPast && !isInProgress && timeDifferenceMin >= 0 && timeDifferenceMin <= 15;
+
+          if (isPast) {
+            block.classList.add('past');
+            block.classList.remove('starting-soon', 'current');
+            const countdownPill = block.querySelector('.countdown-pill');
+            if (countdownPill) countdownPill.remove();
+          } else if (isStartingSoon) {
+            block.classList.add('starting-soon');
+            block.classList.remove('current', 'past');
+            let countdownPill = block.querySelector('.countdown-pill');
+            if (!countdownPill) {
+              countdownPill = document.createElement('div');
+              countdownPill.className = 'countdown-pill starting-soon';
+              block.insertBefore(countdownPill, block.firstChild);
             }
-          });
+            countdownPill.setAttribute('data-time-diff', timeDifferenceMin * 60);
+          } else if (isInProgress) {
+            block.classList.add('current');
+            block.classList.remove('starting-soon', 'past');
+            const countdownPill = block.querySelector('.countdown-pill');
+            if (countdownPill) countdownPill.remove();
+          } else {
+            block.classList.remove('starting-soon', 'current', 'past');
+            const countdownPill = block.querySelector('.countdown-pill');
+            if (countdownPill) countdownPill.remove();
+          }
+        } catch (error) {
+          console.error('checkCourseStates', error);
         }
+      });
+    }
+
+    function toggleFiltersSidebar(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const sidebar = document.getElementById('filtersSidebar');
+      if (!sidebar) return;
+      sidebar.classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('filtersSidebar');
+      const filterButton = document.querySelector('.filter-button');
+      if (!sidebar || !sidebar.classList.contains('open')) return;
+      if (!sidebar.contains(event.target) && filterButton && !filterButton.contains(event.target)) {
+        sidebar.classList.remove('open');
       }
     });
 
-    // Initialisation du planning
-    function initSchedule() {
-      var scheduleContainer = document.getElementById('schedule-container');
-      if (scheduleContainer) {
-        scheduleContainer.innerHTML = generateWeeklyScheduleHtml(scheduleData);
-        markMultilineCourseNames();
-      }
-    }
-
-    // Rafraîchissement automatique toutes les 5 minutes
-    setInterval(function() {
-      initSchedule();
-    }, 5 * 60 * 1000);
-
     function returnToToday() {
       window.location.href = './daily.html';
+    }
+
+    function goToWeekly() {
+      window.location.href = './weekly.html';
     }
 
     function goToWeeklyVertical() {
       window.location.href = './weekly_vertical.html';
     }
 
-    // Animation de clic fiable au toucher sur le bouton rotation (mobile)
     (function initRotationButtonTapAnimation() {
       var el = document.getElementById('rotationViewButton');
       if (!el) return;
@@ -3074,279 +3074,6 @@
       el.addEventListener('pointerleave', removeTapActive);
       el.addEventListener('pointercancel', removeTapActive);
     })();
-
-    // Fonction pour ouvrir/fermer la barre de filtres
-    function toggleFiltersSidebar(event) {
-      if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
-      const sidebar = document.getElementById('filtersSidebar');
-      
-      if (!sidebar) {
-        console.error('Sidebar not found');
-        return;
-      }
-      
-      // Toggle la classe open pour ouvrir/fermer la barre
-      sidebar.classList.toggle('open');
-    }
-
-    // Fermer la barre de filtres quand on clique ailleurs (mais pas sur le bouton ni la barre)
-    document.addEventListener('click', function(event) {
-      const sidebar = document.getElementById('filtersSidebar');
-      const filterButton = document.querySelector('.filter-button');
-      
-      if (sidebar && sidebar.classList.contains('open')) {
-        // Si le clic n'est pas sur la barre de filtres ni sur le bouton
-        if (!sidebar.contains(event.target) && !filterButton.contains(event.target)) {
-          sidebar.classList.remove('open');
-        }
-      }
-    });
-
-    // Fonction pour vérifier l'état des cours et mettre à jour les animations
-    function checkCourseStates() {
-      const now = new Date();
-      const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-      const currentDay = now.getDay();
-      const currentDayName = weekDays[currentDay];
-      const currentHour = now.getHours();
-      const currentMinutes = now.getMinutes();
-      const currentTimeInMinutes = currentHour * 60 + currentMinutes;
-
-      const courseBlocks = document.querySelectorAll('.course-block');
-      
-      courseBlocks.forEach(block => {
-        try {
-          // Vérifier si le block existe
-          if (!block) return;
-
-          // Récupérer les informations du cours avec vérification de nullité
-          const dayCell = block.closest('tr')?.querySelector('th');
-          if (!dayCell) return;
-
-          const dayName = dayCell.textContent?.trim();
-          if (!dayName) return;
-          
-          // Ne vérifier que les cours du jour actuel
-          if (dayName === currentDayName) {
-            const startTime = block.getAttribute('data-start-time') || block.closest('tr')?.querySelector('.time-cell')?.textContent?.trim();
-            const endTimeStr = block.getAttribute('data-end-time');
-            if (!startTime) return;
-
-            const [startHour, startMinute] = startTime.split(':').map(Number);
-            const startTimeInMinutes = startHour * 60 + startMinute;
-            let endTimeInMinutes = startTimeInMinutes + 60;
-            if (endTimeStr) {
-              const [endHour, endMinute] = endTimeStr.split(':').map(Number);
-              endTimeInMinutes = endHour * 60 + endMinute;
-            }
-            
-            const timeDifference = startTimeInMinutes - currentTimeInMinutes;
-            const isStartingSoon = timeDifference >= 0 && timeDifference <= 15;
-            const isInProgress = currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
-            
-            // Mettre à jour les classes en conséquence
-            if (isStartingSoon) {
-              block.classList.add('starting-soon');
-              block.classList.remove('current', 'past');
-              // Ajouter ou mettre à jour la pilule de compte à rebours
-              let countdownPill = block.querySelector('.countdown-pill');
-              if (!countdownPill) {
-                countdownPill = document.createElement('div');
-                countdownPill.className = 'countdown-pill starting-soon';
-                block.insertBefore(countdownPill, block.firstChild);
-              }
-              countdownPill.setAttribute('data-time-diff', timeDifference * 60);
-            } else if (isInProgress) {
-              block.classList.add('current');
-              block.classList.remove('starting-soon', 'past');
-              // Supprimer la pilule de compte à rebours si elle existe
-              const countdownPill = block.querySelector('.countdown-pill');
-              if (countdownPill) {
-                countdownPill.remove();
-              }
-            } else {
-              block.classList.remove('starting-soon', 'current');
-              block.classList.add('past');
-              const countdownPill = block.querySelector('.countdown-pill');
-              if (countdownPill) {
-                countdownPill.remove();
-              }
-            }
-          } else {
-            block.classList.remove('starting-soon', 'current');
-            block.classList.remove('past');
-            const countdownPill = block.querySelector('.countdown-pill');
-            if (countdownPill) {
-              countdownPill.remove();
-            }
-          }
-        } catch (error) {
-          console.error('Erreur lors de la vérification de l\'état du cours:', error);
-        }
-      });
-    }
-
-    // Fonction pour initialiser l'ascenseur personnalisé
-    function initCustomScrollbar() {
-      const scrollbar = document.createElement('div');
-      scrollbar.className = 'custom-scrollbar';
-      
-      const track = document.createElement('div');
-      track.className = 'scrollbar-track';
-      
-      const thumb = document.createElement('div');
-      thumb.className = 'scrollbar-thumb';
-      
-      const touchArea = document.createElement('div');
-      touchArea.className = 'scrollbar-touch-area';
-      
-      scrollbar.appendChild(track);
-      scrollbar.appendChild(thumb);
-      scrollbar.appendChild(touchArea);
-      document.body.appendChild(scrollbar);
-
-      let isDragging = false;
-      let startX;
-      let startScrollTop;
-      let lastTouchY;
-      let velocity = 0;
-      let lastTime = 0;
-      let animationFrame;
-      let isScrolling = false;
-
-      function updateScrollbar() {
-        const contentWrapper = document.querySelector('.content-wrapper');
-        const scrollHeight = contentWrapper.scrollHeight;
-        const clientHeight = contentWrapper.clientHeight;
-        const scrollTop = contentWrapper.scrollTop;
-        
-        if (scrollHeight > clientHeight) {
-          const thumbHeight = (clientHeight / scrollHeight) * clientHeight;
-          const thumbTop = (scrollTop / scrollHeight) * clientHeight;
-          
-          thumb.style.height = `${thumbHeight}px`;
-          thumb.style.top = `${thumbTop}px`;
-        }
-      }
-
-      function handleScroll() {
-        updateScrollbar();
-      }
-
-      function handleMouseDown(e) {
-        isDragging = true;
-        startX = e.clientX;
-        startScrollTop = document.querySelector('.content-wrapper').scrollTop;
-        lastTouchY = e.clientY;
-        lastTime = performance.now();
-        velocity = 0;
-        isScrolling = false;
-        
-        if (animationFrame) {
-          cancelAnimationFrame(animationFrame);
-        }
-        
-        thumb.style.backgroundColor = 'var(--secondary-color)';
-        thumb.style.boxShadow = '0 0 12px var(--secondary-color)';
-        thumb.style.width = '6px';
-        thumb.style.right = '-1px';
-      }
-
-      function handleMouseMove(e) {
-        if (!isDragging) return;
-        
-        const contentWrapper = document.querySelector('.content-wrapper');
-        const deltaX = e.clientX - startX;
-        const currentTime = performance.now();
-        const deltaTime = currentTime - lastTime;
-        
-        if (deltaTime > 0) {
-          const currentTouchY = e.clientY;
-          const deltaY = currentTouchY - lastTouchY;
-          velocity = deltaY / deltaTime;
-          lastTouchY = currentTouchY;
-          lastTime = currentTime;
-        }
-        
-        const scrollHeight = contentWrapper.scrollHeight;
-        const clientHeight = contentWrapper.clientHeight;
-        
-        // Inversion du sens : mouvement vers la droite = défilement vers le haut
-        const newScrollTop = startScrollTop + (deltaX * scrollHeight / clientHeight);
-        contentWrapper.scrollTop = newScrollTop;
-        isScrolling = true;
-      }
-
-      function handleMouseUp() {
-        isDragging = false;
-        thumb.style.backgroundColor = 'var(--primary-color)';
-        thumb.style.boxShadow = '0 0 8px var(--primary-color)';
-        thumb.style.width = '4px';
-        thumb.style.right = '0';
-        
-        if (isScrolling && Math.abs(velocity) > 0.1) {
-          const contentWrapper = document.querySelector('.content-wrapper');
-          let currentScrollTop = contentWrapper.scrollTop;
-          const scrollHeight = contentWrapper.scrollHeight;
-          const clientHeight = contentWrapper.clientHeight;
-          const maxScroll = scrollHeight - clientHeight;
-          
-          function animateScroll() {
-            if (Math.abs(velocity) < 0.1) {
-              cancelAnimationFrame(animationFrame);
-              return;
-            }
-            
-            velocity *= 0.95; // Réduction progressive de la vitesse
-            currentScrollTop += velocity * 1000;
-            
-            // Limiter le défilement aux limites
-            if (currentScrollTop < 0) {
-              currentScrollTop = 0;
-              velocity = 0;
-            } else if (currentScrollTop > maxScroll) {
-              currentScrollTop = maxScroll;
-              velocity = 0;
-            }
-            
-            contentWrapper.scrollTop = currentScrollTop;
-            animationFrame = requestAnimationFrame(animateScroll);
-          }
-          
-          animationFrame = requestAnimationFrame(animateScroll);
-        }
-      }
-
-      // Ajout des événements touch pour mobile avec support du momentum
-      touchArea.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        handleMouseDown(e.touches[0]);
-      }, { passive: false });
-
-      touchArea.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        handleMouseMove(e.touches[0]);
-      }, { passive: false });
-
-      touchArea.addEventListener('touchend', handleMouseUp, { passive: true });
-
-      // Événements pour la souris
-      touchArea.addEventListener('mousedown', handleMouseDown);
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.querySelector('.content-wrapper').addEventListener('scroll', handleScroll);
-
-      // Mise à jour initiale
-      updateScrollbar();
-    }
-
-    // Ajouter l'initialisation de l'ascenseur après le chargement du DOM
-    document.addEventListener('DOMContentLoaded', function() {
-      initCustomScrollbar();
-    });
 
   </script>
 
