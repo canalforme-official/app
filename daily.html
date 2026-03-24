@@ -120,6 +120,50 @@
     body.planning-ramadan .course-studio img {
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
+
+    /* Mode jour férié / fermé (titres or / ambre, confettis jaunes) */
+    body.planning-ferie {
+      --primary-color: #b8860b;
+      --primary-overlay: rgba(184, 134, 11, 0.92);
+      --primary-light: rgba(184, 134, 11, 0.82);
+      --secondary-color: #f59e0b;
+      --secondary-light: rgba(245, 158, 11, 0.75);
+      position: relative;
+    }
+    body.planning-ferie::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-repeat: repeat;
+      background-size: 128px 128px;
+      opacity: 0.035;
+      filter: sepia(1) hue-rotate(5deg) saturate(2.2) brightness(1.05);
+    }
+    body.planning-ferie > #dayOfWeek,
+    body.planning-ferie > #timeline {
+      position: relative;
+      z-index: 1;
+    }
+    body.planning-ferie .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
+    }
+    body.planning-ferie .timeline-block.current::before {
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
+    }
+    body.planning-ferie .time {
+      color: rgba(184, 134, 11, 0.75);
+    }
+    body.planning-ferie .course-studio img {
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
+    }
+
     /* Ne pas appliquer position:relative sur .date ni sur les boutons fixed : ça annule absolute/fixed.
        z-index sur le flux principal uniquement (horaires au-dessus du motif). */
     #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 2px 0; margin: 0 0 2px 0; }
@@ -219,14 +263,17 @@
       margin-top: -4px;
       margin-bottom: 0;
       padding-top: 0;
-      padding-bottom: 8px;
+      padding-bottom: 4px;
       padding-left: 18px;
       font-style: italic;
       opacity: 0.8;
-      line-height: 1.05;
+      line-height: 1.15;
     }
     body.planning-ramadan .planning-type-label {
       color: rgba(38, 70, 45, 0.8);
+    }
+    body.planning-ferie .planning-type-label {
+      color: rgba(184, 134, 11, 0.9);
     }
 
     .date {
@@ -242,48 +289,122 @@
     .opening-hours-bar {
       position: relative;
       z-index: 1;
-      padding: 4px 18px 0 18px;
-      font-size: 0.95em;
+      padding: 2px 18px 6px 18px;
+      font-size: 0.88em;
       color: var(--text-secondary);
-      line-height: 1.35;
+      line-height: 1.2;
       max-width: 1000px;
     }
     .opening-hours-bar:empty {
       display: none;
     }
-    .opening-hours-bar .oh-intro {
-      font-style: italic;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      margin-right: 6px;
+    /* Une seule ligne visuelle : pastilles horizontales, pas de texte au-dessus / en dessous */
+    .opening-hours-bar .oh-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
     }
-    .opening-hours-bar .oh-slot {
-      display: inline;
+    .opening-hours-bar .oh-chip {
+      display: inline-flex;
+      flex-wrap: nowrap;
+      align-items: baseline;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 1px 3px var(--shadow-light);
     }
-    .opening-hours-bar .oh-label {
-      font-style: italic;
+    body.planning-ramadan .opening-hours-bar .oh-chip {
+      background: rgba(255, 255, 255, 0.82);
+      border-color: rgba(38, 70, 45, 0.12);
+    }
+    .opening-hours-bar .oh-chip-label {
+      font-size: 0.78em;
       font-weight: 600;
-      color: var(--text-secondary);
+      font-style: normal;
+      letter-spacing: 0.02em;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+    }
+    .opening-hours-bar .oh-chip-times {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+      font-variant-numeric: tabular-nums;
     }
     .opening-hours-bar .oh-time {
       font-weight: 700;
-      font-variant-numeric: tabular-nums;
+      font-size: 1.02em;
       color: var(--text-primary);
     }
     .opening-hours-bar .oh-sep {
       font-weight: 400;
-      opacity: 0.65;
-      padding: 0 1px;
+      opacity: 0.5;
+      padding: 0 2px;
     }
-    .opening-hours-bar .oh-between {
-      opacity: 0.45;
-      font-weight: 300;
-    }
-    body.planning-ramadan .opening-hours-bar .oh-label {
-      color: rgba(38, 70, 45, 0.85);
+    body.planning-ramadan .opening-hours-bar .oh-chip-label {
+      color: rgba(38, 70, 45, 0.75);
     }
     body.planning-ramadan .opening-hours-bar .oh-time {
       color: rgba(38, 70, 45, 0.95);
+    }
+    body.planning-ferie .opening-hours-bar .oh-chip {
+      border-color: rgba(245, 158, 11, 0.25);
+      background: rgba(255, 255, 255, 0.88);
+    }
+    body.planning-ferie .opening-hours-bar .oh-chip-label {
+      color: rgba(184, 134, 11, 0.88);
+    }
+    body.planning-ferie .opening-hours-bar .oh-time {
+      color: rgba(146, 106, 8, 0.98);
+    }
+
+    /* Une seule pastille : créneaux sans libellés (ex. 09:00–12:00 · 14:00–19:00) */
+    .opening-hours-bar .oh-inner--compact {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .opening-hours-bar .oh-chip--compact {
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .opening-hours-bar .oh-sep-slot {
+      opacity: 0.5;
+      font-weight: 400;
+      padding: 0 3px;
+      user-select: none;
+    }
+
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10050;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      top: -10px;
+      border-radius: 1px;
+      opacity: 0.92;
+      animation: confetti-burst-fall 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    @keyframes confetti-burst-fall {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate3d(var(--dx, 0px), calc(100vh + 20px), 0) rotate(var(--rot, 720deg));
+        opacity: 0.65;
+      }
     }
 
     .timeline-message {
@@ -309,7 +430,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 38vh;
+      min-height: 0;
       padding: 32px 20px 48px;
       box-sizing: border-box;
     }
@@ -345,6 +466,67 @@
     body.planning-ramadan .indetermine-title {
       color: #26462d;
     }
+    body.planning-ferie .indetermine-card {
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    body.planning-ferie .indetermine-title {
+      color: #b8860b;
+    }
+
+    .timeline.no-courses .timeline-message--closed {
+      width: 100%;
+      max-width: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+    .timeline-message--closed {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 0;
+      padding: 32px 20px 48px;
+      box-sizing: border-box;
+    }
+    .closed-card {
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      background: var(--background-card);
+      border-radius: 18px;
+      padding: 32px 28px;
+      box-shadow: 0 10px 40px var(--shadow-light), 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(72, 6, 7, 0.12);
+    }
+    body.planning-ramadan .closed-card {
+      border-color: rgba(38, 70, 45, 0.2);
+      box-shadow: 0 10px 40px rgba(38, 70, 45, 0.1), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    .closed-title {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 1.35em;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: var(--primary-color);
+      line-height: 1.25;
+    }
+    .closed-text {
+      margin: 0;
+      font-size: 1.02em;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    body.planning-ramadan .closed-title {
+      color: #26462d;
+    }
+    body.planning-ferie .closed-card {
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    body.planning-ferie .closed-title {
+      color: #b8860b;
+    }
 
     /* Styles pour la timeline */
     .timeline {
@@ -371,6 +553,23 @@
     /* Nouveau style pour les jours sans cours */
     .timeline.no-courses {
       padding-left: 0;
+      min-height: calc(100vh - 200px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+
+    .timeline.no-courses .timeline-message--closed,
+    .timeline.no-courses .timeline-message--indetermine {
+      min-height: 0;
+      flex: 0 0 auto;
+      width: 100%;
     }
 
     .timeline-block {
@@ -866,7 +1065,7 @@
       visibility: hidden;
     }
 
-    /* Accès rapide horaires de prière (lien flottant) */
+    /* Accès rapide horaires de prière (lien flottant) — au-dessus du sticky (1000) et du contenu */
     .ramadan-switch-button {
       position: fixed;
       top: 75%;
@@ -881,7 +1080,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      z-index: 1000;
+      z-index: 10040;
       overflow: visible;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: all;
@@ -1638,23 +1837,9 @@
       padding: 0;
       width: auto;
     }
-    .sticky-day-name .planning-type-label {
-      font-family: var(--font-text);
-      font-size: 0.5em;
-      font-weight: 400;
-      color: var(--text-secondary);
-      text-transform: none;
-      font-style: italic;
-      opacity: 0.7;
-      margin: 0;
-      padding: 0;
-      line-height: 1.05;
-      text-align: center;
-      display: block;
-      width: auto;
-    }
-    body.planning-ramadan .sticky-day-name .planning-type-label {
-      color: rgba(38, 70, 45, 0.8);
+    /* Sticky : pas de libellé « Planning régulier / Ramadan » (détail uniquement sous le titre principal) */
+    #stickyPlanningTypeLabel {
+      display: none !important;
     }
 
     /* Sticky : jour et badge accolés, centrés ensemble */
@@ -2036,7 +2221,7 @@
   </div>
   <span class="planning-type-label" id="planningTypeLabel"></span>
   <div class="date" id="dateStr"></div>
-  <div id="openingHoursBar" class="opening-hours-bar" aria-live="polite"></div>
+  <div id="openingHoursBar" class="opening-hours-bar" aria-live="polite" aria-label="Horaires d'ouverture du club"></div>
   <div id="planningViewSwitcher" style="display: none;"></div>
   <div class="timeline" id="timeline">
     <!-- Les cours seront injectés ici -->
@@ -2175,10 +2360,10 @@
       var arrReg = planning[dayName] || [];
       return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
     }
-    /** Caricatures : date réelle du téléphone dans le 1–7 mai (année courante). */
+    /** Caricatures : date réelle du téléphone du 1er au 7 avril (Poisson d’avril, année courante). */
     function useCaricatureCoachPhotos() {
       var real = new Date();
-      if (real.getMonth() !== 4) return false;
+      if (real.getMonth() !== 3) return false;
       var dom = real.getDate();
       return dom >= 1 && dom <= 7;
     }
@@ -2192,6 +2377,7 @@
 
     function initPlanningView(data) {
       document.body.classList.remove('planning-ramadan');
+      document.body.classList.remove('planning-ferie');
     }
     function renderPlanningViewSwitcher(data) {
       var container = document.getElementById('planningViewSwitcher');
@@ -2248,7 +2434,7 @@
         if (/^planning$/i.test(labelText)) labelText = 'Planning régulier';
       }
       if (label) label.textContent = labelText;
-      if (stickyLabel) stickyLabel.textContent = labelText;
+      if (stickyLabel) stickyLabel.textContent = '';
     }
 
     // Option pour afficher/masquer les images des cours
@@ -2506,24 +2692,91 @@
     function formatOpeningHoursHtml(h) {
       if (!h) return '';
       var esc = escapeHtml;
-      function slot(label, openT, closeT) {
-        var inner = (label && String(label).trim())
-          ? '<span class="oh-label">' + esc(String(label).trim()) + '</span> '
+      function chip(label, openT, closeT) {
+        var lab = (label && String(label).trim())
+          ? '<span class="oh-chip-label">' + esc(String(label).trim()) + '</span>'
           : '';
-        inner += '<span class="oh-time">' + esc(openT) + '</span><span class="oh-sep">–</span><span class="oh-time">' + esc(closeT) + '</span>';
-        return '<span class="oh-slot">' + inner + '</span>';
+        var times = '<span class="oh-chip-times"><span class="oh-time">' + esc(openT) + '</span><span class="oh-sep">–</span><span class="oh-time">' + esc(closeT) + '</span></span>';
+        return '<span class="oh-chip">' + lab + times + '</span>';
       }
       var parts = [];
-      if (h.open1 && h.close1) parts.push(slot(h.open1Label, h.open1, h.close1));
-      if (h.open2 && h.close2) parts.push(slot(h.open2Label, h.open2, h.close2));
-      return parts.length ? parts.join('<span class="oh-between"> · </span>') : '';
+      if (h.open1 && h.close1) parts.push(chip(h.open1Label, h.open1, h.close1));
+      if (h.open2 && h.close2) parts.push(chip(h.open2Label, h.open2, h.close2));
+      return parts.length ? '<div class="oh-inner">' + parts.join('') + '</div>' : '';
+    }
+    /** Horaires sans libellés, une seule cellule : plage1 · plage2 */
+    function formatOpeningHoursCompactHtml(h) {
+      if (!h) return '';
+      var esc = escapeHtml;
+      function range(openT, closeT) {
+        return '<span class="oh-chip-times"><span class="oh-time">' + esc(openT) + '</span><span class="oh-sep">–</span><span class="oh-time">' + esc(closeT) + '</span></span>';
+      }
+      var ranges = [];
+      if (h.open1 && h.close1) ranges.push(range(h.open1, h.close1));
+      if (h.open2 && h.close2) ranges.push(range(h.open2, h.close2));
+      if (!ranges.length) return '';
+      var inner = ranges.join('<span class="oh-sep-slot" aria-hidden="true"> · </span>');
+      return '<div class="oh-inner oh-inner--compact"><span class="oh-chip oh-chip--compact">' + inner + '</span></div>';
     }
     function displayClosedMessage(rv) {
       var name = rv.periodName ? escapeHtml(rv.periodName) : '';
       var isTodayView = selectedDateYmd === ymdFromDate(new Date());
       var title = isTodayView ? 'Club fermé aujourd’hui' : 'Club fermé';
       if (name) title += ' — ' + name;
-      return '<div class="timeline-message"><strong>' + title + '</strong><p>Aucun cours prévu.</p></div>';
+      return '<div class="timeline-message timeline-message--closed" role="status">' +
+        '<div class="closed-card">' +
+        '<strong class="closed-title">' + title + '</strong>' +
+        '<p class="closed-text">Aucun cours prévu pour cette journée.</p>' +
+        '</div></div>';
+    }
+
+    /** Confettis à chaque changement de « mode » jour (navigation). */
+    var lastPlanningKeyForConfetti = null;
+    function spawnConfettiBurst(colors) {
+      if (!colors || !colors.length) return;
+      var layer = document.createElement('div');
+      layer.className = 'confetti-layer';
+      layer.setAttribute('aria-hidden', 'true');
+      var n = 120;
+      var i;
+      for (i = 0; i < n; i++) {
+        var p = document.createElement('div');
+        p.className = 'confetti-piece';
+        p.style.left = 8 + Math.random() * 84 + '%';
+        p.style.background = colors[i % colors.length];
+        p.style.animationDelay = Math.random() * 0.35 + 's';
+        p.style.animationDuration = 1.8 + Math.random() * 0.9 + 's';
+        var drift = (Math.random() - 0.5) * 220;
+        var rot = 360 + Math.random() * 720;
+        p.style.setProperty('--dx', drift + 'px');
+        p.style.setProperty('--rot', rot + 'deg');
+        layer.appendChild(p);
+      }
+      document.body.appendChild(layer);
+      setTimeout(function() {
+        if (layer.parentNode) layer.parentNode.removeChild(layer);
+      }, 2800);
+    }
+    function triggerPlanningModeConfetti(planningKey) {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        lastPlanningKeyForConfetti = planningKey;
+        return;
+      }
+      if (lastPlanningKeyForConfetti === null) {
+        lastPlanningKeyForConfetti = planningKey;
+        return;
+      }
+      if (lastPlanningKeyForConfetti === planningKey) return;
+      lastPlanningKeyForConfetti = planningKey;
+      var palettes = {
+        regulier: ['#480607', '#6b1218', '#8b2942', '#a02828'],
+        ramadan: ['#26462d', '#3d6b47', '#4a8c5e', '#2d5a38', '#1e3a24', '#5a8f6a', '#a8d4b8'],
+        ferie: ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047']
+      };
+      /* Jours fermés : même confettis jaunes que férié */
+      var paletteKey = planningKey === 'ferme' ? 'ferie' : planningKey;
+      var colors = palettes[paletteKey] || palettes.regulier;
+      spawnConfettiBurst(colors);
     }
     function displayIndetermineMessage() {
       return '<div class="timeline-message timeline-message--indetermine" role="status">' +
@@ -2543,11 +2796,37 @@
       if (nextBtn) nextBtn.disabled = selectedDateYmd >= max;
     }
 
+    function maybeRestoreScrollAfterPrayer() {
+      try {
+        if (sessionStorage.getItem('planning_should_restore_scroll') !== '1') return;
+        var savedUrl = sessionStorage.getItem('planning_return_url') || '';
+        if (savedUrl && window.location.href.split('#')[0] !== savedUrl.split('#')[0]) return;
+        var y = sessionStorage.getItem('planning_return_scroll');
+        sessionStorage.removeItem('planning_should_restore_scroll');
+        sessionStorage.removeItem('planning_return_url');
+        sessionStorage.removeItem('planning_return_scroll');
+        if (y == null) return;
+        var n = parseInt(y, 10);
+        if (isNaN(n)) return;
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            window.scrollTo(0, n);
+          });
+        });
+      } catch (e) {}
+    }
+
     function displaySchedule() {
       if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
       var scheduleContainer = document.getElementById('timeline');
       if (!scheduleContainer) return;
       if (!allData || !allData.planning) return;
+
+      try {
+      var skipAutoScroll = false;
+      try {
+        skipAutoScroll = sessionStorage.getItem('planning_should_restore_scroll') === '1';
+      } catch (e) {}
 
       var dayIndex = parseYmdLocal(selectedDateYmd).getDay();
       currentDayIndex = dayIndex;
@@ -2571,6 +2850,7 @@
 
       var rv = resolveDailyView(selectedDateYmd, allData);
       document.body.classList.toggle('planning-ramadan', rv.planningKey === 'ramadan');
+      document.body.classList.toggle('planning-ferie', rv.planningKey === 'ferie' || rv.planningKey === 'ferme');
       updatePlanningTypeLabelFromView(rv);
 
       var ohBar = document.getElementById('openingHoursBar');
@@ -2579,8 +2859,8 @@
           ohBar.innerHTML = '';
         } else {
           var hk = allData.metadata.horaires[rv.planningKey];
-          var line = formatOpeningHoursHtml(hk);
-          ohBar.innerHTML = line ? ('<span class="oh-intro">Ouverture</span> ' + line) : '';
+          var line = formatOpeningHoursCompactHtml(hk);
+          ohBar.innerHTML = line || '';
         }
       }
 
@@ -2589,12 +2869,13 @@
         loadPrayerTimes();
       }
       renderPlanningViewSwitcher(allData);
+      triggerPlanningModeConfetti(rv.planningKey);
 
       if (rv.closed) {
         scheduleContainer.className = 'timeline no-courses';
         scheduleContainer.innerHTML = displayClosedMessage(rv);
         toggleTodayButton();
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        if (!skipAutoScroll) window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         updateNavButtonsState();
         updateTodayButtonPosition();
         return;
@@ -2604,7 +2885,7 @@
         scheduleContainer.className = 'timeline no-courses';
         scheduleContainer.innerHTML = displayIndetermineMessage();
         toggleTodayButton();
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        if (!skipAutoScroll) window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         updateNavButtonsState();
         updateTodayButtonPosition();
         return;
@@ -2615,7 +2896,7 @@
         scheduleContainer.className = 'timeline no-courses';
         scheduleContainer.innerHTML = displayNoCourseMessage();
         toggleTodayButton();
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        if (!skipAutoScroll) window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         updateNavButtonsState();
         updateTodayButtonPosition();
         return;
@@ -2701,19 +2982,26 @@
       scheduleContainer.innerHTML = scheduleHTML;
       toggleTodayButton();
 
-      if (isSelectedDateToday()) {
-        if (areAllCoursesInThePast(courses)) {
-          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      if (!skipAutoScroll) {
+        if (isSelectedDateToday()) {
+          if (areAllCoursesInThePast(courses)) {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+          } else {
+            scrollToNextUpcomingCourse();
+          }
+          initializeCountdowns();
         } else {
-          scrollToNextUpcomingCourse();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        initializeCountdowns();
       } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (isSelectedDateToday()) initializeCountdowns();
       }
 
       updateNavButtonsState();
       updateTodayButtonPosition();
+    } finally {
+      maybeRestoreScrollAfterPrayer();
+    }
     }
 
     function isSelectedDateToday() {
@@ -3025,6 +3313,15 @@
         }
       });
     });
+
+    document.addEventListener('click', function(e) {
+      var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
+      if (!a || !a.getAttribute('href')) return;
+      try {
+        sessionStorage.setItem('planning_return_url', window.location.href);
+        sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
+      } catch (err) {}
+    }, true);
 
   </script>
 

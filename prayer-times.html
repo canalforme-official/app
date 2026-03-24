@@ -578,7 +578,7 @@
   </style>
 </head>
 <body>
-  <a href="./daily.html" class="back-button">← Retour</a>
+  <a href="./daily.html" class="back-button" id="planningBackFromPrayer">← Retour</a>
 
   <!-- Bouton pour revenir à aujourd'hui (daily.html) -->
   <div class="today-view-button" id="todayViewButton">
@@ -765,6 +765,21 @@
       }
     }
 
+    (function initPlanningBackLink() {
+      var back = document.getElementById('planningBackFromPrayer');
+      if (!back) return;
+      try {
+        var u = sessionStorage.getItem('planning_return_url');
+        if (u) back.setAttribute('href', u);
+      } catch (e) {}
+      back.addEventListener('click', function() {
+        try {
+          if (sessionStorage.getItem('planning_return_url')) {
+            sessionStorage.setItem('planning_should_restore_scroll', '1');
+          }
+        } catch (e) {}
+      });
+    })();
 
     // Charger les données au chargement de la page
     loadPrayerTimes();

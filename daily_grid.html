@@ -73,8 +73,8 @@
       --shadow-medium: rgba(150, 150, 150, 0.5);
       --shadow-dark: rgba(0, 0, 0, 0.4);
     }
-    /* Motif de fond en planning régulier (même que daily.html) */
-    body:not(.planning-ramadan)::before {
+    /* Motif de fond en planning régulier (même que daily.html) — pas en Ramadan ni jour férié */
+    body:not(.planning-ramadan):not(.planning-ferie)::before {
       content: '';
       position: fixed;
       inset: 0;
@@ -84,7 +84,7 @@
       z-index: 0;
       pointer-events: none;
     }
-    body:not(.planning-ramadan)::after {
+    body:not(.planning-ramadan):not(.planning-ferie)::after {
       content: '';
       position: fixed;
       inset: 0;
@@ -118,6 +118,71 @@
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
 
+    body.planning-ferie {
+      --primary-color: #b8860b;
+      --primary-overlay: rgba(184, 134, 11, 0.92);
+      --primary-light: rgba(184, 134, 11, 0.82);
+      --secondary-color: #f59e0b;
+      --secondary-light: rgba(245, 158, 11, 0.75);
+      position: relative;
+    }
+    body.planning-ferie::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-repeat: repeat;
+      background-size: 128px 128px;
+      opacity: 0.035;
+      filter: sepia(1) hue-rotate(5deg) saturate(2.2) brightness(1.05);
+    }
+    body.planning-ferie .content-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+    body.planning-ferie .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
+    }
+    body.planning-ferie .studio-icon {
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
+    }
+    body.planning-ferie .course-time {
+      color: rgba(184, 134, 11, 0.85);
+    }
+
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10050;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      top: -10px;
+      border-radius: 1px;
+      opacity: 0.92;
+      animation: confetti-burst-fall 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    @keyframes confetti-burst-fall {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate3d(var(--dx, 0px), calc(100vh + 20px), 0) rotate(var(--rot, 720deg));
+        opacity: 0.65;
+      }
+    }
+
     /* Bouton switch planning Ramadan — au-dessus du bouton today, mobile uniquement */
     .ramadan-switch-button {
       position: fixed;
@@ -127,6 +192,8 @@
       height: auto;
       background: transparent;
       border: none;
+      text-decoration: none;
+      color: inherit;
       display: none;
       align-items: center;
       justify-content: center;
@@ -247,12 +314,9 @@
 
     .header {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 5px;
-      margin-top: 0;
-      margin-left: 0;
-      margin-right: 0;
+      align-items: stretch;
+      justify-content: center;
+      margin: 0;
       position: sticky;
       top: 0;
       left: 0;
@@ -261,65 +325,109 @@
       max-width: 100vw;
       background: var(--gradient-primary);
       z-index: 100;
-      padding: 6px 16px;
+      padding: 4px 12px;
       box-sizing: border-box;
-      min-height: 44px;
+      height: 52px;
+      min-height: 52px;
+      max-height: 52px;
+      overflow: hidden;
     }
 
     .nav-button {
       display: none;
     }
 
-    .day-title {
+    .header-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      width: 100%;
+      gap: 4px 10px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .header-left {
+      grid-column: 1;
+      justify-self: start;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .header-center {
+      grid-column: 2;
+      justify-self: center;
+      min-width: 0;
+      max-width: 42vw;
+      text-align: center;
+    }
+
+    .header-center .day-name {
       font-family: var(--font-title);
       color: var(--text-light);
-      font-size: 1.6em;
-      text-align: center;
-      margin: 0;
-      padding: 0;
+      font-size: 1.52em;
       font-weight: 600;
       text-transform: uppercase;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      flex: 1;
-      position: relative;
-      align-self: center;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      display: block;
+      margin: 0;
+      padding: 0;
     }
-    .day-title .day-name {
-      position: relative;
-      width: 100%;
-      text-align: center;
+
+    .header-right {
+      grid-column: 3;
+      justify-self: end;
+      align-self: start;
+      min-width: 0;
+      max-width: 48%;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-start;
+      gap: 2px;
+      text-align: right;
+      padding-top: 0;
     }
+
+    .header-right .date-str {
+      font-family: var(--font-text);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 1.05em;
+      font-weight: 500;
+      text-transform: none;
+      line-height: 1.15;
+      display: block;
+      margin: 0;
+    }
+
     .planning-type-label {
       font-family: var(--font-text);
-      font-size: 0.65em;
-      font-weight: 400;
-      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.72em;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.88);
       text-transform: none;
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
       font-style: italic;
+      line-height: 1.15;
+      max-width: 100%;
     }
 
-    .day-name {
-      line-height: 1.2;
-      position: relative;
-      text-align: center;
+    body.planning-ramadan .planning-type-label {
+      color: rgba(255, 255, 255, 0.92);
     }
 
-    /* Badge Maghrib : même ligne que "Planning Ramadan", à gauche, visible uniquement en vue Ramadan */
+    body.planning-ferie .planning-type-label {
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Badge Maghrib sous le libellé planning, visible en Ramadan */
     .maghrib-badge {
       font-family: var(--font-text);
-      font-size: 0.8em;
+      font-size: 0.72em;
       color: var(--secondary-color);
       font-weight: 500;
       display: inline-flex;
@@ -328,15 +436,12 @@
       cursor: pointer;
       transition: opacity 0.3s ease;
       text-transform: none;
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
+      text-decoration: none;
       white-space: nowrap;
       z-index: 10;
-      pointer-events: auto;
     }
 
+    .maghrib-badge .maghrib-badge-icon,
     .maghrib-badge .maghrib-icon {
       display: inline-flex;
       align-items: center;
@@ -347,6 +452,7 @@
       color: inherit;
     }
 
+    .maghrib-badge .maghrib-badge-icon svg,
     .maghrib-badge .maghrib-icon svg {
       width: 100%;
       height: 100%;
@@ -364,23 +470,115 @@
       display: none !important;
     }
 
-    /* En vue Puppeteer : masquer le badge seulement hors Ramadan ; en planning Ramadan, garder le badge à gauche comme en version normale */
     body.puppeteer-view:not(.planning-ramadan) .maghrib-badge {
       display: none !important;
     }
 
-    .day-date {
-      font-family: var(--font-title);
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 0.75em;
-      font-weight: 300;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 1.2;
-      margin-left: auto;
+    .timeline-message {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 1.05em;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+    .timeline-message strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.15em;
+    }
+    .timeline-message--indetermine {
       display: flex;
+      justify-content: center;
       align-items: center;
-      align-self: center;
+      min-height: 0;
+      padding: 24px 16px 32px;
+      box-sizing: border-box;
+    }
+    .indetermine-card {
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      background: var(--background-card);
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px var(--shadow-light), 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    body.planning-ramadan .indetermine-card {
+      border-color: rgba(38, 70, 45, 0.18);
+      box-shadow: 0 10px 40px rgba(38, 70, 45, 0.08), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    .indetermine-title {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 1.25em;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--primary-color);
+      line-height: 1.25;
+    }
+    .indetermine-text {
+      margin: 0;
+      font-size: 0.98em;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    body.planning-ramadan .indetermine-title {
+      color: #26462d;
+    }
+    body.planning-ferie .indetermine-card {
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    body.planning-ferie .indetermine-title {
+      color: #b8860b;
+    }
+    .timeline-message--closed {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 0;
+      padding: 24px 16px 32px;
+      box-sizing: border-box;
+    }
+    .closed-card {
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      background: var(--background-card);
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px var(--shadow-light), 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(72, 6, 7, 0.12);
+    }
+    body.planning-ramadan .closed-card {
+      border-color: rgba(38, 70, 45, 0.2);
+      box-shadow: 0 10px 40px rgba(38, 70, 45, 0.1), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    .closed-title {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 1.25em;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--primary-color);
+      line-height: 1.25;
+    }
+    .closed-text {
+      margin: 0;
+      font-size: 0.98em;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    body.planning-ramadan .closed-title {
+      color: #26462d;
+    }
+    body.planning-ferie .closed-card {
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    body.planning-ferie .closed-title {
+      color: #b8860b;
     }
 
     .content-wrapper {
@@ -405,6 +603,19 @@
       height: 100%;
       overflow: hidden;
       position: relative;
+    }
+
+    .studios-container:has(.timeline-message--closed),
+    .studios-container:has(.timeline-message--indetermine) {
+      justify-content: center;
+      min-height: calc(100vh - 130px);
+      overflow: visible;
+    }
+
+    .studios-container .timeline-message--closed,
+    .studios-container .timeline-message--indetermine {
+      min-height: 0;
+      flex: 0 0 auto;
     }
     
     .no-courses-container {
@@ -916,14 +1127,16 @@
       }
 
       .header {
-        padding: 2px 12px;
+        padding: 2px 10px;
         background: var(--primary-color);
-        min-height: 35px;
+        height: 52px;
+        min-height: 52px;
+        max-height: 52px;
         align-items: center;
       }
 
       .content-wrapper {
-        height: calc(100vh - 74px);
+        height: calc(100vh - 82px);
         min-height: 0;
         padding-left: 5px;
         padding-right: 5px;
@@ -1012,20 +1225,16 @@
         font-size: 0.6em;
       }
 
-      .day-title {
-        font-size: 1.25em;
-        gap: 8px;
-        min-height: 26px;
-        align-items: center;
-      }
-      
-      .day-name {
-        line-height: 1.3;
+      .header-center .day-name {
+        font-size: 1.28em;
       }
 
-      .day-date {
+      .header-right .date-str {
+        font-size: 0.88em;
+      }
+
+      .planning-type-label {
         font-size: 0.65em;
-        letter-spacing: 0.4px;
       }
 
       /* Puppeteer (viewport ≤768px) : mêmes dimensions qu’avant les changements mobile (dégradé, marge basse, rows 50 %) */
@@ -1043,7 +1252,7 @@
         background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
       }
       body.puppeteer-view .content-wrapper {
-        height: calc(100vh - 74px);
+        height: calc(100vh - 82px);
         margin-bottom: 48px;
         visibility: visible !important;
         opacity: 1 !important;
@@ -1096,12 +1305,12 @@
         font-size: 0.75em;
       }
 
-      .day-title {
-        font-size: 1.1em;
+      .header-center .day-name {
+        font-size: 1.15em;
       }
 
-      .day-date {
-        font-size: 0.6em;
+      .header-right .date-str {
+        font-size: 0.82em;
       }
 
       .coaches-section {
@@ -1251,13 +1460,13 @@
 <body>
   <!-- Boutons de navigation -->
   <div class="navigation">
-    <button id="prevDay" onclick="navigateDay(-1)" class="nav-button prev-button">
+    <button id="prevDay" onclick="changeDay(-1)" class="nav-button prev-button">
       <div class="nav-segments">
         <div class="segment segment-1"></div>
         <div class="segment segment-2"></div>
       </div>
     </button>
-    <button id="nextDay" onclick="navigateDay(1)" class="nav-button next-button">
+    <button id="nextDay" onclick="changeDay(1)" class="nav-button next-button">
       <div class="nav-segments">
         <div class="segment segment-1"></div>
         <div class="segment segment-2"></div>
@@ -1266,30 +1475,31 @@
   </div>
 
   <div class="header">
-    <span class="maghrib-badge hidden" id="maghribBadge" onclick="window.location.href='./prayer-times.html'" title="Voir les horaires de prière"><span class="maghrib-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg></span><span class="maghrib-time"></span></span>
-    <h1 class="day-title" id="currentDay">
-      <span class="day-name" id="dayName"></span>
-      <span class="day-date" id="dayDate"></span>
-      <span class="planning-type-label" id="planningTypeLabel"></span>
-    </h1>
+    <div class="header-inner">
+      <div class="header-left">
+        <span class="planning-type-label" id="planningTypeLabel"></span>
+        <a href="./prayer-times.html" class="maghrib-badge hidden" id="maghribBadge" title="Voir les horaires de prière" aria-label="Horaires de prière Maghrib">
+          <span class="maghrib-badge-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg></span>
+          <span class="maghrib-badge-time"></span>
+        </a>
+      </div>
+      <div class="header-center">
+        <span class="day-name" id="dayName"></span>
+      </div>
+      <div class="header-right">
+        <span class="date-str" id="dateStr"></span>
+      </div>
+    </div>
   </div>
 
-  <!-- Script inline pour initialiser la date immédiatement -->
   <script>
     (function() {
-      const today = new Date();
-      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-      const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-      
-      const dayName = document.getElementById('dayName');
-      const dayDate = document.getElementById('dayDate');
-      
-      if (dayName) {
-        dayName.textContent = days[today.getDay()].toUpperCase();
-      }
-      if (dayDate) {
-        dayDate.textContent = '';
-      }
+      var d = new Date();
+      var days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      var dn = document.getElementById('dayName');
+      var ds = document.getElementById('dateStr');
+      if (dn) dn.textContent = days[d.getDay()].charAt(0).toUpperCase() + days[d.getDay()].slice(1);
+      if (ds) ds.textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
     })();
   </script>
 
@@ -1303,11 +1513,10 @@
     </div>
   </div>
 
-  <!-- Bouton switch planning Ramadan (mobile uniquement, masqué en vue Puppeteer) -->
-  <button id="ramadanSwitchButton" class="ramadan-switch-button" onclick="toggleRamadanPlanning()">
-    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Switch Ramadan" class="ramadan-icon">
-    <div class="confetti-container"></div>
-  </button>
+  <!-- Accès rapide horaires de prière (aligné sur daily.html) -->
+  <a href="./prayer-times.html" id="ramadanSwitchButton" class="ramadan-switch-button" title="Horaires de prière" aria-label="Horaires de prière">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Horaires de prière" class="ramadan-icon">
+  </a>
 
   <!-- Bouton pour revenir à daily.html -->
   <div class="today-view-button" id="todayViewButton">
@@ -1315,139 +1524,280 @@
   </div>
 
   <script>
-    // Navigation "à la daily.html" : on boucle sur 7 jours (0..6) au lieu de faire défiler une date infiniment
-    let currentDayIndex = new Date().getDay();
-    let currentDate = new Date();
-    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    const months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-    let allData = null;
-    var activePlanningView = 'regulier';
-    function getCurrentPlanning() {
-      if (!allData || !allData.planning) return {};
-      if (activePlanningView === 'ramadan' && allData.planningRamadan) {
-        var pr = allData.planningRamadan;
-        var hasCourses = Object.keys(pr).some(function(day) { return pr[day] && pr[day].length > 0; });
-        if (hasCourses) return pr;
+    var NAV_DAYS_LIMIT = 180;
+    var selectedDateYmd = '';
+    var currentDayIndex = new Date().getDay();
+    var days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    var months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
+    var allData = null;
+    var lastPlanningKeyForConfetti = null;
+
+    function ymdFromDate(d) {
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+    function parseYmdLocal(s) {
+      var p = String(s).split('-');
+      return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+    }
+    function addDaysToYmd(ymd, deltaDays) {
+      var d = parseYmdLocal(ymd);
+      d.setDate(d.getDate() + deltaDays);
+      return ymdFromDate(d);
+    }
+    function clampNavYmd(ymd) {
+      var today = ymdFromDate(new Date());
+      var min = addDaysToYmd(today, -NAV_DAYS_LIMIT);
+      var max = addDaysToYmd(today, NAV_DAYS_LIMIT);
+      if (ymd < min) return min;
+      if (ymd > max) return max;
+      return ymd;
+    }
+    function getDayNameFrFromYmd(dateStr) {
+      var d = parseYmdLocal(dateStr);
+      var dn = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+      return dn[d.getDay()];
+    }
+    function formatDateFrShort(ymd) {
+      var d = parseYmdLocal(ymd);
+      return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    }
+    function normalizePlanningKey(raw) {
+      var s = String(raw || '').trim().toLowerCase();
+      if (!s) return 'regulier';
+      var n = s.replace(/[éèêë]/g, 'e').replace(/[àâ]/g, 'a').replace(/[ùû]/g, 'u');
+      if (n === 'ferme' || (n.length >= 4 && n.substring(0, 4) === 'ferm')) return 'ferme';
+      if (n.indexOf('ramadan') !== -1) return 'ramadan';
+      if ((n.indexOf('jours') !== -1 && n.indexOf('ferie') !== -1) || n === 'ferie' || n.indexOf('ferie') !== -1) return 'ferie';
+      if (n.indexOf('regulier') !== -1 || n.indexOf('planning') !== -1) return 'regulier';
+      return 'regulier';
+    }
+    function periodPriorityScore(p) {
+      var k = normalizePlanningKey((p && p.planningKey) ? p.planningKey : '');
+      if (k === 'ferme') return 4;
+      if (k === 'ferie') return 3;
+      if (k === 'ramadan') return 2;
+      if (k === 'regulier') return 1;
+      return 0;
+    }
+    function isDateInRamadanRange(dateStr, meta) {
+      if (!dateStr || !meta || !meta.ramadanStart || !meta.ramadanEnd) return false;
+      return dateStr >= meta.ramadanStart && dateStr <= meta.ramadanEnd;
+    }
+    function findPeriodsForDate(dateStr, periodes) {
+      var out = [];
+      if (!dateStr || !periodes || !periodes.length) return out;
+      for (var i = 0; i < periodes.length; i++) {
+        var p = periodes[i];
+        if (dateStr >= p.start && dateStr <= p.end) out.push(p);
       }
-      return allData.planning;
+      return out;
     }
-    function isNonMobileView() {
-      return typeof window !== 'undefined' && window.innerWidth > 768;
-    }
-    function initPlanningView(data) {
-      if (!data) return;
-      var urlView = '', stored = '';
-      try {
-        var params = new URLSearchParams(window.location.search);
-        urlView = params.get('planning') || '';
-        stored = (typeof localStorage !== 'undefined' && localStorage.getItem) ? localStorage.getItem('planningView') || '' : '';
-      } catch (e) { urlView = ''; stored = ''; }
-      var today = new Date().toISOString().slice(0, 10);
-      var ramadanStart = data.metadata && data.metadata.ramadanStart;
-      var ramadanEnd = data.metadata && data.metadata.ramadanEnd;
-      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-      var daysBeforeRamadan = 7;
-      var preRamadanWindow = !!(ramadanStart && today < ramadanStart &&
-        (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBeforeRamadan);
-      var allowStoredRamadan = !!(inRamadan || preRamadanWindow);
-      if (urlView === 'ramadan' || urlView === 'regulier') {
-        activePlanningView = urlView;
-        try { localStorage.setItem('planningView', urlView); } catch (e) {}
-      } else if (isNonMobileView() || isAutomatedBrowser()) {
-        // Non-mobile ou Puppeteer : bascule prioritaire selon la période (Ramadan → ramadan, hors Ramadan → régulier)
-        activePlanningView = inRamadan ? 'ramadan' : 'regulier';
-        try { localStorage.setItem('planningView', activePlanningView); } catch (e) {}
-      } else {
-        // Mobile uniquement : URL > localStorage (Ramadan seulement si période / fenêtre avant Ramadan) > période > régulier
-        if (stored === 'ramadan' || stored === 'regulier') {
-          if (stored === 'ramadan' && !allowStoredRamadan) { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
-          else { activePlanningView = stored; }
+    function getEffectivePeriodForDate(dateStr, periodes) {
+      var matches = findPeriodsForDate(dateStr, periodes);
+      if (!matches.length) return null;
+      var normalized = matches.map(function(p) {
+        var o = {};
+        for (var k in p) { if (Object.prototype.hasOwnProperty.call(p, k)) o[k] = p[k]; }
+        o.planningKey = normalizePlanningKey(p.planningKey);
+        return o;
+      });
+      var best = normalized[0];
+      var bestScore = periodPriorityScore(best);
+      for (var j = 1; j < normalized.length; j++) {
+        var sc = periodPriorityScore(normalized[j]);
+        if (sc > bestScore) {
+          bestScore = sc;
+          best = normalized[j];
         }
-        else if (inRamadan) { activePlanningView = 'ramadan'; try { localStorage.setItem('planningView', 'ramadan'); } catch (e) {} }
-        else { activePlanningView = 'regulier'; try { localStorage.setItem('planningView', 'regulier'); } catch (e) {} }
       }
-      document.body.classList.toggle('planning-ramadan', activePlanningView === 'ramadan');
-      updatePlanningTypeLabel();
+      return best;
     }
+    function resolveDailyView(dateStr, data) {
+      var periodes = (data.metadata && data.metadata.periods) ? data.metadata.periods : [];
+      var eff = getEffectivePeriodForDate(dateStr, periodes);
+      var key = eff ? normalizePlanningKey(eff.planningKey) : 'regulier';
+      if (key === 'regulier' && isDateInRamadanRange(dateStr, data.metadata)) {
+        key = 'ramadan';
+      }
+      var periodName = eff && eff.name ? String(eff.name) : '';
+      var dayName = getDayNameFrFromYmd(dateStr);
+      var planning = data.planning || {};
+      var planningRamadan = data.planningRamadan || {};
+      var planningFerieByDate = data.planningFerieByDate || {};
+      if (key === 'ferme') {
+        return { courses: [], planningKey: 'ferme', periodName: periodName, closed: true, indetermine: false, dayName: dayName };
+      }
+      var arrF = planningFerieByDate[dateStr];
+      if (arrF && arrF.length) {
+        return { courses: arrF, planningKey: 'ferie', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
+      }
+      if (key === 'ferie') {
+        return { courses: [], planningKey: 'ferie', periodName: periodName, closed: false, indetermine: true, dayName: dayName };
+      }
+      if (key === 'ramadan') {
+        var arrR = planningRamadan[dayName] || [];
+        return { courses: arrR, planningKey: 'ramadan', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
+      }
+      var arrReg = planning[dayName] || [];
+      return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
+    }
+    function useCaricatureCoachPhotos() {
+      var real = new Date();
+      if (real.getMonth() !== 3) return false;
+      var dom = real.getDate();
+      return dom >= 1 && dom <= 7;
+    }
+    function coachPhotoUrl(coach) {
+      if (!coach) return '';
+      if (useCaricatureCoachPhotos() && coach.pngCaricature && String(coach.pngCaricature).trim() !== '') {
+        return coach.pngCaricature;
+      }
+      return coach.imageUrl || '';
+    }
+
+    function initPlanningView(data) {
+      document.body.classList.remove('planning-ramadan');
+      document.body.classList.remove('planning-ferie');
+    }
+
     function renderPlanningViewSwitcher(data) {
       var ramadanButton = document.getElementById('ramadanSwitchButton');
       if (!ramadanButton || !data) return;
-      
+      var isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        ramadanButton.style.display = 'none';
+        ramadanButton.classList.remove('loaded');
+        return;
+      }
       var meta = data.metadata || {};
-      var ramadanStart = meta.ramadanStart, ramadanEnd = meta.ramadanEnd;
-      var today = new Date().toISOString().slice(0, 10);
-      var inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
+      var ramadanStart = meta.ramadanStart;
+      var ramadanEnd = meta.ramadanEnd;
+      var today = ymdFromDate(new Date());
+      var viewYmd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : today;
+      function inRamadanRange(ymd) {
+        return !!(ramadanStart && ramadanEnd && ymd >= ramadanStart && ymd <= ramadanEnd);
+      }
+      var inRamadanToday = inRamadanRange(today);
+      var viewInRamadan = inRamadanRange(viewYmd);
       var daysBefore = 7;
-      var showSwitcher = (data.planningRamadan && ramadanStart) && (inRamadan || (today < ramadanStart && (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBefore));
+      var soonBeforeRamadan = ramadanStart && today < ramadanStart &&
+        (new Date(ramadanStart) - new Date(today)) / (24 * 60 * 60 * 1000) <= daysBefore;
+      var showSwitcher = !!(data.planningRamadan && ramadanStart) &&
+        (viewInRamadan || inRamadanToday || soonBeforeRamadan);
       if (showSwitcher) {
         ramadanButton.style.display = 'flex';
         setTimeout(function() { ramadanButton.classList.add('loaded'); }, 100);
       } else {
         ramadanButton.style.display = 'none';
-      }
-    }
-    function toggleRamadanPlanning() {
-      var button = document.getElementById('ramadanSwitchButton');
-      if (!button) return;
-      
-      // Animation d'explosion de paillettes sur toute la page
-      var color = document.body.classList.contains('planning-ramadan') ? '#480607' : '#26462d';
-      var pageConfettiContainer = document.getElementById('pageConfettiContainer');
-      if (!pageConfettiContainer) {
-        pageConfettiContainer = document.createElement('div');
-        pageConfettiContainer.id = 'pageConfettiContainer';
-        pageConfettiContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000; overflow: visible;';
-        document.body.appendChild(pageConfettiContainer);
-      }
-      
-      // Créer beaucoup plus de paillettes qui se répandent sur toute la page
-      var buttonRect = button.getBoundingClientRect();
-      var centerX = buttonRect.left + buttonRect.width / 2;
-      var centerY = buttonRect.top + buttonRect.height / 2;
-      
-      for (var i = 0; i < 100; i++) {
-        var burst = document.createElement('div');
-        burst.className = 'confetti-burst';
-        burst.style.cssText = 'position: absolute; width: 8px; height: 8px; border-radius: 50%; background: ' + color + '; z-index: 10000;';
-        burst.style.left = centerX + 'px';
-        burst.style.top = centerY + 'px';
-        var angle = (Math.random() * 360) * Math.PI / 180;
-        var distance = 200 + Math.random() * 400;
-        var x = Math.cos(angle) * distance;
-        var y = Math.sin(angle) * distance;
-        burst.style.setProperty('--burst-x', x + 'px');
-        burst.style.setProperty('--burst-y', y + 'px');
-        pageConfettiContainer.appendChild(burst);
-        setTimeout(function(el) { if (el && el.parentNode) el.remove(); }, 2000, burst);
-      }
-      
-      var currentView = activePlanningView === 'ramadan' ? 'regulier' : 'ramadan';
-      setPlanningView(currentView);
-    }
-    function setPlanningView(view) {
-      activePlanningView = view;
-      localStorage.setItem('planningView', view);
-      document.body.classList.toggle('planning-ramadan', view === 'ramadan');
-      updatePlanningTypeLabel();
-      updateMaghribBadge(); // Afficher ou masquer le badge selon la vue
-      if (allData) { renderPlanningViewSwitcher(allData); loadAndDisplayCourses(); }
-    }
-    function updatePlanningTypeLabel() {
-      var label = document.getElementById('planningTypeLabel');
-      if (label) {
-        label.textContent = activePlanningView === 'ramadan' ? 'Planning Ramadan' : 'Planning régulier';
+        ramadanButton.classList.remove('loaded');
       }
     }
 
-    function syncCurrentDateToWeekWindow() {
-      // Même logique que dans daily.html:
-      // on mappe un index de jour vers la prochaine occurrence de ce jour sur les 7 jours à venir
-      const base = new Date();
-      const baseDay = base.getDay();
-      base.setDate(base.getDate() + (currentDayIndex - baseDay + 7) % 7);
-      currentDate = base;
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text == null ? '' : String(text);
+      return div.innerHTML;
     }
-    
+    function displayClosedMessage(rv) {
+      var name = rv.periodName ? escapeHtml(rv.periodName) : '';
+      var isTodayView = selectedDateYmd === ymdFromDate(new Date());
+      var title = isTodayView ? 'Club fermé aujourd’hui' : 'Club fermé';
+      if (name) title += ' — ' + name;
+      return '<div class="timeline-message timeline-message--closed" role="status">' +
+        '<div class="closed-card">' +
+        '<strong class="closed-title">' + title + '</strong>' +
+        '<p class="closed-text">Aucun cours prévu pour cette journée.</p>' +
+        '</div></div>';
+    }
+    function displayIndetermineMessage() {
+      return '<div class="timeline-message timeline-message--indetermine" role="status">' +
+        '<div class="indetermine-card">' +
+        '<strong class="indetermine-title">Planning à déterminer</strong>' +
+        '<p class="indetermine-text">Un planning sera publié prochainement. Vous serez averti par notification ; il s’affichera ici dès la mise à jour.</p>' +
+        '</div></div>';
+    }
+
+    function spawnConfettiBurst(colors) {
+      if (!colors || !colors.length) return;
+      var layer = document.createElement('div');
+      layer.className = 'confetti-layer';
+      layer.setAttribute('aria-hidden', 'true');
+      var n = 120;
+      var i;
+      for (i = 0; i < n; i++) {
+        var p = document.createElement('div');
+        p.className = 'confetti-piece';
+        p.style.left = 8 + Math.random() * 84 + '%';
+        p.style.background = colors[i % colors.length];
+        p.style.animationDelay = Math.random() * 0.35 + 's';
+        p.style.animationDuration = 1.8 + Math.random() * 0.9 + 's';
+        var drift = (Math.random() - 0.5) * 220;
+        var rot = 360 + Math.random() * 720;
+        p.style.setProperty('--dx', drift + 'px');
+        p.style.setProperty('--rot', rot + 'deg');
+        layer.appendChild(p);
+      }
+      document.body.appendChild(layer);
+      setTimeout(function() {
+        if (layer.parentNode) layer.parentNode.removeChild(layer);
+      }, 2800);
+    }
+    function triggerPlanningModeConfetti(planningKey) {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        lastPlanningKeyForConfetti = planningKey;
+        return;
+      }
+      if (lastPlanningKeyForConfetti === null) {
+        lastPlanningKeyForConfetti = planningKey;
+        return;
+      }
+      if (lastPlanningKeyForConfetti === planningKey) return;
+      lastPlanningKeyForConfetti = planningKey;
+      var palettes = {
+        regulier: ['#480607', '#6b1218', '#8b2942', '#a02828'],
+        ramadan: ['#26462d', '#3d6b47', '#4a8c5e', '#2d5a38', '#1e3a24', '#5a8f6a', '#a8d4b8'],
+        ferie: ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047']
+      };
+      var paletteKey = planningKey === 'ferme' ? 'ferie' : planningKey;
+      var colors = palettes[paletteKey] || palettes.regulier;
+      spawnConfettiBurst(colors);
+    }
+
+    function updatePlanningTypeLabelFromView(rv) {
+      var label = document.getElementById('planningTypeLabel');
+      var labelText = '';
+      var hor = allData && allData.metadata && allData.metadata.horaires ? allData.metadata.horaires : null;
+      if (rv.closed) {
+        labelText = rv.periodName ? ('Fermé — ' + rv.periodName) : 'Club fermé';
+      } else if (rv.planningKey === 'ferie') {
+        labelText = rv.periodName ? ('Jour férié — ' + rv.periodName) : 'Jour férié';
+      } else if (rv.planningKey === 'ramadan') {
+        var lr = hor && hor.ramadan && hor.ramadan.planningLabel;
+        labelText = (lr && String(lr).trim()) ? String(lr).trim() : 'Planning Ramadan';
+        if (labelText.toLowerCase().indexOf('planning') === -1) {
+          labelText = 'Planning ' + labelText;
+        }
+      } else {
+        var lreg = hor && hor.regulier && hor.regulier.planningLabel;
+        labelText = (lreg && String(lreg).trim()) ? String(lreg).trim() : 'Planning régulier';
+        if (/^planning$/i.test(labelText)) labelText = 'Planning régulier';
+      }
+      if (label) label.textContent = labelText;
+    }
+
+    function updateNavButtonsState() {
+      var today = ymdFromDate(new Date());
+      var min = addDaysToYmd(today, -NAV_DAYS_LIMIT);
+      var max = addDaysToYmd(today, NAV_DAYS_LIMIT);
+      var prevBtn = document.getElementById('prevDay');
+      var nextBtn = document.getElementById('nextDay');
+      if (prevBtn) prevBtn.disabled = selectedDateYmd <= min;
+      if (nextBtn) nextBtn.disabled = selectedDateYmd >= max;
+    }
+
     // Détection automatique de Puppeteer/navigateur automatisé
     function isAutomatedBrowser() {
       // Vérifier plusieurs indicateurs de navigateur automatisé
@@ -1583,55 +1933,29 @@
       }
     }
 
-    function formatDate(date) {
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = months[date.getMonth()];
-      return `${day} ${month}`;
-    }
-
-    function updateDayTitle() {
-      const dayName = document.getElementById('dayName');
-      const dayDate = document.getElementById('dayDate');
-      
-      if (dayName) {
-        dayName.textContent = days[currentDate.getDay()].toUpperCase();
-      }
-      if (dayDate) {
-        dayDate.textContent = '';
-      }
-      
-      // Mettre à jour le badge Maghrib
-      updateMaghribBadge();
-    }
-
-    /**
-     * Charge les horaires de prière et affiche le badge Maghrib si on est en période Ramadan
-     */
     async function loadPrayerTimes() {
       try {
-        // Vérifier si on est en période Ramadan
         if (!allData || !allData.metadata) return;
-        
+
         const ramadanStart = allData.metadata.ramadanStart;
         const ramadanEnd = allData.metadata.ramadanEnd;
-        const today = new Date().toISOString().slice(0, 10);
-        
-        const inRamadan = ramadanStart && ramadanEnd && today >= ramadanStart && today <= ramadanEnd;
-        
-        if (!inRamadan) {
-          const badge = document.getElementById('maghribBadge');
-          if (badge) badge.classList.add('hidden');
+        if (!ramadanStart || !ramadanEnd) return;
+
+        const today = ymdFromDate(new Date());
+        const sel = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : today;
+        function inRamadanWindow(ymd) {
+          return ymd >= ramadanStart && ymd <= ramadanEnd;
+        }
+        if (!inRamadanWindow(today) && !inRamadanWindow(sel)) {
+          updateMaghribBadge();
           return;
         }
-        
-        // Charger les horaires seulement si on est en vue Ramadan
-        if (activePlanningView !== 'ramadan') {
-          const badge = document.getElementById('maghribBadge');
-          if (badge) badge.classList.add('hidden');
+
+        if (window.prayerTimesData && window.prayerTimesData.prayerTimes) {
+          updateMaghribBadge();
           return;
         }
-        
-        // Charger les horaires de prière (local puis distant)
+
         let prayerData = null;
         try {
           const localResp = await fetch('./prayer-times.json');
@@ -1651,52 +1975,37 @@
           prayerData = await remoteResp.json();
           console.log('✅ Horaires de prière chargés depuis GitHub');
         }
-        window.prayerTimesData = prayerData; // Stocker pour utilisation ultérieure
-        
-        // Mettre à jour le badge
+        window.prayerTimesData = prayerData;
         updateMaghribBadge();
       } catch (error) {
         console.warn('Erreur lors du chargement des horaires de prière:', error);
       }
     }
 
-    /**
-     * Met à jour l'affichage du badge Maghrib avec l'heure du jour actuel
-     */
     function updateMaghribBadge() {
-      const badge = document.getElementById('maghribBadge');
-      if (!badge) return;
-      
-      // Afficher le badge uniquement en vue Ramadan
-      if (activePlanningView !== 'ramadan') {
-        badge.classList.add('hidden');
+      var badge = document.getElementById('maghribBadge');
+      if (!badge || !allData || !allData.metadata) {
+        if (badge) badge.classList.add('hidden');
         return;
       }
-      
-      // Afficher le badge uniquement pour le jour d'aujourd'hui (pas pour les autres jours affichés)
-      const realToday = new Date().toISOString().slice(0, 10);
-      const displayedDate = currentDate.toISOString().slice(0, 10);
-      if (displayedDate !== realToday) {
-        badge.classList.add('hidden');
+      var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+      var rv = resolveDailyView(ymd, allData);
+      if (!rv || rv.planningKey !== 'ramadan') {
+        if (badge) badge.classList.add('hidden');
         return;
       }
-      
       if (!window.prayerTimesData || !window.prayerTimesData.prayerTimes) {
-        badge.classList.add('hidden');
+        if (badge) badge.classList.add('hidden');
         return;
       }
-      
-      const today = currentDate.toISOString().slice(0, 10);
-      const prayerTimes = window.prayerTimesData.prayerTimes;
-      const todayPrayer = prayerTimes[today];
-      
-      if (todayPrayer && todayPrayer.maghrib) {
-        var timeEl = badge.querySelector('.maghrib-time');
-        if (timeEl) timeEl.textContent = todayPrayer.maghrib;
-        else { var t = document.createElement('span'); t.className = 'maghrib-time'; t.textContent = todayPrayer.maghrib; badge.appendChild(t); }
+      var prayerTimes = window.prayerTimesData.prayerTimes;
+      var dayPrayer = prayerTimes[ymd];
+      if (dayPrayer && dayPrayer.maghrib) {
+        var timeEl = badge.querySelector('.maghrib-badge-time');
+        if (timeEl) timeEl.textContent = dayPrayer.maghrib;
         badge.classList.remove('hidden');
       } else {
-        badge.classList.add('hidden');
+        if (badge) badge.classList.add('hidden');
       }
     }
 
@@ -1740,11 +2049,20 @@
       return { message, image };
     }
 
-    function navigateDay(offset) {
-      currentDayIndex = (currentDayIndex + offset + 7) % 7;
-      syncCurrentDateToWeekWindow();
-      updateDayTitle(); // Mettre à jour le titre et le badge Maghrib
-      loadAndDisplayCourses();
+    function displayNoCourseMessageHtml() {
+      var r = getNoCourseMessage();
+      return '<div class="no-courses-container" style="text-align:center;padding:20px;">' +
+        '<img src="' + escapeHtml(r.image) + '" alt="" style="max-width:100%;height:auto;margin-bottom:20px;border-radius:10px;" />' +
+        '<p class="no-courses-message" style="font-style:italic;font-size:1.2em;color:var(--text-secondary);">' + escapeHtml(r.message) + '</p></div>';
+    }
+
+    function changeDay(direction) {
+      if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
+      var next = addDaysToYmd(selectedDateYmd, direction);
+      var clamped = clampNavYmd(next);
+      if (clamped !== next) return;
+      selectedDateYmd = clamped;
+      displayGridSchedule();
     }
 
     /**
@@ -1752,8 +2070,8 @@
      * Ne s'applique qu'au jour affiché = aujourd'hui. Appelée au rendu et à intervalle régulier.
      */
     function updateCourseCardsState() {
-      var todayStr = new Date().toISOString().slice(0, 10);
-      var displayedStr = currentDate.toISOString().slice(0, 10);
+      var todayStr = ymdFromDate(new Date());
+      var displayedStr = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : todayStr;
       var isViewingToday = (todayStr === displayedStr);
       var now = new Date();
       var currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
@@ -1804,9 +2122,215 @@
       });
     }
 
+    /** Après retour depuis prayer-times.html : restaurer la position de scroll. */
+    function maybeRestoreScrollAfterPrayer() {
+      try {
+        if (sessionStorage.getItem('planning_should_restore_scroll') !== '1') return;
+        var savedUrl = sessionStorage.getItem('planning_return_url') || '';
+        if (savedUrl && window.location.href.split('#')[0] !== savedUrl.split('#')[0]) return;
+        var y = sessionStorage.getItem('planning_return_scroll');
+        sessionStorage.removeItem('planning_should_restore_scroll');
+        sessionStorage.removeItem('planning_return_url');
+        sessionStorage.removeItem('planning_return_scroll');
+        if (y == null) return;
+        var n = parseInt(y, 10);
+        if (isNaN(n)) return;
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            window.scrollTo(0, n);
+          });
+        });
+      } catch (e) {}
+    }
+
+    function displayGridSchedule() {
+      try {
+      if (!allData || !allData.planning) return;
+      if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
+
+      var dayIndex = parseYmdLocal(selectedDateYmd).getDay();
+      currentDayIndex = dayIndex;
+
+      var dayNamesLower = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+      var dayOfWeek = dayNamesLower[dayIndex];
+      var displayDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+      var dateLabel = formatDateFrShort(selectedDateYmd);
+
+      var dayNameEl = document.getElementById('dayName');
+      var dateStrEl = document.getElementById('dateStr');
+      if (dayNameEl) dayNameEl.textContent = displayDayOfWeek;
+      if (dateStrEl) dateStrEl.textContent = dateLabel;
+
+      var rv = resolveDailyView(selectedDateYmd, allData);
+      document.body.classList.toggle('planning-ramadan', rv.planningKey === 'ramadan');
+      document.body.classList.toggle('planning-ferie', rv.planningKey === 'ferie' || rv.planningKey === 'ferme');
+      updatePlanningTypeLabelFromView(rv);
+
+      updateMaghribBadge();
+      if (rv.planningKey === 'ramadan' && (!window.prayerTimesData || !window.prayerTimesData.prayerTimes)) {
+        loadPrayerTimes();
+      }
+      renderPlanningViewSwitcher(allData);
+      triggerPlanningModeConfetti(rv.planningKey);
+
+      var studiosContainer = document.getElementById('studiosContainer');
+      studiosContainer.innerHTML = '';
+
+      if (rv.closed) {
+        studiosContainer.innerHTML = displayClosedMessage(rv);
+        document.getElementById('coachesSection').innerHTML = '';
+        updateNavButtonsState();
+        document.body.setAttribute('data-daily-grid-ready', 'true');
+        return;
+      }
+      if (rv.indetermine) {
+        studiosContainer.innerHTML = displayIndetermineMessage();
+        document.getElementById('coachesSection').innerHTML = '';
+        updateNavButtonsState();
+        document.body.setAttribute('data-daily-grid-ready', 'true');
+        return;
+      }
+
+      var todaysCourses = rv.courses || [];
+      if (todaysCourses.length === 0) {
+        studiosContainer.innerHTML = displayNoCourseMessageHtml();
+        document.getElementById('coachesSection').innerHTML = '';
+        updateNavButtonsState();
+        document.body.setAttribute('data-daily-grid-ready', 'true');
+        return;
+      }
+
+      if (!allData.studios || !Array.isArray(allData.studios) || allData.studios.length === 0) {
+        var fallback = document.createElement('div');
+        fallback.className = 'no-courses-container';
+        fallback.style.cssText = 'text-align:center;padding:20px;color:var(--text-secondary);';
+        fallback.textContent = 'Aucun studio configuré.';
+        studiosContainer.appendChild(fallback);
+        updateNavButtonsState();
+        document.body.setAttribute('data-daily-grid-ready', 'true');
+        return;
+      }
+
+      var sortedStudios = allData.studios.slice().sort(function(a, b) {
+        var rankA = a.rank !== undefined ? a.rank : (a.rang !== undefined ? a.rang : 0);
+        var rankB = b.rank !== undefined ? b.rank : (b.rang !== undefined ? b.rang : 0);
+        return rankA - rankB;
+      });
+
+      for (var i = 0; i < sortedStudios.length; i += 3) {
+        var row = document.createElement('div');
+        row.className = 'studios-row';
+        for (var j = 0; j < 3 && i + j < sortedStudios.length; j++) {
+          var studio = sortedStudios[i + j];
+          var studioCourses = (todaysCourses || [])
+            .filter(function(course) { return (course.studioId || '') === (studio.id || ''); })
+            .sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
+
+          var studioColumn = document.createElement('div');
+          studioColumn.className = 'studio-column';
+
+          var studioTitle = document.createElement('h2');
+          studioTitle.className = 'studio-title';
+
+          if (studio.imageUrl) {
+            var studioIcon = document.createElement('img');
+            studioIcon.className = 'studio-icon';
+            studioIcon.src = studio.imageUrl;
+            studioIcon.alt = (studio.name || '') + ' icon';
+            studioIcon.onerror = function() { this.style.display = 'none'; };
+            studioTitle.appendChild(studioIcon);
+          }
+          var studioNameText = document.createElement('span');
+          studioNameText.textContent = studio.name;
+          studioTitle.appendChild(studioNameText);
+
+          var coursesContainer = document.createElement('div');
+          coursesContainer.className = 'courses-container';
+
+          if (studioCourses.length === 0) {
+            var emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-message';
+            emptyMessage.textContent = 'Pas de cours';
+            coursesContainer.appendChild(emptyMessage);
+          } else {
+            studioCourses.forEach(function(course) {
+              var coursIdStr = (course.coursId || '').toString();
+              var courseName = coursIdStr.split('-').slice(1).join(' ').toUpperCase();
+              var coachIds = course.coachIds || [];
+              var coachList = allData.coachs || [];
+              var courseCoaches = coachIds.map(function(coachId) {
+                return coachList.find(function(c) { return c && c.id === coachId; });
+              }).filter(function(c) { return c !== undefined; });
+
+              var coachNamesText = '';
+              if (courseCoaches.length === 0) coachNamesText = '–';
+              else if (courseCoaches.length === 1) coachNamesText = courseCoaches[0].name || '–';
+              else if (courseCoaches.length === 2) coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '');
+              else coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '') + '...';
+
+              var startTimeStr = course.startTime || '';
+              var endTimeStr = course.endTime || '';
+              if (!endTimeStr && startTimeStr) {
+                var parts = startTimeStr.split(':');
+                var h = parseInt(parts[0], 10) || 0;
+                var m = parseInt(parts[1], 10) || 0;
+                m += 60;
+                h += Math.floor(m / 60);
+                m = m % 60;
+                endTimeStr = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+              }
+              var courseCard = document.createElement('div');
+              courseCard.className = 'course-card';
+              courseCard.setAttribute('data-start-time', startTimeStr);
+              courseCard.setAttribute('data-end-time', endTimeStr);
+              var courseType = (course.type || '').toString().toLowerCase();
+              var studioName = (studio.name || '').toString().toLowerCase();
+              if (courseType.indexOf('femme') !== -1) courseCard.classList.add('women-only');
+              if (studioName.indexOf('piscine') !== -1 || studioName.indexOf('aqua') !== -1) courseCard.classList.add('pool');
+
+              courseCard.innerHTML = '<div class="course-time">' + (course.startTime || '') + '</div><div class="course-name">' + (courseName || '') + '</div><div class="course-coach">' + (coachNamesText || '–') + '</div>';
+              coursesContainer.appendChild(courseCard);
+            });
+          }
+
+          studioColumn.appendChild(studioTitle);
+          studioColumn.appendChild(coursesContainer);
+          row.appendChild(studioColumn);
+        }
+        studiosContainer.appendChild(row);
+      }
+
+      updateCourseCardsState();
+
+      var uniqueCoachIds = [];
+      todaysCourses.forEach(function(course) {
+        (course.coachIds || []).forEach(function(id) {
+          if (id !== undefined && id !== null && uniqueCoachIds.indexOf(id) === -1) uniqueCoachIds.push(id);
+        });
+      });
+
+      var coachesSection = document.getElementById('coachesSection');
+      coachesSection.innerHTML = '';
+      var coachListForSection = allData.coachs || [];
+      uniqueCoachIds.forEach(function(coachId) {
+        var coachData = coachListForSection.find(function(c) { return c && c.id === coachId; });
+        if (!coachData) return;
+        var coachCard = document.createElement('div');
+        coachCard.className = 'coach-card';
+        var coachImage = coachPhotoUrl(coachData) || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
+        coachCard.innerHTML = '<img src="' + coachImage + '" alt="' + escapeHtml(coachData.name) + '" class="coach-image" onerror="this.src=\'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png\'"><div class="coach-name">' + escapeHtml(coachData.name) + '</div>';
+        coachesSection.appendChild(coachCard);
+      });
+
+      updateNavButtonsState();
+      document.body.setAttribute('data-daily-grid-ready', 'true');
+    } finally {
+      maybeRestoreScrollAfterPrayer();
+    }
+    }
+
     async function loadAndDisplayCourses() {
       try {
-        syncCurrentDateToWeekWindow();
         console.log('Début du chargement des données...');
         let response = null;
         let data = null;
@@ -1830,269 +2354,12 @@
         }
 
         allData = data;
-        try {
-          initPlanningView(allData);
-          renderPlanningViewSwitcher(allData);
-        } catch (e) {
-          console.warn('Init planning / switcher:', e);
-          activePlanningView = 'regulier';
-          document.body.classList.remove('planning-ramadan');
-        }
+        initPlanningView(allData);
         console.log('Données chargées avec succès:', allData);
-        
-        // Charger les horaires de prière après le chargement des données principales
+
         await loadPrayerTimes();
-        var planning = getCurrentPlanning();
-        console.log('Structure des données de planning:', Object.keys(planning));
-
-        const today = currentDate.toISOString().split('T')[0];
-        const dayName = days[currentDate.getDay()].toLowerCase();
-        
-        let todaysCourses = planning[dayName] || [];
-        if (todaysCourses.length === 0) {
-          todaysCourses = planning[today] || [];
-        }
-        console.log('Cours du jour:', todaysCourses);
-        if (allData.studios) console.log('Liste des studios disponibles:', allData.studios.map(s => ({ id: s.id, name: s.name })));
-
-        const studiosContainer = document.getElementById('studiosContainer');
-        studiosContainer.innerHTML = '';
-
-        // Si aucun cours pour ce jour
-        if (todaysCourses.length === 0) {
-          console.log('Aucun cours trouvé pour ce jour');
-          
-          // Récupérer message et image de manière synchrone et simple
-          let message, image;
-          try {
-            const result = getNoCourseMessage();
-            message = result.message;
-            image = result.image;
-            console.log('Message et image récupérés:', message, image);
-          } catch (err) {
-            console.error('Erreur getNoCourseMessage:', err);
-            // Fallback si getNoCourseMessage échoue
-            message = 'Profitez de votre journée de repos !';
-            image = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/70a8506a-23ce-3fc3-0e6d-2bc78a5b13d6.png';
-          }
-          
-          // Créer le conteneur de manière simple et directe
-          const noCoursesContainer = document.createElement('div');
-          noCoursesContainer.className = 'no-courses-container';
-          noCoursesContainer.style.textAlign = 'center';
-          noCoursesContainer.style.padding = '20px';
-          
-          // Créer l'image de manière explicite (pas innerHTML)
-          const img = document.createElement('img');
-          img.src = image;
-          img.alt = 'Image de repos';
-          img.style.maxWidth = '100%';
-          img.style.height = 'auto';
-          img.style.marginBottom = '20px';
-          img.style.borderRadius = '10px';
-          
-          // Fallback si l'image ne charge pas
-          const defaultImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-          img.onerror = function() {
-            console.log('Image principale échouée, utilisation du fallback');
-            this.src = defaultImage;
-          };
-          
-          // Créer le message
-          const messageP = document.createElement('p');
-          messageP.className = 'no-courses-message';
-          messageP.style.fontStyle = 'italic';
-          messageP.style.fontSize = '1.4em';
-          messageP.style.color = 'var(--text-secondary)';
-          messageP.style.textAlign = 'center';
-          messageP.style.marginTop = '20px';
-          messageP.style.width = '100%';
-          messageP.style.lineHeight = '1.5';
-          messageP.textContent = message;
-          
-          console.log('Message créé:', message);
-          console.log('Texte du messageP:', messageP.textContent);
-          
-          // Assembler le tout
-          noCoursesContainer.appendChild(img);
-          noCoursesContainer.appendChild(messageP);
-          studiosContainer.appendChild(noCoursesContainer);
-          
-          console.log('Conteneur no-courses créé et ajouté au DOM');
-          console.log('Image src:', img.src);
-          console.log('Message texte:', messageP.textContent);
-          console.log('Nombre d\'enfants dans noCoursesContainer:', noCoursesContainer.children.length);
-          console.log('Nombre d\'enfants dans studiosContainer:', studiosContainer.children.length);
-          
-          updateDayTitle();
-          document.getElementById('coachesSection').innerHTML = '';
-          document.body.setAttribute('data-daily-grid-ready', 'true');
-          return;
-        }
-
-        // Trier les studios par rang (utiliser 'rang' ou 'rank' selon ce qui existe)
-        if (!allData.studios || !Array.isArray(allData.studios) || allData.studios.length === 0) {
-          console.warn('Aucun studio dans les données');
-          const studiosContainer = document.getElementById('studiosContainer');
-          const fallback = document.createElement('div');
-          fallback.className = 'no-courses-container';
-          fallback.style.cssText = 'text-align:center;padding:20px;color:var(--text-secondary);';
-          fallback.textContent = 'Aucun studio configuré.';
-          studiosContainer.appendChild(fallback);
-          updateDayTitle();
-          document.body.setAttribute('data-daily-grid-ready', 'true');
-          return;
-        }
-        console.log('Studios avant tri:', allData.studios.map(s => ({ name: s.name, rank: s.rank, rang: s.rang })));
-        const sortedStudios = allData.studios
-          .sort((a, b) => {
-            const rankA = a.rank !== undefined ? a.rank : (a.rang !== undefined ? a.rang : 0);
-            const rankB = b.rank !== undefined ? b.rank : (b.rang !== undefined ? b.rang : 0);
-            return rankA - rankB;
-          });
-        console.log('Studios triés par rang:', sortedStudios.map(s => ({ name: s.name, rank: s.rank, rang: s.rang })));
-        console.log('Liste des IDs de studios:', sortedStudios.map(s => s.id));
-
-        // Créer des rangées de 3 studios
-        for (let i = 0; i < sortedStudios.length; i += 3) {
-          const row = document.createElement('div');
-          row.className = 'studios-row';
-          
-          // Ajouter les studios de cette rangée
-          for (let j = 0; j < 3 && i + j < sortedStudios.length; j++) {
-            const studio = sortedStudios[i + j];
-            console.log('Traitement du studio:', studio);
-            
-            var studioCourses = (todaysCourses || [])
-              .filter(function(course) { return (course.studioId || '') === (studio.id || ''); })
-              .sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
-            console.log('Cours du studio:', studioCourses);
-            console.log('IDs des cours pour ce studio:', studioCourses.map(c => c.coursId));
-            
-            const studioColumn = document.createElement('div');
-            studioColumn.className = 'studio-column';
-            
-            const studioTitle = document.createElement('h2');
-            studioTitle.className = 'studio-title';
-            
-            // Ajouter l'icône du studio si elle existe
-            if (studio.imageUrl) {
-              const studioIcon = document.createElement('img');
-              studioIcon.className = 'studio-icon';
-              studioIcon.src = studio.imageUrl;
-              studioIcon.alt = `${studio.name} icon`;
-              studioIcon.onerror = function() {
-                // Si l'image ne charge pas, la masquer
-                this.style.display = 'none';
-              };
-              studioTitle.appendChild(studioIcon);
-            }
-            
-            // Ajouter le texte du nom du studio
-            const studioNameText = document.createElement('span');
-            studioNameText.textContent = studio.name;
-            studioTitle.appendChild(studioNameText);
-            
-            const coursesContainer = document.createElement('div');
-            coursesContainer.className = 'courses-container';
-            
-            if (studioCourses.length === 0) {
-              const emptyMessage = document.createElement('div');
-              emptyMessage.className = 'empty-message';
-              emptyMessage.textContent = 'Pas de cours';
-              coursesContainer.appendChild(emptyMessage);
-            } else {
-              studioCourses.forEach(function(course) {
-                var coursIdStr = (course.coursId || '').toString();
-                var courseName = coursIdStr.split('-').slice(1).join(' ').toUpperCase();
-                
-                // Récupérer tous les coachs du cours
-                const coachIds = course.coachIds || [];
-                const coachList = allData.coachs || [];
-                const courseCoaches = coachIds.map(function(coachId) { return coachList.find(function(c) { return c && c.id === coachId; }); }).filter(function(c) { return c !== undefined; });
-                
-                var coachNamesText = '';
-                if (courseCoaches.length === 0) {
-                  coachNamesText = '–';
-                } else if (courseCoaches.length === 1) {
-                  coachNamesText = courseCoaches[0].name || '–';
-                } else if (courseCoaches.length === 2) {
-                  coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '');
-                } else {
-                  coachNamesText = (courseCoaches[0].name || '') + ', ' + (courseCoaches[1].name || '') + '...';
-                }
-                
-                var startTimeStr = course.startTime || '';
-                var endTimeStr = course.endTime || '';
-                if (!endTimeStr && startTimeStr) {
-                  var parts = startTimeStr.split(':');
-                  var h = parseInt(parts[0], 10) || 0;
-                  var m = parseInt(parts[1], 10) || 0;
-                  m += 60;
-                  h += Math.floor(m / 60);
-                  m = m % 60;
-                  endTimeStr = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
-                }
-                const courseCard = document.createElement('div');
-                courseCard.className = 'course-card';
-                courseCard.setAttribute('data-start-time', startTimeStr);
-                courseCard.setAttribute('data-end-time', endTimeStr);
-                var courseType = (course.type || '').toString().toLowerCase();
-                var studioName = (studio.name || '').toString().toLowerCase();
-                if (courseType.indexOf('femme') !== -1) {
-                  courseCard.classList.add('women-only');
-                }
-                if (studioName.indexOf('piscine') !== -1 || studioName.indexOf('aqua') !== -1) {
-                  courseCard.classList.add('pool');
-                }
-                
-                courseCard.innerHTML = '<div class="course-time">' + (course.startTime || '') + '</div><div class="course-name">' + (courseName || '') + '</div><div class="course-coach">' + (coachNamesText || '–') + '</div>';
-                coursesContainer.appendChild(courseCard);
-              });
-            }
-            
-            studioColumn.appendChild(studioTitle);
-            studioColumn.appendChild(coursesContainer);
-            row.appendChild(studioColumn);
-          }
-          
-          studiosContainer.appendChild(row);
-        }
-        
-        updateCourseCardsState();
-        updateDayTitle();
-        
-        // Gérer les coachs
-        const uniqueCoachIds = [...new Set(todaysCourses
-          .flatMap(function(course) { return course.coachIds || []; })
-          .filter(function(id) { return id !== undefined && id !== null; }))];
-        console.log('IDs des coachs uniques:', uniqueCoachIds);
-        
-        const coachesSection = document.getElementById('coachesSection');
-        coachesSection.innerHTML = '';
-        
-        var coachListForSection = allData.coachs || [];
-        if (uniqueCoachIds.length > 0 && coachListForSection.length > 0) {
-          uniqueCoachIds.forEach(function(coachId) {
-            var coachData = coachListForSection.find(function(c) { return c && c.id === coachId; });
-            if (!coachData) return;
-            
-            const coachCard = document.createElement('div');
-            coachCard.className = 'coach-card';
-            
-            // Utiliser directement l'imageUrl du coach
-            const coachImage = coachData.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-            console.log('URL de l\'image du coach:', coachImage);
-            
-            coachCard.innerHTML = `
-              <img src="${coachImage}" alt="${coachData.name}" class="coach-image" onerror="this.src='https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png'">
-              <div class="coach-name">${coachData.name}</div>
-            `;
-            
-            coachesSection.appendChild(coachCard);
-          });
-        }
-        document.body.setAttribute('data-daily-grid-ready', 'true');
+        if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
+        displayGridSchedule();
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         document.body.setAttribute('data-daily-grid-ready', 'error');
@@ -2153,6 +2420,15 @@
     
     // Appeler handleResize au redimensionnement de la fenêtre
     window.addEventListener('resize', handleResize);
+
+    document.addEventListener('click', function(e) {
+      var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
+      if (!a || !a.getAttribute('href')) return;
+      try {
+        sessionStorage.setItem('planning_return_url', window.location.href);
+        sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
+      } catch (err) {}
+    }, true);
   </script>
 </body>
 </html> 
