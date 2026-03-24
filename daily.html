@@ -370,14 +370,36 @@
     }
     .opening-hours-bar .oh-chip--compact {
       flex-wrap: wrap;
-      align-items: baseline;
+      align-items: center;
       gap: 6px;
     }
+    .opening-hours-bar .oh-chip--compact .oh-chip-times {
+      align-items: center;
+    }
+    /* Séparateur entre deux plages horaires : barre verticale (hors Ramadan) */
     .opening-hours-bar .oh-sep-slot {
-      opacity: 0.5;
-      font-weight: 400;
-      padding: 0 3px;
+      display: inline-block;
+      flex-shrink: 0;
+      align-self: center;
+      width: 2px;
+      height: 1.05em;
+      margin: 0 8px;
+      border-radius: 1px;
+      background: rgba(0, 0, 0, 0.22);
+      opacity: 1;
+      padding: 0;
       user-select: none;
+    }
+    /* Ramadan : coucher de soleil (meme graphe que svg/planning-icons.svg#sunset-ramadan ; data URI = fiable en background) */
+    body.planning-ramadan .opening-hours-bar .oh-sep-slot {
+      width: 22px;
+      height: 22px;
+      margin: 0 6px;
+      border-radius: 0;
+      background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2326462d%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2018C8%2015.7909%209.79086%2014%2012%2014C14.2091%2014%2016%2015.7909%2016%2018%22%2F%3E%3Cline%20x1%3D%2221%22%20y1%3D%2221%22%20x2%3D%223%22%20y2%3D%2221%22%2F%3E%3Cline%20x1%3D%2212%22%20y1%3D%2211%22%20x2%3D%2212%22%20y2%3D%229%22%2F%3E%3Cpath%20d%3D%22M12%2011L12%203%22%2F%3E%3Cpath%20d%3D%22M12%2011L15%208.5%22%2F%3E%3Cpath%20d%3D%22M12%2011L9%208.5%22%2F%3E%3Cline%20x1%3D%225%22%20y1%3D%2218%22%20x2%3D%223%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%2221%22%20y1%3D%2218%22%20x2%3D%2219%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%2219.071%22%20y1%3D%2211.3432%22%20x2%3D%2217.6568%22%20y2%3D%2212.7574%22%2F%3E%3Cline%20x1%3D%225.41421%22%20y1%3D%2212%22%20x2%3D%226.82843%22%20y2%3D%2213.4142%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") center / contain no-repeat;
+    }
+    body.planning-ferie:not(.planning-ramadan) .opening-hours-bar .oh-sep-slot {
+      background: rgba(184, 134, 11, 0.5);
     }
 
     .confetti-layer {
@@ -1075,11 +1097,11 @@
       visibility: hidden;
     }
 
-    /* Accès rapide horaires de prière (lien flottant) — au-dessus du sticky (1000) et du contenu */
+    /* Accès rapide horaires de prière : bord gauche, centré verticalement dans la moitié basse */
     .ramadan-switch-button {
       position: fixed;
       top: 75%;
-      left: 10px;
+      left: max(10px, env(safe-area-inset-left, 0px));
       width: auto;
       height: auto;
       background: transparent;
@@ -1095,13 +1117,13 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: all;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translate(0, calc(-50% + 20px));
       padding: 0;
     }
 
     .ramadan-switch-button.loaded {
       opacity: 1;
-      transform: translateY(0);
+      transform: translate(0, -50%);
     }
 
     .ramadan-icon {
@@ -1135,11 +1157,11 @@
 
     /* Animation élégante au clic */
     .ramadan-switch-button:active {
-      transform: translateY(20px) scale(0.9);
+      transform: translate(0, calc(-50% + 20px)) scale(0.9);
       transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .ramadan-switch-button.loaded:active {
-      transform: translateY(0) scale(0.9);
+      transform: translate(0, -50%) scale(0.9);
     }
 
     .ramadan-switch-button:active::after {
@@ -1658,6 +1680,11 @@
       pointer-events: none;
       z-index: 2;
     }
+    /* Chiffre du bouton hebdo : meme jaune orange que la vue reguliere (#FFA630), meme ombre */
+    body.planning-ramadan .weekly-view-button::after {
+      color: #FFA630;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 6px rgba(255, 166, 48, 0.45);
+    }
 
     .weekly-view-button a {
       z-index: 3;
@@ -1912,7 +1939,8 @@
       color: inherit;
     }
 
-    .maghrib-badge .maghrib-badge-icon svg {
+    .maghrib-badge .maghrib-badge-icon svg,
+    .maghrib-badge .maghrib-badge-icon-svg {
       width: 100%;
       height: 100%;
     }
@@ -2174,7 +2202,7 @@
       <span class="planning-type-label" id="stickyPlanningTypeLabel"></span>
     </div>
     <a href="./prayer-times.html" class="maghrib-badge hidden sticky-right" id="stickyMaghribBadge" title="Voir les horaires de prière">
-      <span class="maghrib-badge-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg></span>
+      <span class="maghrib-badge-icon" aria-hidden="true"><svg class="maghrib-badge-icon-svg" width="16" height="16" viewBox="0 0 24 24" focusable="false"><use href="./svg/planning-icons.svg#moon-maghrib"/></svg></span>
       <span class="maghrib-badge-time"></span>
       <span class="maghrib-badge-hint">Horaires</span>
     </a>
@@ -2224,7 +2252,7 @@
   <div class="day-title-row">
     <h1 id="dayOfWeek"></h1>
     <a href="./prayer-times.html" class="maghrib-badge hidden" id="maghribBadge" title="Voir les horaires de prière">
-      <span class="maghrib-badge-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg></span>
+      <span class="maghrib-badge-icon" aria-hidden="true"><svg class="maghrib-badge-icon-svg" width="16" height="16" viewBox="0 0 24 24" focusable="false"><use href="./svg/planning-icons.svg#moon-maghrib"/></svg></span>
       <span class="maghrib-badge-time"></span>
       <span class="maghrib-badge-hint">Horaires</span>
     </a>
@@ -2725,7 +2753,7 @@
       if (h.open1 && h.close1) ranges.push(range(h.open1, h.close1));
       if (h.open2 && h.close2) ranges.push(range(h.open2, h.close2));
       if (!ranges.length) return '';
-      var inner = ranges.join('<span class="oh-sep-slot" aria-hidden="true"> · </span>');
+      var inner = ranges.join('<span class="oh-sep-slot" aria-hidden="true"></span>');
       return '<div class="oh-inner oh-inner--compact"><span class="oh-chip oh-chip--compact">' + inner + '</span></div>';
     }
     function displayClosedMessage(rv) {

@@ -765,20 +765,34 @@
       }
     }
 
-    (function initPlanningBackLink() {
+    (function initPlanningReturnLinks() {
       var back = document.getElementById('planningBackFromPrayer');
-      if (!back) return;
+      var todayA = document.querySelector('#todayViewButton a');
       try {
         var u = sessionStorage.getItem('planning_return_url');
-        if (u) back.setAttribute('href', u);
+        if (u) {
+          if (back) back.setAttribute('href', u);
+          if (todayA) todayA.setAttribute('href', u);
+        }
       } catch (e) {}
-      back.addEventListener('click', function() {
-        try {
-          if (sessionStorage.getItem('planning_return_url')) {
-            sessionStorage.setItem('planning_should_restore_scroll', '1');
-          }
-        } catch (e) {}
-      });
+      if (back) {
+        back.addEventListener('click', function() {
+          try {
+            if (sessionStorage.getItem('planning_return_url')) {
+              sessionStorage.setItem('planning_should_restore_scroll', '1');
+            }
+          } catch (e) {}
+        });
+      }
+      if (todayA) {
+        todayA.addEventListener('click', function() {
+          try {
+            if (sessionStorage.getItem('planning_return_url')) {
+              sessionStorage.setItem('planning_should_restore_scroll', '1');
+            }
+          } catch (e) {}
+        });
+      }
     })();
 
     // Charger les données au chargement de la page

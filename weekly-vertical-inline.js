@@ -205,7 +205,9 @@
           if (rv.periodName) msgInner += '<br><span>' + PR.escapeHtml(rv.periodName) + '</span>';
           msgInner += '</div>';
         } else {
-          msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>À déterminer</strong>';
+          msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>' +
+            '<span class="indetermine-title-line">Planning</span><br>' +
+            '<span class="indetermine-title-line">à&nbsp;déterminer</span></strong>';
           if (rv.periodName) msgInner += '<br><span class="weekly-msg-holiday">' + PR.escapeHtml(rv.periodName) + '</span>';
           msgInner += '<br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
         }
@@ -923,11 +925,13 @@
     }
 
     function goToWeekly() {
-      window.location.href = './weekly.html';
+      var q = weekMondayYmd ? ('?week=' + encodeURIComponent(weekMondayYmd)) : '';
+      window.location.href = './weekly.html' + q;
     }
 
     function goToWeeklyVertical() {
-      window.location.href = './weekly_vertical.html';
+      var q = weekMondayYmd ? ('?week=' + encodeURIComponent(weekMondayYmd)) : '';
+      window.location.href = './weekly_vertical.html' + q;
     }
 
     (function initRotationButtonTapAnimation() {
@@ -942,3 +946,12 @@
       el.addEventListener('pointerleave', removeTapActive);
       el.addEventListener('pointercancel', removeTapActive);
     })();
+
+    /** Avant d’ouvrir les horaires de prière : mémoriser la page courante pour le lien Retour. */
+    document.addEventListener('click', function(e) {
+      var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
+      if (!a) return;
+      try {
+        sessionStorage.setItem('planning_return_url', window.location.href);
+      } catch (err) {}
+    }, true);

@@ -152,8 +152,9 @@
     body.planning-ferie .studio-icon {
       filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
     }
+    /* Jour férié avec cours affichés : heures de début lisibles en blanc sur fond coloré */
     body.planning-ferie .course-time {
-      color: rgba(184, 134, 11, 0.85);
+      color: #fff;
     }
 
     .confetti-layer {
@@ -183,11 +184,11 @@
       }
     }
 
-    /* Bouton switch planning Ramadan — au-dessus du bouton today, mobile uniquement */
+    /* Horaires de prière : bord gauche, moitié basse (centrage vertical) */
     .ramadan-switch-button {
       position: fixed;
-      bottom: 150px;
-      right: 10px;
+      top: 75%;
+      left: max(10px, env(safe-area-inset-left, 0px));
       width: auto;
       height: auto;
       background: transparent;
@@ -198,17 +199,17 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      z-index: 1000;
+      z-index: 10040;
       overflow: visible;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: all;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translate(0, calc(-50% + 20px));
       padding: 0;
     }
     .ramadan-switch-button.loaded {
       opacity: 1;
-      transform: translateY(0);
+      transform: translate(0, -50%);
     }
     .ramadan-icon {
       width: 55px;
@@ -236,11 +237,11 @@
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     }
     .ramadan-switch-button:active {
-      transform: translateY(20px) scale(0.9);
+      transform: translate(0, calc(-50% + 20px)) scale(0.9);
       transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .ramadan-switch-button.loaded:active {
-      transform: translateY(0) scale(0.9);
+      transform: translate(0, -50%) scale(0.9);
     }
 
     /* Paillettes d'explosion au clic */
@@ -453,6 +454,7 @@
     }
 
     .maghrib-badge .maghrib-badge-icon svg,
+    .maghrib-badge .maghrib-badge-icon-svg,
     .maghrib-badge .maghrib-icon svg {
       width: 100%;
       height: 100%;
@@ -467,10 +469,6 @@
     }
 
     .maghrib-badge.hidden {
-      display: none !important;
-    }
-
-    body.puppeteer-view:not(.planning-ramadan) .maghrib-badge {
       display: none !important;
     }
 
@@ -1247,8 +1245,11 @@
         font-size: 0.65em;
       }
 
-      /* Puppeteer (viewport ≤768px) : mêmes dimensions qu’avant les changements mobile (dégradé, marge basse, rows 50 %) */
+      /* Puppeteer : aucun bouton flottant ni navigation */
       body.puppeteer-view .ramadan-switch-button { display: none !important; }
+      body.puppeteer-view .navigation { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+      body.puppeteer-view .today-view-button { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+      body.puppeteer-view .maghrib-badge { display: none !important; }
       body.puppeteer-view .header {
         background: var(--gradient-primary);
       }
@@ -1489,7 +1490,7 @@
       <div class="header-left">
         <span class="planning-type-label" id="planningTypeLabel"></span>
         <a href="./prayer-times.html" class="maghrib-badge hidden" id="maghribBadge" title="Voir les horaires de prière" aria-label="Horaires de prière Maghrib">
-          <span class="maghrib-badge-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg></span>
+          <span class="maghrib-badge-icon" aria-hidden="true"><svg class="maghrib-badge-icon-svg" width="16" height="16" viewBox="0 0 24 24" focusable="false"><use href="./svg/planning-icons.svg#moon-maghrib"/></svg></span>
           <span class="maghrib-badge-time"></span>
         </a>
       </div>
