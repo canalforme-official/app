@@ -368,6 +368,8 @@
       if (stickyContent) stickyContent.innerHTML = '';
       if (!thead || !stickyContent || !scheduleWrapper) {
         applyFilters();
+        markMultilineCourseNames();
+        refreshWeeklyFerieSparklesAfterLayout();
         return;
       }
       var colgroup = mainTable.querySelector('colgroup');
@@ -416,6 +418,7 @@
 
       applyFilters();
       markMultilineCourseNames();
+      refreshWeeklyFerieSparklesAfterLayout();
     }
 
     function initializeWeeklyPage() {
@@ -485,6 +488,7 @@
         })();
 
         markMultilineCourseNames();
+        refreshWeeklyFerieSparklesAfterLayout();
         renderPlanningViewSwitcher(data);
         updateNavButtonsStateWeek();
 
@@ -766,6 +770,247 @@
         els.forEach(function(el) {
           if (el.scrollHeight > lineHeightPx + 4) el.classList.add('multiline');
           else el.classList.remove('multiline');
+        });
+      });
+    }
+
+    var weeklyFerieSparkleResizeTimer = null;
+
+    /** Même palette et logique que daily.html (spawnConfettiBurst / .confetti-piece), chute ~ un tiers de la fenêtre. */
+    function buildWeeklyFerieSparkleParticlesHtml() {
+      var colors = ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047'];
+      var parts = '';
+      var p;
+      for (p = 0; p < 56; p++) {
+        var leftPct = 8 + Math.random() * 84;
+        var dur = (1.8 + Math.random() * 0.9).toFixed(2);
+        var delay = (Math.random() * 0.45).toFixed(2);
+        var drift = ((Math.random() - 0.5) * 220).toFixed(1);
+        var rot = (360 + Math.random() * 720).toFixed(0);
+        var bg = colors[p % colors.length];
+        parts += '<span class="weekly-ferie-confetti-piece" style="left:' + leftPct + '%;background:' + bg +
+          ';animation-duration:' + dur + 's;animation-delay:' + delay + 's;--dx:' + drift + 'px;--rot:' + rot + 'deg"></span>';
+      }
+      return parts;
+    }
+
+    /** Même ligne d’en-têtes que celle utilisée pour construire le tableau (sticky ou thead). */
+    function getWeeklyScheduleHeaderRow() {
+      var r = document.querySelector('.sticky-days-bar .weekly-schedule-header tr');
+      if (r) return r;
+      return document.querySelector('#weeklySchedule .weekly-schedule thead tr');
+    }
+
+    /**
+     * Calque dans .content-wrapper : même arbre que le planning sous body transform (rotation 90° mobile weekly).
+     */
+    function getWeeklyFerieSparkleMountParent() {
+      return document.querySelector('.content-wrapper') || document.body;
+    }
+
+    /** Clés d’en-tête pour lesquelles on affiche les confettis (férié ou fermeture). */
+    function isWeeklyFerieHeaderKey(pk) {
+      return pk === 'ferie' || pk === 'ferme';
+    }
+
+    /** Résout le <th> férié / fermé par data-ymd sur la ligne d’en-têtes (plus fiable que cellIndex seul). */
+    function ferieThForColumn(headerRow, ymd, cellIndexHint) {
+      if (!headerRow || !headerRow.cells || !ymd) return null;
+      var y = String(ymd).trim();
+      var k;
+      for (k = 0; k < headerRow.cells.length; k++) {
+        var cell = headerRow.cells[k];
+        if (!isWeeklyFerieHeaderKey(cell.getAttribute('data-planning-key'))) continue;
+        if (String(cell.getAttribute('data-ymd') || '').trim() === y) return cell;
+      }
+      if (typeof cellIndexHint === 'number' && !isNaN(cellIndexHint) && cellIndexHint >= 0 && headerRow.cells[cellIndexHint]) {
+        var hintCell = headerRow.cells[cellIndexHint];
+        if (isWeeklyFerieHeaderKey(hintCell.getAttribute('data-planning-key'))) return hintCell;
+      }
+      return null;
+    }
+
+    /**
+     * Position du bord haut-gauche de `el` par rapport à `ancestor`, via offsetParent
+     * (cohérent avec le repère CSS de position:absolute sous body transform / rotation 90° mobile).
+     */
+    function cumulativeOffsetToAncestor(el, ancestor) {
+      if (!el || !ancestor || !ancestor.contains(el)) return null;
+      var x = 0;
+      var y = 0;
+      var cur = el;
+      while (cur && cur !== ancestor) {
+        x += cur.offsetLeft;
+        y += cur.offsetTop;
+        cur = cur.offsetParent;
+      }
+      if (cur !== ancestor) return null;
+      return { x: x, y: y };
+    }
+
+    /** Défilement horizontal du planning (barre sticky synchronisée par transform). */
+    function getWeeklyScheduleScrollLeft() {
+      var w = document.getElementById('scheduleScrollWrapper');
+      return w ? w.scrollLeft : 0;
+    }
+
+    /** Première ligne du tbody avec le même nombre de colonnes que l’en-tête (sync largeurs / offset). */
+    function weeklyBodyRowMatchingHeader(headerRow) {
+      var tbody = document.querySelector('#weeklySchedule .weekly-schedule tbody');
+      if (!tbody || !headerRow || !headerRow.cells) return null;
+      var n = headerRow.cells.length;
+      var rows = tbody.rows;
+      var r;
+      for (r = 0; r < rows.length; r++) {
+        if (rows[r].cells && rows[r].cells.length === n) return rows[r];
+      }
+      return rows[0] || null;
+    }
+
+    function syncWeeklyFerieLayerBox(host, layer) {
+      if (!host || !layer) return;
+      var h = Math.max(host.scrollHeight, host.clientHeight, 1);
+      layer.style.minHeight = h + 'px';
+    }
+
+    function positionWeeklyFerieSparkles() {
+      var layer = document.querySelector('.weekly-ferie-sparkle-layer');
+      if (!layer) return;
+      var host = layer.parentElement;
+      if (!host) return;
+      var headerRow = getWeeklyScheduleHeaderRow();
+      if (!headerRow || !headerRow.cells || !headerRow.cells.length) return;
+      syncWeeklyFerieLayerBox(host, layer);
+      var hr = host.getBoundingClientRect();
+      var vhThird = (typeof window !== 'undefined' && window.innerHeight) ? Math.round(window.innerHeight * 0.34) : 260;
+      var scrollLeft = getWeeklyScheduleScrollLeft();
+      var cols = layer.querySelectorAll('.weekly-ferie-sparkle-column');
+      var i;
+      for (i = 0; i < cols.length; i++) {
+        var ymd = cols[i].getAttribute('data-ferie-ymd');
+        if (!ymd) continue;
+        var ci = parseInt(cols[i].getAttribute('data-ferie-cell-index'), 10);
+        var th = ferieThForColumn(headerRow, ymd, isNaN(ci) ? -1 : ci);
+        if (!th) {
+          cols[i].style.display = 'none';
+          continue;
+        }
+        cols[i].style.display = '';
+        var offTh = cumulativeOffsetToAncestor(th, host);
+        var offHoriz = offTh;
+        var colW = Math.max(8, th.offsetWidth);
+        if (!offHoriz) {
+          var syncRow = weeklyBodyRowMatchingHeader(headerRow);
+          var mirror = syncRow && syncRow.cells && syncRow.cells[th.cellIndex];
+          if (mirror) {
+            var om = cumulativeOffsetToAncestor(mirror, host);
+            if (om) {
+              offHoriz = om;
+              colW = Math.max(8, mirror.offsetWidth);
+            }
+          }
+        }
+        var top;
+        var left;
+        if (offHoriz) {
+          left = offHoriz.x - scrollLeft;
+          if (offTh) {
+            top = offTh.y + th.offsetHeight;
+          } else {
+            var trTop = th.getBoundingClientRect();
+            top = trTop.bottom - hr.top + host.scrollTop;
+          }
+        } else {
+          var tr = th.getBoundingClientRect();
+          top = tr.bottom - hr.top + host.scrollTop;
+          left = tr.left - hr.left + host.scrollLeft;
+          colW = Math.max(8, tr.width);
+        }
+        cols[i].style.position = 'absolute';
+        cols[i].style.top = top + 'px';
+        cols[i].style.left = left + 'px';
+        cols[i].style.width = colW + 'px';
+        cols[i].style.height = vhThird + 'px';
+        cols[i].style.zIndex = '1';
+      }
+    }
+
+    function removeWeeklyFerieSparkleLayers() {
+      var all = document.querySelectorAll('.weekly-ferie-sparkle-layer');
+      for (var a = 0; a < all.length; a++) {
+        all[a].remove();
+      }
+    }
+
+    function refreshWeeklyFerieSparkles() {
+      var scheduleEl = document.getElementById('weeklySchedule');
+      if (!scheduleEl) return;
+      removeWeeklyFerieSparkleLayers();
+
+      var ferieThSel = '.sticky-days-bar .weekly-schedule-header th[data-planning-key="ferie"], .sticky-days-bar .weekly-schedule-header th[data-planning-key="ferme"]';
+      var theadFerieSel = '#weeklySchedule .weekly-schedule thead th[data-planning-key="ferie"], #weeklySchedule .weekly-schedule thead th[data-planning-key="ferme"]';
+      var stickyHeaders = document.querySelectorAll(ferieThSel);
+      var theadHeaders = document.querySelectorAll(theadFerieSel);
+      var headers = stickyHeaders.length ? stickyHeaders : theadHeaders;
+      if (!headers.length) return;
+
+      var layer = document.createElement('div');
+      layer.className = 'weekly-ferie-sparkle-layer';
+      layer.setAttribute('aria-hidden', 'true');
+
+      var h;
+      for (h = 0; h < headers.length; h++) {
+        var thEl = headers[h];
+        var ymd = thEl.getAttribute('data-ymd');
+        if (!ymd) continue;
+        var cellIndex = typeof thEl.cellIndex === 'number' ? thEl.cellIndex : -1;
+        var col = document.createElement('div');
+        col.className = 'weekly-ferie-sparkle-column';
+        col.setAttribute('data-ferie-ymd', ymd);
+        col.setAttribute('data-ferie-cell-index', String(cellIndex));
+        col.innerHTML = buildWeeklyFerieSparkleParticlesHtml();
+        layer.appendChild(col);
+      }
+
+      if (!layer.children.length) return;
+
+      var mountParent = getWeeklyFerieSparkleMountParent();
+      layer.style.position = 'absolute';
+      layer.style.left = '0';
+      layer.style.top = '0';
+      layer.style.width = '100%';
+      layer.style.pointerEvents = 'none';
+      layer.style.zIndex = '850';
+      layer.style.overflow = 'visible';
+      mountParent.appendChild(layer);
+      positionWeeklyFerieSparkles();
+
+      if (!window._weeklyFerieSparkleListeners) {
+        window._weeklyFerieSparkleListeners = true;
+        function schedPos() {
+          requestAnimationFrame(positionWeeklyFerieSparkles);
+        }
+        var wrap = document.getElementById('scheduleScrollWrapper');
+        if (wrap) wrap.addEventListener('scroll', schedPos, { passive: true });
+        var cw = document.querySelector('.content-wrapper');
+        if (cw) cw.addEventListener('scroll', schedPos, { passive: true });
+        window.addEventListener('scroll', schedPos, { passive: true });
+        window.addEventListener('resize', function() {
+          if (weeklyFerieSparkleResizeTimer) clearTimeout(weeklyFerieSparkleResizeTimer);
+          weeklyFerieSparkleResizeTimer = setTimeout(function() {
+            weeklyFerieSparkleResizeTimer = null;
+            positionWeeklyFerieSparkles();
+          }, 120);
+        });
+      }
+    }
+
+    function refreshWeeklyFerieSparklesAfterLayout() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          refreshWeeklyFerieSparkles();
+          setTimeout(positionWeeklyFerieSparkles, 200);
+          setTimeout(positionWeeklyFerieSparkles, 550);
         });
       });
     }

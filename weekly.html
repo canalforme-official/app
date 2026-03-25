@@ -1422,6 +1422,69 @@
 
   #weeklySchedule {
     height: 100%;
+    position: relative;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .weekly-ferie-sparkle-layer {
+      display: none !important;
+    }
+  }
+
+  .weekly-ferie-sparkle-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 850;
+    overflow: visible;
+  }
+
+  .weekly-ferie-sparkle-column {
+    position: absolute;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 58%,
+      rgba(0, 0, 0, 0.55) 78%,
+      transparent 96%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 58%,
+      rgba(0, 0, 0, 0.55) 78%,
+      transparent 96%
+    );
+  }
+
+  @keyframes weekly-ferie-confetti-fall {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    72% {
+      opacity: 0.88;
+    }
+    100% {
+      transform: translate3d(var(--dx, 0px), 33vh, 0) rotate(var(--rot, 720deg));
+      opacity: 0;
+    }
+  }
+
+  .weekly-ferie-confetti-piece {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    top: -10px;
+    border-radius: 1px;
+    opacity: 0.92;
+    animation: weekly-ferie-confetti-fall 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+    will-change: transform, opacity;
   }
 
   /* Styles spécifiques pour les appareils mobiles avec rotation */
@@ -1459,6 +1522,7 @@
     #weeklySchedule {
       width: 100%;
       height: auto;
+      position: relative;
       transform: none !important;
       touch-action: pan-y;
     }
