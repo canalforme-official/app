@@ -139,8 +139,16 @@
       background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
       background-repeat: repeat;
       background-size: 128px 128px;
-      opacity: 0.035;
-      filter: sepia(1) hue-rotate(5deg) saturate(2.2) brightness(1.05);
+      opacity: 0.09;
+      filter: sepia(1) hue-rotate(5deg) saturate(2.2) brightness(0.82) contrast(1.08);
+    }
+    body.planning-ferie::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-color: rgba(146, 106, 8, 0.1);
     }
     body.planning-ferie .content-wrapper {
       position: relative;
@@ -489,12 +497,16 @@
       justify-content: center;
       align-items: center;
       min-height: 0;
+      width: 100%;
       padding: 24px 16px 32px;
       box-sizing: border-box;
     }
     .indetermine-card {
-      max-width: 440px;
+      box-sizing: border-box;
       width: 100%;
+      max-width: min(66.67vw, 100%);
+      margin-left: auto;
+      margin-right: auto;
       text-align: center;
       background: var(--background-card);
       border-radius: 18px;
@@ -546,12 +558,16 @@
       justify-content: center;
       align-items: center;
       min-height: 0;
+      width: 100%;
       padding: 24px 16px 32px;
       box-sizing: border-box;
     }
     .closed-card {
-      max-width: 440px;
+      box-sizing: border-box;
       width: 100%;
+      max-width: min(66.67vw, 100%);
+      margin-left: auto;
+      margin-right: auto;
       text-align: center;
       background: var(--background-card);
       border-radius: 18px;
@@ -624,10 +640,16 @@
     .studios-container .timeline-message--indetermine {
       min-height: 0;
       flex: 0 0 auto;
+      align-self: center;
     }
     
     .no-courses-container {
       overflow: visible;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: min(66.67vw, 100%);
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .studios-row {
@@ -1490,7 +1512,11 @@
       <div class="header-left">
         <span class="planning-type-label" id="planningTypeLabel"></span>
         <a href="./prayer-times.html" class="maghrib-badge hidden" id="maghribBadge" title="Voir les horaires de prière" aria-label="Horaires de prière Maghrib">
-          <span class="maghrib-badge-icon" aria-hidden="true"><svg class="maghrib-badge-icon-svg" width="16" height="16" viewBox="0 0 24 24" focusable="false"><use href="./svg/planning-icons.svg#moon-maghrib"/></svg></span>
+          <span class="maghrib-badge-icon" aria-hidden="true">
+            <svg class="maghrib-badge-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+              <path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+            </svg>
+          </span>
           <span class="maghrib-badge-time"></span>
         </a>
       </div>
@@ -2087,6 +2113,8 @@
       var todayStr = ymdFromDate(new Date());
       var displayedStr = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : todayStr;
       var isViewingToday = (todayStr === displayedStr);
+      var isPastDay = displayedStr < todayStr;
+      var isFutureDay = displayedStr > todayStr;
       var now = new Date();
       var currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
       var cards = document.querySelectorAll('#studiosContainer .course-card');
@@ -2104,6 +2132,19 @@
         }
         var endSeconds = endMinutes * 60;
         var diffSeconds = startSeconds - currentSeconds;
+        if (isPastDay) {
+          card.classList.add('past');
+          card.classList.remove('starting-soon', 'current');
+          var pillP = card.querySelector('.countdown-pill');
+          if (pillP) pillP.remove();
+          return;
+        }
+        if (isFutureDay) {
+          card.classList.remove('past', 'starting-soon', 'current');
+          var pillF = card.querySelector('.countdown-pill');
+          if (pillF) pillF.remove();
+          return;
+        }
         var isStartingSoon = isViewingToday && diffSeconds > 0 && diffSeconds <= 15 * 60;
         var isInProgress = isViewingToday && diffSeconds <= 0 && currentSeconds < endSeconds;
         var isPast = isViewingToday && currentSeconds >= endSeconds;
@@ -2136,12 +2177,24 @@
       });
     }
 
+    function planningUrlsMatchForRestore(currentHref, savedHref) {
+      try {
+        var a = new URL(currentHref, window.location.origin || undefined);
+        var b = new URL(savedHref, window.location.origin || undefined);
+        if (a.pathname !== b.pathname) return false;
+        var da = a.searchParams.get('date') || '';
+        var db = b.searchParams.get('date') || '';
+        return da === db;
+      } catch (e) {
+        return currentHref.split('#')[0] === (savedHref || '').split('#')[0];
+      }
+    }
     /** Après retour depuis prayer-times.html : restaurer la position de scroll. */
     function maybeRestoreScrollAfterPrayer() {
       try {
         if (sessionStorage.getItem('planning_should_restore_scroll') !== '1') return;
         var savedUrl = sessionStorage.getItem('planning_return_url') || '';
-        if (savedUrl && window.location.href.split('#')[0] !== savedUrl.split('#')[0]) return;
+        if (savedUrl && !planningUrlsMatchForRestore(window.location.href.split('#')[0], savedUrl.split('#')[0])) return;
         var y = sessionStorage.getItem('planning_return_scroll');
         sessionStorage.removeItem('planning_should_restore_scroll');
         sessionStorage.removeItem('planning_return_url');
@@ -2373,6 +2426,11 @@
 
         await loadPrayerTimes();
         if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
+        try {
+          var paramsDg = new URLSearchParams(window.location.search);
+          var dpDg = paramsDg.get('date');
+          if (dpDg && /^\d{4}-\d{2}-\d{2}$/.test(dpDg)) selectedDateYmd = clampNavYmd(dpDg);
+        } catch (eDg) {}
         displayGridSchedule();
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
@@ -2439,9 +2497,19 @@
       var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
       if (!a || !a.getAttribute('href')) return;
       try {
-        sessionStorage.setItem('planning_return_url', window.location.href);
+        var ymdDg = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+        var retDg = new URL(window.location.href);
+        retDg.searchParams.set('date', ymdDg);
+        sessionStorage.setItem('planning_return_url', retDg.toString());
         sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
-      } catch (err) {}
+      } catch (err) {
+        try {
+          var ymdD2 = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+          var pageDg = (window.location.pathname && window.location.pathname.replace(/^.*\//, '')) || 'daily_grid.html';
+          sessionStorage.setItem('planning_return_url', pageDg + '?date=' + encodeURIComponent(ymdD2));
+          sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
+        } catch (e2) {}
+      }
     }, true);
   </script>
 </body>

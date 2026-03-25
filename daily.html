@@ -143,8 +143,8 @@
       background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
       background-repeat: repeat;
       background-size: 128px 128px;
-      opacity: 0.035;
-      filter: sepia(1) hue-rotate(5deg) saturate(2.2) brightness(1.05);
+      opacity: 0.09;
+      filter: sepia(1) hue-rotate(5deg) saturate(2.2) brightness(0.82) contrast(1.08);
     }
     body.planning-ferie > #dayOfWeek,
     body.planning-ferie > #timeline {
@@ -201,13 +201,22 @@
       pointer-events: none;
     }
 
-    body::after {
+    /* Voile bordeaux : pas en jour férié (sinon le motif ambre disparaît). */
+    body:not(.planning-ferie)::after {
       content: '';
       position: fixed;
       inset: 0;
       background-color: rgba(72, 6, 7, 0.08);
       z-index: 0;
       pointer-events: none;
+    }
+    body.planning-ferie::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-color: rgba(146, 106, 8, 0.1);
     }
 
     /* Images non sélectionnables */
@@ -391,11 +400,37 @@
       user-select: none;
     }
     /* Ramadan : coucher de soleil (meme graphe que svg/planning-icons.svg#sunset-ramadan ; data URI = fiable en background) */
+    /* Ramadan : heure Maghrib en tout petit au-dessus de l’icône coucher (sans augmenter la hauteur de ligne). */
+    body.planning-ramadan .opening-hours-bar .oh-sep-slot-stack {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 4px;
+      vertical-align: middle;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    body.planning-ramadan .opening-hours-bar .oh-maghrib-time {
+      font-family: var(--font-title);
+      font-size: 0.52em;
+      font-weight: 600;
+      color: rgba(38, 70, 45, 0.88);
+      margin-bottom: 0;
+      padding-bottom: 1px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    body.planning-ramadan .opening-hours-bar .oh-sep-slot-stack .oh-sep-slot {
+      margin: 0;
+    }
     body.planning-ramadan .opening-hours-bar .oh-sep-slot {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       margin: 0 6px;
       border-radius: 0;
+      flex-shrink: 0;
       background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2326462d%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2018C8%2015.7909%209.79086%2014%2012%2014C14.2091%2014%2016%2015.7909%2016%2018%22%2F%3E%3Cline%20x1%3D%2221%22%20y1%3D%2221%22%20x2%3D%223%22%20y2%3D%2221%22%2F%3E%3Cline%20x1%3D%2212%22%20y1%3D%2211%22%20x2%3D%2212%22%20y2%3D%229%22%2F%3E%3Cpath%20d%3D%22M12%2011L12%203%22%2F%3E%3Cpath%20d%3D%22M12%2011L15%208.5%22%2F%3E%3Cpath%20d%3D%22M12%2011L9%208.5%22%2F%3E%3Cline%20x1%3D%225%22%20y1%3D%2218%22%20x2%3D%223%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%2221%22%20y1%3D%2218%22%20x2%3D%2219%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%2219.071%22%20y1%3D%2211.3432%22%20x2%3D%2217.6568%22%20y2%3D%2212.7574%22%2F%3E%3Cline%20x1%3D%225.41421%22%20y1%3D%2212%22%20x2%3D%226.82843%22%20y2%3D%2213.4142%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") center / contain no-repeat;
     }
     body.planning-ferie:not(.planning-ramadan) .opening-hours-bar .oh-sep-slot {
@@ -453,12 +488,16 @@
       justify-content: center;
       align-items: center;
       min-height: 0;
+      width: 100%;
       padding: 32px 20px 48px;
       box-sizing: border-box;
     }
     .indetermine-card {
-      max-width: 440px;
+      box-sizing: border-box;
       width: 100%;
+      max-width: min(66.67vw, 100%);
+      margin-left: auto;
+      margin-right: auto;
       text-align: center;
       background: var(--background-card);
       border-radius: 18px;
@@ -517,12 +556,16 @@
       justify-content: center;
       align-items: center;
       min-height: 0;
+      width: 100%;
       padding: 32px 20px 48px;
       box-sizing: border-box;
     }
     .closed-card {
-      max-width: 440px;
+      box-sizing: border-box;
       width: 100%;
+      max-width: min(66.67vw, 100%);
+      margin-left: auto;
+      margin-right: auto;
       text-align: center;
       background: var(--background-card);
       border-radius: 18px;
@@ -664,6 +707,16 @@
     /* Correction de la transparence pour le point des cours passés */
     .timeline-block.past::before {
       opacity: 0.5;
+    }
+    .timeline-block.past .time {
+      color: var(--state-past);
+      opacity: 0.85;
+    }
+    body.planning-ramadan .timeline-block.past .time {
+      color: rgba(38, 70, 45, 0.45);
+    }
+    body.planning-ferie .timeline-block.past .time {
+      color: rgba(184, 134, 11, 0.5);
     }
 
     /* Les cours à venir et sur le point de démarrer gardent le point par défaut */
@@ -2605,6 +2658,11 @@
         localStorage.setItem('lastUpdate', new Date().toISOString());
 
         selectedDateYmd = ymdFromDate(new Date());
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var dp = params.get('date');
+          if (dp && /^\d{4}-\d{2}-\d{2}$/.test(dp)) selectedDateYmd = clampNavYmd(dp);
+        } catch (e) {}
         displaySchedule();
         hideLoadingOverlay();
         
@@ -2619,6 +2677,11 @@
           initPlanningView(allData);
           renderPlanningViewSwitcher(allData);
           selectedDateYmd = ymdFromDate(new Date());
+          try {
+            var params2 = new URLSearchParams(window.location.search);
+            var dp2 = params2.get('date');
+            if (dp2 && /^\d{4}-\d{2}-\d{2}$/.test(dp2)) selectedDateYmd = clampNavYmd(dp2);
+          } catch (e2) {}
           displaySchedule();
           hideLoadingOverlay();
           await loadPrayerTimes();
@@ -2681,45 +2744,33 @@
       }
     }
 
-    /**
-     * Met à jour l'affichage du badge Maghrib avec l'heure du jour actuel
-     */
+    /** Badge Maghrib retiré en vue Ramadan : l’heure est dans la barre d’ouverture (icône coucher). */
     function updateMaghribBadge() {
-      const badge = document.getElementById('maghribBadge');
-      const stickyBadge = document.getElementById('stickyMaghribBadge');
-      if (!allData || !allData.planning) {
-        if (badge) badge.classList.add('hidden');
-        if (stickyBadge) stickyBadge.classList.add('hidden');
-        return;
-      }
+      var badge = document.getElementById('maghribBadge');
+      var stickyBadge = document.getElementById('stickyMaghribBadge');
+      if (badge) badge.classList.add('hidden');
+      if (stickyBadge) stickyBadge.classList.add('hidden');
+      if (!allData || !allData.planning) return;
       var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
-      var rv = resolveDailyView(ymd, allData);
-      if (!rv || rv.planningKey !== 'ramadan') {
-        if (badge) badge.classList.add('hidden');
-        if (stickyBadge) stickyBadge.classList.add('hidden');
+      renderOpeningHoursBar(resolveDailyView(ymd, allData));
+    }
+
+    function renderOpeningHoursBar(rv) {
+      var ohBar = document.getElementById('openingHoursBar');
+      if (!ohBar) return;
+      if (!rv || rv.closed || !allData.metadata || !allData.metadata.horaires) {
+        ohBar.innerHTML = '';
         return;
       }
-      if (!window.prayerTimesData || !window.prayerTimesData.prayerTimes) {
-        if (badge) badge.classList.add('hidden');
-        if (stickyBadge) stickyBadge.classList.add('hidden');
-        return;
+      var hk = allData.metadata.horaires[rv.planningKey];
+      var maghribForBar = '';
+      if (rv.planningKey === 'ramadan' && window.prayerTimesData && window.prayerTimesData.prayerTimes) {
+        var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+        var pt = window.prayerTimesData.prayerTimes[ymd];
+        if (pt && pt.maghrib) maghribForBar = pt.maghrib;
       }
-      var prayerTimes = window.prayerTimesData.prayerTimes;
-      /* Clé locale yyyy-MM-dd (pas UTC) pour correspondre au JSON. */
-      var dayPrayer = prayerTimes[ymd];
-      if (dayPrayer && dayPrayer.maghrib) {
-        const setBadgeContent = function(el) {
-          if (!el) return;
-          var timeEl = el.querySelector('.maghrib-badge-time');
-          if (timeEl) timeEl.textContent = dayPrayer.maghrib;
-          el.classList.remove('hidden');
-        };
-        setBadgeContent(badge);
-        setBadgeContent(stickyBadge);
-      } else {
-        if (badge) badge.classList.add('hidden');
-        if (stickyBadge) stickyBadge.classList.add('hidden');
-      }
+      var line = formatOpeningHoursCompactHtml(hk, maghribForBar);
+      ohBar.innerHTML = line || '';
     }
 
     function escapeHtml(text) {
@@ -2743,7 +2794,7 @@
       return parts.length ? '<div class="oh-inner">' + parts.join('') + '</div>' : '';
     }
     /** Horaires sans libellés, une seule cellule : plage1 · plage2 */
-    function formatOpeningHoursCompactHtml(h) {
+    function formatOpeningHoursCompactHtml(h, maghribTime) {
       if (!h) return '';
       var esc = escapeHtml;
       function range(openT, closeT) {
@@ -2753,7 +2804,11 @@
       if (h.open1 && h.close1) ranges.push(range(h.open1, h.close1));
       if (h.open2 && h.close2) ranges.push(range(h.open2, h.close2));
       if (!ranges.length) return '';
-      var inner = ranges.join('<span class="oh-sep-slot" aria-hidden="true"></span>');
+      var sep = '<span class="oh-sep-slot" aria-hidden="true"></span>';
+      if (maghribTime && String(maghribTime).trim()) {
+        sep = '<span class="oh-sep-slot-stack" aria-hidden="true"><span class="oh-maghrib-time">' + esc(String(maghribTime).trim()) + '</span><span class="oh-sep-slot"></span></span>';
+      }
+      var inner = ranges.join(sep);
       return '<div class="oh-inner oh-inner--compact"><span class="oh-chip oh-chip--compact">' + inner + '</span></div>';
     }
     function displayClosedMessage(rv) {
@@ -2837,11 +2892,23 @@
       if (nextBtn) nextBtn.disabled = selectedDateYmd >= max;
     }
 
+    function planningUrlsMatchForRestore(currentHref, savedHref) {
+      try {
+        var a = new URL(currentHref, window.location.origin || undefined);
+        var b = new URL(savedHref, window.location.origin || undefined);
+        if (a.pathname !== b.pathname) return false;
+        var da = a.searchParams.get('date') || '';
+        var db = b.searchParams.get('date') || '';
+        return da === db;
+      } catch (e) {
+        return currentHref.split('#')[0] === (savedHref || '').split('#')[0];
+      }
+    }
     function maybeRestoreScrollAfterPrayer() {
       try {
         if (sessionStorage.getItem('planning_should_restore_scroll') !== '1') return;
         var savedUrl = sessionStorage.getItem('planning_return_url') || '';
-        if (savedUrl && window.location.href.split('#')[0] !== savedUrl.split('#')[0]) return;
+        if (savedUrl && !planningUrlsMatchForRestore(window.location.href.split('#')[0], savedUrl.split('#')[0])) return;
         var y = sessionStorage.getItem('planning_return_scroll');
         sessionStorage.removeItem('planning_should_restore_scroll');
         sessionStorage.removeItem('planning_return_url');
@@ -2893,17 +2960,6 @@
       document.body.classList.toggle('planning-ramadan', rv.planningKey === 'ramadan');
       document.body.classList.toggle('planning-ferie', rv.planningKey === 'ferie' || rv.planningKey === 'ferme');
       updatePlanningTypeLabelFromView(rv);
-
-      var ohBar = document.getElementById('openingHoursBar');
-      if (ohBar) {
-        if (rv.closed || !allData.metadata || !allData.metadata.horaires) {
-          ohBar.innerHTML = '';
-        } else {
-          var hk = allData.metadata.horaires[rv.planningKey];
-          var line = formatOpeningHoursCompactHtml(hk);
-          ohBar.innerHTML = line || '';
-        }
-      }
 
       updateMaghribBadge();
       if (rv.planningKey === 'ramadan' && (!window.prayerTimesData || !window.prayerTimesData.prayerTimes)) {
@@ -2971,14 +3027,19 @@
         }
 
         var courseStatusClass = '';
-        var now = new Date();
-        var currentTime = now.getHours() * 60 + now.getMinutes();
+        var todayYmd = ymdFromDate(new Date());
         var startParts = course.startTime.split(':').map(Number);
         var endParts = course.endTime.split(':').map(Number);
         var courseStartTime = startParts[0] * 60 + startParts[1];
         var courseEndTime = endParts[0] * 60 + endParts[1];
 
-        if (isSelectedDateToday()) {
+        if (selectedDateYmd < todayYmd) {
+          courseStatusClass = 'past';
+        } else if (selectedDateYmd > todayYmd) {
+          courseStatusClass = 'upcoming';
+        } else {
+          var now = new Date();
+          var currentTime = now.getHours() * 60 + now.getMinutes();
           if (currentTime >= courseStartTime && currentTime <= courseEndTime) {
             courseStatusClass = 'current focus';
           } else if (currentTime < courseStartTime && courseStartTime - currentTime <= 15) {
@@ -2988,8 +3049,6 @@
           } else {
             courseStatusClass = 'past';
           }
-        } else {
-          courseStatusClass = 'upcoming';
         }
 
         var defaultCoachImg = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
@@ -3355,13 +3414,34 @@
       });
     });
 
+    /* Daily → grille : conserver le jour affiché (seulement ce sens ; retour grille → daily sans ?date). */
+    document.addEventListener('click', function(e) {
+      var gridLink = e.target.closest && e.target.closest('.daily-grid-view-button a');
+      if (!gridLink || !gridLink.getAttribute('href')) return;
+      try {
+        var ymdGrid = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+        e.preventDefault();
+        window.location.href = './daily_grid.html?date=' + encodeURIComponent(ymdGrid);
+      } catch (err) {}
+    }, true);
+
     document.addEventListener('click', function(e) {
       var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
       if (!a || !a.getAttribute('href')) return;
       try {
-        sessionStorage.setItem('planning_return_url', window.location.href);
+        var ymdRet = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+        var ret = new URL(window.location.href);
+        ret.searchParams.set('date', ymdRet);
+        sessionStorage.setItem('planning_return_url', ret.toString());
         sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
-      } catch (err) {}
+      } catch (err) {
+        try {
+          var ymdR2 = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+          var page = (window.location.pathname && window.location.pathname.replace(/^.*\//, '')) || 'daily.html';
+          sessionStorage.setItem('planning_return_url', page + '?date=' + encodeURIComponent(ymdR2));
+          sessionStorage.setItem('planning_return_scroll', String(window.scrollY || window.pageYOffset || 0));
+        } catch (e2) {}
+      }
     }, true);
 
   </script>
