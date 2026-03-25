@@ -2723,6 +2723,29 @@
       renderOpeningHoursBar(resolveDailyView(ymd, allData));
     }
 
+    /** Aligné sur PlanningResolve.pickOpeningHoursForDay (metadata.horaires avec byDay ou plat). */
+    function pickOpeningHoursForDay(horairesMeta, planningKey, dayNameFrLower) {
+      if (!horairesMeta || !planningKey) return null;
+      var block = horairesMeta[planningKey];
+      if (!block || typeof block !== 'object') return null;
+      var day = dayNameFrLower ? String(dayNameFrLower).trim().toLowerCase() : '';
+      if (block.byDay && day && block.byDay[day]) {
+        var slot = block.byDay[day];
+        if (slot && typeof slot === 'object') return slot;
+      }
+      if (block.open1 || block.close1 || block.open2 || block.close2) {
+        return {
+          open1Label: block.open1Label,
+          open1: block.open1,
+          close1: block.close1,
+          open2Label: block.open2Label,
+          open2: block.open2,
+          close2: block.close2
+        };
+      }
+      return null;
+    }
+
     function renderOpeningHoursBar(rv) {
       var ohBar = document.getElementById('openingHoursBar');
       if (!ohBar) return;
@@ -2730,7 +2753,7 @@
         ohBar.innerHTML = '';
         return;
       }
-      var hk = allData.metadata.horaires[rv.planningKey];
+      var hk = pickOpeningHoursForDay(allData.metadata.horaires, rv.planningKey, rv.dayName);
       var maghribForBar = '';
       if (rv.planningKey === 'ramadan' && window.prayerTimesData && window.prayerTimesData.prayerTimes) {
         var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());

@@ -188,6 +188,35 @@
     return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
   }
 
+  /**
+   * Bloc créneaux pour un mode planning et un jour (fr minuscule : lundi … dimanche).
+   * @param {Object|null} horairesMeta metadata.horaires
+   * @param {string} planningKey regulier | ramadan | ferie
+   * @param {string} dayNameFrLower ex. depuis resolveDailyView().dayName
+   * @returns {Object|null} { open1Label, open1, close1, open2Label, open2, close2 }
+   */
+  function pickOpeningHoursForDay(horairesMeta, planningKey, dayNameFrLower) {
+    if (!horairesMeta || !planningKey) return null;
+    var block = horairesMeta[planningKey];
+    if (!block || typeof block !== 'object') return null;
+    var day = dayNameFrLower ? String(dayNameFrLower).trim().toLowerCase() : '';
+    if (block.byDay && day && block.byDay[day]) {
+      var slot = block.byDay[day];
+      if (slot && typeof slot === 'object') return slot;
+    }
+    if (block.open1 || block.close1 || block.open2 || block.close2) {
+      return {
+        open1Label: block.open1Label,
+        open1: block.open1,
+        close1: block.close1,
+        open2Label: block.open2Label,
+        open2: block.open2,
+        close2: block.close2
+      };
+    }
+    return null;
+  }
+
   function escapeHtml(text) {
     var div = document.createElement('div');
     div.textContent = text == null ? '' : String(text);
@@ -230,6 +259,7 @@
     getEffectivePeriodForDate: getEffectivePeriodForDate,
     isWeekdayListedInBasePlannings: isWeekdayListedInBasePlannings,
     resolveDailyView: resolveDailyView,
+    pickOpeningHoursForDay: pickOpeningHoursForDay,
     escapeHtml: escapeHtml,
     useCaricatureCoachPhotos: useCaricatureCoachPhotos,
     coachPhotoUrl: coachPhotoUrl
