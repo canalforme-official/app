@@ -3144,7 +3144,11 @@
         }, 300);
       }
       displaySchedule();
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      /* Ne pas forcer le haut de page quand on arrive sur aujourd’hui : displaySchedule()
+         fait déjà défiler vers le cours en cours / prochain (comme returnToToday). */
+      if (!isSelectedDateToday()) {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      }
     }
 
     function areAllCoursesInThePast(courses) {
