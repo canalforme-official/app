@@ -1538,7 +1538,25 @@
     </div>
   </div>
 
+  <script src="./planning-resolve.js"></script>
   <script>
+
+    const DEFAULT_COACH_PHOTO_LEADERBOARD = 'default-coach-photo.png';
+
+    /** Photo coach leaderboard : caricature 1er–7 avril (date locale), aligné sur PlanningResolve.coachPhotoUrl. */
+    function leaderboardCoachPhotoSrc(user) {
+      if (!user || user.type !== 'Coach') return '';
+      var coachObj = {
+        imageUrl: user.coachLink || '',
+        pngCaricature: (user.pngCaricature && String(user.pngCaricature).trim()) || ''
+      };
+      var url = '';
+      if (typeof PlanningResolve !== 'undefined' && PlanningResolve.coachPhotoUrl) {
+        url = PlanningResolve.coachPhotoUrl(coachObj) || '';
+      }
+      if (!url) url = user.coachLink || '';
+      return url || DEFAULT_COACH_PHOTO_LEADERBOARD;
+    }
 
     /* Overlay de chargement au démarrage : true = activé, false = désactivé (par défaut) */
     const SHOW_LOADING_OVERLAY = false;
@@ -2165,10 +2183,10 @@
         }
 
         // Ajoute la photo du coach si l'utilisateur est un coach
-        if (user.type === 'Coach' && user.coachLink) {
+        if (user.type === 'Coach') {
           const coachPhoto = document.createElement('img');
           coachPhoto.classList.add('coach-podium-photo');
-          coachPhoto.src = user.coachLink;
+          coachPhoto.src = leaderboardCoachPhotoSrc(user);
           coachPhoto.alt = `Photo du coach ${user.nickname}`;
           stepDiv.appendChild(coachPhoto);
         }
@@ -2273,6 +2291,7 @@
         const rankChangeSvg = getRankChangeSvg(rankChange);
         const zoneBarHtml = getZoneBarHtml(user);
 
+        var coachPhotoUrlRow = user.type === 'Coach' ? leaderboardCoachPhotoSrc(user) : '';
         tableHtml += `
             <div class="leaderboard-row">
                 <span class="rank-cell">
@@ -2281,7 +2300,7 @@
                 </span>
 
                 <!-- Photo du coach si le type est Coach -->
-                ${user.type === 'Coach' ? `<img class="coach-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo de ${user.nickname}" />` : ''}
+                ${user.type === 'Coach' ? `<img class="coach-photo" src="${coachPhotoUrlRow}" alt="Photo de ${user.nickname}" />` : ''}
                 
                 <span class="nickname">${user.nickname}</span>
                 <span class="leaderboard-meps">
@@ -2295,7 +2314,7 @@
 
                 <!-- Ajout de la photo du coach sur le podium -->
                 ${isPodium && user.type === 'Coach' ? `
-                    <img class="coach-podium-photo" src="${user.coachLink || 'default-coach-photo.png'}" alt="Photo podium de ${user.nickname}" />
+                    <img class="coach-podium-photo" src="${coachPhotoUrlRow}" alt="Photo podium de ${user.nickname}" />
                 ` : ''}
             </div>`;
       });

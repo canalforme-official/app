@@ -933,7 +933,28 @@
         <!-- Les tableaux seront générés dynamiquement ici -->
     </div>
 
+    <script src="./planning-resolve.js"></script>
     <script>
+        const DEFAULT_COACH_PHOTO_STATUS = '';
+
+        /** Avatar coach / membre avec photo : caricature 1er–7 avril si pngCaricature (JSON leaderboard). */
+        function leaderboardCoachPhotoSrc(user) {
+            if (!user) return '';
+            var hasImg = user.coachLink && String(user.coachLink).trim();
+            var hasCaricature = user.pngCaricature && String(user.pngCaricature).trim();
+            if (!hasImg && !hasCaricature) return '';
+            var coachObj = {
+                imageUrl: user.coachLink || '',
+                pngCaricature: hasCaricature || ''
+            };
+            var url = '';
+            if (typeof PlanningResolve !== 'undefined' && PlanningResolve.coachPhotoUrl) {
+                url = PlanningResolve.coachPhotoUrl(coachObj) || '';
+            }
+            if (!url) url = user.coachLink || '';
+            return url || DEFAULT_COACH_PHOTO_STATUS;
+        }
+
         let medalAnimationInterval = null;
         let medalUrls = [];
 
@@ -1099,11 +1120,12 @@
                             newRow.style.animationDelay = `${index * 0.05}s`;
                             newRow.setAttribute('data-position', user.position);
                             
+                            var coachImgSrcMore = leaderboardCoachPhotoSrc(user);
                             newRow.innerHTML = `
                                 <td style="font-weight: bold;">${user.position}</td>
                                 <td style="padding-left: 15px;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                        ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
+                                        ${coachImgSrcMore ? `<img src="${coachImgSrcMore}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
                                         ${user.nickname}
                                     </div>
                                 </td>
