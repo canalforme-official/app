@@ -209,6 +209,10 @@
       opacity: 0;
       transform: translate(0, calc(-50% + 20px));
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
     }
     .ramadan-switch-button.loaded {
       opacity: 1;
@@ -223,6 +227,8 @@
       position: relative;
       display: block;
       animation: float-icon 3s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: none;
     }
     
     @keyframes float-icon {

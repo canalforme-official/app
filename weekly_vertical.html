@@ -96,6 +96,8 @@
     a.ramadan-switch-button {
       text-decoration: none;
       color: inherit;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
     }
     .ramadan-switch-button {
       position: fixed;
@@ -118,6 +120,10 @@
       pointer-events: all;
       opacity: 0;
       transform: translate(0, calc(-50% + 20px));
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
     }
     .ramadan-switch-button.loaded {
       opacity: 1;
@@ -132,6 +138,8 @@
       position: relative;
       display: block;
       animation: float-icon 3s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: none;
     }
     
     @keyframes float-icon {

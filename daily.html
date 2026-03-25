@@ -1168,6 +1168,10 @@
       opacity: 0;
       transform: translate(0, calc(-50% + 20px));
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      outline: none;
     }
 
     .ramadan-switch-button.loaded {
@@ -1184,6 +1188,8 @@
       position: relative;
       display: block;
       animation: float-icon 3s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: none;
     }
     
     @keyframes float-icon {
@@ -1211,36 +1217,6 @@
     }
     .ramadan-switch-button.loaded:active {
       transform: translate(0, -50%) scale(0.9);
-    }
-
-    .ramadan-switch-button:active::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(72, 6, 7, 0.3);
-      transform: translate(-50%, -50%);
-      animation: ripple-click 0.6s ease-out;
-    }
-
-    body.planning-ramadan .ramadan-switch-button:active::after {
-      background: rgba(38, 70, 45, 0.4);
-    }
-
-    @keyframes ripple-click {
-      0% {
-        width: 0;
-        height: 0;
-        opacity: 1;
-      }
-      100% {
-        width: 100px;
-        height: 100px;
-        opacity: 0;
-      }
     }
 
     /* Masquer l'ancien bouton en haut */
