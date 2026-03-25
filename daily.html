@@ -473,12 +473,6 @@
       font-size: 1.15em;
     }
 
-    .timeline.no-courses .timeline-message--indetermine {
-      width: 100%;
-      max-width: none;
-      margin-left: 0;
-      padding-left: 0;
-    }
     .timeline-message--indetermine {
       display: flex;
       justify-content: center;
@@ -541,12 +535,6 @@
       color: #b45309;
     }
 
-    .timeline.no-courses .timeline-message--closed {
-      width: 100%;
-      max-width: none;
-      margin-left: 0;
-      padding-left: 0;
-    }
     .timeline-message--closed {
       display: flex;
       justify-content: center;
@@ -641,6 +629,10 @@
       min-height: 0;
       flex: 0 0 auto;
       width: 100%;
+      max-width: min(66.67vw, 520px);
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
     }
 
     .timeline-block {
@@ -1362,6 +1354,10 @@
 
       .timeline {
         padding-left: 35px;
+      }
+
+      .timeline.no-courses {
+        padding-left: 0 !important;
       }
 
       .timeline.has-courses {

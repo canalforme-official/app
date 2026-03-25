@@ -633,6 +633,7 @@
     .studios-container:has(.timeline-message--closed),
     .studios-container:has(.timeline-message--indetermine) {
       justify-content: center;
+      align-items: center;
       min-height: calc(100vh - 130px);
       overflow: visible;
     }
@@ -642,6 +643,11 @@
       min-height: 0;
       flex: 0 0 auto;
       align-self: center;
+      width: 100%;
+      max-width: min(66.67vw, 520px);
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
     }
     
     .no-courses-container {
