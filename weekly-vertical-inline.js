@@ -285,7 +285,7 @@
               courseDisplay = '';
               logoUrl = course.logo || '';
               if (SHOW_COURSE_IMAGES && logoUrl) {
-                courseNameDisplay = '<img class="logo-cours" src="' + PR.escapeHtml(logoUrl) + '" alt="' + PR.escapeHtml(course.courseName) + ' Logo">';
+                courseNameDisplay = '<img class="logo-cours" src="' + PR.escapeHtml(logoUrl) + '" alt="' + PR.escapeHtml(course.courseName) + ' Logo" draggable="false">';
               } else {
                 courseNameDisplay = '<div class="course-name-text">' + PR.escapeHtml(course.courseName) + '</div>';
               }
@@ -293,13 +293,13 @@
               if (course.coachs.length === 1) {
                 var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
                 coachImagesHtml = '<div class="single-coach">' +
-                  '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(course.coachs[0].name) + '">' +
+                  '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(course.coachs[0].name) + '" draggable="false">' +
                   '<span>' + PR.escapeHtml(course.coachs[0].name) + '</span></div>';
               } else if (course.coachs.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
                 course.coachs.forEach(function(coach) {
                   if (coach.imageUrl) {
-                    coachImagesHtml += '<img src="' + PR.escapeHtml(coach.imageUrl) + '" alt="" class="coach-image">';
+                    coachImagesHtml += '<img src="' + PR.escapeHtml(coach.imageUrl) + '" alt="" class="coach-image" draggable="false">';
                   }
                 });
                 coachImagesHtml += '</div>';
@@ -831,8 +831,8 @@
     }
 
     /**
-     * Position du bord haut-gauche de `el` par rapport à `ancestor`, via offsetParent
-     * (cohérent avec le repère CSS de position:absolute sous body transform / rotation 90° mobile).
+     * Offset cumulé jusqu’à `ancestor` (repère layout, cohérent si body a une rotation / transform).
+     * À éviter pour l’en-tête sticky weekly_vertical : le translate3d(-scrollLeft) n’y est pas reflété.
      */
     function cumulativeOffsetToAncestor(el, ancestor) {
       if (!el || !ancestor || !ancestor.contains(el)) return null;
@@ -848,23 +848,11 @@
       return { x: x, y: y };
     }
 
-    /** Défilement horizontal du planning (barre sticky synchronisée par transform). */
-    function getWeeklyScheduleScrollLeft() {
-      var w = document.getElementById('scheduleScrollWrapper');
-      return w ? w.scrollLeft : 0;
-    }
-
-    /** Première ligne du tbody avec le même nombre de colonnes que l’en-tête (sync largeurs / offset). */
-    function weeklyBodyRowMatchingHeader(headerRow) {
-      var tbody = document.querySelector('#weeklySchedule .weekly-schedule tbody');
-      if (!tbody || !headerRow || !headerRow.cells) return null;
-      var n = headerRow.cells.length;
-      var rows = tbody.rows;
-      var r;
-      for (r = 0; r < rows.length; r++) {
-        if (rows[r].cells && rows[r].cells.length === n) return rows[r];
-      }
-      return rows[0] || null;
+    /** weekly_vertical : barre de jours sticky + scroll horizontal ; getBoundingClientRect tient compte du translate. */
+    function weeklyFerieSparklesUseViewportPositioning() {
+      var wrap = document.getElementById('scheduleScrollWrapper');
+      if (!wrap) return false;
+      return !!document.querySelector('.sticky-days-bar .weekly-schedule-header tr');
     }
 
     function syncWeeklyFerieLayerBox(host, layer) {
@@ -883,7 +871,7 @@
       syncWeeklyFerieLayerBox(host, layer);
       var hr = host.getBoundingClientRect();
       var vhThird = (typeof window !== 'undefined' && window.innerHeight) ? Math.round(window.innerHeight * 0.34) : 260;
-      var scrollLeft = getWeeklyScheduleScrollLeft();
+      var useViewportRect = weeklyFerieSparklesUseViewportPositioning();
       var cols = layer.querySelectorAll('.weekly-ferie-sparkle-column');
       var i;
       for (i = 0; i < cols.length; i++) {
@@ -896,35 +884,27 @@
           continue;
         }
         cols[i].style.display = '';
-        var offTh = cumulativeOffsetToAncestor(th, host);
-        var offHoriz = offTh;
-        var colW = Math.max(8, th.offsetWidth);
-        if (!offHoriz) {
-          var syncRow = weeklyBodyRowMatchingHeader(headerRow);
-          var mirror = syncRow && syncRow.cells && syncRow.cells[th.cellIndex];
-          if (mirror) {
-            var om = cumulativeOffsetToAncestor(mirror, host);
-            if (om) {
-              offHoriz = om;
-              colW = Math.max(8, mirror.offsetWidth);
-            }
-          }
-        }
-        var top;
         var left;
-        if (offHoriz) {
-          left = offHoriz.x - scrollLeft;
-          if (offTh) {
-            top = offTh.y + th.offsetHeight;
-          } else {
-            var trTop = th.getBoundingClientRect();
-            top = trTop.bottom - hr.top + host.scrollTop;
-          }
-        } else {
+        var top;
+        var colW;
+        if (useViewportRect) {
           var tr = th.getBoundingClientRect();
-          top = tr.bottom - hr.top + host.scrollTop;
           left = tr.left - hr.left + host.scrollLeft;
+          top = tr.bottom - hr.top + host.scrollTop;
           colW = Math.max(8, tr.width);
+        } else {
+          /* weekly.html (souvent body en rotate(90deg) sur mobile) : repère viewport ≠ repère CSS local. */
+          var off = cumulativeOffsetToAncestor(th, host);
+          if (off) {
+            left = off.x;
+            top = off.y + th.offsetHeight;
+            colW = Math.max(8, th.offsetWidth);
+          } else {
+            var tr2 = th.getBoundingClientRect();
+            left = tr2.left - hr.left + host.scrollLeft;
+            top = tr2.bottom - hr.top + host.scrollTop;
+            colW = Math.max(8, tr2.width);
+          }
         }
         cols[i].style.position = 'absolute';
         cols[i].style.top = top + 'px';

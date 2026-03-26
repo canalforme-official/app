@@ -2103,12 +2103,22 @@
         '<p class="no-courses-message" style="font-style:italic;font-size:1.2em;color:var(--text-secondary);">' + escapeHtml(r.message) + '</p></div>';
     }
 
+    function syncDailyGridDateInUrl() {
+      try {
+        if (!selectedDateYmd || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDateYmd)) return;
+        var url = new URL(window.location.href);
+        url.searchParams.set('date', selectedDateYmd);
+        history.replaceState({}, '', url);
+      } catch (e) {}
+    }
+
     function changeDay(direction) {
       if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
       var next = addDaysToYmd(selectedDateYmd, direction);
       var clamped = clampNavYmd(next);
       if (clamped !== next) return;
       selectedDateYmd = clamped;
+      syncDailyGridDateInUrl();
       displayGridSchedule();
     }
 
@@ -2432,12 +2442,18 @@
         console.log('Données chargées avec succès:', allData);
 
         await loadPrayerTimes();
-        if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
-        try {
-          var paramsDg = new URLSearchParams(window.location.search);
-          var dpDg = paramsDg.get('date');
-          if (dpDg && /^\d{4}-\d{2}-\d{2}$/.test(dpDg)) selectedDateYmd = clampNavYmd(dpDg);
-        } catch (eDg) {}
+        /* Au premier chargement : URL ou aujourd’hui. Rafraîchissement (setInterval) : garder la date affichée
+           pour ne pas réécraser avec un ?date= encore figé sur un jour passé (ex. aujourd’hui). */
+        var previousYmd = selectedDateYmd;
+        if (!previousYmd || !/^\d{4}-\d{2}-\d{2}$/.test(previousYmd)) {
+          selectedDateYmd = ymdFromDate(new Date());
+          try {
+            var paramsDg = new URLSearchParams(window.location.search);
+            var dpDg = paramsDg.get('date');
+            if (dpDg && /^\d{4}-\d{2}-\d{2}$/.test(dpDg)) selectedDateYmd = clampNavYmd(dpDg);
+          } catch (eDg) {}
+        }
+        syncDailyGridDateInUrl();
         displayGridSchedule();
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);

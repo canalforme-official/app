@@ -2631,6 +2631,7 @@
           var dp = params.get('date');
           if (dp && /^\d{4}-\d{2}-\d{2}$/.test(dp)) selectedDateYmd = clampNavYmd(dp);
         } catch (e) {}
+        syncDailyPageDateInUrl();
         displaySchedule();
         hideLoadingOverlay();
         
@@ -2650,6 +2651,7 @@
             var dp2 = params2.get('date');
             if (dp2 && /^\d{4}-\d{2}-\d{2}$/.test(dp2)) selectedDateYmd = clampNavYmd(dp2);
           } catch (e2) {}
+          syncDailyPageDateInUrl();
           displaySchedule();
           hideLoadingOverlay();
           await loadPrayerTimes();
@@ -3117,6 +3119,7 @@
           todayButton.style.display = 'none';
           selectedDateYmd = ymdFromDate(new Date());
           currentDayIndex = new Date().getDay();
+          syncDailyPageDateInUrl();
           displaySchedule();
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
           updateTodayButtonPosition();
@@ -3125,6 +3128,7 @@
       } else {
         selectedDateYmd = ymdFromDate(new Date());
         currentDayIndex = new Date().getDay();
+        syncDailyPageDateInUrl();
         displaySchedule();
       }
     }
@@ -3154,11 +3158,21 @@
       }
     }
 
+    function syncDailyPageDateInUrl() {
+      try {
+        if (!selectedDateYmd || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDateYmd)) return;
+        var url = new URL(window.location.href);
+        url.searchParams.set('date', selectedDateYmd);
+        history.replaceState({}, '', url);
+      } catch (e) {}
+    }
+
     function changeDay(direction) {
       var next = addDaysToYmd(selectedDateYmd, direction);
       var clamped = clampNavYmd(next);
       if (clamped !== next) return;
       selectedDateYmd = clamped;
+      syncDailyPageDateInUrl();
       var todayButton = document.getElementById('todayViewButton');
       if (isSelectedDateToday() && todayButton) {
         todayButton.classList.remove('visible');
