@@ -100,6 +100,36 @@
     body.planning-ramadan .today-view-button::before {
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
+
+    body.planning-ete {
+      --primary-color: #1e5a8a;
+      --primary-overlay: rgba(30, 90, 138, 0.92);
+      --primary-light: rgba(30, 90, 138, 0.82);
+      --secondary-color: #e8c547;
+      --secondary-light: rgba(232, 197, 71, 0.85);
+      position: relative;
+    }
+    body.planning-ete .course-block { border-left-color: var(--primary-color); }
+    body.planning-ete .weekly-schedule th { background: var(--primary-light); color: #fff; }
+    body.planning-ete::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      min-height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
+      opacity: 0.5;
+    }
+    body.planning-ete .content-wrapper { position: relative; z-index: 1; }
+    body.planning-ete .rotation-view-button::before,
+    body.planning-ete .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+
     /* Horaires de prière : fond transparent, icône verte Ramadan */
     a.ramadan-switch-button {
       text-decoration: none;
@@ -2077,6 +2107,12 @@
     .weekly-day-title { font-weight: 700; font-size: 0.95em; }
     .weekly-day-date { font-size: 0.78em; font-weight: 500; opacity: 0.9; margin-top: 2px; }
     .weekly-schedule thead th[data-planning-key="ramadan"] { background: rgba(38, 70, 45, 0.92) !important; color: #fff !important; }
+    .weekly-schedule thead th[data-planning-key="ete"],
+    .weekly-schedule thead th.today[data-planning-key="ete"] {
+      background: linear-gradient(165deg, rgba(232, 197, 71, 0.95) 0%, #1e5a8a 100%) !important;
+      color: #fff !important;
+      border-bottom-color: rgba(255, 255, 255, 0.25);
+    }
     /* Même or que le titre du jour en daily (body.planning-ferie --primary-color #b8860b) */
     .weekly-schedule thead th[data-planning-key="ferie"],
     .weekly-schedule thead th[data-planning-key="ferme"] {
@@ -2135,7 +2171,8 @@
     }
     /* Férié sans cours renseignés ou jour fermé : zone « blanche » à 85 % d’opacité */
     .weekly-schedule td.course-cell--status-msg[data-planning-key="ferie"],
-    .weekly-schedule td.course-cell--status-msg[data-planning-key="ferme"] {
+    .weekly-schedule td.course-cell--status-msg[data-planning-key="ferme"],
+    .weekly-schedule td.course-cell--status-msg[data-planning-key="ete"] {
       opacity: 0.85;
     }
     .weekly-msg-tranche {

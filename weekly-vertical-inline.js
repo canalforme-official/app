@@ -204,6 +204,12 @@
           msgInner = '<div class="weekly-msg weekly-msg--closed"><strong>Fermé</strong>';
           if (rv.periodName) msgInner += '<br><span>' + PR.escapeHtml(rv.periodName) + '</span>';
           msgInner += '</div>';
+        } else if (rv.planningKey === 'ete') {
+          msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>' +
+            '<span class="indetermine-title-line">Planning estival</span><br>' +
+            '<span class="indetermine-title-line">à&nbsp;déterminer</span></strong>';
+          if (rv.periodName) msgInner += '<br><span class="weekly-msg-holiday">' + PR.escapeHtml(rv.periodName) + '</span>';
+          msgInner += '<br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
         } else {
           msgInner = '<div class="weekly-msg weekly-msg--indetermine"><strong>' +
             '<span class="indetermine-title-line">Planning</span><br>' +
@@ -352,12 +358,31 @@
       return html;
     }
 
+    /** Thème plein écran si « aujourd'hui » tombe dans la semaine affichée (aligné sur daily). */
+    function applyWeeklyBodyPlanningTheme() {
+      document.body.classList.remove('planning-ramadan');
+      document.body.classList.remove('planning-ferie');
+      document.body.classList.remove('planning-ete');
+      var PR = getPR();
+      if (!scheduleData || !weekMondayYmd || !PR) return;
+      var todayYmd = PR.ymdFromDate(new Date());
+      var di, ymd, rv;
+      for (di = 0; di < 7; di++) {
+        ymd = PR.addDaysToYmd(weekMondayYmd, di);
+        if (ymd !== todayYmd) continue;
+        rv = PR.resolveDailyView(ymd, scheduleData);
+        document.body.classList.toggle('planning-ramadan', rv.planningKey === 'ramadan');
+        document.body.classList.toggle('planning-ferie', rv.planningKey === 'ferie' || rv.planningKey === 'ferme');
+        document.body.classList.toggle('planning-ete', rv.planningKey === 'ete');
+        break;
+      }
+    }
+
     function refreshPlanningDisplay() {
       var el = document.getElementById('weeklySchedule');
       if (!el) return;
       el.innerHTML = generateWeeklyScheduleHtml();
-      document.body.classList.remove('planning-ramadan');
-      document.body.classList.remove('planning-ferie');
+      applyWeeklyBodyPlanningTheme();
       updateNavButtonsStateWeek();
       if (scheduleData) renderPlanningViewSwitcher(scheduleData);
 
@@ -489,6 +514,7 @@
 
         markMultilineCourseNames();
         refreshWeeklyFerieSparklesAfterLayout();
+        applyWeeklyBodyPlanningTheme();
         renderPlanningViewSwitcher(data);
         updateNavButtonsStateWeek();
 

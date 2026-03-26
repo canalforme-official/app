@@ -95,15 +95,17 @@
     if (n === 'ferme' || (n.length >= 4 && n.substring(0, 4) === 'ferm')) return 'ferme';
     if (n.indexOf('ramadan') !== -1) return 'ramadan';
     if ((n.indexOf('jours') !== -1 && n.indexOf('ferie') !== -1) || n === 'ferie' || n.indexOf('ferie') !== -1) return 'ferie';
+    if (n.indexOf('estival') !== -1 || n === 'ete' || n.indexOf('ete') !== -1) return 'ete';
     if (n.indexOf('regulier') !== -1 || n.indexOf('planning') !== -1) return 'regulier';
     return 'regulier';
   }
 
   function periodPriorityScore(p) {
     var k = normalizePlanningKey((p && p.planningKey) ? p.planningKey : '');
-    if (k === 'ferme') return 4;
-    if (k === 'ferie') return 3;
-    if (k === 'ramadan') return 2;
+    if (k === 'ferme') return 5;
+    if (k === 'ferie') return 4;
+    if (k === 'ramadan') return 3;
+    if (k === 'ete') return 2;
     if (k === 'regulier') return 1;
     return 0;
   }
@@ -147,15 +149,17 @@
   }
 
   /**
-   * Au moins un cours dans planning OU planningRamadan pour ce jour (clé fr minuscule).
+   * Au moins un cours dans planning, planningRamadan ou planningEte pour ce jour (clé fr minuscule).
    */
   function isWeekdayListedInBasePlannings(data, dayNameFrLower) {
     if (!data) return false;
     var p = data.planning && data.planning[dayNameFrLower];
     var r = data.planningRamadan && data.planningRamadan[dayNameFrLower];
+    var e = data.planningEte && data.planningEte[dayNameFrLower];
     var np = Array.isArray(p) && p.length > 0;
     var nr = Array.isArray(r) && r.length > 0;
-    return np || nr;
+    var ne = Array.isArray(e) && e.length > 0;
+    return np || nr || ne;
   }
 
   function resolveDailyView(dateStr, data) {
@@ -169,6 +173,7 @@
     var dayName = getDayNameFrFromYmd(dateStr);
     var planning = data.planning || {};
     var planningRamadan = data.planningRamadan || {};
+    var planningEte = data.planningEte || {};
     var planningFerieByDate = data.planningFerieByDate || {};
     if (key === 'ferme') {
       return { courses: [], planningKey: 'ferme', periodName: periodName, closed: true, indetermine: false, dayName: dayName };
@@ -184,6 +189,13 @@
       var arrR = planningRamadan[dayName] || [];
       return { courses: arrR, planningKey: 'ramadan', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
     }
+    if (key === 'ete') {
+      var arrE = planningEte[dayName] || [];
+      if (!arrE.length) {
+        return { courses: [], planningKey: 'ete', periodName: periodName, closed: false, indetermine: true, dayName: dayName };
+      }
+      return { courses: arrE, planningKey: 'ete', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
+    }
     var arrReg = planning[dayName] || [];
     return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
   }
@@ -191,13 +203,15 @@
   /**
    * Bloc créneaux pour un mode planning et un jour (fr minuscule : lundi … dimanche).
    * @param {Object|null} horairesMeta metadata.horaires
-   * @param {string} planningKey regulier | ramadan | ferie
+   * @param {string} planningKey regulier | ramadan | ete | ferie
    * @param {string} dayNameFrLower ex. depuis resolveDailyView().dayName
    * @returns {Object|null} { open1Label, open1, close1, open2Label, open2, close2 }
    */
   function pickOpeningHoursForDay(horairesMeta, planningKey, dayNameFrLower) {
     if (!horairesMeta || !planningKey) return null;
-    var block = horairesMeta[planningKey];
+    var hk = planningKey;
+    if (hk === 'ete' && !horairesMeta.ete) hk = 'regulier';
+    var block = horairesMeta[hk];
     if (!block || typeof block !== 'object') return null;
     var day = dayNameFrLower ? String(dayNameFrLower).trim().toLowerCase() : '';
     if (block.byDay && day && block.byDay[day]) {

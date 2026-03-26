@@ -159,6 +159,46 @@
       filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
     }
 
+    /* Mode planning estival (jaune / bleu) */
+    body.planning-ete {
+      --primary-color: #1e5a8a;
+      --primary-overlay: rgba(30, 90, 138, 0.92);
+      --primary-light: rgba(30, 90, 138, 0.82);
+      --secondary-color: #e8c547;
+      --secondary-light: rgba(232, 197, 71, 0.85);
+      position: relative;
+    }
+    body.planning-ete::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
+      opacity: 0.85;
+    }
+    body.planning-ete > #planningViewSwitcher,
+    body.planning-ete > #dayOfWeek,
+    body.planning-ete > #timeline {
+      position: relative;
+      z-index: 1;
+    }
+    body.planning-ete .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+    body.planning-ete .timeline-block.current::before {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+    body.planning-ete .time {
+      color: rgba(30, 90, 138, 0.72);
+    }
+    body.planning-ete .course-studio img {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+
     /* Ne pas appliquer position:relative sur .date ni sur les boutons fixed : ça annule absolute/fixed.
        z-index sur le flux principal uniquement (horaires au-dessus du motif). */
     #planningViewSwitcher { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 2px 0; margin: 0 0 2px 0; }
@@ -197,7 +237,7 @@
     }
 
     /* Voile bordeaux léger (régulier / Ramadan hors férié ; jour férié utilise le même voile, voir .planning-ferie::after). */
-    body:not(.planning-ferie)::after {
+    body:not(.planning-ferie):not(.planning-ete)::after {
       content: '';
       position: fixed;
       inset: 0;
@@ -213,6 +253,14 @@
       z-index: 0;
       pointer-events: none;
       background-color: rgba(72, 6, 7, 0.08);
+    }
+    body.planning-ete::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(160deg, rgba(232, 197, 71, 0.12) 0%, rgba(30, 90, 138, 0.1) 55%, rgba(72, 6, 7, 0.05) 100%);
     }
 
     /* Images non sélectionnables */
@@ -279,6 +327,9 @@
     }
     body.planning-ferie .planning-type-label {
       color: rgba(184, 134, 11, 0.9);
+    }
+    body.planning-ete .planning-type-label {
+      color: rgba(30, 90, 138, 0.88);
     }
 
     .date {
@@ -364,6 +415,16 @@
     }
     body.planning-ferie .opening-hours-bar .oh-time {
       color: rgba(146, 106, 8, 0.98);
+    }
+    body.planning-ete .opening-hours-bar .oh-chip {
+      border-color: rgba(30, 90, 138, 0.22);
+      background: rgba(255, 255, 255, 0.9);
+    }
+    body.planning-ete .opening-hours-bar .oh-chip-label {
+      color: rgba(30, 90, 138, 0.78);
+    }
+    body.planning-ete .opening-hours-bar .oh-time {
+      color: rgba(22, 70, 110, 0.98);
     }
 
     /* Une seule pastille : créneaux sans libellés (ex. 09:00–12:00 · 14:00–19:00) */
@@ -499,6 +560,10 @@
       border-color: rgba(38, 70, 45, 0.18);
       box-shadow: 0 10px 40px rgba(38, 70, 45, 0.08), 0 2px 12px rgba(0, 0, 0, 0.05);
     }
+    body.planning-ete .indetermine-card {
+      border-color: rgba(30, 90, 138, 0.2);
+      box-shadow: 0 10px 40px rgba(30, 90, 138, 0.1), 0 2px 12px rgba(232, 197, 71, 0.12);
+    }
     .indetermine-title {
       display: block;
       font-family: var(--font-title);
@@ -533,6 +598,12 @@
     }
     body.planning-ferie .indetermine-holiday {
       color: #b45309;
+    }
+    body.planning-ete .indetermine-title {
+      color: #1e5a8a;
+    }
+    body.planning-ete .indetermine-holiday {
+      color: #145a8a;
     }
 
     .timeline-message--closed {
@@ -2333,7 +2404,7 @@
       var d = parseYmdLocal(ymd);
       return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
     }
-    /** Aligné sur SheetsService.normalizePlanningAfficheKey (régulier | ramadan | ferie | ferme). */
+    /** Aligné sur SheetsService.normalizePlanningAfficheKey (régulier | ramadan | ete | ferie | ferme). */
     function normalizePlanningKey(raw) {
       var s = String(raw || '').trim().toLowerCase();
       if (!s) return 'regulier';
@@ -2341,14 +2412,16 @@
       if (n === 'ferme' || (n.length >= 4 && n.substring(0, 4) === 'ferm')) return 'ferme';
       if (n.indexOf('ramadan') !== -1) return 'ramadan';
       if ((n.indexOf('jours') !== -1 && n.indexOf('ferie') !== -1) || n === 'ferie' || n.indexOf('ferie') !== -1) return 'ferie';
+      if (n.indexOf('estival') !== -1 || n === 'ete' || n.indexOf('ete') !== -1) return 'ete';
       if (n.indexOf('regulier') !== -1 || n.indexOf('planning') !== -1) return 'regulier';
       return 'regulier';
     }
     function periodPriorityScore(p) {
       var k = normalizePlanningKey((p && p.planningKey) ? p.planningKey : '');
-      if (k === 'ferme') return 4;
-      if (k === 'ferie') return 3;
-      if (k === 'ramadan') return 2;
+      if (k === 'ferme') return 5;
+      if (k === 'ferie') return 4;
+      if (k === 'ramadan') return 3;
+      if (k === 'ete') return 2;
       if (k === 'regulier') return 1;
       return 0;
     }
@@ -2386,7 +2459,7 @@
       return best;
     }
     /**
-     * Résout cours + mode pour une date (priorité § plan : fermé > férié > ramadan > régulier).
+     * Résout cours + mode pour une date (priorité : fermé > férié > ramadan > été > régulier).
      */
     function resolveDailyView(dateStr, data) {
       var periodes = (data.metadata && data.metadata.periods) ? data.metadata.periods : [];
@@ -2400,6 +2473,7 @@
       var dayName = getDayNameFrFromYmd(dateStr);
       var planning = data.planning || {};
       var planningRamadan = data.planningRamadan || {};
+      var planningEte = data.planningEte || {};
       var planningFerieByDate = data.planningFerieByDate || {};
       if (key === 'ferme') {
         return { courses: [], planningKey: 'ferme', periodName: periodName, closed: true, indetermine: false, dayName: dayName };
@@ -2415,6 +2489,13 @@
       if (key === 'ramadan') {
         var arrR = planningRamadan[dayName] || [];
         return { courses: arrR, planningKey: 'ramadan', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
+      }
+      if (key === 'ete') {
+        var arrE = planningEte[dayName] || [];
+        if (!arrE.length) {
+          return { courses: [], planningKey: 'ete', periodName: periodName, closed: false, indetermine: true, dayName: dayName };
+        }
+        return { courses: arrE, planningKey: 'ete', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
       }
       var arrReg = planning[dayName] || [];
       return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
@@ -2437,6 +2518,7 @@
     function initPlanningView(data) {
       document.body.classList.remove('planning-ramadan');
       document.body.classList.remove('planning-ferie');
+      document.body.classList.remove('planning-ete');
     }
     function renderPlanningViewSwitcher(data) {
       var container = document.getElementById('planningViewSwitcher');
@@ -2484,6 +2566,12 @@
       } else if (rv.planningKey === 'ramadan') {
         var lr = hor && hor.ramadan && hor.ramadan.planningLabel;
         labelText = (lr && String(lr).trim()) ? String(lr).trim() : 'Planning Ramadan';
+        if (labelText.toLowerCase().indexOf('planning') === -1) {
+          labelText = 'Planning ' + labelText;
+        }
+      } else if (rv.planningKey === 'ete') {
+        var le = hor && hor.ete && hor.ete.planningLabel;
+        labelText = (le && String(le).trim()) ? String(le).trim() : 'Planning été';
         if (labelText.toLowerCase().indexOf('planning') === -1) {
           labelText = 'Planning ' + labelText;
         }
@@ -2728,7 +2816,9 @@
     /** Aligné sur PlanningResolve.pickOpeningHoursForDay (metadata.horaires avec byDay ou plat). */
     function pickOpeningHoursForDay(horairesMeta, planningKey, dayNameFrLower) {
       if (!horairesMeta || !planningKey) return null;
-      var block = horairesMeta[planningKey];
+      var hk = planningKey;
+      if (hk === 'ete' && !horairesMeta.ete) hk = 'regulier';
+      var block = horairesMeta[hk];
       if (!block || typeof block !== 'object') return null;
       var day = dayNameFrLower ? String(dayNameFrLower).trim().toLowerCase() : '';
       if (block.byDay && day && block.byDay[day]) {
@@ -2857,6 +2947,7 @@
       var palettes = {
         regulier: ['#480607', '#6b1218', '#8b2942', '#a02828'],
         ramadan: ['#26462d', '#3d6b47', '#4a8c5e', '#2d5a38', '#1e3a24', '#5a8f6a', '#a8d4b8'],
+        ete: ['#1e5a8a', '#2a7ab8', '#e8c547', '#f4d03f', '#87ceeb', '#4682b4', '#ffd54f'],
         ferie: ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047']
       };
       /* Jours fermés : même confettis jaunes que férié */
@@ -2867,9 +2958,13 @@
     function displayIndetermineMessage(rv) {
       var name = rv && rv.periodName ? escapeHtml(rv.periodName) : '';
       var holidayLine = name ? '<p class="indetermine-holiday">' + name + '</p>' : '';
+      var title =
+        rv && rv.planningKey === 'ete'
+          ? 'Planning estival à déterminer'
+          : 'Planning à déterminer';
       return '<div class="timeline-message timeline-message--indetermine" role="status">' +
         '<div class="indetermine-card">' +
-        '<strong class="indetermine-title">Planning à déterminer</strong>' +
+        '<strong class="indetermine-title">' + title + '</strong>' +
         holidayLine +
         '<p class="indetermine-text">Un planning sera publié prochainement. Vous serez averti par notification ; il s’affichera ici dès la mise à jour.</p>' +
         '</div></div>';
@@ -2952,6 +3047,7 @@
       var rv = resolveDailyView(selectedDateYmd, allData);
       document.body.classList.toggle('planning-ramadan', rv.planningKey === 'ramadan');
       document.body.classList.toggle('planning-ferie', rv.planningKey === 'ferie' || rv.planningKey === 'ferme');
+      document.body.classList.toggle('planning-ete', rv.planningKey === 'ete');
       updatePlanningTypeLabelFromView(rv);
 
       updateMaghribBadge();
