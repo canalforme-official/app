@@ -14,7 +14,7 @@
     :root {
       --font-title: 'Oswald', sans-serif;
       --font-text: 'Lora', serif;
-      --bg: #f0eeeb;
+      --bg: #f5f5f5;
       --bg-elevated: #faf9f7;
       --card: #ffffff;
       --text: #2c2a28;
@@ -43,6 +43,14 @@
       --today-ring: var(--planning-ete-secondary);
     }
     * { box-sizing: border-box; }
+    /**
+     * Fond aligné sur daily.html : couleur de base sur body, motif en ::before (z-index 0), voile ::after.
+     * z-index: -1 sur ::before plaçait le motif derrière le canvas → fond « blanc » sans tuile visible.
+     */
+    html {
+      min-height: 100vh;
+      background-color: var(--bg);
+    }
     body {
       margin: 0;
       min-height: 100vh;
@@ -53,33 +61,32 @@
       position: relative;
       --primary-color: var(--primary);
     }
-    /* Motif répété (même tuile que daily.html — leaderboard / planning) */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
+      z-index: 0;
+      pointer-events: none;
       background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
-      z-index: 0;
-      pointer-events: none;
     }
     body.pr-ramadan::before {
       background-image: var(--planning-pattern-ramadan-url);
       background-size: 40px 40px;
-      background-position: 0 0;
       opacity: 0.04;
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
     }
     body.pr-ferie::before {
-      background-image: var(--planning-pattern-mosaic-url);
-      background-size: 128px 128px;
+      background-image:
+        linear-gradient(180deg, rgba(30, 90, 138, 0.14) 0%, rgba(30, 90, 138, 0.06) 45%, transparent 85%),
+        var(--planning-pattern-mosaic-url);
+      background-size: auto, 128px 128px;
+      background-repeat: no-repeat, repeat;
       filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
       opacity: 0.85;
     }
     body.pr-ete::before {
-      background-image: var(--planning-pattern-mosaic-url);
-      background-size: 128px 128px;
       opacity: 1;
       filter: none;
     }
@@ -90,13 +97,22 @@
       z-index: 0;
       pointer-events: none;
     }
-    body.pr-regulier::after,
-    body.pr-ramadan::after,
-    body.pr-ete::after {
+    body:not(.pr-ferie)::after {
       background-color: rgba(72, 6, 7, 0.08);
     }
     body.pr-ferie::after {
       background: var(--planning-daily-ferie-sheen);
+    }
+    /* Puppeteer : calques non-fixed pour capture fiable */
+    body.puppeteer-view::before,
+    body.puppeteer-view::after {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 100vh;
+      height: auto;
+      bottom: auto;
     }
     .wrap {
       max-width: 640px;
@@ -421,6 +437,17 @@
         display: none !important;
       }
     }
+    /* Puppeteer / screenshot / ?puppeteer=1 — masquer les flèches (daily_grid : .puppeteer-view) */
+    html.puppeteer-view .horaires-navigation,
+    body.puppeteer-view .horaires-navigation {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
 
     @supports not (color: color-mix(in srgb, white 50%, black)) {
       .period-pill { background: rgba(255, 166, 48, 0.22); }
@@ -429,6 +456,24 @@
   </style>
 </head>
 <body>
+  <script>
+  (function () {
+    function isAutomatedBrowser() {
+      try {
+        var q = new URLSearchParams(window.location.search);
+        if (q.get('puppeteer') === '1' || q.get('screenshot') === '1') return true;
+      } catch (e) {}
+      var isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isRealMobile && 'ontouchstart' in window) return false;
+      return navigator.webdriver === true ||
+        (navigator.userAgent && navigator.userAgent.indexOf('HeadlessChrome') !== -1 && !isRealMobile);
+    }
+    if (isAutomatedBrowser()) {
+      document.documentElement.classList.add('puppeteer-view');
+      document.body.classList.add('puppeteer-view');
+    }
+  })();
+  </script>
   <div class="wrap">
     <div id="app">
       <p class="loading">Chargement des horaires…</p>
@@ -491,11 +536,23 @@
 
   function setBodyTheme(planningKey) {
     var k = String(planningKey || 'regulier');
-    document.body.className = '';
-    if (k === 'ramadan') document.body.classList.add('pr-ramadan');
-    else if (k === 'ferie') document.body.classList.add('pr-ferie');
-    else if (k === 'ete') document.body.classList.add('pr-ete');
-    else document.body.classList.add('pr-regulier');
+    var themes = ['pr-regulier', 'pr-ramadan', 'pr-ferie', 'pr-ete'];
+    var next =
+      k === 'ramadan' ? 'pr-ramadan' :
+      k === 'ferie' ? 'pr-ferie' :
+      k === 'ete' ? 'pr-ete' : 'pr-regulier';
+    var pe =
+      document.body.classList.contains('puppeteer-view') ||
+      document.documentElement.classList.contains('puppeteer-view');
+    themes.forEach(function (c) {
+      document.body.classList.remove(c);
+      document.documentElement.classList.remove(c);
+    });
+    document.body.classList.add(next);
+    if (pe) {
+      document.body.classList.add('puppeteer-view');
+      document.documentElement.classList.add('puppeteer-view');
+    }
   }
 
   function renderStructuredHours(parts) {
