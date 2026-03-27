@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horaires — Canal Forme</title>
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="planning-tokens.css">
+  <script src="planning-resolve.js"></script>
+  <style>
+    :root {
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      --bg: #f0eeeb;
+      --bg-elevated: #faf9f7;
+      --card: #ffffff;
+      --text: #2c2a28;
+      --muted: #6b6560;
+      --primary: #480607;
+      --accent: #FFA630;
+      --border: rgba(72, 6, 7, 0.1);
+      --today-ring: var(--accent);
+      --shadow: 0 4px 24px rgba(72, 6, 7, 0.07);
+      --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-light: rgba(200, 200, 200, 0.35);
+    }
+    body.pr-ramadan {
+      --primary: var(--planning-ramadan-primary);
+      --accent: var(--planning-ramadan-secondary);
+      --today-ring: var(--planning-ramadan-secondary);
+    }
+    body.pr-ferie {
+      --primary: var(--planning-ferie-primary);
+      --accent: var(--planning-ferie-secondary);
+      --today-ring: var(--planning-ferie-secondary);
+    }
+    body.pr-ete {
+      --primary: var(--planning-ete-primary);
+      --accent: var(--planning-ete-secondary);
+      --today-ring: var(--planning-ete-secondary);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-text);
+      color: var(--text);
+      background-color: var(--bg);
+      line-height: 1.5;
+      position: relative;
+      --primary-color: var(--primary);
+    }
+    /* Motif répété (même tuile que daily.html — leaderboard / planning) */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body.pr-ramadan::before {
+      background-image: var(--planning-pattern-ramadan-url);
+      background-size: 40px 40px;
+      background-position: 0 0;
+      opacity: 0.04;
+      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+    body.pr-ferie::before {
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
+      opacity: 0.85;
+    }
+    body.pr-ete::before {
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      opacity: 1;
+      filter: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body.pr-regulier::after,
+    body.pr-ramadan::after,
+    body.pr-ete::after {
+      background-color: rgba(72, 6, 7, 0.08);
+    }
+    body.pr-ferie::after {
+      background: var(--planning-daily-ferie-sheen);
+    }
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1.5rem 1.15rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+    .page-head {
+      margin-bottom: 1.5rem;
+    }
+    h1.page-title {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: clamp(1.75rem, 5vw, 2.1rem);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin: 0 0 0.4rem;
+      line-height: 1.15;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 1.35rem 1.35rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card--hero {
+      border-left: 4px solid var(--accent);
+      background: linear-gradient(135deg, #ffffff 0%, var(--bg-elevated) 100%);
+    }
+    .card .section-kicker {
+      font-family: var(--font-title);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 0 0 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .period-pill {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-title);
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 22%, transparent);
+      color: var(--primary);
+      margin-bottom: 0.85rem;
+    }
+    /**
+     * Même motif que daily.html : .day-title-row + titre jour puis .date#dateStr
+     * (h2.daily-day-heading pour respecter un seul h1 sur la page — le titre « Horaires »).
+     * (Oswald / Lora, date en couleur primaire comme .date sur daily).
+     */
+    .horaires-daily-pattern {
+      margin: 0 0 1rem;
+    }
+    .horaires-daily-pattern .day-title-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 8px 0 0 0;
+    }
+    .horaires-daily-pattern .day-title-row .daily-day-heading {
+      font-family: var(--font-title);
+      color: var(--primary);
+      font-size: 2.5em;
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      letter-spacing: normal;
+      line-height: 1.1;
+      text-transform: none;
+    }
+    .horaires-daily-pattern .date {
+      font-family: var(--font-text);
+      position: static;
+      top: auto;
+      right: auto;
+      font-size: 1.4em;
+      color: var(--primary);
+      font-weight: 400;
+      margin: 0;
+      padding: 0;
+      z-index: 1;
+      line-height: 1.2;
+    }
+    /* Répétition dans la liste : même structure, tailles réduites */
+    .horaires-daily-pattern--compact {
+      margin: 0;
+      flex: 1 1 12rem;
+      min-width: 0;
+    }
+    .horaires-daily-pattern--compact .day-title-row {
+      padding-top: 0;
+    }
+    .horaires-daily-pattern--compact .day-heading-compact {
+      font-family: var(--font-title);
+      color: var(--primary);
+      font-size: 1.55em;
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      line-height: 1.15;
+    }
+    .horaires-daily-pattern--compact .date {
+      font-size: 1.05em;
+    }
+    .week-ferie-note {
+      font-family: var(--font-text);
+      font-size: 0.82rem;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0.25rem 0 0;
+      line-height: 1.35;
+    }
+    .today-hours {
+      font-family: var(--font-title);
+      font-size: 1.35rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      line-height: 1.35;
+      margin: 0;
+      padding: 1rem 0;
+      border-top: 1px solid var(--border);
+    }
+    .today-hours .oh-slot { display: block; margin-top: 0.35rem; }
+    .today-hours .oh-slot:first-child { margin-top: 0; }
+    .today-hours .oh-lbl {
+      font-size: 0.72rem;
+      font-family: var(--font-text);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-right: 0.35rem;
+    }
+    .warn-msg {
+      font-size: 0.95rem;
+      color: #7a4a1a;
+      margin: 0 0 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--accent) 18%, #fff 82%);
+    }
+    .week-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .week-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.65rem 1rem;
+      padding: 0.95rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .week-row.is-today {
+      border-color: color-mix(in srgb, var(--today-ring) 55%, var(--border));
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--today-ring) 35%, transparent), var(--shadow-soft);
+      background: #fff;
+    }
+    .week-hours {
+      font-family: var(--font-title);
+      font-weight: 500;
+      font-size: 0.92rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      text-align: right;
+      flex: 1;
+      min-width: 12rem;
+    }
+    .week-hours.closed {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .week-hours .oh-bit {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 0.35rem 0.5rem;
+      margin-top: 0.2rem;
+    }
+    .week-hours .oh-bit:first-child { margin-top: 0; }
+    .week-hours .oh-lbl {
+      flex: 0 1 auto;
+      font-size: 0.78rem;
+      font-family: var(--font-text);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .loading, .error {
+      padding: 2.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .error { color: #8b2942; }
+
+    /* Navigation jour — visible téléphone / tablette uniquement (comme daily.html) */
+    .horaires-navigation {
+      position: fixed;
+      top: 50%;
+      left: max(10px, env(safe-area-inset-left, 0px));
+      right: max(10px, env(safe-area-inset-right, 0px));
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 1000;
+      transform: translateY(-50%);
+    }
+    .horaires-navigation.loaded {
+      pointer-events: all;
+    }
+    .horaires-navigation .nav-button {
+      background: rgba(255, 255, 255, 0.35);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(10px);
+    }
+    .horaires-navigation .nav-segments {
+      position: relative;
+      width: 20px;
+      height: 20px;
+    }
+    .horaires-navigation .segment {
+      position: absolute;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .horaires-navigation .prev-button .segment-1 {
+      width: 16px;
+      height: 3px;
+      top: 8px;
+      right: 1px;
+      transform: rotate(45deg);
+      transform-origin: left center;
+    }
+    .horaires-navigation .prev-button .segment-2 {
+      width: 16px;
+      height: 3px;
+      top: 10px;
+      right: 1px;
+      transform: rotate(-45deg);
+      transform-origin: left center;
+    }
+    .horaires-navigation .next-button .segment-1 {
+      width: 16px;
+      height: 3px;
+      top: 8px;
+      left: 1px;
+      transform: rotate(-45deg);
+      transform-origin: right center;
+    }
+    .horaires-navigation .next-button .segment-2 {
+      width: 16px;
+      height: 3px;
+      top: 10px;
+      left: 1px;
+      transform: rotate(45deg);
+      transform-origin: right center;
+    }
+    @media (hover: hover) {
+      .horaires-navigation .nav-button:hover {
+        background: var(--primary-color);
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .horaires-navigation .nav-button:hover .segment {
+        background: #fff;
+      }
+    }
+    .horaires-navigation .nav-button:active {
+      transform: scale(0.95);
+    }
+    .horaires-navigation .nav-button:disabled {
+      visibility: hidden;
+    }
+    @media screen and (max-width: 1024px) {
+      body {
+        padding: 10px 15px;
+      }
+      .horaires-navigation {
+        display: flex;
+      }
+    }
+    @media screen and (min-width: 1025px) {
+      .horaires-navigation {
+        display: none !important;
+      }
+    }
+
+    @supports not (color: color-mix(in srgb, white 50%, black)) {
+      .period-pill { background: rgba(255, 166, 48, 0.22); }
+      .warn-msg { background: rgba(255, 166, 48, 0.15); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="app">
+      <p class="loading">Chargement des horaires…</p>
+    </div>
+  </div>
+  <div class="horaires-navigation" id="horairesNavigation" aria-label="Navigation par jour">
+    <button type="button" id="horairesPrevDay" class="nav-button prev-button" aria-label="Jour précédent">
+      <span class="nav-segments">
+        <span class="segment segment-1"></span>
+        <span class="segment segment-2"></span>
+      </span>
+    </button>
+    <button type="button" id="horairesNextDay" class="nav-button next-button" aria-label="Jour suivant">
+      <span class="nav-segments">
+        <span class="segment segment-1"></span>
+        <span class="segment segment-2"></span>
+      </span>
+    </button>
+  </div>
+  <script>
+(function () {
+  var PR = window.PlanningResolve;
+  if (!PR) {
+    document.getElementById('app').innerHTML = '<p class="error">planning-resolve.js est introuvable.</p>';
+    return;
+  }
+
+  /** Retourne { lines: [{ label, range }], plain: string } pour un slot metadata */
+  function openingParts(slot) {
+    if (!slot) return { lines: [], plain: '' };
+    var lines = [];
+    if (slot.open1 && slot.close1) {
+      lines.push({
+        label: slot.open1Label ? String(slot.open1Label).trim() : '',
+        range: slot.open1 + ' – ' + slot.close1
+      });
+    }
+    if (slot.open2 && slot.close2) {
+      lines.push({
+        label: slot.open2Label ? String(slot.open2Label).trim() : '',
+        range: slot.open2 + ' – ' + slot.close2
+      });
+    }
+    var plain = lines.map(function (L) {
+      return (L.label ? L.label + ' ' : '') + L.range;
+    }).join(' · ');
+    return { lines: lines, plain: plain };
+  }
+
+  /** Pastille uniquement hors période « régulière » (contexte horaires). */
+  function periodLabel(resolved) {
+    var k = String(resolved.planningKey || '');
+    var n = resolved.periodName ? String(resolved.periodName).trim() : '';
+    if (k === 'ferme') return n || 'Fermé';
+    if (k === 'ferie') return n || 'Jour férié';
+    if (k === 'ramadan') return n || 'Ramadan';
+    if (k === 'ete') return n || 'Été';
+    return '';
+  }
+
+  function setBodyTheme(planningKey) {
+    var k = String(planningKey || 'regulier');
+    document.body.className = '';
+    if (k === 'ramadan') document.body.classList.add('pr-ramadan');
+    else if (k === 'ferie') document.body.classList.add('pr-ferie');
+    else if (k === 'ete') document.body.classList.add('pr-ete');
+    else document.body.classList.add('pr-regulier');
+  }
+
+  function renderStructuredHours(parts) {
+    if (!parts.lines.length) return '';
+    var html = '';
+    parts.lines.forEach(function (L) {
+      html +=
+        '<span class="oh-slot">' +
+        (L.label
+          ? '<span class="oh-lbl">' + PR.escapeHtml(L.label) + '</span>'
+          : '') +
+        PR.escapeHtml(L.range) +
+        '</span>';
+    });
+    return html;
+  }
+
+  /** Identifiant stable pour fusionner des jours consécutifs à horaires identiques. */
+  function hoursSignature(rv, p) {
+    if (rv.closed) return 'x:closed';
+    if (!p.lines.length) return 'x:empty';
+    return 'o:' + p.plain;
+  }
+
+  /** JJ mois ou « JJ – JJ mois » / « JJ mois – JJ mois » (noms de mois complets). */
+  function formatDateRangeFr(fromYmd, toYmd) {
+    if (fromYmd === toYmd) return PR.formatDateJjMmmm(fromYmd);
+    var a = PR.parseYmdLocal(fromYmd);
+    var b = PR.parseYmdLocal(toYmd);
+    var months = [
+      'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+    ];
+    if (a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()) {
+      return a.getDate() + ' – ' + b.getDate() + ' ' + months[a.getMonth()];
+    }
+    return PR.formatDateJjMmmm(fromYmd) + ' – ' + PR.formatDateJjMmmm(toYmd);
+  }
+
+  /** Un jour ou « Lundi au Mercredi » — chaque jour avec une capitale initiale. */
+  function dayNamesRangeFr(firstRv, lastRv) {
+    var a = PR.capitalizeDayFr(firstRv.dayName);
+    if (firstRv.dayName === lastRv.dayName) return a;
+    return a + ' au ' + PR.capitalizeDayFr(lastRv.dayName);
+  }
+
+  /** Ligne « Férié » (+ noms de période) si au moins un jour du groupe est férié. */
+  function ferieNoteForWeekGroup(g) {
+    var hasFerie = g.some(function (x) {
+      return x.rv.planningKey === 'ferie';
+    });
+    if (!hasFerie) return '';
+    var names = [];
+    g.forEach(function (x) {
+      if (x.rv.planningKey !== 'ferie') return;
+      var t = x.rv.periodName && String(x.rv.periodName).trim();
+      if (t && names.indexOf(t) === -1) names.push(t);
+    });
+    var line = 'Férié';
+    if (names.length) line += ' — ' + names.join(' · ');
+    return '<p class="week-ferie-note">' + PR.escapeHtml(line) + '</p>';
+  }
+
+  function renderWeekHoursCell(rv, p) {
+    if (rv.closed) {
+      return '<div class="week-hours closed">Fermé</div>';
+    }
+    if (p.lines.length) {
+      var bits = '';
+      p.lines.forEach(function (L) {
+        bits +=
+          '<span class="oh-bit">' +
+          (L.label ? '<span class="oh-lbl">' + PR.escapeHtml(L.label) + '</span>' : '') +
+          PR.escapeHtml(L.range) +
+          '</span>';
+      });
+      return '<div class="week-hours">' + bits + '</div>';
+    }
+    return '<div class="week-hours closed">—</div>';
+  }
+
+  function fetchPlanningJson() {
+    var urls = [
+      './planning-v2.json',
+      './Planning-v2.json',
+      'https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json'
+    ];
+    return (async function () {
+      var lastErr = null;
+      for (var i = 0; i < urls.length; i++) {
+        try {
+          var r = await fetch(urls[i]);
+          if (r.ok) return await r.json();
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+      throw lastErr || new Error('Impossible de charger les horaires');
+    })();
+  }
+
+  function getSelectedYmd() {
+    var ymd = PR.ymdFromDate(new Date());
+    try {
+      var q = new URLSearchParams(window.location.search).get('date');
+      if (q && /^\d{4}-\d{2}-\d{2}$/.test(q)) ymd = PR.clampNavYmd(q);
+    } catch (e) {}
+    return ymd;
+  }
+
+  function syncDateToUrl(ymd) {
+    try {
+      var u = new URL(window.location.href);
+      u.searchParams.set('date', ymd);
+      var qs = u.searchParams.toString();
+      history.pushState({ horairesDate: ymd }, '', u.pathname + (qs ? '?' + qs : '') + u.hash);
+    } catch (e) {}
+  }
+
+  function navCanPrev(ymd) {
+    var min = PR.addDaysToYmd(PR.ymdFromDate(new Date()), -PR.NAV_DAYS_LIMIT);
+    return PR.addDaysToYmd(ymd, -1) >= min;
+  }
+
+  function navCanNext(ymd) {
+    var max = PR.addDaysToYmd(PR.ymdFromDate(new Date()), PR.NAV_DAYS_LIMIT);
+    return PR.addDaysToYmd(ymd, 1) <= max;
+  }
+
+  function updateNavButtons(ymd) {
+    var prev = document.getElementById('horairesPrevDay');
+    var next = document.getElementById('horairesNextDay');
+    if (prev) prev.disabled = !navCanPrev(ymd);
+    if (next) next.disabled = !navCanNext(ymd);
+  }
+
+  var planningData = null;
+
+  function renderHoraires(data, ymd) {
+    var root = document.getElementById('app');
+    var resolved = PR.resolveDailyView(ymd, data);
+    setBodyTheme(resolved.planningKey);
+
+    var horairesMeta = data.metadata && data.metadata.horaires;
+    var oh = PR.pickOpeningHoursForDay(horairesMeta, resolved.planningKey, resolved.dayName);
+    var todayParts = openingParts(oh);
+
+    var pl = periodLabel(resolved);
+    var realToday = PR.ymdFromDate(new Date());
+    var todayHeadline = ymd === realToday ? 'Aujourd’hui' : 'Ce jour';
+    var dateLong = PR.capitalizeDayFr(resolved.dayName) + ' ' + PR.formatDateJjMmmm(ymd);
+
+    var heroDayHead =
+      '<div class="horaires-daily-pattern">' +
+      '<div class="day-title-row">' +
+      '<h2 class="daily-day-heading" id="horairesDayOfWeek">' +
+      PR.escapeHtml(PR.capitalizeDayFr(resolved.dayName)) +
+      '</h2>' +
+      '</div>' +
+      '<div class="date" id="horairesDateStr">' +
+      PR.escapeHtml(PR.formatDateJjMmmm(ymd)) +
+      '</div>' +
+      '</div>';
+
+    var todayBlock = '';
+    if (resolved.closed) {
+      todayBlock =
+        '<p class="warn-msg">La salle est fermée ce jour.</p>';
+    } else if (resolved.indetermine && resolved.planningKey === 'ferie') {
+      todayBlock =
+        '<p class="warn-msg">Horaires d’ouverture indicatifs pour ce jour férié.</p>';
+    }
+
+    var todayHoursBlock = '';
+    if (!resolved.closed) {
+      if (todayParts.lines.length) {
+        todayHoursBlock =
+          '<div class="today-hours">' + renderStructuredHours(todayParts) + '</div>';
+      } else {
+        todayHoursBlock =
+          '<p class="warn-msg" style="margin-top:0.5rem;">Horaires non renseignés pour ce jour.</p>';
+      }
+    }
+
+    var weekHtml = '';
+    var mon = PR.mondayOfWeekContaining(ymd);
+    var weekDays = [];
+    for (var d = 0; d < 7; d++) {
+      var y = PR.addDaysToYmd(mon, d);
+      var rv = PR.resolveDailyView(y, data);
+      var slotW = PR.pickOpeningHoursForDay(horairesMeta, rv.planningKey, rv.dayName);
+      var pW = openingParts(slotW);
+      weekDays.push({ ymd: y, rv: rv, p: pW, sig: hoursSignature(rv, pW) });
+    }
+
+    var weekGroups = [];
+    for (var gi = 0; gi < weekDays.length; ) {
+      var gj = gi;
+      while (gj + 1 < weekDays.length && weekDays[gj + 1].sig === weekDays[gi].sig) {
+        gj++;
+      }
+      weekGroups.push(weekDays.slice(gi, gj + 1));
+      gi = gj + 1;
+    }
+
+    weekGroups.forEach(function (g) {
+      var first = g[0];
+      var last = g[g.length - 1];
+      var inSel = g.some(function (x) {
+        return x.ymd === ymd;
+      });
+      var nameLine = dayNamesRangeFr(first.rv, last.rv);
+      var dateLine = formatDateRangeFr(first.ymd, last.ymd);
+      weekHtml +=
+        '<div class="week-row' + (inSel ? ' is-today' : '') + '">' +
+        '<div class="horaires-daily-pattern horaires-daily-pattern--compact">' +
+        '<div class="day-title-row">' +
+        '<p class="day-heading-compact">' +
+        PR.escapeHtml(nameLine) +
+        '</p>' +
+        '</div>' +
+        '<div class="date">' +
+        PR.escapeHtml(dateLine) +
+        '</div>' +
+        ferieNoteForWeekGroup(g) +
+        '</div>' +
+        renderWeekHoursCell(first.rv, first.p) +
+        '</div>';
+    });
+
+    root.innerHTML =
+      '<header class="page-head">' +
+      '<h1 class="page-title">Horaires d’ouverture</h1>' +
+      '</header>' +
+      '<div class="card card--hero">' +
+      '<h2 class="section-kicker">' + todayHeadline + '</h2>' +
+      (pl ? '<div class="period-pill">' + PR.escapeHtml(pl) + '</div>' : '') +
+      heroDayHead +
+      todayBlock +
+      todayHoursBlock +
+      '</div>' +
+      '<div class="card">' +
+      '<h2 class="section-kicker">La semaine</h2>' +
+      '<div class="week-list">' +
+      weekHtml +
+      '</div>' +
+      '</div>';
+
+    document.title = 'Horaires — ' + dateLong + ' — Canal Forme';
+
+    var navEl = document.getElementById('horairesNavigation');
+    if (navEl) navEl.classList.add('loaded');
+    updateNavButtons(ymd);
+  }
+
+  function bindHorairesNav() {
+    var prev = document.getElementById('horairesPrevDay');
+    var next = document.getElementById('horairesNextDay');
+    if (prev) {
+      prev.addEventListener('click', function () {
+        if (!planningData) return;
+        var y = getSelectedYmd();
+        if (!navCanPrev(y)) return;
+        var n = PR.clampNavYmd(PR.addDaysToYmd(y, -1));
+        syncDateToUrl(n);
+        renderHoraires(planningData, n);
+      });
+    }
+    if (next) {
+      next.addEventListener('click', function () {
+        if (!planningData) return;
+        var y = getSelectedYmd();
+        if (!navCanNext(y)) return;
+        var n = PR.clampNavYmd(PR.addDaysToYmd(y, 1));
+        syncDateToUrl(n);
+        renderHoraires(planningData, n);
+      });
+    }
+    window.addEventListener('popstate', function () {
+      if (planningData) renderHoraires(planningData, getSelectedYmd());
+    });
+  }
+
+  async function main() {
+    var root = document.getElementById('app');
+    try {
+      planningData = await fetchPlanningJson();
+    } catch (e) {
+      root.innerHTML =
+        '<p class="error">Impossible de charger les données. Vérifiez la connexion ou le fichier local.</p>';
+      return;
+    }
+    bindHorairesNav();
+    renderHoraires(planningData, getSelectedYmd());
+  }
+
+  main();
+})();
+  </script>
+</body>
+</html>
