@@ -7,7 +7,7 @@
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  
+  <link rel="stylesheet" href="planning-tokens.css">
 
   <style>
     /* Styles généraux */
@@ -67,7 +67,14 @@
       --schedule-hours-min-width: 38px;
       --schedule-day-width: calc((100vw - var(--schedule-hours-width)) / 4.4);
     }
-    body.planning-ramadan { --primary-color: #26462d; --primary-overlay: rgba(38, 70, 45, 0.95); --primary-light: rgba(38, 70, 45, 0.85); --secondary-color: #c9a227; position: relative; }
+    body.planning-ramadan {
+      --primary-color: var(--planning-ramadan-primary);
+      --primary-overlay: var(--planning-ramadan-overlay);
+      --primary-light: var(--planning-ramadan-light);
+      --secondary-color: var(--planning-ramadan-secondary);
+      --secondary-light: var(--planning-ramadan-secondary-light);
+      position: relative;
+    }
     body.planning-ramadan::before {
       content: '';
       position: fixed;
@@ -76,7 +83,7 @@
       min-height: 100vh;
       z-index: 0;
       pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');
+      background-image: var(--planning-pattern-ramadan-url);
       background-repeat: repeat;
       background-size: 40px 40px;
       background-position: 0 0;
@@ -93,11 +100,11 @@
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
     body.planning-ferie {
-      --primary-color: #1e5a8a;
-      --primary-overlay: rgba(30, 90, 138, 0.92);
-      --primary-light: rgba(30, 90, 138, 0.82);
-      --secondary-color: #e8c547;
-      --secondary-light: rgba(232, 197, 71, 0.85);
+      --primary-color: var(--planning-ferie-primary);
+      --primary-overlay: var(--planning-ferie-overlay);
+      --primary-light: var(--planning-ferie-light);
+      --secondary-color: var(--planning-ferie-secondary);
+      --secondary-light: var(--planning-ferie-secondary-light);
       position: relative;
     }
     body.planning-ferie .course-block { border-left-color: var(--primary-color); }
@@ -109,7 +116,7 @@
       min-height: 100vh;
       z-index: 0;
       pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
       filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
@@ -122,11 +129,11 @@
     }
 
     body.planning-ete {
-      --primary-color: #b8860b;
-      --primary-overlay: rgba(184, 134, 11, 0.92);
-      --primary-light: rgba(184, 134, 11, 0.82);
-      --secondary-color: #f59e0b;
-      --secondary-light: rgba(245, 158, 11, 0.75);
+      --primary-color: var(--planning-ete-primary);
+      --primary-overlay: var(--planning-ete-overlay);
+      --primary-light: var(--planning-ete-light);
+      --secondary-color: var(--planning-ete-secondary);
+      --secondary-light: var(--planning-ete-secondary-light);
       position: relative;
     }
     body.planning-ete .course-block { border-left-color: var(--primary-color); }
@@ -138,7 +145,7 @@
       min-height: 100vh;
       z-index: 0;
       pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
       opacity: 0.5;
@@ -1833,7 +1840,7 @@
       right: 0;
       top: 0;
       bottom: 0;
-      background-image: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
+      background-image: var(--planning-pattern-mosaic-url);
       background-size: 67px 67px;
       background-repeat: repeat;
       opacity: 0.4;
@@ -1906,37 +1913,37 @@
 
     .weekly-day-title { font-weight: 700; font-size: 0.95em; }
     .weekly-day-date { font-size: 0.78em; font-weight: 500; opacity: 0.9; margin-top: 2px; }
-    .weekly-schedule thead th[data-planning-key="ramadan"] { background: rgba(38, 70, 45, 0.92) !important; color: #fff !important; }
+    .weekly-schedule thead th[data-planning-key="ramadan"] { background: var(--planning-weekly-header-ramadan-bg) !important; color: #fff !important; }
     .weekly-schedule thead th[data-planning-key="ete"],
     .weekly-schedule thead th.today[data-planning-key="ete"] {
-      background: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%) !important;
+      background: var(--planning-weekly-header-ete-gradient) !important;
       color: #fff !important;
       border-bottom-color: rgba(255, 255, 255, 0.25);
     }
     .sticky-days-bar .weekly-schedule-header th[data-planning-key="ete"],
     .sticky-days-bar .weekly-schedule-header th.today[data-planning-key="ete"] {
-      background: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%) !important;
+      background: var(--planning-weekly-header-ete-gradient) !important;
       color: #fff !important;
     }
     .weekly-schedule thead th[data-planning-key="ferie"],
     .weekly-schedule thead th[data-planning-key="ferme"] {
-      background: rgba(30, 90, 138, 0.92) !important;
+      background: var(--planning-weekly-header-ferie-bg) !important;
       color: #fff !important;
       border-bottom-color: rgba(255, 255, 255, 0.25);
     }
     .weekly-schedule thead th.today[data-planning-key="ferie"],
     .weekly-schedule thead th.today[data-planning-key="ferme"] {
-      background: rgba(30, 90, 138, 0.92) !important;
+      background: var(--planning-weekly-header-ferie-bg) !important;
       color: #fff !important;
     }
     .sticky-days-bar .weekly-schedule-header th[data-planning-key="ferie"],
     .sticky-days-bar .weekly-schedule-header th[data-planning-key="ferme"] {
-      background: rgba(30, 90, 138, 0.92) !important;
+      background: var(--planning-weekly-header-ferie-bg) !important;
       color: #fff !important;
     }
     .sticky-days-bar .weekly-schedule-header th.today[data-planning-key="ferie"],
     .sticky-days-bar .weekly-schedule-header th.today[data-planning-key="ferme"] {
-      background: rgba(30, 90, 138, 0.92) !important;
+      background: var(--planning-weekly-header-ferie-bg) !important;
       color: #fff !important;
     }
     .weekly-msg { padding: 8px 6px; text-align: center; font-size: 0.8em; line-height: 1.3; }

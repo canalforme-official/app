@@ -1,0 +1,34 @@
+/**
+ * Jetons partagés : thèmes planning public (Ramadan, férié, été).
+ * Chargé en premier dans le <head> (avant les blocs <style> des pages).
+ * Détails : PLANNING-CSS.md
+ */
+:root {
+  --planning-pattern-mosaic-url: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+  --planning-pattern-ramadan-url: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');
+
+  --planning-ramadan-primary: #26462d;
+  --planning-ramadan-overlay: rgba(38, 70, 45, 0.95);
+  --planning-ramadan-light: rgba(38, 70, 45, 0.85);
+  --planning-ramadan-secondary: #c9a227;
+  --planning-ramadan-secondary-light: rgba(201, 162, 39, 0.75);
+  --planning-ramadan-time: rgba(38, 70, 45, 0.7);
+  --planning-weekly-header-ramadan-bg: rgba(38, 70, 45, 0.92);
+
+  --planning-ferie-primary: #1e5a8a;
+  --planning-ferie-overlay: rgba(30, 90, 138, 0.92);
+  --planning-ferie-light: rgba(30, 90, 138, 0.82);
+  --planning-ferie-secondary: #e8c547;
+  --planning-ferie-secondary-light: rgba(232, 197, 71, 0.85);
+  --planning-ferie-time: rgba(30, 90, 138, 0.72);
+  --planning-weekly-header-ferie-bg: rgba(30, 90, 138, 0.92);
+  --planning-daily-ferie-sheen: linear-gradient(160deg, rgba(232, 197, 71, 0.12) 0%, rgba(30, 90, 138, 0.1) 55%, rgba(72, 6, 7, 0.05) 100%);
+
+  --planning-ete-primary: #b8860b;
+  --planning-ete-overlay: rgba(184, 134, 11, 0.92);
+  --planning-ete-light: rgba(184, 134, 11, 0.82);
+  --planning-ete-secondary: #f59e0b;
+  --planning-ete-secondary-light: rgba(245, 158, 11, 0.75);
+  --planning-ete-time: rgba(184, 134, 11, 0.75);
+  --planning-weekly-header-ete-gradient: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%);
+}

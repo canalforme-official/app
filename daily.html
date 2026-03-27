@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="planning-tokens.css">
 
   <!-- Meta viewport to prevent zooming -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -73,11 +74,11 @@
       --overlay-lighter: rgba(255, 255, 255, 0.2);
     }
     body.planning-ramadan {
-      --primary-color: #26462d;
-      --primary-overlay: rgba(38, 70, 45, 0.95);
-      --primary-light: rgba(38, 70, 45, 0.85);
-      --secondary-color: #c9a227;
-      --secondary-light: rgba(201, 162, 39, 0.75);
+      --primary-color: var(--planning-ramadan-primary);
+      --primary-overlay: var(--planning-ramadan-overlay);
+      --primary-light: var(--planning-ramadan-light);
+      --secondary-color: var(--planning-ramadan-secondary);
+      --secondary-light: var(--planning-ramadan-secondary-light);
       position: relative;
     }
     body.planning-ramadan::before {
@@ -90,7 +91,7 @@
       min-height: 100vh;
       z-index: 0;
       pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');
+      background-image: var(--planning-pattern-ramadan-url);
       background-repeat: repeat;
       background-size: 40px 40px;
       background-position: 0 0;
@@ -114,7 +115,7 @@
     }
     /* Heures de cours en vert Ramadan avec transparence équivalente */
     body.planning-ramadan .time {
-      color: rgba(38, 70, 45, 0.7);
+      color: var(--planning-ramadan-time);
     }
     /* Icônes des studios en vert Ramadan (#26462d) en mode Ramadan */
     body.planning-ramadan .course-studio img {
@@ -123,11 +124,11 @@
 
     /* Mode jour férié / fermé (accent bleu — inversé avec l’été) */
     body.planning-ferie {
-      --primary-color: #1e5a8a;
-      --primary-overlay: rgba(30, 90, 138, 0.92);
-      --primary-light: rgba(30, 90, 138, 0.82);
-      --secondary-color: #e8c547;
-      --secondary-light: rgba(232, 197, 71, 0.85);
+      --primary-color: var(--planning-ferie-primary);
+      --primary-overlay: var(--planning-ferie-overlay);
+      --primary-light: var(--planning-ferie-light);
+      --secondary-color: var(--planning-ferie-secondary);
+      --secondary-light: var(--planning-ferie-secondary-light);
       position: relative;
     }
     body.planning-ferie::before {
@@ -136,7 +137,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
       filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
@@ -155,7 +156,7 @@
       filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
     }
     body.planning-ferie .time {
-      color: rgba(30, 90, 138, 0.72);
+      color: var(--planning-ferie-time);
     }
     body.planning-ferie .course-studio img {
       filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
@@ -163,11 +164,11 @@
 
     /* Mode planning estival (or / ambre — inversé avec le férié) */
     body.planning-ete {
-      --primary-color: #b8860b;
-      --primary-overlay: rgba(184, 134, 11, 0.92);
-      --primary-light: rgba(184, 134, 11, 0.82);
-      --secondary-color: #f59e0b;
-      --secondary-light: rgba(245, 158, 11, 0.75);
+      --primary-color: var(--planning-ete-primary);
+      --primary-overlay: var(--planning-ete-overlay);
+      --primary-light: var(--planning-ete-light);
+      --secondary-color: var(--planning-ete-secondary);
+      --secondary-light: var(--planning-ete-secondary-light);
       position: relative;
     }
     body.planning-ete::before {
@@ -176,7 +177,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
     }
@@ -193,7 +194,7 @@
       filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
     }
     body.planning-ete .time {
-      color: rgba(184, 134, 11, 0.75);
+      color: var(--planning-ete-time);
     }
     body.planning-ete .course-studio img {
       filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
@@ -229,7 +230,7 @@
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
       z-index: 0;
@@ -251,7 +252,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: linear-gradient(160deg, rgba(232, 197, 71, 0.12) 0%, rgba(30, 90, 138, 0.1) 55%, rgba(72, 6, 7, 0.05) 100%);
+      background: var(--planning-daily-ferie-sheen);
     }
     body.planning-ete::after {
       content: '';
