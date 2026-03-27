@@ -44,75 +44,51 @@
     }
     * { box-sizing: border-box; }
     /**
-     * Fond aligné sur daily.html : couleur de base sur body, motif en ::before (z-index 0), voile ::after.
-     * z-index: -1 sur ::before plaçait le motif derrière le canvas → fond « blanc » sans tuile visible.
+     * Motif + voile uniquement via les calques background de <html> (pas de ::before fixed sur body).
+     * Puppeteer / page.screenshot() peignent mal les pseudo fixed ou changent selon le viewport :
+     * un seul chemin pour tout le monde = pas « soit l’un soit l’autre ».
+     * Ordre des backgrounds : première image = au-dessus (voile), dernière = tuile répétée.
      */
     html {
       min-height: 100vh;
       background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08)),
+        var(--planning-pattern-mosaic-url);
+      background-size: 100% 100%, 128px 128px;
+      background-repeat: no-repeat, repeat;
+      background-attachment: scroll, scroll;
+    }
+    html.pr-ramadan {
+      background-image:
+        linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08)),
+        var(--planning-pattern-ramadan-url);
+      background-size: 100% 100%, 40px 40px;
+    }
+    html.pr-ferie {
+      background-image:
+        var(--planning-daily-ferie-sheen),
+        linear-gradient(180deg, rgba(30, 90, 138, 0.1) 0%, rgba(30, 90, 138, 0.04) 50%, transparent 90%),
+        var(--planning-pattern-mosaic-url);
+      background-size: 100% 100%, 100% 100%, 128px 128px;
+      background-repeat: no-repeat, no-repeat, repeat;
+    }
+    html.pr-ete {
+      background-image:
+        linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08)),
+        var(--planning-pattern-mosaic-url);
+      background-size: 100% 100%, 128px 128px;
+      background-repeat: no-repeat, repeat;
     }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: var(--font-text);
       color: var(--text);
-      background-color: var(--bg);
+      background: transparent;
       line-height: 1.5;
       position: relative;
       --primary-color: var(--primary);
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-image: var(--planning-pattern-mosaic-url);
-      background-size: 128px 128px;
-      background-repeat: repeat;
-    }
-    body.pr-ramadan::before {
-      background-image: var(--planning-pattern-ramadan-url);
-      background-size: 40px 40px;
-      opacity: 0.04;
-      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
-    }
-    body.pr-ferie::before {
-      background-image:
-        linear-gradient(180deg, rgba(30, 90, 138, 0.14) 0%, rgba(30, 90, 138, 0.06) 45%, transparent 85%),
-        var(--planning-pattern-mosaic-url);
-      background-size: auto, 128px 128px;
-      background-repeat: no-repeat, repeat;
-      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
-      opacity: 0.85;
-    }
-    body.pr-ete::before {
-      opacity: 1;
-      filter: none;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-    body:not(.pr-ferie)::after {
-      background-color: rgba(72, 6, 7, 0.08);
-    }
-    body.pr-ferie::after {
-      background: var(--planning-daily-ferie-sheen);
-    }
-    /* Puppeteer : calques non-fixed pour capture fiable */
-    body.puppeteer-view::before,
-    body.puppeteer-view::after {
-      position: absolute !important;
-      top: 0;
-      left: 0;
-      width: 100%;
-      min-height: 100vh;
-      height: auto;
-      bottom: auto;
     }
     .wrap {
       max-width: 640px;
@@ -549,6 +525,7 @@
       document.documentElement.classList.remove(c);
     });
     document.body.classList.add(next);
+    document.documentElement.classList.add(next);
     if (pe) {
       document.body.classList.add('puppeteer-view');
       document.documentElement.classList.add('puppeteer-view');
