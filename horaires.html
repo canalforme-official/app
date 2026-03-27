@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-keep-screenshot-bg="1">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,41 +44,57 @@
     }
     * { box-sizing: border-box; }
     /**
-     * Motif + voile uniquement via les calques background de <html> (pas de ::before fixed sur body).
-     * Puppeteer / page.screenshot() peignent mal les pseudo fixed ou changent selon le viewport :
-     * un seul chemin pour tout le monde = pas « soit l’un soit l’autre ».
-     * Ordre des backgrounds : première image = au-dessus (voile), dernière = tuile répétée.
+     * Motif : calques réels dans <body> (.horaires-bg-*), pas seulement le fond de <html>.
+     * Le screenshot-service Puppeteer fait document.body.style.backgroundColor = 'white' :
+     * tout ce qui est « sous » le body (fond html) disparaît ; ces divs fixed restent au-dessus.
+     * data-keep-screenshot-bg sur <html> : le service peut ne plus forcer le blanc (voir screenshot-service).
      */
     html {
       min-height: 100vh;
       background-color: var(--bg);
+    }
+    .horaires-bg-tiles,
+    .horaires-bg-veil {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .horaires-bg-tiles {
+      z-index: 0;
+      background-color: var(--bg);
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+    }
+    body.pr-ramadan .horaires-bg-tiles {
+      background-image: var(--planning-pattern-ramadan-url);
+      background-size: 40px 40px;
+      opacity: 0.04;
+      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+    body.pr-ferie .horaires-bg-tiles {
       background-image:
-        linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08)),
+        linear-gradient(180deg, rgba(30, 90, 138, 0.14) 0%, rgba(30, 90, 138, 0.06) 45%, transparent 85%),
         var(--planning-pattern-mosaic-url);
-      background-size: 100% 100%, 128px 128px;
+      background-size: auto, 128px 128px;
       background-repeat: no-repeat, repeat;
-      background-attachment: scroll, scroll;
+      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
+      opacity: 0.85;
     }
-    html.pr-ramadan {
-      background-image:
-        linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08)),
-        var(--planning-pattern-ramadan-url);
-      background-size: 100% 100%, 40px 40px;
+    body.pr-ete .horaires-bg-tiles {
+      opacity: 1;
+      filter: none;
     }
-    html.pr-ferie {
-      background-image:
-        var(--planning-daily-ferie-sheen),
-        linear-gradient(180deg, rgba(30, 90, 138, 0.1) 0%, rgba(30, 90, 138, 0.04) 50%, transparent 90%),
-        var(--planning-pattern-mosaic-url);
-      background-size: 100% 100%, 100% 100%, 128px 128px;
-      background-repeat: no-repeat, no-repeat, repeat;
+    .horaires-bg-veil {
+      z-index: 0;
     }
-    html.pr-ete {
-      background-image:
-        linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08)),
-        var(--planning-pattern-mosaic-url);
-      background-size: 100% 100%, 128px 128px;
-      background-repeat: no-repeat, repeat;
+    body:not(.pr-ferie) .horaires-bg-veil {
+      background: linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08));
+    }
+    body.pr-ferie .horaires-bg-veil {
+      background: var(--planning-daily-ferie-sheen);
     }
     body {
       margin: 0;
@@ -450,6 +466,8 @@
     }
   })();
   </script>
+  <div class="horaires-bg-tiles" aria-hidden="true"></div>
+  <div class="horaires-bg-veil" aria-hidden="true"></div>
   <div class="wrap">
     <div id="app">
       <p class="loading">Chargement des horaires…</p>
