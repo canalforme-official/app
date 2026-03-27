@@ -119,55 +119,14 @@
     }
 
     body.planning-ferie {
-      --primary-color: #b8860b;
-      --primary-overlay: rgba(184, 134, 11, 0.92);
-      --primary-light: rgba(184, 134, 11, 0.82);
-      --secondary-color: #f59e0b;
-      --secondary-light: rgba(245, 158, 11, 0.75);
-      position: relative;
-    }
-    /* Même motif que planning régulier : pas de filtre (icônes blanches comme d’habitude) */
-    body.planning-ferie::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
-      background-size: 128px 128px;
-      background-repeat: repeat;
-    }
-    body.planning-ferie::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-color: rgba(72, 6, 7, 0.08);
-    }
-    body.planning-ferie .content-wrapper {
-      position: relative;
-      z-index: 1;
-    }
-    body.planning-ferie .today-view-button::before {
-      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
-    }
-    body.planning-ferie .studio-icon {
-      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
-    }
-    /* Jour férié avec cours affichés : heures de début lisibles en blanc sur fond coloré */
-    body.planning-ferie .course-time {
-      color: #fff;
-    }
-
-    body.planning-ete {
       --primary-color: #1e5a8a;
       --primary-overlay: rgba(30, 90, 138, 0.92);
       --primary-light: rgba(30, 90, 138, 0.82);
       --secondary-color: #e8c547;
+      --secondary-light: rgba(232, 197, 71, 0.85);
       position: relative;
     }
-    body.planning-ete::before {
+    body.planning-ferie::before {
       content: '';
       position: fixed;
       inset: 0;
@@ -179,7 +138,7 @@
       filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
       opacity: 0.85;
     }
-    body.planning-ete::after {
+    body.planning-ferie::after {
       content: '';
       position: fixed;
       inset: 0;
@@ -187,15 +146,55 @@
       pointer-events: none;
       background: linear-gradient(160deg, rgba(232, 197, 71, 0.12) 0%, rgba(30, 90, 138, 0.1) 55%, rgba(72, 6, 7, 0.05) 100%);
     }
+    body.planning-ferie .content-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+    body.planning-ferie .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+    body.planning-ferie .studio-icon {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+    body.planning-ferie .course-time {
+      color: #fff;
+    }
+
+    body.planning-ete {
+      --primary-color: #b8860b;
+      --primary-overlay: rgba(184, 134, 11, 0.92);
+      --primary-light: rgba(184, 134, 11, 0.82);
+      --secondary-color: #f59e0b;
+      --secondary-light: rgba(245, 158, 11, 0.75);
+      position: relative;
+    }
+    body.planning-ete::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-size: 128px 128px;
+      background-repeat: repeat;
+    }
+    body.planning-ete::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-color: rgba(72, 6, 7, 0.08);
+    }
     body.planning-ete .content-wrapper {
       position: relative;
       z-index: 1;
     }
     body.planning-ete .today-view-button::before {
-      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
     }
     body.planning-ete .studio-icon {
-      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
     }
 
     .confetti-layer {
@@ -469,10 +468,10 @@
     }
 
     body.planning-ferie .planning-type-label {
-      color: rgba(255, 255, 255, 0.95);
+      color: rgba(255, 255, 255, 0.94);
     }
     body.planning-ete .planning-type-label {
-      color: rgba(255, 255, 255, 0.94);
+      color: rgba(255, 255, 255, 0.95);
     }
 
     /* Badge Maghrib sous le libellé planning, visible en Ramadan */
@@ -561,8 +560,8 @@
       box-shadow: 0 10px 40px rgba(38, 70, 45, 0.08), 0 2px 12px rgba(0, 0, 0, 0.05);
     }
     body.planning-ete .indetermine-card {
-      border-color: rgba(30, 90, 138, 0.2);
-      box-shadow: 0 10px 40px rgba(30, 90, 138, 0.1), 0 2px 12px rgba(232, 197, 71, 0.12);
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
     }
     .indetermine-title {
       display: block;
@@ -583,11 +582,11 @@
       color: #26462d;
     }
     body.planning-ferie .indetermine-card {
-      border-color: rgba(245, 158, 11, 0.35);
-      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
+      border-color: rgba(30, 90, 138, 0.2);
+      box-shadow: 0 10px 40px rgba(30, 90, 138, 0.1), 0 2px 12px rgba(232, 197, 71, 0.12);
     }
     body.planning-ferie .indetermine-title {
-      color: #b8860b;
+      color: #1e5a8a;
     }
     .indetermine-holiday {
       margin: 0 0 12px 0;
@@ -597,13 +596,13 @@
       line-height: 1.35;
     }
     body.planning-ferie .indetermine-holiday {
-      color: #b45309;
+      color: #145a8a;
     }
     body.planning-ete .indetermine-title {
-      color: #1e5a8a;
+      color: #b8860b;
     }
     body.planning-ete .indetermine-holiday {
-      color: #145a8a;
+      color: #b45309;
     }
     .timeline-message--closed {
       display: flex;
@@ -650,10 +649,17 @@
       color: #26462d;
     }
     body.planning-ferie .closed-card {
+      border-color: rgba(30, 90, 138, 0.2);
+      box-shadow: 0 10px 40px rgba(30, 90, 138, 0.1), 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    body.planning-ferie .closed-title {
+      color: #1e5a8a;
+    }
+    body.planning-ete .closed-card {
       border-color: rgba(245, 158, 11, 0.35);
       box-shadow: 0 10px 40px rgba(245, 158, 11, 0.12), 0 2px 12px rgba(0, 0, 0, 0.05);
     }
-    body.planning-ferie .closed-title {
+    body.planning-ete .closed-title {
       color: #b8860b;
     }
 
@@ -1699,6 +1705,12 @@
         var o = {};
         for (var k in p) { if (Object.prototype.hasOwnProperty.call(p, k)) o[k] = p[k]; }
         o.planningKey = normalizePlanningKey(p.planningKey);
+        if (p.type) {
+          var fromType = normalizePlanningKey(p.type);
+          if (o.planningKey === 'regulier' && fromType !== 'regulier') {
+            o.planningKey = fromType;
+          }
+        }
         return o;
       });
       var best = normalized[0];
@@ -1872,8 +1884,8 @@
       var palettes = {
         regulier: ['#480607', '#6b1218', '#8b2942', '#a02828'],
         ramadan: ['#26462d', '#3d6b47', '#4a8c5e', '#2d5a38', '#1e3a24', '#5a8f6a', '#a8d4b8'],
-        ete: ['#1e5a8a', '#2a7ab8', '#e8c547', '#f4d03f', '#87ceeb', '#4682b4', '#ffd54f'],
-        ferie: ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047']
+        ferie: ['#1e5a8a', '#2a7ab8', '#e8c547', '#f4d03f', '#87ceeb', '#4682b4', '#ffd54f'],
+        ete: ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047']
       };
       var paletteKey = planningKey === 'ferme' ? 'ferie' : planningKey;
       var colors = palettes[paletteKey] || palettes.regulier;

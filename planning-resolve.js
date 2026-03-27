@@ -134,6 +134,13 @@
         if (Object.prototype.hasOwnProperty.call(p, k)) o[k] = p[k];
       }
       o.planningKey = normalizePlanningKey(p.planningKey);
+      /* Si la colonne Planning est vide mais « Type » vaut été / férié… (aligné feuille Périodes). */
+      if (p.type) {
+        var fromType = normalizePlanningKey(p.type);
+        if (o.planningKey === 'regulier' && fromType !== 'regulier') {
+          o.planningKey = fromType;
+        }
+      }
       return o;
     });
     var best = normalized[0];

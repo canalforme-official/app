@@ -105,9 +105,10 @@
       for (i = 0; i < 7; i++) {
         ymd = PR.addDaysToYmd(weekMondayYmd, i);
         dayLower = weekDaysOrder[i];
-        listed = PR.isWeekdayListedInBasePlannings(data, dayLower);
-        if (!listed) continue;
         rv = PR.resolveDailyView(ymd, data);
+        listed = PR.isWeekdayListedInBasePlannings(data, dayLower);
+        /* Jour sans aucun cours en base mais période été : afficher quand même la colonne « à déterminer ». */
+        if (!listed && rv.planningKey !== 'ete') continue;
         columns.push({
           ymd: ymd,
           dayKey: dayLower,
@@ -169,7 +170,15 @@
         bodyRows.push({ kind: 'time', time: time });
       }
       if (!bodyRows.length) {
-        bodyRows.push({ kind: 'placeholder' });
+        /* Aucun créneau : une seule ligne donne des cellules status d’une ligne de haut (effet « tout en haut »). */
+        var weekAllStatusOnly = columns.length > 0 && columns.every(function(c) {
+          return c.rv.closed || c.rv.indetermine;
+        });
+        if (weekAllStatusOnly) {
+          bodyRows.push({ kind: 'weekAllStatus' });
+        } else {
+          bodyRows.push({ kind: 'placeholder' });
+        }
       }
 
       var numBodyRows = bodyRows.length;
@@ -189,7 +198,8 @@
         html += '<div class="weekly-day-date">' + PR.escapeHtml(col.dateLabel) + '</div>';
         html += '</th>';
       });
-      html += '</tr></thead><tbody>';
+      var tbodyAllStatusOnly = bodyRows.length === 1 && bodyRows[0].kind === 'weekAllStatus';
+      html += '</tr></thead><tbody' + (tbodyAllStatusOnly ? ' class="weekly-tbody--all-status-only"' : '') + '>';
 
       var todayYmdGen = PR.ymdFromDate(new Date());
       var nowGen = new Date();
@@ -198,7 +208,11 @@
       var ri, row, ci, col;
       var rowspanDone = columns.map(function() { return false; });
 
-      function weeklyStatusColumnHtml(rv) {
+      /**
+       * @param {string} layout 'tranches' ( rowspan sur grille ) | 'centered' ( semaine entière sans créneau )
+       */
+      function weeklyStatusColumnHtml(rv, layout) {
+        layout = layout || 'tranches';
         var msgInner;
         if (rv.closed) {
           msgInner = '<div class="weekly-msg weekly-msg--closed"><strong>Fermé</strong>';
@@ -216,6 +230,9 @@
             '<span class="indetermine-title-line">à&nbsp;déterminer</span></strong>';
           if (rv.periodName) msgInner += '<br><span class="weekly-msg-holiday">' + PR.escapeHtml(rv.periodName) + '</span>';
           msgInner += '<br><span class="weekly-msg-sub">Planning publié prochainement</span></div>';
+        }
+        if (layout === 'centered') {
+          return '<div class="weekly-msg-column weekly-msg-column--single" role="status">' + msgInner + '</div>';
         }
         var tr = '<div class="weekly-msg-tranche"><div class="weekly-msg-tranche-inner">' + msgInner + '</div></div>';
         return '<div class="weekly-msg-column" role="status">' + tr + tr + tr + '</div>';
@@ -258,6 +275,19 @@
             } else {
               html += '<span class="weekly-msg">—</span>';
             }
+            html += '</td>';
+          }
+          html += '</tr>';
+          break;
+        }
+
+        if (row.kind === 'weekAllStatus') {
+          html += '<tr class="course-row-white weekly-row--week-all-status">';
+          html += '<td class="time-cell time-cell-white time-cell--all-status-spacer" aria-hidden="true"></td>';
+          for (ci = 0; ci < columns.length; ci++) {
+            col = columns[ci];
+            html += '<td class="course-cell course-cell--status-msg course-cell--status-msg-centered" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '">';
+            html += weeklyStatusColumnHtml(col.rv, 'centered');
             html += '</td>';
           }
           html += '</tr>';
@@ -804,7 +834,7 @@
 
     /** Même palette et logique que daily.html (spawnConfettiBurst / .confetti-piece), chute ~ un tiers de la fenêtre. */
     function buildWeeklyFerieSparkleParticlesHtml() {
-      var colors = ['#e6b800', '#ffc107', '#f59e0b', '#fff3cd', '#fbbf24', '#fde047'];
+      var colors = ['#1e5a8a', '#2a7ab8', '#87ceeb', '#4682b4', '#5a9fd4', '#3d7bb8'];
       var parts = '';
       var p;
       for (p = 0; p < 56; p++) {

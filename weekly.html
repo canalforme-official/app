@@ -101,12 +101,41 @@
       filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%) !important;
     }
 
-    body.planning-ete {
+    body.planning-ferie {
       --primary-color: #1e5a8a;
       --primary-overlay: rgba(30, 90, 138, 0.92);
       --primary-light: rgba(30, 90, 138, 0.82);
       --secondary-color: #e8c547;
       --secondary-light: rgba(232, 197, 71, 0.85);
+      position: relative;
+    }
+    body.planning-ferie .course-block { border-left-color: var(--primary-color); }
+    body.planning-ferie .weekly-schedule th { background: var(--primary-light); color: #fff; }
+    body.planning-ferie::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      min-height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
+      opacity: 0.5;
+    }
+    body.planning-ferie .content-wrapper { position: relative; z-index: 1; }
+    body.planning-ferie .rotation-view-button::before,
+    body.planning-ferie .today-view-button::before {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+    }
+
+    body.planning-ete {
+      --primary-color: #b8860b;
+      --primary-overlay: rgba(184, 134, 11, 0.92);
+      --primary-light: rgba(184, 134, 11, 0.82);
+      --secondary-color: #f59e0b;
+      --secondary-light: rgba(245, 158, 11, 0.75);
       position: relative;
     }
     body.planning-ete .course-block { border-left-color: var(--primary-color); }
@@ -121,13 +150,12 @@
       background-image: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
       background-size: 128px 128px;
       background-repeat: repeat;
-      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
       opacity: 0.5;
     }
     body.planning-ete .content-wrapper { position: relative; z-index: 1; }
     body.planning-ete .rotation-view-button::before,
     body.planning-ete .today-view-button::before {
-      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%) !important;
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%) !important;
     }
 
     /* Horaires de prière : fond transparent, icône verte Ramadan */
@@ -2109,20 +2137,19 @@
     .weekly-schedule thead th[data-planning-key="ramadan"] { background: rgba(38, 70, 45, 0.92) !important; color: #fff !important; }
     .weekly-schedule thead th[data-planning-key="ete"],
     .weekly-schedule thead th.today[data-planning-key="ete"] {
-      background: linear-gradient(165deg, rgba(232, 197, 71, 0.95) 0%, #1e5a8a 100%) !important;
+      background: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%) !important;
       color: #fff !important;
       border-bottom-color: rgba(255, 255, 255, 0.25);
     }
-    /* Même or que le titre du jour en daily (body.planning-ferie --primary-color #b8860b) */
     .weekly-schedule thead th[data-planning-key="ferie"],
     .weekly-schedule thead th[data-planning-key="ferme"] {
-      background: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%) !important;
+      background: rgba(30, 90, 138, 0.92) !important;
       color: #fff !important;
       border-bottom-color: rgba(255, 255, 255, 0.25);
     }
     .weekly-schedule thead th.today[data-planning-key="ferie"],
     .weekly-schedule thead th.today[data-planning-key="ferme"] {
-      background: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%) !important;
+      background: rgba(30, 90, 138, 0.92) !important;
       color: #fff !important;
     }
     .weekly-msg { padding: 8px 6px; text-align: center; font-size: 0.8em; line-height: 1.3; }
@@ -2174,6 +2201,29 @@
     .weekly-schedule td.course-cell--status-msg[data-planning-key="ferme"],
     .weekly-schedule td.course-cell--status-msg[data-planning-key="ete"] {
       opacity: 0.85;
+    }
+    /* Semaine entière fermée / à déterminer : un seul message centré par jour */
+    .weekly-schedule tbody.weekly-tbody--all-status-only td.time-cell--all-status-spacer,
+    .weekly-schedule tbody.weekly-tbody--all-status-only td.course-cell--status-msg-centered {
+      min-height: min(68vh, 520px);
+      vertical-align: middle;
+    }
+    .weekly-schedule td.course-cell--status-msg-centered {
+      vertical-align: middle;
+    }
+    .weekly-schedule td.course-cell--status-msg-centered .weekly-msg-column--single {
+      position: static;
+      inset: auto;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      min-height: min(64vh, 480px);
+      max-width: 100%;
+    }
+    .weekly-schedule .weekly-msg-column--single {
+      display: flex;
+      box-sizing: border-box;
+      padding: 12px 8px;
     }
     .weekly-msg-tranche {
       flex: 1 1 0;
