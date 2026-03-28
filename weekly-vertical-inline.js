@@ -408,6 +408,35 @@
       }
     }
 
+    /** Aligne la barre sticky sur `scrollLeft` (évite décalage en-tête / grille après changement de semaine sans scroll). */
+    function syncStickyHeaderToScrollLeft() {
+      var wrap = document.getElementById('scheduleScrollWrapper');
+      var sticky = document.getElementById('stickyHeaderContent');
+      if (!wrap || !sticky) return;
+      sticky.style.transform = 'translate3d(' + (-wrap.scrollLeft) + 'px,0,0)';
+    }
+
+    /**
+     * Recolle les calques scroll/transformation (WebKit / Safari surtout) après re-render :
+     * pastilles et blocs animés ne restent pas figés à l’ancienne position à l’écran.
+     */
+    function forceWeeklyVerticalScrollLayersSync() {
+      var wrap = document.getElementById('scheduleScrollWrapper');
+      if (!wrap) return;
+      function runSync() {
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            syncStickyHeaderToScrollLeft();
+            void wrap.offsetHeight;
+            var sl = wrap.scrollLeft;
+            wrap.scrollLeft = sl;
+          });
+        });
+      }
+      runSync();
+      setTimeout(runSync, 220);
+    }
+
     function refreshPlanningDisplay() {
       var el = document.getElementById('weeklySchedule');
       if (!el) return;
@@ -468,12 +497,13 @@
       }
       scheduleWrapper.removeEventListener('scroll', onScroll);
       scheduleWrapper.addEventListener('scroll', onScroll, { passive: true });
-      stickyContent.style.transform = 'translate3d(0,0,0)';
+      syncStickyHeaderToScrollLeft();
       scheduleWrapper.style.webkitOverflowScrolling = 'touch';
 
       applyFilters();
       markMultilineCourseNames();
       refreshWeeklyFerieSparklesAfterLayout();
+      forceWeeklyVerticalScrollLayersSync();
     }
 
     function initializeWeeklyPage() {
@@ -538,12 +568,13 @@
             }
           }
           scheduleWrapper.addEventListener('scroll', onScroll, { passive: true });
-          stickyContent.style.transform = 'translate3d(0,0,0)';
+          syncStickyHeaderToScrollLeft();
           scheduleWrapper.style.webkitOverflowScrolling = 'touch';
         })();
 
         markMultilineCourseNames();
         refreshWeeklyFerieSparklesAfterLayout();
+        forceWeeklyVerticalScrollLayersSync();
         applyWeeklyBodyPlanningTheme();
         renderPlanningViewSwitcher(data);
         updateNavButtonsStateWeek();
