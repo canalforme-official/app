@@ -1335,26 +1335,29 @@
       body.puppeteer-view.planning-ramadan .coaches-section {
         background: radial-gradient(circle, #26462d 0%, #1e3a24 50%, #152a1a 100%);
       }
+      /* Puppeteer : pas de barre du bas ni nav — remplir jusqu’en bas du viewport comme le mobile,
+         sinon 82px−52px + margin-bottom 48px laissaient une bande vide sous les studios. */
       body.puppeteer-view .content-wrapper {
-        height: calc(100vh - 82px);
-        margin-bottom: 48px;
+        height: calc(100vh - 52px);
+        min-height: 0;
+        margin-bottom: 0;
         visibility: visible !important;
         opacity: 1 !important;
         display: flex !important;
         flex-direction: column !important;
       }
       body.puppeteer-view .studios-container {
-        flex: 1 1 auto;
-        min-height: 50vh;
+        flex: 1;
+        min-height: 0;
         visibility: visible !important;
         opacity: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow: visible;
+        overflow: hidden;
       }
       body.puppeteer-view .studios-row {
-        flex: 1 1 auto;
-        min-height: 180px;
+        flex: 1;
+        min-height: 0;
         height: auto;
       }
     }
