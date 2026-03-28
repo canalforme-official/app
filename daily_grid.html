@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-keep-screenshot-bg="1">
 <head>
   <meta charset="UTF-8">
   <title>Planning du jour</title>
@@ -74,24 +74,24 @@
       --shadow-medium: rgba(150, 150, 150, 0.5);
       --shadow-dark: rgba(0, 0, 0, 0.4);
     }
-    /* Motif de fond en planning régulier (même que daily.html) — pas en Ramadan ni jour férié */
-    body:not(.planning-ramadan):not(.planning-ferie):not(.planning-ete)::before {
-      content: '';
+    /* Motif + voile : nœuds .dg-bg-* (captures Puppeteer / headless peignent mal body::before/::after). */
+    .dg-bg-tiles,
+    .dg-bg-veil {
       position: fixed;
       inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body:not(.planning-ramadan):not(.planning-ferie):not(.planning-ete) .dg-bg-tiles {
+      background-color: var(--background-main);
       background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
-      z-index: 0;
-      pointer-events: none;
     }
-    body:not(.planning-ramadan):not(.planning-ferie):not(.planning-ete)::after {
-      content: '';
-      position: fixed;
-      inset: 0;
+    body:not(.planning-ramadan):not(.planning-ferie):not(.planning-ete) .dg-bg-veil {
       background-color: rgba(72, 6, 7, 0.08);
-      z-index: 0;
-      pointer-events: none;
     }
     body.planning-ramadan {
       --primary-color: var(--planning-ramadan-primary);
@@ -101,20 +101,17 @@
       --secondary-light: var(--planning-ramadan-secondary-light);
       position: relative;
     }
-    body.planning-ramadan::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      min-height: 100vh;
-      z-index: 0;
-      pointer-events: none;
+    body.planning-ramadan .dg-bg-tiles {
+      background-color: var(--background-main);
       background-image: var(--planning-pattern-ramadan-url);
       background-repeat: repeat;
       background-size: 40px 40px;
       background-position: 0 0;
       opacity: 0.04;
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+    body.planning-ramadan .dg-bg-veil {
+      display: none;
     }
     body.planning-ramadan .content-wrapper { position: relative; z-index: 1; }
     /* Icône retour à aujourd'hui en vert Ramadan (#26462d) opaque en mode Ramadan */
@@ -134,24 +131,15 @@
       --secondary-light: var(--planning-ferie-secondary-light);
       position: relative;
     }
-    body.planning-ferie::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+    body.planning-ferie .dg-bg-tiles {
+      background-color: var(--background-main);
       background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
       filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
       opacity: 0.85;
     }
-    body.planning-ferie::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+    body.planning-ferie .dg-bg-veil {
       background: var(--planning-daily-ferie-sheen);
     }
     body.planning-ferie .content-wrapper {
@@ -176,22 +164,13 @@
       --secondary-light: var(--planning-ete-secondary-light);
       position: relative;
     }
-    body.planning-ete::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+    body.planning-ete .dg-bg-tiles {
+      background-color: var(--background-main);
       background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
     }
-    body.planning-ete::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+    body.planning-ete .dg-bg-veil {
       background-color: rgba(72, 6, 7, 0.08);
     }
     body.planning-ete .content-wrapper {
@@ -1563,6 +1542,8 @@
   </style>
 </head>
 <body>
+  <div class="dg-bg-tiles" aria-hidden="true"></div>
+  <div class="dg-bg-veil" aria-hidden="true"></div>
   <!-- Boutons de navigation -->
   <div class="navigation">
     <button id="prevDay" onclick="changeDay(-1)" class="nav-button prev-button">
