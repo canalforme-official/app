@@ -650,6 +650,7 @@
 
     function populateCoachDropdown() {
       var data = scheduleData;
+      var PR = getPR();
       var coachDropdownContent = document.getElementById('coachDropdownContent');
       var coachDropdownButton = document.getElementById('coachDropdownButton');
       var coachDropdownText = document.getElementById('coachDropdownText');
@@ -666,7 +667,8 @@
             (course.coachIds || []).forEach(function(coachId) {
               var coach = coachsData.find(function(c) { return c.id === coachId; });
               if (coach && !uniqueCoachesMap.has(coach.name)) {
-                uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: coach.imageUrl || defaultCoachImage });
+                var thumb = (PR && PR.coachPhotoUrl ? PR.coachPhotoUrl(coach) : '') || (coach && coach.imageUrl) || defaultCoachImage;
+                uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: thumb });
               }
             });
           });
