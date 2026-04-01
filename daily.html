@@ -1550,6 +1550,92 @@
       margin-right: 10px;
     }
 
+    .coach-photo-zoomable {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .coach-photo-zoomable:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    .coach-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000020;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .coach-lightbox.coach-lightbox--open {
+      display: flex;
+    }
+
+    .coach-lightbox-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.62);
+      cursor: pointer;
+    }
+
+    .coach-lightbox-panel {
+      position: relative;
+      z-index: 1;
+      max-width: min(96vw, 520px);
+      max-height: 90vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .coach-lightbox-panel img {
+      max-width: 100%;
+      max-height: calc(90vh - 64px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .coach-lightbox-close {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--background-card, #fff);
+      color: var(--primary-color, #333);
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .coach-lightbox-caption {
+      margin: 0;
+      text-align: center;
+      font-size: 1.05em;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+      max-width: 100%;
+    }
+
     /* Style pour le bouton daily-grid-view */
     .daily-grid-view-button {
       position: fixed;
@@ -2377,6 +2463,15 @@
     </div>
   </div>
 
+  <div id="coachLightbox" class="coach-lightbox" aria-hidden="true">
+    <div class="coach-lightbox-backdrop" tabindex="-1" aria-hidden="true"></div>
+    <div class="coach-lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="coachLightboxCaption">
+      <button type="button" class="coach-lightbox-close" aria-label="Fermer">&times;</button>
+      <img id="coachLightboxImg" src="" alt="">
+      <p id="coachLightboxCaption" class="coach-lightbox-caption"></p>
+    </div>
+  </div>
+
   <script>
     var NAV_DAYS_LIMIT = 180;
     let allData = [];
@@ -2532,6 +2627,99 @@
         return coach.pngCaricature;
       }
       return coach.imageUrl || '';
+    }
+
+    /** Portrait HD : G (caricature) en période 1–7 avr., sinon F ; repli sur vignette. */
+    function coachBigPhotoUrl(coach) {
+      if (!coach) return '';
+      if (useCaricatureCoachPhotos() && coach.bigPngCaricature && String(coach.bigPngCaricature).trim() !== '') {
+        return String(coach.bigPngCaricature).trim();
+      }
+      if (coach.bigPngUrl && String(coach.bigPngUrl).trim() !== '') {
+        return String(coach.bigPngUrl).trim();
+      }
+      return coachPhotoUrl(coach) || coach.imageUrl || '';
+    }
+
+    /** Légende lightbox : nom caricature (E) si période + rempli, sinon nom du coach. */
+    function coachLightboxCaption(coach) {
+      if (!coach) return '';
+      if (useCaricatureCoachPhotos() && coach.nomCaricature && String(coach.nomCaricature).trim() !== '') {
+        return String(coach.nomCaricature).trim();
+      }
+      return coach.name || '';
+    }
+
+    var coachLightboxScrollLock_ = '';
+
+    function openCoachLightbox(src, caption) {
+      var root = document.getElementById('coachLightbox');
+      var img = document.getElementById('coachLightboxImg');
+      var cap = document.getElementById('coachLightboxCaption');
+      var closeBtn = root && root.querySelector('.coach-lightbox-close');
+      if (!root || !img || !cap) return;
+      img.src = src;
+      img.alt = caption || '';
+      cap.textContent = caption || '';
+      root.classList.add('coach-lightbox--open');
+      root.setAttribute('aria-hidden', 'false');
+      coachLightboxScrollLock_ = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeCoachLightbox() {
+      var root = document.getElementById('coachLightbox');
+      var img = document.getElementById('coachLightboxImg');
+      if (!root) return;
+      root.classList.remove('coach-lightbox--open');
+      root.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = coachLightboxScrollLock_ || '';
+      if (img) {
+        img.src = '';
+        img.alt = '';
+      }
+    }
+
+    function setupCoachLightbox() {
+      if (window._coachLightboxSetup) return;
+      window._coachLightboxSetup = true;
+      var root = document.getElementById('coachLightbox');
+      var timeline = document.getElementById('timeline');
+      if (!root || !timeline) return;
+      var closeEl = root.querySelector('.coach-lightbox-close');
+      var backdropEl = root.querySelector('.coach-lightbox-backdrop');
+      var panelEl = root.querySelector('.coach-lightbox-panel');
+      if (closeEl) closeEl.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeCoachLightbox();
+      });
+      if (backdropEl) backdropEl.addEventListener('click', function() {
+        closeCoachLightbox();
+      });
+      if (panelEl) panelEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+      timeline.addEventListener('click', function(e) {
+        var ph = e.target.closest && e.target.closest('.coach-photo-zoomable');
+        if (!ph || !ph.getAttribute('data-big-src')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openCoachLightbox(ph.getAttribute('data-big-src'), ph.getAttribute('data-lightbox-caption') || ph.getAttribute('alt') || '');
+      });
+      timeline.addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var ph = e.target.closest && e.target.closest('.coach-photo-zoomable');
+        if (!ph || !ph.getAttribute('data-big-src')) return;
+        e.preventDefault();
+        openCoachLightbox(ph.getAttribute('data-big-src'), ph.getAttribute('data-lightbox-caption') || ph.getAttribute('alt') || '');
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        if (!root.classList.contains('coach-lightbox--open')) return;
+        closeCoachLightbox();
+      });
     }
 
     function initPlanningView(data) {
@@ -3162,8 +3350,15 @@
         var defaultCoachImg = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
         var coachImagesHTML = coachs.map(function(coach) {
           var imgSrc = coachPhotoUrl(coach) || defaultCoachImg;
+          var bigSrc = coachBigPhotoUrl(coach);
+          var lbCaption = coachLightboxCaption(coach);
+          var zoomClass = bigSrc ? ' coach-photo-zoomable' : '';
+          var zoomData = bigSrc
+            ? ' data-big-src="' + escapeHtml(bigSrc) + '" data-lightbox-caption="' + escapeHtml(lbCaption) + '"' +
+              ' tabindex="0" role="button" aria-label="Agrandir la photo de ' + escapeHtml(lbCaption || coach.name) + '"'
+            : '';
           return '<div class="coach-item ' + (isMultipleCoachs ? '' : 'single') + '">' +
-            '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + '" src="' + imgSrc + '" alt="' + escapeHtml(coach.name) + '">' +
+            '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + zoomClass + '" src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(coach.name) + '"' + zoomData + '>' +
             (!isMultipleCoachs ? '<span>' + escapeHtml(coach.name) + '</span>' : '') +
             '</div>';
         }).join('');
@@ -3519,6 +3714,8 @@
       }, observerOptions);
 
       observer.observe(dayOfWeekElement);
+
+      setupCoachLightbox();
     });
 
     // Ajout d'un gestionnaire d'événements pour empêcher le défilement horizontal
