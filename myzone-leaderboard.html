@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Myzone Leaderboard - Canal Forme</title>
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
+  <link rel="stylesheet" href="planning-tokens.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
@@ -2133,7 +2134,8 @@
         profileDiv.classList.add('profile');
 
         const nameDiv = document.createElement('div');
-        nameDiv.classList.add('name');
+        nameDiv.classList.add('name', 'coach-name-bidi');
+        nameDiv.dir = 'auto';
         nameDiv.textContent = user.nickname;
         profileDiv.appendChild(nameDiv);
 
@@ -2302,7 +2304,7 @@
                 <!-- Photo du coach si le type est Coach -->
                 ${user.type === 'Coach' ? `<img class="coach-photo" src="${coachPhotoUrlRow}" alt="Photo de ${user.nickname}" />` : ''}
                 
-                <span class="nickname">${user.nickname}</span>
+                <span class="nickname coach-name-bidi" dir="auto">${user.nickname}</span>
                 <span class="leaderboard-meps">
                     <div class="zone-bar-wrap">${zoneBarHtml}</div>
                     <div class="leaderboard-meps-row">

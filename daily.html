@@ -2468,7 +2468,7 @@
     <div class="coach-lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="coachLightboxCaption">
       <button type="button" class="coach-lightbox-close" aria-label="Fermer">&times;</button>
       <img id="coachLightboxImg" src="" alt="">
-      <p id="coachLightboxCaption" class="coach-lightbox-caption"></p>
+      <p id="coachLightboxCaption" class="coach-lightbox-caption coach-name-bidi" dir="auto"></p>
     </div>
   </div>
 
@@ -2641,13 +2641,17 @@
       return coachPhotoUrl(coach) || coach.imageUrl || '';
     }
 
-    /** Légende lightbox : nom caricature (E) si période + rempli, sinon nom du coach. */
-    function coachLightboxCaption(coach) {
+    /** Texte affiché pour un coach : nom caricature (feuille, col. E) du 1er au 7 avril si renseigné, sinon nom. */
+    function coachDisplayName(coach) {
       if (!coach) return '';
       if (useCaricatureCoachPhotos() && coach.nomCaricature && String(coach.nomCaricature).trim() !== '') {
         return String(coach.nomCaricature).trim();
       }
       return coach.name || '';
+    }
+
+    function coachLightboxCaption(coach) {
+      return coachDisplayName(coach);
     }
 
     var coachLightboxScrollLock_ = '';
@@ -2720,6 +2724,115 @@
         if (!root.classList.contains('coach-lightbox--open')) return;
         closeCoachLightbox();
       });
+    }
+
+    /**
+     * Préchargement intelligent des portraits HD : jour affiché en priorité, puis J±1, hors charge UI.
+     * Les réponses HTTP (Cache-Control / ETag) du CDN des images fixent la durée de cache disque ;
+     * le navigateur réutilise automatiquement les mêmes URL que la lightbox (pas d’expiration côté HTML).
+     */
+    var coachBigPreloadGen_ = 0;
+    var coachBigPreloadDone_ = new Set();
+    var coachBigPreloadInflight_ = new Set();
+    var COACH_BIG_PRELOAD_MAX_PARALLEL = 2;
+
+    function collectDistinctCoachBigUrlsForYmd(ymd, data, skipIfBigEqualsThumb) {
+      if (!data || !ymd) return [];
+      var rv = resolveDailyView(ymd, data);
+      if (rv.closed || rv.indetermine || !(rv.courses && rv.courses.length)) return [];
+      var coachsList = data.coachs || [];
+      var ordered = [];
+      var seen = new Set();
+      rv.courses.forEach(function(course) {
+        var coachs = (course.coachIds || []).map(function(cid) {
+          return coachsList.find(function(c) { return c.id === cid; });
+        }).filter(Boolean);
+        coachs.forEach(function(coach) {
+          var big = coachBigPhotoUrl(coach);
+          if (!big) return;
+          if (skipIfBigEqualsThumb) {
+            var thumb = coachPhotoUrl(coach) || coach.imageUrl || '';
+            if (big === thumb) return;
+          }
+          if (seen.has(big)) return;
+          seen.add(big);
+          ordered.push(big);
+        });
+      });
+      return ordered;
+    }
+
+    function runCoachBigPreloadQueue(urls, gen) {
+      if (gen !== coachBigPreloadGen_) return;
+      var queue = urls.filter(function(u) {
+        return !coachBigPreloadDone_.has(u) && !coachBigPreloadInflight_.has(u);
+      });
+      if (!queue.length) return;
+
+      var inflightCount = 0;
+
+      function isStale() {
+        return gen !== coachBigPreloadGen_;
+      }
+
+      function pump() {
+        if (isStale()) return;
+        while (inflightCount < COACH_BIG_PRELOAD_MAX_PARALLEL && queue.length) {
+          (function(urlToLoad) {
+            coachBigPreloadInflight_.add(urlToLoad);
+            inflightCount++;
+            var im = new Image();
+            im.onload = im.onerror = function() {
+              coachBigPreloadInflight_.delete(urlToLoad);
+              coachBigPreloadDone_.add(urlToLoad);
+              inflightCount--;
+              if (isStale()) return;
+              pump();
+            };
+            im.src = urlToLoad;
+          })(queue.shift());
+        }
+      }
+
+      function start() {
+        if (isStale()) return;
+        pump();
+      }
+
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(start, { timeout: 2200 });
+      } else {
+        setTimeout(start, 100);
+      }
+    }
+
+    function scheduleCoachBigPhotoPreload() {
+      if (!allData) return;
+      var gen = ++coachBigPreloadGen_;
+      var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
+
+      var parts = [];
+      parts = parts.concat(collectDistinctCoachBigUrlsForYmd(ymd, allData, true));
+
+      var prevY = addDaysToYmd(ymd, -1);
+      var nextY = addDaysToYmd(ymd, 1);
+      if (clampNavYmd(prevY) === prevY) {
+        parts = parts.concat(collectDistinctCoachBigUrlsForYmd(prevY, allData, false));
+      }
+      if (clampNavYmd(nextY) === nextY) {
+        parts = parts.concat(collectDistinctCoachBigUrlsForYmd(nextY, allData, false));
+      }
+
+      var merged = [];
+      var seen = new Set();
+      for (var i = 0; i < parts.length; i++) {
+        var u = parts[i];
+        if (seen.has(u)) continue;
+        seen.add(u);
+        merged.push(u);
+      }
+
+      runCoachBigPreloadQueue(merged, gen);
     }
 
     function initPlanningView(data) {
@@ -3351,15 +3464,16 @@
         var coachImagesHTML = coachs.map(function(coach) {
           var imgSrc = coachPhotoUrl(coach) || defaultCoachImg;
           var bigSrc = coachBigPhotoUrl(coach);
+          var disp = coachDisplayName(coach);
           var lbCaption = coachLightboxCaption(coach);
           var zoomClass = bigSrc ? ' coach-photo-zoomable' : '';
           var zoomData = bigSrc
             ? ' data-big-src="' + escapeHtml(bigSrc) + '" data-lightbox-caption="' + escapeHtml(lbCaption) + '"' +
-              ' tabindex="0" role="button" aria-label="Agrandir la photo de ' + escapeHtml(lbCaption || coach.name) + '"'
+              ' tabindex="0" role="button" aria-label="Agrandir la photo de ' + escapeHtml(lbCaption || disp) + '"'
             : '';
           return '<div class="coach-item ' + (isMultipleCoachs ? '' : 'single') + '">' +
-            '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + zoomClass + '" src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(coach.name) + '"' + zoomData + '>' +
-            (!isMultipleCoachs ? '<span>' + escapeHtml(coach.name) + '</span>' : '') +
+            '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + zoomClass + '" src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(disp) + '"' + zoomData + '>' +
+            (!isMultipleCoachs ? '<span dir="auto" class="coach-name-bidi">' + escapeHtml(disp) + '</span>' : '') +
             '</div>';
         }).join('');
 
@@ -3384,6 +3498,12 @@
 
       scheduleContainer.innerHTML = scheduleHTML;
       toggleTodayButton();
+
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          scheduleCoachBigPhotoPreload();
+        });
+      });
 
       if (!skipAutoScroll) {
         if (isSelectedDateToday()) {

@@ -1767,6 +1767,14 @@
       return coach.imageUrl || '';
     }
 
+    function coachDisplayName(coach) {
+      if (!coach) return '';
+      if (useCaricatureCoachPhotos() && coach.nomCaricature && String(coach.nomCaricature).trim() !== '') {
+        return String(coach.nomCaricature).trim();
+      }
+      return coach.name || '';
+    }
+
     function initPlanningView(data) {
       document.body.classList.remove('planning-ramadan');
       document.body.classList.remove('planning-ferie');
@@ -2480,7 +2488,8 @@
         var coachCard = document.createElement('div');
         coachCard.className = 'coach-card';
         var coachImage = coachPhotoUrl(coachData) || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
-        coachCard.innerHTML = '<img src="' + coachImage + '" alt="' + escapeHtml(coachData.name) + '" class="coach-image" onerror="this.src=\'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png\'"><div class="coach-name">' + escapeHtml(coachData.name) + '</div>';
+        var disp = coachDisplayName(coachData);
+        coachCard.innerHTML = '<img src="' + coachImage + '" alt="' + escapeHtml(disp) + '" class="coach-image" onerror="this.src=\'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png\'"><div class="coach-name coach-name-bidi" dir="auto">' + escapeHtml(disp) + '</div>';
         coachesSection.appendChild(coachCard);
       });
 

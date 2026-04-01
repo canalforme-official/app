@@ -3,6 +3,14 @@
  * Chargé en premier dans le <head> (avant les blocs <style> des pages).
  * Détails : PLANNING-CSS.md
  */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap');
+
+/* Noms de coachs (FR / AR / mixte) : direction auto côté HTML (dir="auto") + police arabe lisible */
+.coach-name-bidi {
+  unicode-bidi: isolate;
+  font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, system-ui, sans-serif;
+}
+
 :root {
   --planning-pattern-mosaic-url: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png');
   --planning-pattern-ramadan-url: url('https://mcusercontent.com/74abea872abd45d46efed5d41/images/46685c10-b83c-7d4f-0cbd-4ead782d61a4.png');

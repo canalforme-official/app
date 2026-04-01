@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
     <title>Status Leaderboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="planning-tokens.css">
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -1069,7 +1070,7 @@
                         <td style="padding-left: 15px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
-                                ${user.nickname}
+                                <span class="coach-name-bidi" dir="auto">${user.nickname}</span>
                             </div>
                         </td>
                         <td>
@@ -1126,7 +1127,7 @@
                                 <td style="padding-left: 15px;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         ${coachImgSrcMore ? `<img src="${coachImgSrcMore}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
-                                        ${user.nickname}
+                                        <span class="coach-name-bidi" dir="auto">${user.nickname}</span>
                                     </div>
                                 </td>
                                 <td>

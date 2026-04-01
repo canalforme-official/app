@@ -260,6 +260,15 @@
     return coach.imageUrl || '';
   }
 
+  /** Libellé affiché : nom caricature (feuille Coachs, col. E) du 1er au 7 avril si renseigné, sinon nom du coach. */
+  function coachDisplayName(coach) {
+    if (!coach) return '';
+    if (useCaricatureCoachPhotos() && coach.nomCaricature && String(coach.nomCaricature).trim() !== '') {
+      return String(coach.nomCaricature).trim();
+    }
+    return coach.name || '';
+  }
+
   var api = {
     NAV_DAYS_LIMIT: NAV_DAYS_LIMIT,
     ymdFromDate: ymdFromDate,
@@ -283,7 +292,8 @@
     pickOpeningHoursForDay: pickOpeningHoursForDay,
     escapeHtml: escapeHtml,
     useCaricatureCoachPhotos: useCaricatureCoachPhotos,
-    coachPhotoUrl: coachPhotoUrl
+    coachPhotoUrl: coachPhotoUrl,
+    coachDisplayName: coachDisplayName
   };
 
   global.PlanningResolve = api;

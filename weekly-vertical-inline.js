@@ -150,8 +150,11 @@
             duration: course.duration,
             type: course.type,
             coachs: coachsInfo.map(function(coach) {
+              var nm = coach ? coach.name : 'Coach inconnu';
+              var disp = coach && PR.coachDisplayName ? PR.coachDisplayName(coach) : nm;
               return {
-                name: coach ? coach.name : 'Coach inconnu',
+                name: nm,
+                displayName: disp,
                 imageUrl: PR.coachPhotoUrl(coach) || (coach && coach.imageUrl) || ''
               };
             })
@@ -327,10 +330,12 @@
               }
               coachImagesHtml = '';
               if (course.coachs.length === 1) {
-                var coachImageUrl = course.coachs[0].imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+                var c0 = course.coachs[0];
+                var coachImageUrl = c0.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+                var disp0 = c0.displayName || c0.name;
                 coachImagesHtml = '<div class="single-coach">' +
-                  '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(course.coachs[0].name) + '" draggable="false">' +
-                  '<span>' + PR.escapeHtml(course.coachs[0].name) + '</span></div>';
+                  '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(disp0) + '" draggable="false">' +
+                  '<span dir="auto" class="coach-name-bidi">' + PR.escapeHtml(disp0) + '</span></div>';
               } else if (course.coachs.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
                 course.coachs.forEach(function(coach) {
@@ -668,7 +673,8 @@
               var coach = coachsData.find(function(c) { return c.id === coachId; });
               if (coach && !uniqueCoachesMap.has(coach.name)) {
                 var thumb = (PR && PR.coachPhotoUrl ? PR.coachPhotoUrl(coach) : '') || (coach && coach.imageUrl) || defaultCoachImage;
-                uniqueCoachesMap.set(coach.name, { name: coach.name, imageUrl: thumb });
+                var dispN = PR.coachDisplayName ? PR.coachDisplayName(coach) : coach.name;
+                uniqueCoachesMap.set(coach.name, { name: coach.name, displayName: dispN, imageUrl: thumb });
               }
             });
           });
@@ -700,9 +706,11 @@
         var img = document.createElement('img');
         img.className = 'coach-dropdown-option-photo';
         img.src = coachObj.imageUrl;
-        img.alt = coachObj.name;
+        img.alt = coachObj.displayName || coachObj.name;
         var span = document.createElement('span');
-        span.textContent = coachObj.name;
+        span.dir = 'auto';
+        span.className = 'coach-name-bidi';
+        span.textContent = coachObj.displayName || coachObj.name;
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = coachObj.name;
