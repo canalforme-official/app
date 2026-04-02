@@ -83,26 +83,23 @@
       );
     }
     .photo-load-hint {
-      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.45rem;
-      margin: 0 auto 0.35rem;
-      padding: 0.28rem 0.65rem;
-      max-width: 18rem;
+      gap: 0.35rem;
+      margin: 0;
+      padding: 0.2rem 0;
       width: 100%;
+      max-width: 100%;
       font-family: var(--font-title);
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--wcp-primary);
-      background: rgba(255, 255, 255, 0.82);
-      border: 1px solid var(--wcp-border);
-      border-radius: 999px;
-      box-shadow: var(--wcp-shadow);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
+      color: var(--wcp-muted);
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
     }
     .photo-load-hint[hidden] {
       display: none !important;
@@ -125,19 +122,28 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
+      justify-content: flex-start;
       min-height: 0;
-      padding: max(0.28rem, env(safe-area-inset-top, 0px)) 0.45rem 2.25rem;
+      padding:
+        max(0.28rem, env(safe-area-inset-top, 0px))
+        max(0.45rem, env(safe-area-inset-right, 0px))
+        max(0.35rem, env(safe-area-inset-bottom, 0px))
+        max(0.45rem, env(safe-area-inset-left, 0px));
       width: 100%;
-      margin: 0 auto;
+      margin: 0;
+    }
+    .app__content-top {
+      flex-shrink: 0;
+      align-self: flex-start;
+      max-width: 19.5rem;
+      width: 100%;
     }
     .week-ribbon {
-      flex-shrink: 0;
-      margin: 0 0 0.35rem;
-      padding: 0 0.5rem;
+      margin: 0 0 0.2rem;
+      padding: 0;
       width: 100%;
-      max-width: 20rem;
-      text-align: center;
+      text-align: left;
       font-size: 0.58rem;
       letter-spacing: 0.04em;
       color: rgba(92, 83, 80, 0.92);
@@ -147,42 +153,103 @@
         0 0 8px rgba(255, 255, 255, 0.95),
         0 1px 2px rgba(255, 255, 255, 0.8);
     }
+    .schedule-header {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: center;
+      width: 100%;
+      max-width: 19.5rem;
+      margin: 0 0 0.08rem;
+      padding: 0;
+      font-family: var(--font-title);
+      pointer-events: none;
+    }
+    .schedule-course-count {
+      flex-shrink: 0;
+      margin: 0;
+      padding: 0;
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--wcp-primary);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+      white-space: nowrap;
+      text-align: center;
+    }
+    .schedule-course-count[hidden],
+    .schedule-header[hidden] {
+      display: none !important;
+    }
+    .coach-dock {
+      position: fixed;
+      z-index: 40;
+      left: max(0.45rem, env(safe-area-inset-left, 0px));
+      right: max(0.45rem, env(safe-area-inset-right, 0px));
+      bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
+      width: auto;
+      max-width: none;
+      max-height: calc(100dvh - max(0.45rem, env(safe-area-inset-bottom, 0px)) - max(0.28rem, env(safe-area-inset-top, 0px)) - 0.5rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.12rem;
+      pointer-events: none;
+    }
+    .coach-dock__stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.12rem;
+      min-height: 0;
+      flex: 0 1 auto;
+      width: 100%;
+      max-width: min(22rem, calc(100vw - 0.9rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+    }
+    .coach-dock .schedule-narrow {
+      pointer-events: auto;
+    }
     .coach-hero-name:empty {
       display: none;
     }
     .coach-hero-name {
-      position: fixed;
-      z-index: 40;
-      right: max(0.65rem, env(safe-area-inset-right, 0px));
-      bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
-      left: auto;
+      --coach-name-fs: clamp(0.75rem, 8vw, 4.4rem);
+      position: static;
       margin: 0;
-      padding: 0.15rem 0.1rem;
-      max-width: min(92vw, 14rem);
+      padding: 0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       font-family: var(--font-title);
       font-weight: 700;
-      font-size: clamp(2.4rem, 11vw, 4.4rem);
+      font-size: var(--coach-name-fs);
       letter-spacing: 0.03em;
       text-transform: uppercase;
-      text-align: right;
-      line-height: 0.95;
+      text-align: center;
+      line-height: 1;
       color: var(--wcp-primary);
       pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
       text-shadow:
         0 0 20px rgba(255, 255, 255, 0.98),
         0 0 8px rgba(255, 255, 255, 1),
         0 2px 14px rgba(243, 241, 240, 0.95);
     }
-    .coach-footer-whisper {
+    .coach-index-badge {
       position: fixed;
-      z-index: 39;
-      left: max(0.55rem, env(safe-area-inset-left, 0px));
-      right: auto;
-      bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+      z-index: 40;
+      left: max(0.5rem, env(safe-area-inset-left, 0px));
+      bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
+      margin: 0;
+      padding: 0;
+      max-width: calc(50vw - 1rem);
       text-align: left;
       pointer-events: none;
       font-family: var(--font-title);
-      font-size: 0.58rem;
+      font-size: 0.55rem;
       letter-spacing: 0.04em;
       color: rgba(92, 83, 80, 0.88);
       text-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
@@ -192,8 +259,10 @@
       font-family: 'Noto Sans Arabic', 'Segoe UI', system-ui, sans-serif;
     }
     .schedule-narrow {
-      flex: 1;
+      flex: 0 1 auto;
+      margin-top: 0;
       min-height: 0;
+      max-height: min(46vh, calc(100dvh - 11rem));
       width: 100%;
       max-width: 19.5rem;
       display: flex;
@@ -204,7 +273,7 @@
       min-height: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 0.12rem 0 max(6.5rem, env(safe-area-inset-bottom, 0px));
+      padding: 0.12rem 0 0.35rem;
     }
     .schedule-table {
       width: 100%;
@@ -254,48 +323,48 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.18rem 0.32rem;
+      gap: 0.2rem 0.4rem;
     }
     .slot-tools {
       display: inline-flex;
       align-items: center;
-      gap: 0.22rem;
+      gap: 0.28rem;
       flex-shrink: 0;
       margin-left: auto;
     }
-    /* Pastilles type : mêmes symboles & dégradés que AdminStyles (atelier planning) */
+    /* Symboles atelier (♀ ♂ ⚥) : même fond dégradé, intégrés à la ligne sans cadre séparé */
     .wcp-type-pill {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
       flex-shrink: 0;
-      padding: 0;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      padding: 0.08rem 0.34rem 0.1rem;
+      margin: 0;
+      min-width: 0;
+      height: auto;
+      border-radius: 6px;
+      font-size: 1.05rem;
       line-height: 1;
-      border: 1px solid var(--wcp-border);
-      box-shadow: 0 1px 3px rgba(var(--wcp-primary-rgb), 0.08);
+      border: none;
+      box-shadow: none;
+      vertical-align: middle;
     }
     .wcp-type-pill__ico {
       pointer-events: none;
       line-height: 1;
+      display: block;
     }
     .wcp-type-pill--f {
       background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
       color: #880e4f;
-      border-color: #f48fb1;
     }
     .wcp-type-pill--h {
       background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
       color: #0d47a1;
-      border-color: #64b5f6;
     }
     .wcp-type-pill--m {
       background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
       color: #4a148c;
-      border-color: #ce93d8;
     }
     .slot-studio-logo {
       display: block;
@@ -326,8 +395,8 @@
     .empty-msg {
       padding: 0.75rem 0.5rem;
       max-width: 19.5rem;
-      margin: 0 auto;
-      text-align: center;
+      margin: 0;
+      text-align: left;
       font-size: 0.78rem;
       color: var(--wcp-muted);
       background: rgba(255, 255, 255, 0.38);
@@ -448,18 +517,27 @@
     <div id="appPhoto" class="app__photo" aria-hidden="true"></div>
     <div class="app__veil" aria-hidden="true"></div>
     <div class="app__content">
-      <p class="week-ribbon" id="weekRangeLine"></p>
+      <div class="app__content-top">
+        <p class="week-ribbon" id="weekRangeLine"></p>
+      </div>
+    </div>
+    <p class="coach-index-badge" id="coachFooterWhisper" aria-live="polite"></p>
+    <div class="coach-dock" id="coachDock" aria-live="polite">
+      <div class="coach-dock__stack">
+        <div class="schedule-header" id="scheduleBlockHeader">
+          <span class="schedule-course-count" id="courseCountLine" hidden></span>
+        </div>
+        <div class="schedule-narrow">
+          <div class="schedule" id="schedule"></div>
+        </div>
+        <h2 class="coach-hero-name coach-name-bidi" id="coachName" dir="auto"></h2>
+      </div>
       <div id="photoLoadHint" class="photo-load-hint" hidden>
         <span class="photo-load-hint__spin" aria-hidden="true"></span>
         <span>Chargement de la photo…</span>
       </div>
-      <div class="schedule-narrow">
-        <div class="schedule" id="schedule"></div>
-      </div>
     </div>
   </div>
-  <h2 class="coach-hero-name coach-name-bidi" id="coachName" dir="auto"></h2>
-  <p class="coach-footer-whisper" id="coachFooterWhisper" aria-live="polite"></p>
   <div class="coach-navigation" id="coachNavigation" aria-label="Changer de coach">
     <button type="button" id="btnPrevCoach" class="nav-button prev-button" aria-label="Coach précédent">
       <span class="nav-segments">
@@ -705,7 +783,6 @@
           '<span class="slot-row">' +
           '<span class="slot-time">' +
           PR.escapeHtml(c.startTime || '') +
-          (c.endTime ? '–' + PR.escapeHtml(c.endTime) : '') +
           '</span>' +
           '<span class="slot-title">' + PR.escapeHtml(title) + '</span>' +
           (tools ? '<span class="slot-tools">' + tools + '</span>' : '') +
@@ -717,7 +794,69 @@
     return '<table class="schedule-table">' + rows + '</table>';
   }
 
-  var photoPreloadRef_ = null;
+  /**
+   * Cache mémoire + file d’attente : une seule requête réseau par URL (HTTP cache navigateur en plus).
+   * Les autres coaches de la semaine sont préchargés en arrière-plan.
+   */
+  var heroPhotoReady_ = Object.create(null);
+  var heroPhotoFailed_ = Object.create(null);
+  var heroInflightCbs_ = Object.create(null);
+  var applyPhotoGeneration_ = 0;
+
+  function preloadHeroPhotoUrl(url, callback) {
+    if (!url) {
+      if (callback) callback(false);
+      return;
+    }
+    if (heroPhotoReady_[url]) {
+      if (callback) callback(true);
+      return;
+    }
+    if (heroPhotoFailed_[url]) {
+      if (callback) callback(false);
+      return;
+    }
+    if (!heroInflightCbs_[url]) {
+      heroInflightCbs_[url] = [];
+      var img = new Image();
+      img.onload = function () {
+        heroPhotoReady_[url] = true;
+        var list = heroInflightCbs_[url];
+        delete heroInflightCbs_[url];
+        if (list) {
+          for (var i = 0; i < list.length; i++) {
+            if (list[i]) list[i](true);
+          }
+        }
+      };
+      img.onerror = function () {
+        heroPhotoFailed_[url] = true;
+        var list = heroInflightCbs_[url];
+        delete heroInflightCbs_[url];
+        if (list) {
+          for (var j = 0; j < list.length; j++) {
+            if (list[j]) list[j](false);
+          }
+        }
+      };
+      img.src = url;
+    }
+    if (callback) heroInflightCbs_[url].push(callback);
+  }
+
+  function prefetchHeroPhotosForWeek(data, bag) {
+    if (!data || !bag || !bag.coachOrder || !bag.coachOrder.length) return;
+    var list = data.coachs || [];
+    for (var i = 0; i < bag.coachOrder.length; i++) {
+      var cid = bag.coachOrder[i];
+      var coach = list.find(function (c) {
+        return c && c.id === cid;
+      });
+      var u =
+        coach && PR.coachHeroBackgroundUrl ? PR.coachHeroBackgroundUrl(coach) : '';
+      if (u) preloadHeroPhotoUrl(u, null);
+    }
+  }
 
   function setPhotoLoadingUi(active) {
     var photoEl = document.getElementById('appPhoto');
@@ -729,32 +868,60 @@
   function applyPhoto(bigUrl) {
     var el = document.getElementById('appPhoto');
     if (!el) return;
-    if (photoPreloadRef_) {
-      photoPreloadRef_.onload = null;
-      photoPreloadRef_.onerror = null;
-      photoPreloadRef_ = null;
-    }
+    var gen = ++applyPhotoGeneration_;
     if (!bigUrl) {
       el.style.backgroundImage = 'none';
       setPhotoLoadingUi(false);
       return;
     }
-    setPhotoLoadingUi(true);
-    var img = new Image();
-    photoPreloadRef_ = img;
-    img.onload = function () {
-      if (photoPreloadRef_ !== img) return;
+    if (heroPhotoReady_[bigUrl]) {
       el.style.backgroundImage = cssBackgroundImageUrl(bigUrl);
       setPhotoLoadingUi(false);
-      photoPreloadRef_ = null;
-    };
-    img.onerror = function () {
-      if (photoPreloadRef_ !== img) return;
+      return;
+    }
+    if (heroPhotoFailed_[bigUrl]) {
       el.style.backgroundImage = 'none';
       setPhotoLoadingUi(false);
-      photoPreloadRef_ = null;
-    };
-    img.src = bigUrl;
+      return;
+    }
+    setPhotoLoadingUi(true);
+    preloadHeroPhotoUrl(bigUrl, function (ok) {
+      if (gen !== applyPhotoGeneration_) return;
+      if (ok) el.style.backgroundImage = cssBackgroundImageUrl(bigUrl);
+      else el.style.backgroundImage = 'none';
+      setPhotoLoadingUi(false);
+    });
+  }
+
+  function fitCoachHeroName() {
+    var el = document.getElementById('coachName');
+    if (!el) return;
+    if (!(el.textContent || '').trim()) {
+      el.style.removeProperty('--coach-name-fs');
+      return;
+    }
+    var maxRem = 4.4;
+    var minRem = 0.55;
+    var step = 0.055;
+    var rem = maxRem;
+    el.style.setProperty('--coach-name-fs', rem + 'rem');
+    var iter = 0;
+    while (iter < 110) {
+      if (el.scrollWidth <= el.clientWidth + 1) break;
+      rem -= step;
+      if (rem <= minRem) {
+        el.style.setProperty('--coach-name-fs', minRem + 'rem');
+        break;
+      }
+      el.style.setProperty('--coach-name-fs', rem + 'rem');
+      iter++;
+    }
+  }
+
+  function scheduleFitCoachName() {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(fitCoachHeroName);
+    });
   }
 
   function render() {
@@ -774,13 +941,21 @@
 
     document.getElementById('coachNavigation').classList.toggle('loaded', n > 1);
 
+    var countLine = document.getElementById('courseCountLine');
+    var blockHeader = document.getElementById('scheduleBlockHeader');
     if (n === 0) {
       applyPhoto('');
       document.getElementById('coachName').textContent = '';
       document.getElementById('coachFooterWhisper').textContent = '';
+      if (blockHeader) blockHeader.hidden = true;
+      if (countLine) {
+        countLine.textContent = '';
+        countLine.hidden = true;
+      }
       document.getElementById('schedule').innerHTML =
       '<p class="empty-msg">Aucun cours sur cette semaine.</p>';
       document.title = 'Planning coach — Canal Forme';
+      scheduleFitCoachName();
       return;
     }
 
@@ -799,9 +974,21 @@
     document.getElementById('coachFooterWhisper').textContent =
       'Coach ' + (state.coachIndex + 1) + ' / ' + n;
 
+    if (blockHeader) blockHeader.hidden = false;
+    if (countLine) {
+      var nCours = entries.length;
+      countLine.textContent = nCours + ' cours cette semaine';
+      countLine.hidden = false;
+    }
+
     document.getElementById('schedule').innerHTML = renderScheduleTable(data, entries);
+
+    prefetchHeroPhotosForWeek(data, bag);
+
     document.title =
       displayName + ' — sem. ISO ' + iso.week + ' — Canal Forme';
+
+    scheduleFitCoachName();
   }
 
   function prevCoach() {
@@ -820,9 +1007,15 @@
     render();
   }
 
+  var wcpFitNameTimer = null;
+
   function bindNav() {
     document.getElementById('btnPrevCoach').addEventListener('click', prevCoach);
     document.getElementById('btnNextCoach').addEventListener('click', nextCoach);
+    window.addEventListener('resize', function () {
+      clearTimeout(wcpFitNameTimer);
+      wcpFitNameTimer = setTimeout(scheduleFitCoachName, 120);
+    });
     window.addEventListener('popstate', function () {
       state.weekMonday = getWeekMondayFromLocation();
       var bag = state.data ? collectWeekByCoach(state.data, state.weekMonday) : null;
