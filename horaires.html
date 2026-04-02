@@ -11,20 +11,28 @@
   <link rel="stylesheet" href="planning-tokens.css">
   <script src="planning-resolve.js"></script>
   <style>
+    /* Palette alignée sur myzone-leaderboard.html (bordeaux #6e0c0c ↔ rouge #e42218) */
     :root {
+      --horaires-logo-size: clamp(76px, 17vw, 98px);
+      --horaires-primary-rgb: 110, 12, 12;
+      --horaires-card-fill: rgba(255, 255, 255, 0.86);
+      --horaires-hero-gradient-top: rgba(255, 255, 255, 0.9);
+      --horaires-hero-gradient-bot: rgba(var(--horaires-primary-rgb), 0.08);
       --font-title: 'Oswald', sans-serif;
       --font-text: 'Lora', serif;
-      --bg: #f5f5f5;
-      --bg-elevated: #faf9f7;
+      --bg: #f8f9fa;
+      --bg-elevated: #f3f1f0;
       --card: #ffffff;
-      --text: #2c2a28;
-      --muted: #6b6560;
-      --primary: #480607;
-      --accent: #FFA630;
-      --border: rgba(72, 6, 7, 0.1);
-      --today-ring: var(--accent);
-      --shadow: 0 4px 24px rgba(72, 6, 7, 0.07);
-      --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --text: #2a2424;
+      --muted: #5c5350;
+      --primary: #6e0c0c;
+      --primary-light: #8a1212;
+      --accent: #e42218;
+      --accent-soft: #c41e1e;
+      --border: rgba(var(--horaires-primary-rgb), 0.14);
+      --today-ring: var(--accent-soft);
+      --shadow: 0 4px 24px rgba(var(--horaires-primary-rgb), 0.12);
+      --shadow-soft: 0 1px 3px rgba(var(--horaires-primary-rgb), 0.06);
       --shadow-light: rgba(200, 200, 200, 0.35);
     }
     body.pr-ramadan {
@@ -44,10 +52,9 @@
     }
     * { box-sizing: border-box; }
     /**
-     * Motif : calques réels dans <body> (.horaires-bg-*), pas seulement le fond de <html>.
-     * Le screenshot-service Puppeteer fait document.body.style.backgroundColor = 'white' :
-     * tout ce qui est « sous » le body (fond html) disparaît ; ces divs fixed restent au-dessus.
-     * data-keep-screenshot-bg sur <html> : le service peut ne plus forcer le blanc (voir screenshot-service).
+     * Motif + voile : nœuds .horaires-bg-* (même approche que daily_grid .dg-bg-*).
+     * Puppeteer ne repeint pas bien body::before/::after ; des div fixed + z-index 0 assurent la capture.
+     * screenshot-service : data-keep-screenshot-bg sur <html> évite body fond blanc (index.js).
      */
     html {
       min-height: 100vh;
@@ -59,22 +66,34 @@
       inset: 0;
       width: 100%;
       height: 100%;
+      min-height: 100vh;
       pointer-events: none;
-    }
-    .horaires-bg-tiles {
       z-index: 0;
+    }
+    body:not(.pr-ramadan):not(.pr-ferie):not(.pr-ete) .horaires-bg-tiles {
       background-color: var(--bg);
       background-image: var(--planning-pattern-mosaic-url);
       background-size: 128px 128px;
       background-repeat: repeat;
+      background-position: 0 0;
+    }
+    body:not(.pr-ramadan):not(.pr-ferie):not(.pr-ete) .horaires-bg-veil {
+      background: rgba(var(--horaires-primary-rgb), 0.08);
     }
     body.pr-ramadan .horaires-bg-tiles {
+      background-color: var(--bg);
       background-image: var(--planning-pattern-ramadan-url);
+      background-repeat: repeat;
       background-size: 40px 40px;
+      background-position: 0 0;
       opacity: 0.04;
       filter: sepia(1) hue-rotate(335deg) saturate(2.5);
     }
+    body.pr-ramadan .horaires-bg-veil {
+      display: none;
+    }
     body.pr-ferie .horaires-bg-tiles {
+      background-color: var(--bg);
       background-image:
         linear-gradient(180deg, rgba(30, 90, 138, 0.14) 0%, rgba(30, 90, 138, 0.06) 45%, transparent 85%),
         var(--planning-pattern-mosaic-url);
@@ -83,18 +102,20 @@
       filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
       opacity: 0.85;
     }
+    body.pr-ferie .horaires-bg-veil {
+      background: var(--planning-daily-ferie-sheen);
+    }
     body.pr-ete .horaires-bg-tiles {
+      background-color: var(--bg);
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      background-position: 0 0;
       opacity: 1;
       filter: none;
     }
-    .horaires-bg-veil {
-      z-index: 0;
-    }
-    body:not(.pr-ferie) .horaires-bg-veil {
-      background: linear-gradient(rgba(72, 6, 7, 0.08), rgba(72, 6, 7, 0.08));
-    }
-    body.pr-ferie .horaires-bg-veil {
-      background: var(--planning-daily-ferie-sheen);
+    body.pr-ete .horaires-bg-veil {
+      background: rgba(var(--horaires-primary-rgb), 0.08);
     }
     body {
       margin: 0;
@@ -105,45 +126,87 @@
       line-height: 1.5;
       position: relative;
       --primary-color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .wrap {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 1.5rem 1.15rem 3rem;
+      max-width: 460px;
+      width: 100%;
+      margin: auto;
+      padding: 0.85rem 0.85rem 1.45rem;
       position: relative;
       z-index: 1;
+      flex-shrink: 0;
     }
     .page-head {
-      margin-bottom: 1.5rem;
+      text-align: center;
+      margin: 0.65rem 0 0.72rem;
+      padding: 0 0.2rem;
     }
     h1.page-title {
       font-family: var(--font-title);
       font-weight: 700;
-      font-size: clamp(1.75rem, 5vw, 2.1rem);
+      font-size: clamp(1.4rem, 4vw, 1.65rem);
       letter-spacing: 0.03em;
       text-transform: uppercase;
       color: var(--primary);
-      margin: 0 0 0.4rem;
+      margin: 0;
       line-height: 1.15;
     }
+    /** Logo en calque : le flux du bloc reste celui d’une carte normale (pas de padding imposé par le logo). */
+    .card.horaires-hero-card {
+      position: relative;
+    }
+    /** Logo : moitié au-dessus du bord supérieur de la carte, masque circulaire */
+    .horaires-logo-mask {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translate(-50%, -50%);
+      width: var(--horaires-logo-size);
+      height: var(--horaires-logo-size);
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 2;
+      pointer-events: none;
+      box-shadow:
+        0 6px 24px rgba(var(--horaires-primary-rgb), 0.2),
+        0 0 0 3px rgba(255, 255, 255, 0.92);
+      -webkit-mask-image: radial-gradient(circle closest-side, #000 99%, transparent 100%);
+      mask-image: radial-gradient(circle closest-side, #000 99%, transparent 100%);
+    }
+    .horaires-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
     .card {
-      background: var(--card);
-      border-radius: 16px;
+      background: var(--horaires-card-fill);
+      border-radius: 11px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      padding: 1.35rem 1.35rem 1.5rem;
-      margin-bottom: 1.25rem;
+      padding: 0.68rem 0.82rem 0.82rem;
+      margin-bottom: 0.6rem;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
     }
     .card--hero {
-      border-left: 4px solid var(--accent);
-      background: linear-gradient(135deg, #ffffff 0%, var(--bg-elevated) 100%);
+      border-left: 3px solid var(--accent);
+      background: linear-gradient(
+        135deg,
+        var(--horaires-hero-gradient-top) 0%,
+        var(--horaires-hero-gradient-bot) 100%
+      );
     }
     .card .section-kicker {
       font-family: var(--font-title);
-      font-size: 0.78rem;
+      font-size: 0.68rem;
       font-weight: 600;
       color: var(--muted);
-      margin: 0 0 1rem;
+      margin: 0 0 0.42rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
     }
@@ -155,11 +218,11 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      padding: 0.35rem 0.65rem;
+      padding: 0.22rem 0.48rem;
       border-radius: 999px;
-      background: color-mix(in srgb, var(--accent) 22%, transparent);
+      background: color-mix(in srgb, var(--accent) 18%, rgba(var(--horaires-primary-rgb), 0.12) 82%);
       color: var(--primary);
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.4rem;
     }
     /**
      * Même motif que daily.html : .day-title-row + titre jour puis .date#dateStr
@@ -167,7 +230,7 @@
      * (Oswald / Lora, date en couleur primaire comme .date sur daily).
      */
     .horaires-daily-pattern {
-      margin: 0 0 1rem;
+      margin: 0 0 0.42rem;
     }
     .horaires-daily-pattern .day-title-row {
       position: relative;
@@ -175,13 +238,13 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
-      padding: 8px 0 0 0;
+      gap: 6px;
+      padding: 2px 0 0 0;
     }
     .horaires-daily-pattern .day-title-row .daily-day-heading {
       font-family: var(--font-title);
       color: var(--primary);
-      font-size: 2.5em;
+      font-size: 1.78em;
       margin: 0;
       padding: 0;
       font-weight: 600;
@@ -194,7 +257,7 @@
       position: static;
       top: auto;
       right: auto;
-      font-size: 1.4em;
+      font-size: 1.06em;
       color: var(--primary);
       font-weight: 400;
       margin: 0;
@@ -205,7 +268,7 @@
     /* Répétition dans la liste : même structure, tailles réduites */
     .horaires-daily-pattern--compact {
       margin: 0;
-      flex: 1 1 12rem;
+      flex: 1 1 10.5rem;
       min-width: 0;
     }
     .horaires-daily-pattern--compact .day-title-row {
@@ -214,14 +277,14 @@
     .horaires-daily-pattern--compact .day-heading-compact {
       font-family: var(--font-title);
       color: var(--primary);
-      font-size: 1.55em;
+      font-size: 1.18em;
       margin: 0;
       padding: 0;
       font-weight: 600;
       line-height: 1.15;
     }
     .horaires-daily-pattern--compact .date {
-      font-size: 1.05em;
+      font-size: 0.88em;
     }
     .week-ferie-note {
       font-family: var(--font-text);
@@ -234,16 +297,16 @@
     }
     .today-hours {
       font-family: var(--font-title);
-      font-size: 1.35rem;
+      font-size: 1.02rem;
       font-weight: 500;
       font-variant-numeric: tabular-nums;
       color: var(--text);
-      line-height: 1.35;
+      line-height: 1.28;
       margin: 0;
-      padding: 1rem 0;
+      padding: 0.42rem 0 0.08rem;
       border-top: 1px solid var(--border);
     }
-    .today-hours .oh-slot { display: block; margin-top: 0.35rem; }
+    .today-hours .oh-slot { display: block; margin-top: 0.28rem; }
     .today-hours .oh-slot:first-child { margin-top: 0; }
     .today-hours .oh-lbl {
       font-size: 0.72rem;
@@ -255,44 +318,49 @@
       margin-right: 0.35rem;
     }
     .warn-msg {
-      font-size: 0.95rem;
-      color: #7a4a1a;
-      margin: 0 0 0.75rem;
-      padding: 0.75rem 0.9rem;
-      border-radius: 10px;
-      background: color-mix(in srgb, var(--accent) 18%, #fff 82%);
+      font-size: 0.82rem;
+      color: var(--primary);
+      margin: 0 0 0.4rem;
+      padding: 0.42rem 0.62rem;
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--accent) 12%, rgba(var(--horaires-primary-rgb), 0.08) 88%);
+      border: 1px solid rgba(var(--horaires-primary-rgb), 0.12);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
     }
     .week-list {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.3rem;
     }
     .week-row {
       display: flex;
       flex-wrap: wrap;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 0.65rem 1rem;
-      padding: 0.95rem 1rem;
-      border-radius: 12px;
+      gap: 0.38rem 0.6rem;
+      padding: 0.45rem 0.62rem;
+      border-radius: 9px;
       border: 1px solid var(--border);
-      background: var(--bg-elevated);
+      background: rgba(var(--horaires-primary-rgb), 0.06);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .week-row.is-today {
       border-color: color-mix(in srgb, var(--today-ring) 55%, var(--border));
       box-shadow: 0 0 0 1px color-mix(in srgb, var(--today-ring) 35%, transparent), var(--shadow-soft);
-      background: #fff;
+      background: rgba(255, 255, 255, 0.9);
     }
     .week-hours {
       font-family: var(--font-title);
       font-weight: 500;
-      font-size: 0.92rem;
+      font-size: 0.78rem;
       font-variant-numeric: tabular-nums;
       color: var(--text);
       text-align: right;
       flex: 1;
-      min-width: 12rem;
+      min-width: 9rem;
     }
     .week-hours.closed {
       color: var(--muted);
@@ -310,7 +378,7 @@
     .week-hours .oh-bit:first-child { margin-top: 0; }
     .week-hours .oh-lbl {
       flex: 0 1 auto;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-family: var(--font-text);
       font-weight: 600;
       text-transform: uppercase;
@@ -318,7 +386,7 @@
       color: var(--muted);
     }
     .loading, .error {
-      padding: 2.5rem 1rem;
+      padding: 1.2rem 0.85rem;
       text-align: center;
       color: var(--muted);
       font-size: 0.95rem;
@@ -442,8 +510,8 @@
     }
 
     @supports not (color: color-mix(in srgb, white 50%, black)) {
-      .period-pill { background: rgba(255, 166, 48, 0.22); }
-      .warn-msg { background: rgba(255, 166, 48, 0.15); }
+      .period-pill { background: rgba(228, 34, 24, 0.12); }
+      .warn-msg { background: rgba(110, 12, 12, 0.1); }
     }
   </style>
 </head>
@@ -778,17 +846,22 @@
         '</div>';
     });
 
+    var logoSrc =
+      'https://mcusercontent.com/74abea872abd45d46efed5d41/images/4b11fb69-1858-5b3c-d5b1-b5e5bb46ac22.jpg';
     root.innerHTML =
-      '<header class="page-head">' +
-      '<h1 class="page-title">Horaires d’ouverture</h1>' +
-      '</header>' +
-      '<div class="card card--hero">' +
+      '<div class="card card--hero horaires-hero-card">' +
+      '<div class="horaires-logo-mask" aria-hidden="true">' +
+      '<img class="horaires-logo-img" src="' + logoSrc + '" alt="" width="200" height="200" decoding="async" />' +
+      '</div>' +
       '<h2 class="section-kicker">' + todayHeadline + '</h2>' +
       (pl ? '<div class="period-pill">' + PR.escapeHtml(pl) + '</div>' : '') +
       heroDayHead +
       todayBlock +
       todayHoursBlock +
       '</div>' +
+      '<header class="page-head">' +
+      '<h1 class="page-title">Horaires d’ouverture</h1>' +
+      '</header>' +
       '<div class="card">' +
       '<h2 class="section-kicker">La semaine</h2>' +
       '<div class="week-list">' +

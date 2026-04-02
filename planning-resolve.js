@@ -260,6 +260,45 @@
     return coach.imageUrl || '';
   }
 
+  /**
+   * Portrait plein format (col. F puis G) : en période 1–7 avril, priorité à bigPngCaricature, sinon bigPngUrl, puis vignette.
+   */
+  function coachBigPhotoUrl(coach) {
+    if (!coach) return '';
+    if (useCaricatureCoachPhotos() && coach.bigPngCaricature && String(coach.bigPngCaricature).trim() !== '') {
+      return String(coach.bigPngCaricature).trim();
+    }
+    if (coach.bigPngUrl && String(coach.bigPngUrl).trim() !== '') {
+      return String(coach.bigPngUrl).trim();
+    }
+    return coachPhotoUrl(coach) || (coach.imageUrl ? String(coach.imageUrl).trim() : '');
+  }
+
+  /**
+   * Fond pleine page : priorité aux URL « grandes » (feuille Coachs F et G), sans la petite vignette seule hors période poisson.
+   * Du 1er au 7 avril (date locale) : 1) bigPngCaricature (G) 2) bigPngUrl (F) 3) repli pngCaricature (D) si pas de colonnes F/G.
+   * Reste de l’année : bigPngUrl (F) uniquement.
+   */
+  function coachHeroBackgroundUrl(coach) {
+    if (!coach) return '';
+    if (useCaricatureCoachPhotos()) {
+      if (coach.bigPngCaricature && String(coach.bigPngCaricature).trim() !== '') {
+        return String(coach.bigPngCaricature).trim();
+      }
+      if (coach.bigPngUrl && String(coach.bigPngUrl).trim() !== '') {
+        return String(coach.bigPngUrl).trim();
+      }
+      if (coach.pngCaricature && String(coach.pngCaricature).trim() !== '') {
+        return String(coach.pngCaricature).trim();
+      }
+      return '';
+    }
+    if (coach.bigPngUrl && String(coach.bigPngUrl).trim() !== '') {
+      return String(coach.bigPngUrl).trim();
+    }
+    return '';
+  }
+
   /** Libellé affiché : nom caricature (feuille Coachs, col. E) du 1er au 7 avril si renseigné, sinon nom du coach. */
   function coachDisplayName(coach) {
     if (!coach) return '';
@@ -293,6 +332,8 @@
     escapeHtml: escapeHtml,
     useCaricatureCoachPhotos: useCaricatureCoachPhotos,
     coachPhotoUrl: coachPhotoUrl,
+    coachBigPhotoUrl: coachBigPhotoUrl,
+    coachHeroBackgroundUrl: coachHeroBackgroundUrl,
     coachDisplayName: coachDisplayName
   };
 
