@@ -2629,7 +2629,7 @@
       return coach.imageUrl || '';
     }
 
-    /** Portrait HD : G (caricature) en période 1–7 avr., sinon F ; repli sur vignette. */
+    /** Portrait HD : G (caricature) en période 1–7 avr., sinon F ; repli sur vignette sauf 1–7 avr. (pas de lightbox sans vrai big). */
     function coachBigPhotoUrl(coach) {
       if (!coach) return '';
       if (useCaricatureCoachPhotos() && coach.bigPngCaricature && String(coach.bigPngCaricature).trim() !== '') {
@@ -2637,6 +2637,9 @@
       }
       if (coach.bigPngUrl && String(coach.bigPngUrl).trim() !== '') {
         return String(coach.bigPngUrl).trim();
+      }
+      if (useCaricatureCoachPhotos()) {
+        return '';
       }
       return coachPhotoUrl(coach) || coach.imageUrl || '';
     }

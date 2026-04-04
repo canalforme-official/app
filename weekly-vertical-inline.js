@@ -1153,7 +1153,7 @@
       const now = new Date();
       const PR = getPR();
       const todayYmd = PR.ymdFromDate(now);
-      const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+      const nowMs = now.getTime();
 
       document.querySelectorAll('.course-block').forEach(function(block) {
         try {
@@ -1179,18 +1179,23 @@
           const endTimeStr = block.getAttribute('data-end-time');
           if (!startTime) return;
 
-          const startParts = startTime.split(':').map(Number);
-          const startTimeInMinutes = startParts[0] * 60 + (startParts[1] || 0);
-          let endTimeInMinutes = startTimeInMinutes + 60;
+          const targetD = PR.parseYmdLocal(ymd);
+          const startParts = startTime.split(':');
+          const startHour = parseInt(startParts[0], 10) || 0;
+          const startMinute = parseInt(startParts[1], 10) || 0;
+          const courseStartMs = new Date(targetD.getFullYear(), targetD.getMonth(), targetD.getDate(), startHour, startMinute, 0, 0).getTime();
+          var endMs;
           if (endTimeStr) {
-            const endParts = endTimeStr.split(':').map(Number);
-            endTimeInMinutes = endParts[0] * 60 + (endParts[1] || 0);
+            var ep = endTimeStr.split(':');
+            endMs = new Date(targetD.getFullYear(), targetD.getMonth(), targetD.getDate(), parseInt(ep[0], 10) || 0, parseInt(ep[1], 10) || 0, 0, 0).getTime();
+          } else {
+            endMs = courseStartMs + 60 * 60 * 1000;
           }
 
-          const isPast = currentTimeInMinutes >= endTimeInMinutes;
-          const isInProgress = !isPast && currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
-          const timeDifferenceMin = startTimeInMinutes - currentTimeInMinutes;
-          const isStartingSoon = !isPast && !isInProgress && timeDifferenceMin >= 0 && timeDifferenceMin <= 15;
+          const isPast = nowMs >= endMs;
+          const isInProgress = !isPast && nowMs >= courseStartMs && nowMs < endMs;
+          const secondsUntilStart = Math.floor((courseStartMs - nowMs) / 1000);
+          const isStartingSoon = !isPast && !isInProgress && secondsUntilStart >= 0 && secondsUntilStart <= 900;
 
           if (isPast) {
             block.classList.add('past');
@@ -1206,7 +1211,7 @@
               countdownPill.className = 'countdown-pill starting-soon';
               block.insertBefore(countdownPill, block.firstChild);
             }
-            countdownPill.setAttribute('data-time-diff', timeDifferenceMin * 60);
+            countdownPill.setAttribute('data-time-diff', String(secondsUntilStart));
           } else if (isInProgress) {
             block.classList.add('current');
             block.classList.remove('starting-soon', 'past');
