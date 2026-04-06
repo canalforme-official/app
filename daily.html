@@ -2628,7 +2628,7 @@
       return coach.imageUrl || '';
     }
 
-    /** Portrait HD : G (caricature) le 1er avr. uniquement, sinon F ; repli sur vignette hors 1er avr. (pas de lightbox sans vrai big). */
+    /** Portrait HD pour lightbox uniquement : bigPngCaricature le 1er avr., sinon bigPngUrl. Sans URL « big » dédiée, pas de zoom (clic sans effet). */
     function coachBigPhotoUrl(coach) {
       if (!coach) return '';
       if (useCaricatureCoachPhotos() && coach.bigPngCaricature && String(coach.bigPngCaricature).trim() !== '') {
@@ -2637,10 +2637,7 @@
       if (coach.bigPngUrl && String(coach.bigPngUrl).trim() !== '') {
         return String(coach.bigPngUrl).trim();
       }
-      if (useCaricatureCoachPhotos()) {
-        return '';
-      }
-      return coachPhotoUrl(coach) || coach.imageUrl || '';
+      return '';
     }
 
     /** Texte affiché pour un coach : nom caricature (feuille, col. E) le 1er avril si renseigné, sinon nom. */
