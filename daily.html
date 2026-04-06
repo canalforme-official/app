@@ -2614,12 +2614,11 @@
       var arrReg = planning[dayName] || [];
       return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
     }
-    /** Caricatures : date réelle du téléphone du 1er au 7 avril (Poisson d’avril, année courante). */
+    /** Caricatures : date réelle du téléphone le 1er avril uniquement (Poisson d’avril, année courante). */
     function useCaricatureCoachPhotos() {
       var real = new Date();
       if (real.getMonth() !== 3) return false;
-      var dom = real.getDate();
-      return dom >= 1 && dom <= 7;
+      return real.getDate() === 1;
     }
     function coachPhotoUrl(coach) {
       if (!coach) return '';
@@ -2629,7 +2628,7 @@
       return coach.imageUrl || '';
     }
 
-    /** Portrait HD : G (caricature) en période 1–7 avr., sinon F ; repli sur vignette sauf 1–7 avr. (pas de lightbox sans vrai big). */
+    /** Portrait HD : G (caricature) le 1er avr. uniquement, sinon F ; repli sur vignette hors 1er avr. (pas de lightbox sans vrai big). */
     function coachBigPhotoUrl(coach) {
       if (!coach) return '';
       if (useCaricatureCoachPhotos() && coach.bigPngCaricature && String(coach.bigPngCaricature).trim() !== '') {
@@ -2644,7 +2643,7 @@
       return coachPhotoUrl(coach) || coach.imageUrl || '';
     }
 
-    /** Texte affiché pour un coach : nom caricature (feuille, col. E) du 1er au 7 avril si renseigné, sinon nom. */
+    /** Texte affiché pour un coach : nom caricature (feuille, col. E) le 1er avril si renseigné, sinon nom. */
     function coachDisplayName(coach) {
       if (!coach) return '';
       if (useCaricatureCoachPhotos() && coach.nomCaricature && String(coach.nomCaricature).trim() !== '') {

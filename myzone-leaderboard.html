@@ -439,7 +439,7 @@
       min-height: 1.2em;
     }
 
-    /* Overlay de chargement */
+    /* Overlay de chargement (masqué par défaut : évite un flash avant que JS n’applique SHOW_LOADING_OVERLAY) */
     #loadingOverlay {
       position: fixed !important;
       top: 0 !important;
@@ -450,7 +450,7 @@
       height: 100vh !important;
       background-color: rgba(var(--primary-rgb), 1) !important;
       z-index: 999999 !important;
-      display: flex;
+      display: none;
       overflow: hidden !important;
       pointer-events: all !important;
       opacity: 1 !important;
@@ -1422,7 +1422,7 @@
       }
     }
 
-    /* Styles pour l'overlay de chargement */
+    /* Styles pour l'overlay de chargement (masqué par défaut — cf. bloc plus haut) */
     #loadingOverlay {
       position: fixed !important;
       top: 0 !important;
@@ -1433,7 +1433,7 @@
       height: 100vh !important;
       background-color: rgba(var(--primary-rgb), 1) !important;
       z-index: 999999 !important;
-      display: flex;
+      display: none;
       overflow: hidden !important;
       pointer-events: all !important;
       opacity: 1 !important;
@@ -1468,7 +1468,7 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <!-- Overlay de chargement -->
+  <!-- Overlay de chargement (display: none par défaut dans le CSS pour éviter le flash au 1er rendu) -->
   <div id="loadingOverlay">
     <div class="modal-center-container">
       <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
@@ -1544,7 +1544,7 @@
 
     const DEFAULT_COACH_PHOTO_LEADERBOARD = 'default-coach-photo.png';
 
-    /** Photo coach leaderboard : caricature 1er–7 avril (date locale), aligné sur PlanningResolve.coachPhotoUrl. */
+    /** Photo coach leaderboard : caricature le 1er avril (date locale), aligné sur PlanningResolve.coachPhotoUrl. */
     function leaderboardCoachPhotoSrc(user) {
       if (!user || user.type !== 'Coach') return '';
       var coachObj = {
