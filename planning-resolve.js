@@ -244,11 +244,12 @@
     return div.innerHTML;
   }
 
-  /** Caricatures : date réelle du téléphone le 1er avril uniquement */
+  /** Caricatures : date réelle du téléphone du 1er au 7 avril */
   function useCaricatureCoachPhotos() {
     var real = new Date();
     if (real.getMonth() !== 3) return false;
-    return real.getDate() === 1;
+    var dom = real.getDate();
+    return dom >= 1 && dom <= 7;
   }
 
   function coachPhotoUrl(coach) {
@@ -260,7 +261,7 @@
   }
 
   /**
-   * Portrait plein format (col. F puis G) : le 1er avril, priorité à bigPngCaricature, sinon bigPngUrl, puis vignette.
+   * Portrait plein format (col. F puis G) : du 1er au 7 avril, priorité à bigPngCaricature, sinon bigPngUrl, puis vignette.
    */
   function coachBigPhotoUrl(coach) {
     if (!coach) return '';
@@ -275,7 +276,7 @@
 
   /**
    * Fond pleine page : priorité aux URL « grandes » (feuille Coachs F et G), sans la petite vignette seule hors période poisson.
-   * Le 1er avril (date locale) : 1) bigPngCaricature (G) 2) bigPngUrl (F) 3) repli pngCaricature (D) si pas de colonnes F/G.
+   * Du 1er au 7 avril (date locale) : 1) bigPngCaricature (G) 2) bigPngUrl (F) 3) repli pngCaricature (D) si pas de colonnes F/G.
    * Reste de l’année : bigPngUrl (F) uniquement.
    */
   function coachHeroBackgroundUrl(coach) {
@@ -298,7 +299,7 @@
     return '';
   }
 
-  /** Libellé affiché : nom caricature (feuille Coachs, col. E) le 1er avril si renseigné, sinon nom du coach. */
+  /** Libellé affiché : nom caricature (feuille Coachs, col. E) du 1er au 7 avril si renseigné, sinon nom du coach. */
   function coachDisplayName(coach) {
     if (!coach) return '';
     if (useCaricatureCoachPhotos() && coach.nomCaricature && String(coach.nomCaricature).trim() !== '') {

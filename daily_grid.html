@@ -1743,6 +1743,7 @@
       var arrReg = planning[dayName] || [];
       return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
     }
+    /** Caricatures : date réelle du téléphone du 1er au 7 avril (aligné sur daily.html / planning-resolve.js). */
     function useCaricatureCoachPhotos() {
       var real = new Date();
       if (real.getMonth() !== 3) return false;
