@@ -667,30 +667,32 @@
       z-index: 5;
     }
 
+    /* Même ordre de taille que daily.html (férié / fermeture) : ~5px + chute avec dérive */
     .confetti-piece {
       position: absolute;
-      width: 3px;
-      height: 3px;
+      width: 5px;
+      height: 5px;
+      top: -12px;
       border-radius: 1px;
-      animation: confetti-fall 3.5s linear forwards;
-      opacity: 0.85;
+      animation: confetti-fall 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      opacity: 0.92;
     }
 
     .confetti-piece.sparkle {
-      width: 2px;
-      height: 2px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
-      box-shadow: 0 0 4px currentColor;
+      box-shadow: 0 0 10px currentColor;
     }
 
     @keyframes confetti-fall {
       0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 0.95;
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 1;
       }
       100% {
-        transform: translateY(320px) rotate(720deg);
-        opacity: 0.2;
+        transform: translate3d(var(--dx, 0px), 400px, 0) rotate(var(--rot, 720deg));
+        opacity: 0.3;
       }
     }
 
@@ -708,6 +710,21 @@
       display: none;
       margin-top: 16px;
       border: 1px solid rgba(var(--primary-rgb), 0.25);
+    }
+
+    .competition-container--previous {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.14) 0%, rgba(var(--primary-rgb), 0.06) 100%);
+    }
+
+    .competition-caption {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0 0 10px;
+      letter-spacing: 0.02em;
     }
 
     .step {
@@ -1174,7 +1191,7 @@
       font-weight: bold;
     }
 
-    /* Trophée SVG : hommes à droite du bloc actifs (+50% taille) */
+    /* Trophée SVG : hommes à droite du bloc actifs — base ~1.65rem, plus grand si .trophy-svg--winner */
     .men-label .trophy-svg {
       position: absolute;
       right: -20px;
@@ -1186,6 +1203,13 @@
       align-items: center;
       justify-content: center;
       animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
+    }
+
+    .men-label .trophy-svg.trophy-svg--winner {
+      width: 2.95rem;
+      height: 2.95rem;
+      right: -36px;
+      animation: trophy-grow-winner 0.55s ease-out forwards, trophy-pulse-winner 1.8s ease-in-out 0.65s infinite;
     }
 
     .men-label .trophy-svg svg {
@@ -1206,6 +1230,13 @@
       align-items: center;
       justify-content: center;
       animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
+    }
+
+    .women-label .trophy-svg.trophy-svg--winner {
+      width: 2.95rem;
+      height: 2.95rem;
+      left: -36px;
+      animation: trophy-grow-winner 0.55s ease-out forwards, trophy-pulse-winner 1.8s ease-in-out 0.65s infinite;
     }
 
     .women-label .trophy-svg svg {
@@ -1235,6 +1266,30 @@
       }
       50% {
         transform: translateY(-50%) scale(1.15);
+      }
+    }
+
+    @keyframes trophy-grow-winner {
+      0% {
+        transform: translateY(-50%) scale(0);
+        opacity: 0;
+      }
+      70% {
+        transform: translateY(-50%) scale(1.12);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes trophy-pulse-winner {
+      0%, 100% {
+        transform: translateY(-50%) scale(1);
+      }
+      50% {
+        transform: translateY(-50%) scale(1.12);
       }
     }
 
@@ -1488,7 +1543,7 @@
       alt="Photo du coach podium actuel">
   </div>
 
-  <div class="competition-container">
+  <div class="competition-container" id="currentMonthCompetition">
     <div class="labels-container">
       <div id="menLabel" class="men-label"></div>
       <div id="womenLabel" class="women-label"></div>
@@ -1529,6 +1584,20 @@
 
     <!-- Titre du mois précédent -->
     <div id="previousMonthTitle" class="month-title"></div>
+
+    <!-- Challenge H/F du mois clos (1er au 7) : mêmes données agrégées que le JSON current -->
+    <div class="competition-container competition-container--previous" id="previousMonthCompetition" style="display: none;">
+      <div id="previousCompetitionCaption" class="competition-caption" aria-hidden="true"></div>
+      <div class="labels-container">
+        <div id="prevMenLabel" class="men-label"></div>
+        <div id="prevWomenLabel" class="women-label"></div>
+      </div>
+      <div id="prevGenderProgressBar" class="progress-bar">
+        <div id="prevMaleBar" class="male"></div>
+        <div id="prevFemaleBar" class="female"></div>
+        <div id="prevDynamicIcon" class="icon-container"></div>
+      </div>
+    </div>
 
     <!-- Section du mois précédent -->
     <div class="container" id="previousMonthContainer">
@@ -1726,73 +1795,72 @@
         });
     }
 
-    function updateMenWomenBar(data) {
-      if (!data || !data.current || !data.current.meps_averages) {
-        console.warn('updateMenWomenBar: données manquantes (current.meps_averages)');
-        return;
+    const CHALLENGE_TROPHY_SVG = '<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M454.5 675.5l-32.4 107.9h181.8L574.5 678" fill="#FBBA22"/><path d="M510.1 682.3c215.1 0 215.1-165.2 215.1-165.2V197.4H300.9v319.7s0 165.2 215.1 165.2h-5.9z" fill="#FBBA22"/><path d="M515.4 783.4h91.1s89.5 2.3 89.5 80.8H332.4c0-78.6 89.5-80.8 89.5-80.8H513" fill="#C04931"/><path d="M816.5 383.8V259.3c0-11.2-9-20.2-20.2-20.2h-50.9v-41.7c0-11.2-9-20.2-20.2-20.2H300.9c-11.2 0-20.2 9-20.2 20.2v41.7h-50.9c-11.2 0-20.2 9-20.2 20.2v124.5c0 1.2-0.7 42.2 27.2 70.9 11.7 12 26.5 19.9 43.9 23.8v38.6c0 1.6 2.1 135.7 147.8 174.7l-21.8 72.7c-39 5.7-94.5 31.2-94.5 99.7 0 11.2 9 20.2 20.2 20.2H696c11.2 0 20.2-9 20.2-20.2 0-69.6-57.2-94.7-96.6-99.9l-20.4-72.9c144.1-39.6 146.2-172.7 146.2-174.3v-38.6c17.4-3.9 32.1-11.8 43.9-23.8 27.9-28.7 27.2-69.7 27.2-70.9z m-550.8 42.7c-16-16.4-15.8-41.9-15.8-42.1V279.6h30.7v156.7c-5.7-2.4-10.8-5.6-14.9-9.8z m338.2 377.1c0.1 0 0.1 0 0 0h2c6.2 0.2 54 3 66.8 40.4h-317c12.8-37.4 60.5-40.2 66.2-40.4h182z m-154.6-40.4l19.1-63.6c12.5 1.6 25.9 2.5 40.1 2.8 0.5 0 1.1 0.1 1.6 0.1h5.9c0.5 0 1.1 0 1.6-0.1 14.9-0.3 28.8-1.3 41.9-3l17.9 63.9H449.3zM705 517c-0.1 5.9-3.5 143.6-191.9 145-17.6-0.1-33.6-1.4-48.1-3.7-1.5-0.9-3-1.7-4.7-2.2-3.2-0.9-6.3-1-9.4-0.4-127.1-27.3-129.7-133.5-129.8-138.6V217.6H705V517z m55.3-90.5c-4.1 4.2-9.1 7.4-15 9.8V279.5H776v104.8c0.1 0.3 0.3 25.8-15.7 42.2z" fill="#211F1E"/><path d="M446.7 449.5l-11.2 65.2c-1 5.7 1.4 11.4 6 14.8 4.7 3.4 10.8 3.8 16 1.1l58.5-30.8 58.5 30.8c2.2 1.2 4.6 1.7 7.1 1.7 3.1 0 6.3-1 8.9-2.9 4.7-3.4 7-9.1 6-14.8l-11.2-65.2 47.4-46.2c4.1-4 5.6-10.1 3.8-15.5-1.8-5.5-6.5-9.5-12.2-10.3L559 368l-29.3-59.3c-2.6-5.2-7.8-8.4-13.6-8.4s-11 3.3-13.6 8.4L473.2 368l-65.5 9.5c-5.7 0.8-10.4 4.8-12.2 10.3-1.8 5.5-0.3 11.5 3.8 15.5l47.4 46.2z m38.8-52.6c4.9-0.7 9.2-3.8 11.4-8.3l19.2-38.9 19.2 38.9c2.2 4.5 6.5 7.6 11.4 8.3l43 6.2-31.1 30.3c-3.6 3.5-5.2 8.5-4.4 13.4l7.3 42.8-38.4-20.2c-4.4-2.3-9.7-2.3-14.1 0l-38.4 20.2 7.3-42.8c0.8-4.9-0.8-9.9-4.4-13.4l-31.1-30.3 43.1-6.2z" fill="#211F1E"/></svg>';
+
+    /**
+     * Remplit la barre challenge H / F à partir d'un bloc période (current ou previous).
+     * @returns {boolean} false si données insuffisantes
+     */
+    function fillGenderChallengeBar(periodData, ids) {
+      if (!periodData || !periodData.meps_averages || !periodData.active_users || !periodData.inactive_users) {
+        return false;
       }
-      const maleMEPs = parseFloat(data.current.meps_averages.male) || 0;
-      const femaleMEPs = parseFloat(data.current.meps_averages.female) || 0;
+      const maleMEPs = parseFloat(periodData.meps_averages.male) || 0;
+      const femaleMEPs = parseFloat(periodData.meps_averages.female) || 0;
       const totalMEPs = maleMEPs + femaleMEPs || 1;
-      const maleUsers = data.current.active_users.male;
-      const femaleUsers = data.current.active_users.female;
-      const maleInactiveUsers = data.current.inactive_users.male;
-      const femaleInactiveUsers = data.current.inactive_users.female;
+      const maleUsers = periodData.active_users.male;
+      const femaleUsers = periodData.active_users.female;
+      const maleInactiveUsers = periodData.inactive_users.male;
+      const femaleInactiveUsers = periodData.inactive_users.female;
 
       const maleTotalUsers = maleUsers + maleInactiveUsers;
       const femaleTotalUsers = femaleUsers + femaleInactiveUsers;
 
       const malePercentage = (maleMEPs / totalMEPs) * 100 || 50;
 
-      // Largeur des barres
-      document.getElementById('maleBar').style.width = `${malePercentage}%`;
-      document.getElementById('femaleBar').style.width = `${100 - malePercentage}%`;
+      const maleBar = document.getElementById(ids.maleBarId);
+      const femaleBar = document.getElementById(ids.femaleBarId);
+      const menLabel = document.getElementById(ids.menLabelId);
+      const womenLabel = document.getElementById(ids.womenLabelId);
+      const dynamicIcon = document.getElementById(ids.dynamicIconId);
+      if (!maleBar || !femaleBar || !menLabel || !womenLabel || !dynamicIcon) {
+        return false;
+      }
 
-      // Mise à jour des labels et barres avec les classes de victoire (🏆 + animation)
-      const menLabel = document.getElementById('menLabel');
-      const womenLabel = document.getElementById('womenLabel');
-      const maleBarEl = document.getElementById('maleBar');
-      const femaleBarEl = document.getElementById('femaleBar');
+      maleBar.style.width = `${malePercentage}%`;
+      femaleBar.style.width = `${100 - malePercentage}%`;
 
       menLabel.classList.remove('winner');
       womenLabel.classList.remove('winner');
-      maleBarEl.classList.remove('winner');
-      femaleBarEl.classList.remove('winner');
+      maleBar.classList.remove('winner');
+      femaleBar.classList.remove('winner');
 
       if (maleMEPs > femaleMEPs) {
         menLabel.classList.add('winner');
-        maleBarEl.classList.add('winner');
+        maleBar.classList.add('winner');
       } else if (femaleMEPs > maleMEPs) {
         womenLabel.classList.add('winner');
-        femaleBarEl.classList.add('winner');
+        femaleBar.classList.add('winner');
       } else {
-        /* Égalité ou données manquantes : on met en valeur le segment le plus large (confettis visibles) */
         if (malePercentage >= 50) {
-          maleBarEl.classList.add('winner');
+          maleBar.classList.add('winner');
         } else {
-          femaleBarEl.classList.add('winner');
+          femaleBar.classList.add('winner');
         }
       }
 
-      // Gestion du pluriel/singulier pour les hommes
       const maleLabel = maleUsers === 1 ? 'Actif' : 'Actifs';
-      // Gestion du pluriel/singulier pour les femmes
       const femaleLabel = femaleUsers === 1 ? 'Active' : 'Actives';
 
-      // SVG trophée pour le challenge (hommes à droite, femmes à gauche)
-      const TROPHY_SVG = '<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M454.5 675.5l-32.4 107.9h181.8L574.5 678" fill="#FBBA22"/><path d="M510.1 682.3c215.1 0 215.1-165.2 215.1-165.2V197.4H300.9v319.7s0 165.2 215.1 165.2h-5.9z" fill="#FBBA22"/><path d="M515.4 783.4h91.1s89.5 2.3 89.5 80.8H332.4c0-78.6 89.5-80.8 89.5-80.8H513" fill="#C04931"/><path d="M816.5 383.8V259.3c0-11.2-9-20.2-20.2-20.2h-50.9v-41.7c0-11.2-9-20.2-20.2-20.2H300.9c-11.2 0-20.2 9-20.2 20.2v41.7h-50.9c-11.2 0-20.2 9-20.2 20.2v124.5c0 1.2-0.7 42.2 27.2 70.9 11.7 12 26.5 19.9 43.9 23.8v38.6c0 1.6 2.1 135.7 147.8 174.7l-21.8 72.7c-39 5.7-94.5 31.2-94.5 99.7 0 11.2 9 20.2 20.2 20.2H696c11.2 0 20.2-9 20.2-20.2 0-69.6-57.2-94.7-96.6-99.9l-20.4-72.9c144.1-39.6 146.2-172.7 146.2-174.3v-38.6c17.4-3.9 32.1-11.8 43.9-23.8 27.9-28.7 27.2-69.7 27.2-70.9z m-550.8 42.7c-16-16.4-15.8-41.9-15.8-42.1V279.6h30.7v156.7c-5.7-2.4-10.8-5.6-14.9-9.8z m338.2 377.1c0.1 0 0.1 0 0 0h2c6.2 0.2 54 3 66.8 40.4h-317c12.8-37.4 60.5-40.2 66.2-40.4h182z m-154.6-40.4l19.1-63.6c12.5 1.6 25.9 2.5 40.1 2.8 0.5 0 1.1 0.1 1.6 0.1h5.9c0.5 0 1.1 0 1.6-0.1 14.9-0.3 28.8-1.3 41.9-3l17.9 63.9H449.3zM705 517c-0.1 5.9-3.5 143.6-191.9 145-17.6-0.1-33.6-1.4-48.1-3.7-1.5-0.9-3-1.7-4.7-2.2-3.2-0.9-6.3-1-9.4-0.4-127.1-27.3-129.7-133.5-129.8-138.6V217.6H705V517z m55.3-90.5c-4.1 4.2-9.1 7.4-15 9.8V279.5H776v104.8c0.1 0.3 0.3 25.8-15.7 42.2z" fill="#211F1E"/><path d="M446.7 449.5l-11.2 65.2c-1 5.7 1.4 11.4 6 14.8 4.7 3.4 10.8 3.8 16 1.1l58.5-30.8 58.5 30.8c2.2 1.2 4.6 1.7 7.1 1.7 3.1 0 6.3-1 8.9-2.9 4.7-3.4 7-9.1 6-14.8l-11.2-65.2 47.4-46.2c4.1-4 5.6-10.1 3.8-15.5-1.8-5.5-6.5-9.5-12.2-10.3L559 368l-29.3-59.3c-2.6-5.2-7.8-8.4-13.6-8.4s-11 3.3-13.6 8.4L473.2 368l-65.5 9.5c-5.7 0.8-10.4 4.8-12.2 10.3-1.8 5.5-0.3 11.5 3.8 15.5l47.4 46.2z m38.8-52.6c4.9-0.7 9.2-3.8 11.4-8.3l19.2-38.9 19.2 38.9c2.2 4.5 6.5 7.6 11.4 8.3l43 6.2-31.1 30.3c-3.6 3.5-5.2 8.5-4.4 13.4l7.3 42.8-38.4-20.2c-4.4-2.3-9.7-2.3-14.1 0l-38.4 20.2 7.3-42.8c0.8-4.9-0.8-9.9-4.4-13.4l-31.1-30.3 43.1-6.2z" fill="#211F1E"/></svg>';
-      const trophySpan = (side) => `<span class="trophy-svg" aria-hidden="true">${TROPHY_SVG}</span>`;
+      const trophyWinner = `<span class="trophy-svg trophy-svg--winner" aria-hidden="true">${CHALLENGE_TROPHY_SVG}</span>`;
 
-      // Mise à jour des labels avec les nouvelles icônes (+ trophée SVG si gagnant)
-      menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}` + (menLabel.classList.contains('winner') ? trophySpan('men') : '');
-      womenLabel.innerHTML = (womenLabel.classList.contains('winner') ? trophySpan('women') : '') + `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+      menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}` + (menLabel.classList.contains('winner') ? trophyWinner : '');
+      womenLabel.innerHTML = (womenLabel.classList.contains('winner') ? trophyWinner : '') + `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
 
-      // Affiche les MEPs dans la barre avec séparateur de milliers (classe pour style letter-spacing)
       const formatMEPs = (n) => Math.round(n).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
-      document.getElementById('maleBar').innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(maleMEPs)}</span> MEPs</strong>`;
-      document.getElementById('femaleBar').innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(femaleMEPs)}</span> MEPs</strong>`;
+      maleBar.innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(maleMEPs)}</span> MEPs</strong>`;
+      femaleBar.innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(femaleMEPs)}</span> MEPs</strong>`;
 
-      // Choix icône
       let iconUrl = '';
       if (maleMEPs > femaleMEPs) {
         iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/851e5185-0160-776f-b434-f53d347ed959.png';
@@ -1802,10 +1870,26 @@
         iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/d45bac30-41fd-6f61-ce4b-8f65a4f76fd2.png';
       }
 
-      // Insérer l'icône
-      const dynamicIcon = document.getElementById('dynamicIcon');
-      dynamicIcon.innerHTML = `<img src="${iconUrl}" alt="Dynamic Icon">`;
+      dynamicIcon.innerHTML = `<img src="${iconUrl}" alt="">`;
       dynamicIcon.style.left = `calc(${malePercentage}% + 3px)`;
+      return true;
+    }
+
+    function updateMenWomenBar(data) {
+      if (!data || !data.current) {
+        console.warn('updateMenWomenBar: données manquantes (current)');
+        return;
+      }
+      const ok = fillGenderChallengeBar(data.current, {
+        menLabelId: 'menLabel',
+        womenLabelId: 'womenLabel',
+        maleBarId: 'maleBar',
+        femaleBarId: 'femaleBar',
+        dynamicIconId: 'dynamicIcon'
+      });
+      if (!ok) {
+        console.warn('updateMenWomenBar: données manquantes (meps_averages / active_users / inactive_users)');
+      }
     }
 
     /**
@@ -1878,34 +1962,42 @@
      * Ajoute quelques confettis (chute en continu, plus aléatoire qu'en rafales)
      */
     function spawnPreviousPodiumConfetti() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const container = document.getElementById('previousPodiumConfetti');
       if (!container) return;
-      const colors = ['#FFD700', '#FFA500', '#e42218', '#6e0c0c', '#ffffff', '#fff8dc', '#ffebcd'];
-      const count = 6 + Math.floor(Math.random() * 15);
+      /* Palette proche du mode férié daily.html + or club — pièces plus grosses (CSS) et ~2× le volume */
+      const colors = ['#1e5a8a', '#2a7ab8', '#e8c547', '#f4d03f', '#ffd700', '#e42218', '#6e0c0c', '#ffffff', '#87ceeb', '#fff8dc'];
+      const count = 14 + Math.floor(Math.random() * 28);
       for (let i = 0; i < count; i++) {
         const piece = document.createElement('div');
-        piece.className = 'confetti-piece' + (Math.random() > 0.4 ? ' sparkle' : '');
+        piece.className = 'confetti-piece' + (Math.random() > 0.35 ? ' sparkle' : '');
         piece.style.left = Math.random() * 100 + '%';
-        piece.style.animationDelay = (Math.random() * 0.05) + 's';
-        piece.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+        piece.style.animationDelay = (Math.random() * 0.35) + 's';
+        piece.style.animationDuration = (1.8 + Math.random() * 0.95) + 's';
+        const drift = (Math.random() - 0.5) * 140;
+        const rot = 360 + Math.random() * 720;
+        piece.style.setProperty('--dx', drift + 'px');
+        piece.style.setProperty('--rot', rot + 'deg');
         piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         piece.style.color = piece.style.backgroundColor;
         container.appendChild(piece);
         setTimeout(function () {
           if (piece.parentNode) piece.remove();
-        }, 4200);
+        }, 3200);
       }
     }
 
     function scheduleNextConfetti() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       previousPodiumConfettiTimeout = setTimeout(function () {
         spawnPreviousPodiumConfetti();
         scheduleNextConfetti();
-      }, 180 + Math.random() * 420);
+      }, 100 + Math.random() * 380);
     }
 
     function startPreviousPodiumConfetti() {
       stopPreviousPodiumConfetti();
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const container = document.getElementById('previousPodiumConfetti');
       if (!container) return;
       container.innerHTML = '';
@@ -2043,8 +2135,28 @@
         if (previousMonthBlock) {
           previousMonthBlock.style.display = 'block';
         }
+
+        const prevComp = document.getElementById('previousMonthCompetition');
+        const prevCap = document.getElementById('previousCompetitionCaption');
+        const prevOk = data.previous && fillGenderChallengeBar(data.previous, {
+          menLabelId: 'prevMenLabel',
+          womenLabelId: 'prevWomenLabel',
+          maleBarId: 'prevMaleBar',
+          femaleBarId: 'prevFemaleBar',
+          dynamicIconId: 'prevDynamicIcon'
+        });
+        if (prevComp) {
+          if (prevOk) {
+            prevComp.style.display = 'block';
+            if (prevCap) prevCap.textContent = 'Challenge hommes / femmes — ' + (data.previous.month || '');
+          } else {
+            prevComp.style.display = 'none';
+          }
+        }
       } else if (dayOfMonth > 7) {
         stopPreviousPodiumConfetti();
+        const prevCompHide = document.getElementById('previousMonthCompetition');
+        if (prevCompHide) prevCompHide.style.display = 'none';
         // Masquer toute la section mois précédent (aucun résidu, plus de bloc translucide)
         const previousSection = document.getElementById('previousMonthSection');
         if (previousSection) {
