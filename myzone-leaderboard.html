@@ -743,7 +743,7 @@
 
     .previous-month-trophy-above-bar .previous-month-trophy-static {
       position: absolute;
-      bottom: -5px;
+      bottom: -8px;
       width: 2.95rem;
       height: 2.95rem;
       display: flex;
@@ -1227,7 +1227,7 @@
     .men-label .trophy-svg {
       position: absolute;
       right: -20px;
-      top: calc(50% - 4px);
+      top: 50%;
       transform: translateY(-50%) scale(0);
       width: 1.65rem;
       height: 1.65rem;
@@ -1247,7 +1247,7 @@
     .women-label .trophy-svg {
       position: absolute;
       left: -20px;
-      top: calc(50% - 4px);
+      top: 50%;
       transform: translateY(-50%) scale(0);
       width: 1.65rem;
       height: 1.65rem;
@@ -1690,6 +1690,42 @@
     let isInitialAnimationDone = false; // Pour contrôler l'animation du podium
     let previousPodiumConfettiInterval = null;
     let previousPodiumConfettiTimeout = null;
+    let previousTrophyLayoutTimer = null;
+
+    /**
+     * Mois précédent : en vue mobile, colle le trophée à droite du pill hommes ou à gauche du pill femmes (sans le superposer).
+     * En vue large : recentré sur le segment gagnant de la barre MEPs.
+     */
+    function positionPreviousMonthTrophyMobile() {
+      var prevComp = document.getElementById('previousMonthCompetition');
+      var troEl = document.querySelector('#previousMonthTrophyAboveBar .previous-month-trophy-static');
+      if (!prevComp || !troEl || prevComp.style.display === 'none') return;
+      var wrap = prevComp.querySelector('.previous-competition-bar-wrap');
+      var menEl = document.getElementById('prevMenLabel');
+      var womEl = document.getElementById('prevWomenLabel');
+      if (!wrap || !menEl || !womEl) return;
+      var barLeftPct = troEl.getAttribute('data-bar-left-pct');
+      if (window.innerWidth > 600) {
+        troEl.style.transform = 'translateX(-50%)';
+        if (barLeftPct != null && barLeftPct !== '') troEl.style.left = barLeftPct + '%';
+        troEl.style.right = 'auto';
+        return;
+      }
+      var isMale = troEl.classList.contains('previous-month-trophy-static--winner-male');
+      var rWrap = wrap.getBoundingClientRect();
+      var tw = troEl.getBoundingClientRect().width || 47;
+      if (isMale) {
+        var rMen = menEl.getBoundingClientRect();
+        troEl.style.left = (rMen.right - rWrap.left + 4) + 'px';
+        troEl.style.right = 'auto';
+      } else {
+        var rWom = womEl.getBoundingClientRect();
+        var xF = rWom.left - rWrap.left - 4 - tw;
+        troEl.style.left = Math.max(4, xF) + 'px';
+        troEl.style.right = 'auto';
+      }
+      troEl.style.transform = 'translateX(0)';
+    }
 
     /**
      * Affiche l'overlay de chargement (uniquement si SHOW_LOADING_OVERLAY est true)
@@ -1866,9 +1902,28 @@
           } else {
             trophySideLeftPct = malePercentage + (100 - malePercentage) / 2;
           }
-          anchor.innerHTML = '<span class="previous-month-trophy-static" aria-hidden="true">' + CHALLENGE_TROPHY_SVG + '</span>';
+          var winnerIsMale = menLabel.classList.contains('winner')
+            ? true
+            : womenLabel.classList.contains('winner')
+              ? false
+              : maleBar.classList.contains('winner');
+          var winCls = winnerIsMale
+            ? 'previous-month-trophy-static--winner-male'
+            : 'previous-month-trophy-static--winner-female';
+          anchor.innerHTML = '<span class="previous-month-trophy-static ' + winCls + '" aria-hidden="true" data-bar-left-pct="' + trophySideLeftPct + '">' + CHALLENGE_TROPHY_SVG + '</span>';
           var troEl = anchor.querySelector('.previous-month-trophy-static');
-          if (troEl) troEl.style.left = trophySideLeftPct + '%';
+          if (troEl) {
+            if (window.innerWidth > 600) {
+              troEl.style.left = trophySideLeftPct + '%';
+              troEl.style.transform = 'translateX(-50%)';
+            } else {
+              troEl.style.left = '';
+              setTimeout(function () {
+                positionPreviousMonthTrophyMobile();
+                requestAnimationFrame(positionPreviousMonthTrophyMobile);
+              }, 50);
+            }
+          }
         }
       } else {
         var trophyWinner = '<span class="trophy-svg" aria-hidden="true">' + CHALLENGE_TROPHY_SVG + '</span>';
@@ -2519,6 +2574,14 @@
     }
 
     function initializePage() {
+      if (!window._leaderboardPrevTrophyResizeBound) {
+        window._leaderboardPrevTrophyResizeBound = true;
+        window.addEventListener('resize', function () {
+          clearTimeout(previousTrophyLayoutTimer);
+          previousTrophyLayoutTimer = setTimeout(positionPreviousMonthTrophyMobile, 120);
+        });
+      }
+
       // Ajouter la classe loading au body
       document.body.classList.add('loading');
 
