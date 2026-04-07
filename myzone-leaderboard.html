@@ -1587,7 +1587,7 @@
 
     <!-- Challenge H/F du mois clos (1er au 7) : mêmes données agrégées que le JSON current -->
     <div class="competition-container competition-container--previous" id="previousMonthCompetition" style="display: none;">
-      <div id="previousCompetitionCaption" class="competition-caption" aria-hidden="true"></div>
+      <div id="previousCompetitionCaption" class="competition-caption"></div>
       <div class="labels-container">
         <div id="prevMenLabel" class="men-label"></div>
         <div id="prevWomenLabel" class="women-label"></div>
@@ -1875,6 +1875,17 @@
       return true;
     }
 
+    /** Légende courte du bloc mois précédent (moyennes MEPs actifs), alignée sur la logique de la barre */
+    function captionPreviousMonthWinners(periodData) {
+      if (!periodData || !periodData.meps_averages) return '';
+      const m = parseFloat(periodData.meps_averages.male) || 0;
+      const f = parseFloat(periodData.meps_averages.female) || 0;
+      if (m > f) return 'Gagnants : Les hommes';
+      if (f > m) return 'Gagnants : Les femmes';
+      const total = m + f || 1;
+      return (m / total) * 100 >= 50 ? 'Gagnants : Les hommes' : 'Gagnants : Les femmes';
+    }
+
     function updateMenWomenBar(data) {
       if (!data || !data.current) {
         console.warn('updateMenWomenBar: données manquantes (current)');
@@ -1965,8 +1976,13 @@
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const container = document.getElementById('previousPodiumConfetti');
       if (!container) return;
-      /* Palette proche du mode férié daily.html + or club — pièces plus grosses (CSS) et ~2× le volume */
-      const colors = ['#1e5a8a', '#2a7ab8', '#e8c547', '#f4d03f', '#ffd700', '#e42218', '#6e0c0c', '#ffffff', '#87ceeb', '#fff8dc'];
+      /* Même palette que les podiums 1er / 2e / 3e (or, argent, bronze) — pas de bleu */
+      const colors = [
+        '#FFD700', '#FFC600', '#FFB700', '#FFA700',
+        '#C0C0C0', '#B0B0B0', '#A0A0A0', '#909090',
+        '#CD7F32', '#B87333', '#A66A2E', '#965A2B',
+        '#ffffff', '#fff8dc'
+      ];
       const count = 14 + Math.floor(Math.random() * 28);
       for (let i = 0; i < count; i++) {
         const piece = document.createElement('div');
@@ -2148,7 +2164,7 @@
         if (prevComp) {
           if (prevOk) {
             prevComp.style.display = 'block';
-            if (prevCap) prevCap.textContent = 'Challenge hommes / femmes — ' + (data.previous.month || '');
+            if (prevCap) prevCap.textContent = captionPreviousMonthWinners(data.previous);
           } else {
             prevComp.style.display = 'none';
           }
