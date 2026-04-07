@@ -674,7 +674,7 @@
       height: 5px;
       top: -12px;
       border-radius: 1px;
-      animation: confetti-fall 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      animation: confetti-fall 3.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
       opacity: 0.92;
     }
 
@@ -716,15 +716,47 @@
       margin-top: 10px;
       margin-bottom: 6px;
       background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.14) 0%, rgba(var(--primary-rgb), 0.06) 100%);
+      overflow: visible;
     }
 
-    .competition-caption {
-      text-align: center;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin: 0 0 10px;
-      letter-spacing: 0.02em;
+    /* Mois précédent : barre MEPs + trophée en calque (hors flux, n’agence pas les pills ni la barre) */
+    .previous-competition-bar-wrap {
+      position: relative;
+      margin-top: 8px;
+      z-index: 1;
+    }
+
+    .previous-competition-bar-wrap .progress-bar {
+      margin-top: 0;
+    }
+
+    .previous-month-trophy-above-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -2.85rem;
+      height: 2.85rem;
+      overflow: visible;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .previous-month-trophy-above-bar .previous-month-trophy-static {
+      position: absolute;
+      bottom: -5px;
+      width: 2.95rem;
+      height: 2.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: none !important;
+      transform: translateX(-50%);
+    }
+
+    .previous-month-trophy-above-bar .previous-month-trophy-static svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .step {
@@ -1191,11 +1223,11 @@
       font-weight: bold;
     }
 
-    /* Trophée SVG : hommes à droite du bloc actifs — base ~1.65rem, plus grand si .trophy-svg--winner */
+    /* Trophée SVG : hommes à droite du pill (mois en cours). Mois précédent : trophée dans .previous-month-trophy-above-bar */
     .men-label .trophy-svg {
       position: absolute;
       right: -20px;
-      top: 50%;
+      top: calc(50% - 4px);
       transform: translateY(-50%) scale(0);
       width: 1.65rem;
       height: 1.65rem;
@@ -1203,13 +1235,6 @@
       align-items: center;
       justify-content: center;
       animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
-    }
-
-    .men-label .trophy-svg.trophy-svg--winner {
-      width: 2.95rem;
-      height: 2.95rem;
-      right: -36px;
-      animation: trophy-grow-winner 0.55s ease-out forwards, trophy-pulse-winner 1.8s ease-in-out 0.65s infinite;
     }
 
     .men-label .trophy-svg svg {
@@ -1222,7 +1247,7 @@
     .women-label .trophy-svg {
       position: absolute;
       left: -20px;
-      top: 50%;
+      top: calc(50% - 4px);
       transform: translateY(-50%) scale(0);
       width: 1.65rem;
       height: 1.65rem;
@@ -1230,13 +1255,6 @@
       align-items: center;
       justify-content: center;
       animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
-    }
-
-    .women-label .trophy-svg.trophy-svg--winner {
-      width: 2.95rem;
-      height: 2.95rem;
-      left: -36px;
-      animation: trophy-grow-winner 0.55s ease-out forwards, trophy-pulse-winner 1.8s ease-in-out 0.65s infinite;
     }
 
     .women-label .trophy-svg svg {
@@ -1266,30 +1284,6 @@
       }
       50% {
         transform: translateY(-50%) scale(1.15);
-      }
-    }
-
-    @keyframes trophy-grow-winner {
-      0% {
-        transform: translateY(-50%) scale(0);
-        opacity: 0;
-      }
-      70% {
-        transform: translateY(-50%) scale(1.12);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-50%) scale(1);
-        opacity: 1;
-      }
-    }
-
-    @keyframes trophy-pulse-winner {
-      0%, 100% {
-        transform: translateY(-50%) scale(1);
-      }
-      50% {
-        transform: translateY(-50%) scale(1.12);
       }
     }
 
@@ -1587,15 +1581,17 @@
 
     <!-- Challenge H/F du mois clos (1er au 7) : mêmes données agrégées que le JSON current -->
     <div class="competition-container competition-container--previous" id="previousMonthCompetition" style="display: none;">
-      <div id="previousCompetitionCaption" class="competition-caption"></div>
       <div class="labels-container">
         <div id="prevMenLabel" class="men-label"></div>
         <div id="prevWomenLabel" class="women-label"></div>
       </div>
-      <div id="prevGenderProgressBar" class="progress-bar">
-        <div id="prevMaleBar" class="male"></div>
-        <div id="prevFemaleBar" class="female"></div>
-        <div id="prevDynamicIcon" class="icon-container"></div>
+      <div class="previous-competition-bar-wrap">
+        <div id="previousMonthTrophyAboveBar" class="previous-month-trophy-above-bar" aria-hidden="true"></div>
+        <div id="prevGenderProgressBar" class="progress-bar">
+          <div id="prevMaleBar" class="male"></div>
+          <div id="prevFemaleBar" class="female"></div>
+          <div id="prevDynamicIcon" class="icon-container"></div>
+        </div>
       </div>
     </div>
 
@@ -1799,9 +1795,12 @@
 
     /**
      * Remplit la barre challenge H / F à partir d'un bloc période (current ou previous).
+     * @param {Object} [opts] opts.trophyAboveBarId — si défini (ex. mois précédent), trophée statique au-dessus de la barre MEPs, sans animation ni crop.
      * @returns {boolean} false si données insuffisantes
      */
-    function fillGenderChallengeBar(periodData, ids) {
+    function fillGenderChallengeBar(periodData, ids, opts) {
+      opts = opts || {};
+      var trophyAboveBarId = opts.trophyAboveBarId || '';
       if (!periodData || !periodData.meps_averages || !periodData.active_users || !periodData.inactive_users) {
         return false;
       }
@@ -1852,10 +1851,30 @@
       const maleLabel = maleUsers === 1 ? 'Actif' : 'Actifs';
       const femaleLabel = femaleUsers === 1 ? 'Active' : 'Actives';
 
-      const trophyWinner = `<span class="trophy-svg trophy-svg--winner" aria-hidden="true">${CHALLENGE_TROPHY_SVG}</span>`;
-
-      menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}` + (menLabel.classList.contains('winner') ? trophyWinner : '');
-      womenLabel.innerHTML = (womenLabel.classList.contains('winner') ? trophyWinner : '') + `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+      if (trophyAboveBarId) {
+        menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}`;
+        womenLabel.innerHTML = `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+        var anchor = document.getElementById(trophyAboveBarId);
+        if (anchor) {
+          var trophySideLeftPct;
+          if (menLabel.classList.contains('winner')) {
+            trophySideLeftPct = malePercentage / 2;
+          } else if (womenLabel.classList.contains('winner')) {
+            trophySideLeftPct = malePercentage + (100 - malePercentage) / 2;
+          } else if (maleBar.classList.contains('winner')) {
+            trophySideLeftPct = malePercentage / 2;
+          } else {
+            trophySideLeftPct = malePercentage + (100 - malePercentage) / 2;
+          }
+          anchor.innerHTML = '<span class="previous-month-trophy-static" aria-hidden="true">' + CHALLENGE_TROPHY_SVG + '</span>';
+          var troEl = anchor.querySelector('.previous-month-trophy-static');
+          if (troEl) troEl.style.left = trophySideLeftPct + '%';
+        }
+      } else {
+        var trophyWinner = '<span class="trophy-svg" aria-hidden="true">' + CHALLENGE_TROPHY_SVG + '</span>';
+        menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}` + (menLabel.classList.contains('winner') ? trophyWinner : '');
+        womenLabel.innerHTML = (womenLabel.classList.contains('winner') ? trophyWinner : '') + `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+      }
 
       const formatMEPs = (n) => Math.round(n).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
       maleBar.innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(maleMEPs)}</span> MEPs</strong>`;
@@ -1873,17 +1892,6 @@
       dynamicIcon.innerHTML = `<img src="${iconUrl}" alt="">`;
       dynamicIcon.style.left = `calc(${malePercentage}% + 3px)`;
       return true;
-    }
-
-    /** Légende courte du bloc mois précédent (moyennes MEPs actifs), alignée sur la logique de la barre */
-    function captionPreviousMonthWinners(periodData) {
-      if (!periodData || !periodData.meps_averages) return '';
-      const m = parseFloat(periodData.meps_averages.male) || 0;
-      const f = parseFloat(periodData.meps_averages.female) || 0;
-      if (m > f) return 'Gagnants : Les hommes';
-      if (f > m) return 'Gagnants : Les femmes';
-      const total = m + f || 1;
-      return (m / total) * 100 >= 50 ? 'Gagnants : Les hommes' : 'Gagnants : Les femmes';
     }
 
     function updateMenWomenBar(data) {
@@ -1983,13 +1991,13 @@
         '#CD7F32', '#B87333', '#A66A2E', '#965A2B',
         '#ffffff', '#fff8dc'
       ];
-      const count = 14 + Math.floor(Math.random() * 28);
+      const count = 28 + Math.floor(Math.random() * 44);
       for (let i = 0; i < count; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece' + (Math.random() > 0.35 ? ' sparkle' : '');
         piece.style.left = Math.random() * 100 + '%';
-        piece.style.animationDelay = (Math.random() * 0.35) + 's';
-        piece.style.animationDuration = (1.8 + Math.random() * 0.95) + 's';
+        piece.style.animationDelay = (Math.random() * 0.45) + 's';
+        piece.style.animationDuration = (2.85 + Math.random() * 1.5) + 's';
         const drift = (Math.random() - 0.5) * 140;
         const rot = 360 + Math.random() * 720;
         piece.style.setProperty('--dx', drift + 'px');
@@ -1999,7 +2007,7 @@
         container.appendChild(piece);
         setTimeout(function () {
           if (piece.parentNode) piece.remove();
-        }, 3200);
+        }, 5200);
       }
     }
 
@@ -2153,26 +2161,26 @@
         }
 
         const prevComp = document.getElementById('previousMonthCompetition');
-        const prevCap = document.getElementById('previousCompetitionCaption');
         const prevOk = data.previous && fillGenderChallengeBar(data.previous, {
           menLabelId: 'prevMenLabel',
           womenLabelId: 'prevWomenLabel',
           maleBarId: 'prevMaleBar',
           femaleBarId: 'prevFemaleBar',
           dynamicIconId: 'prevDynamicIcon'
-        });
+        }, { trophyAboveBarId: 'previousMonthTrophyAboveBar' });
         if (prevComp) {
-          if (prevOk) {
-            prevComp.style.display = 'block';
-            if (prevCap) prevCap.textContent = captionPreviousMonthWinners(data.previous);
-          } else {
-            prevComp.style.display = 'none';
-          }
+          prevComp.style.display = prevOk ? 'block' : 'none';
+        }
+        if (!prevOk) {
+          var clearTrophy = document.getElementById('previousMonthTrophyAboveBar');
+          if (clearTrophy) clearTrophy.innerHTML = '';
         }
       } else if (dayOfMonth > 7) {
         stopPreviousPodiumConfetti();
         const prevCompHide = document.getElementById('previousMonthCompetition');
         if (prevCompHide) prevCompHide.style.display = 'none';
+        const trophyHide = document.getElementById('previousMonthTrophyAboveBar');
+        if (trophyHide) trophyHide.innerHTML = '';
         // Masquer toute la section mois précédent (aucun résidu, plus de bloc translucide)
         const previousSection = document.getElementById('previousMonthSection');
         if (previousSection) {
