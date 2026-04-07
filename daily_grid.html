@@ -963,12 +963,16 @@
       align-items: center;
       justify-content: center;
       object-fit: unset;
-      background: linear-gradient(145deg, #8a8a8e 0%, #4a4a52 50%, #6b6b72 100%);
+      background: linear-gradient(145deg, #c9cbd4 0%, #9698a3 48%, #b0b2bb 100%);
       font-weight: 600;
-      font-size: 0.58rem;
-      color: rgba(255, 255, 255, 0.95);
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.97);
       line-height: 1;
       user-select: none;
+    }
+
+    .coach-image.coach-avatar-placeholder--double {
+      font-size: 0.76rem;
     }
 
     .coach-name {
@@ -1312,7 +1316,11 @@
       }
 
       .coach-image.coach-avatar-placeholder {
-        font-size: 0.52rem;
+        font-size: 0.94rem;
+      }
+
+      .coach-image.coach-avatar-placeholder--double {
+        font-size: 0.67rem;
       }
 
       .coach-name {
@@ -1422,7 +1430,11 @@
       }
 
       .coach-image.coach-avatar-placeholder {
-        font-size: 0.48rem;
+        font-size: 0.86rem;
+      }
+
+      .coach-image.coach-avatar-placeholder--double {
+        font-size: 0.61rem;
       }
 
       .coach-name {
@@ -1493,7 +1505,11 @@
       }
 
       .coach-image.coach-avatar-placeholder {
-        font-size: 0.58rem;
+        font-size: 1.05rem;
+      }
+
+      .coach-image.coach-avatar-placeholder--double {
+        font-size: 0.76rem;
       }
 
       .coach-name {
@@ -1811,6 +1827,10 @@
         return (firstUpper(parts[0]) + firstUpper(parts[parts.length - 1])).slice(0, 2);
       }
       return firstUpper(parts[0]).slice(0, 1) || '?';
+    }
+
+    function dailyGridCoachPlaceholderClass(initials) {
+      return 'coach-image coach-avatar-placeholder' + (String(initials).length >= 2 ? ' coach-avatar-placeholder--double' : '');
     }
 
     function initPlanningView(data) {
@@ -2533,7 +2553,7 @@
           imgEl.addEventListener('error', function onCoachBarImgErr() {
             imgEl.removeEventListener('error', onCoachBarImgErr);
             var ph = document.createElement('div');
-            ph.className = 'coach-image coach-avatar-placeholder';
+            ph.className = dailyGridCoachPlaceholderClass(initials);
             ph.setAttribute('role', 'img');
             ph.setAttribute('aria-label', disp);
             ph.textContent = initials;
@@ -2542,7 +2562,7 @@
           coachCard.appendChild(imgEl);
         } else {
           var phEl = document.createElement('div');
-          phEl.className = 'coach-image coach-avatar-placeholder';
+          phEl.className = dailyGridCoachPlaceholderClass(initials);
           phEl.setAttribute('role', 'img');
           phEl.setAttribute('aria-label', disp);
           phEl.textContent = initials;

@@ -1551,13 +1551,17 @@
       border-radius: 50%;
       margin-right: 5px;
       font-weight: 600;
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.95);
-      background: linear-gradient(145deg, #8a8a8e 0%, #4a4a52 50%, #6b6b72 100%);
+      font-size: 1.425rem;
+      color: rgba(255, 255, 255, 0.97);
+      background: linear-gradient(145deg, #c9cbd4 0%, #9698a3 48%, #b0b2bb 100%);
       box-sizing: border-box;
       vertical-align: middle;
       flex-shrink: 0;
       user-select: none;
+    }
+
+    .coach-photo-placeholder.coach-photo-placeholder--double {
+      font-size: 0.95rem;
     }
 
     .coach-photo.multiple.coach-photo-placeholder {
@@ -3515,9 +3519,10 @@
             ? ' data-big-src="' + escapeHtml(bigSrc) + '" data-lightbox-caption="' + escapeHtml(lbCaption) + '"' +
               ' tabindex="0" role="button" aria-label="Agrandir la photo de ' + escapeHtml(lbCaption || disp) + '"'
             : '';
+          var phDbl = initials.length >= 2 ? ' coach-photo-placeholder--double' : '';
           var avatarInner = imgSrc
             ? '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + zoomClass + '" src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(disp) + '"' + zoomData + '>'
-            : '<div class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + ' coach-photo-placeholder" role="img" aria-label="' + escapeHtml(disp) + '">' + escapeHtml(initials) + '</div>';
+            : '<div class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + ' coach-photo-placeholder' + phDbl + '" role="img" aria-label="' + escapeHtml(disp) + '">' + escapeHtml(initials) + '</div>';
           return '<div class="coach-item ' + (isMultipleCoachs ? '' : 'single') + '">' +
             avatarInner +
             (!isMultipleCoachs ? '<span dir="auto" class="coach-name-bidi">' + escapeHtml(disp) + '</span>' : '') +
@@ -3552,7 +3557,8 @@
           var alt = img.getAttribute('alt') || '';
           var initials = coachInitialsFromDisplayName(alt);
           var div = document.createElement('div');
-          div.className = img.className.replace(/\s*coach-photo-zoomable\s*/g, ' ').replace(/\s+/g, ' ').trim() + ' coach-photo-placeholder';
+          div.className = img.className.replace(/\s*coach-photo-zoomable\s*/g, ' ').replace(/\s+/g, ' ').trim() + ' coach-photo-placeholder' +
+            (String(initials).length >= 2 ? ' coach-photo-placeholder--double' : '');
           div.setAttribute('role', 'img');
           div.setAttribute('aria-label', alt);
           div.textContent = initials;
