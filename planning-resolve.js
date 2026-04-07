@@ -308,6 +308,32 @@
     return coach.name || '';
   }
 
+  /**
+   * Initiales pour avatar sans photo : première lettre du prénom + première lettre du nom si plusieurs mots,
+   * sinon une seule lettre.
+   */
+  function coachInitialsFromDisplayName(displayName) {
+    if (displayName == null || displayName === '') return '?';
+    var s = String(displayName).trim();
+    if (!s) return '?';
+    var parts = s.split(/\s+/).filter(function(p) {
+      return p.length > 0;
+    });
+    function firstUpper(segment) {
+      if (!segment) return '';
+      var ch = segment.charAt(0);
+      try {
+        return ch.toLocaleUpperCase('fr-FR');
+      } catch (e) {
+        return ch.toUpperCase();
+      }
+    }
+    if (parts.length >= 2) {
+      return (firstUpper(parts[0]) + firstUpper(parts[parts.length - 1])).slice(0, 2);
+    }
+    return firstUpper(parts[0]).slice(0, 1) || '?';
+  }
+
   var api = {
     NAV_DAYS_LIMIT: NAV_DAYS_LIMIT,
     ymdFromDate: ymdFromDate,
@@ -334,7 +360,8 @@
     coachPhotoUrl: coachPhotoUrl,
     coachBigPhotoUrl: coachBigPhotoUrl,
     coachHeroBackgroundUrl: coachHeroBackgroundUrl,
-    coachDisplayName: coachDisplayName
+    coachDisplayName: coachDisplayName,
+    coachInitialsFromDisplayName: coachInitialsFromDisplayName
   };
 
   global.PlanningResolve = api;

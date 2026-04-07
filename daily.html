@@ -1542,6 +1542,28 @@
       margin-right: 0;
     }
 
+    .coach-photo-placeholder {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      margin-right: 5px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.95);
+      background: linear-gradient(145deg, #8a8a8e 0%, #4a4a52 50%, #6b6b72 100%);
+      box-sizing: border-box;
+      vertical-align: middle;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .coach-photo.multiple.coach-photo-placeholder {
+      margin-right: 0;
+    }
+
     .course-coach img {
       width: 42px;
       height: 42px;
@@ -2650,6 +2672,28 @@
       return coach.name || '';
     }
 
+    function coachInitialsFromDisplayName(displayName) {
+      if (displayName == null || displayName === '') return '?';
+      var s = String(displayName).trim();
+      if (!s) return '?';
+      var parts = s.split(/\s+/).filter(function(p) {
+        return p.length > 0;
+      });
+      function firstUpper(segment) {
+        if (!segment) return '';
+        var ch = segment.charAt(0);
+        try {
+          return ch.toLocaleUpperCase('fr-FR');
+        } catch (e) {
+          return ch.toUpperCase();
+        }
+      }
+      if (parts.length >= 2) {
+        return (firstUpper(parts[0]) + firstUpper(parts[parts.length - 1])).slice(0, 2);
+      }
+      return firstUpper(parts[0]).slice(0, 1) || '?';
+    }
+
     function coachLightboxCaption(coach) {
       return coachDisplayName(coach);
     }
@@ -3460,19 +3504,22 @@
           }
         }
 
-        var defaultCoachImg = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
         var coachImagesHTML = coachs.map(function(coach) {
-          var imgSrc = coachPhotoUrl(coach) || defaultCoachImg;
+          var imgSrc = coachPhotoUrl(coach) || '';
           var bigSrc = coachBigPhotoUrl(coach);
           var disp = coachDisplayName(coach);
+          var initials = coachInitialsFromDisplayName(disp);
           var lbCaption = coachLightboxCaption(coach);
           var zoomClass = bigSrc ? ' coach-photo-zoomable' : '';
           var zoomData = bigSrc
             ? ' data-big-src="' + escapeHtml(bigSrc) + '" data-lightbox-caption="' + escapeHtml(lbCaption) + '"' +
               ' tabindex="0" role="button" aria-label="Agrandir la photo de ' + escapeHtml(lbCaption || disp) + '"'
             : '';
+          var avatarInner = imgSrc
+            ? '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + zoomClass + '" src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(disp) + '"' + zoomData + '>'
+            : '<div class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + ' coach-photo-placeholder" role="img" aria-label="' + escapeHtml(disp) + '">' + escapeHtml(initials) + '</div>';
           return '<div class="coach-item ' + (isMultipleCoachs ? '' : 'single') + '">' +
-            '<img class="coach-photo ' + (isMultipleCoachs ? 'multiple' : '') + zoomClass + '" src="' + escapeHtml(imgSrc) + '" alt="' + escapeHtml(disp) + '"' + zoomData + '>' +
+            avatarInner +
             (!isMultipleCoachs ? '<span dir="auto" class="coach-name-bidi">' + escapeHtml(disp) + '</span>' : '') +
             '</div>';
         }).join('');
@@ -3497,6 +3544,21 @@
       });
 
       scheduleContainer.innerHTML = scheduleHTML;
+      scheduleContainer.querySelectorAll('img.coach-photo[src]').forEach(function(img) {
+        if (img.getAttribute('data-coach-fallback-wired')) return;
+        img.setAttribute('data-coach-fallback-wired', '1');
+        img.addEventListener('error', function onCoachImgErr() {
+          img.removeEventListener('error', onCoachImgErr);
+          var alt = img.getAttribute('alt') || '';
+          var initials = coachInitialsFromDisplayName(alt);
+          var div = document.createElement('div');
+          div.className = img.className.replace(/\s*coach-photo-zoomable\s*/g, ' ').replace(/\s+/g, ' ').trim() + ' coach-photo-placeholder';
+          div.setAttribute('role', 'img');
+          div.setAttribute('aria-label', alt);
+          div.textContent = initials;
+          img.replaceWith(div);
+        });
+      });
       toggleTodayButton();
 
       requestAnimationFrame(function() {

@@ -331,16 +331,24 @@
               coachImagesHtml = '';
               if (course.coachs.length === 1) {
                 var c0 = course.coachs[0];
-                var coachImageUrl = c0.imageUrl || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/a340beeb-f8a3-d937-7eb8-e17882fc82ec.png';
+                var coachImageUrl = c0.imageUrl || '';
                 var disp0 = c0.displayName || c0.name;
+                var ini0 = PR.coachInitialsFromDisplayName ? PR.coachInitialsFromDisplayName(disp0) : '?';
+                var avatar0 = coachImageUrl
+                  ? '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(disp0) + '" draggable="false">'
+                  : '<div class="coach-avatar-placeholder" role="img" aria-label="' + PR.escapeHtml(disp0) + '">' + PR.escapeHtml(ini0) + '</div>';
                 coachImagesHtml = '<div class="single-coach">' +
-                  '<img src="' + PR.escapeHtml(coachImageUrl) + '" alt="' + PR.escapeHtml(disp0) + '" draggable="false">' +
+                  avatar0 +
                   '<span dir="auto" class="coach-name-bidi">' + PR.escapeHtml(disp0) + '</span></div>';
               } else if (course.coachs.length > 1) {
                 coachImagesHtml = '<div class="multiple-coaches">';
                 course.coachs.forEach(function(coach) {
+                  var dispM = coach.displayName || coach.name;
+                  var iniM = PR.coachInitialsFromDisplayName ? PR.coachInitialsFromDisplayName(dispM) : '?';
                   if (coach.imageUrl) {
                     coachImagesHtml += '<img src="' + PR.escapeHtml(coach.imageUrl) + '" alt="" class="coach-image" draggable="false">';
+                  } else {
+                    coachImagesHtml += '<div class="coach-image coach-avatar-placeholder" role="img" aria-label="' + PR.escapeHtml(dispM) + '">' + PR.escapeHtml(iniM) + '</div>';
                   }
                 });
                 coachImagesHtml += '</div>';
@@ -442,10 +450,37 @@
       setTimeout(runSync, 220);
     }
 
+    /** Si l’URL photo est invalide, remplace l’img par le placeholder initiales (aligné sur daily). */
+    function wireWeeklyCoachPhotoFallbacks() {
+      var PR = getPR();
+      var root = document.getElementById('weeklySchedule');
+      if (!root || !PR || !PR.coachInitialsFromDisplayName) return;
+      root.querySelectorAll('.single-coach img, .multiple-coaches img.coach-image').forEach(function(img) {
+        if (img.getAttribute('data-coach-fallback-wired')) return;
+        img.setAttribute('data-coach-fallback-wired', '1');
+        img.addEventListener('error', function onCoachImgErr() {
+          img.removeEventListener('error', onCoachImgErr);
+          var label = img.getAttribute('alt') || '';
+          if (!label && img.closest('.single-coach')) {
+            var sp = img.closest('.single-coach').querySelector('.coach-name-bidi');
+            if (sp) label = sp.textContent || '';
+          }
+          var initials = PR.coachInitialsFromDisplayName(label) || '?';
+          var div = document.createElement('div');
+          div.className = img.closest('.multiple-coaches') ? 'coach-image coach-avatar-placeholder' : 'coach-avatar-placeholder';
+          div.setAttribute('role', 'img');
+          div.setAttribute('aria-label', label);
+          div.textContent = initials;
+          img.replaceWith(div);
+        });
+      });
+    }
+
     function refreshPlanningDisplay() {
       var el = document.getElementById('weeklySchedule');
       if (!el) return;
       el.innerHTML = generateWeeklyScheduleHtml();
+      wireWeeklyCoachPhotoFallbacks();
       applyWeeklyBodyPlanningTheme();
       updateNavButtonsStateWeek();
       if (scheduleData) renderPlanningViewSwitcher(scheduleData);
@@ -527,6 +562,7 @@
         if (mc) mc.style.display = 'none';
 
         document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
+        wireWeeklyCoachPhotoFallbacks();
 
         (function setupStickyDaysBar() {
           var mainTable = document.querySelector('#weeklySchedule .weekly-schedule');
@@ -661,7 +697,6 @@
       var coachDropdownText = document.getElementById('coachDropdownText');
       if (!data || !coachDropdownContent) return;
 
-      var defaultCoachImage = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png';
       var coachsData = data.coachs || [];
       var uniqueCoachesMap = new Map();
 
@@ -672,7 +707,7 @@
             (course.coachIds || []).forEach(function(coachId) {
               var coach = coachsData.find(function(c) { return c.id === coachId; });
               if (coach && !uniqueCoachesMap.has(coach.name)) {
-                var thumb = (PR && PR.coachPhotoUrl ? PR.coachPhotoUrl(coach) : '') || (coach && coach.imageUrl) || defaultCoachImage;
+                var thumb = (PR && PR.coachPhotoUrl ? PR.coachPhotoUrl(coach) : '') || (coach && coach.imageUrl) || '';
                 var dispN = PR.coachDisplayName ? PR.coachDisplayName(coach) : coach.name;
                 uniqueCoachesMap.set(coach.name, { name: coach.name, displayName: dispN, imageUrl: thumb });
               }
@@ -703,10 +738,32 @@
         label.style.alignItems = 'center';
         label.style.width = '100%';
         label.style.cursor = 'pointer';
-        var img = document.createElement('img');
-        img.className = 'coach-dropdown-option-photo';
-        img.src = coachObj.imageUrl;
-        img.alt = coachObj.displayName || coachObj.name;
+        var img;
+        if (coachObj.imageUrl) {
+          img = document.createElement('img');
+          img.className = 'coach-dropdown-option-photo';
+          img.src = coachObj.imageUrl;
+          img.alt = coachObj.displayName || coachObj.name;
+          img.addEventListener('error', function onCoachDropPh() {
+            img.removeEventListener('error', onCoachDropPh);
+            var ph = document.createElement('div');
+            ph.className = 'coach-dropdown-option-photo coach-avatar-placeholder';
+            ph.setAttribute('role', 'img');
+            ph.setAttribute('aria-label', coachObj.displayName || coachObj.name);
+            ph.textContent = PR.coachInitialsFromDisplayName
+              ? PR.coachInitialsFromDisplayName(coachObj.displayName || coachObj.name)
+              : '?';
+            img.replaceWith(ph);
+          });
+        } else {
+          img = document.createElement('div');
+          img.className = 'coach-dropdown-option-photo coach-avatar-placeholder';
+          img.setAttribute('role', 'img');
+          img.setAttribute('aria-label', coachObj.displayName || coachObj.name);
+          img.textContent = PR.coachInitialsFromDisplayName
+            ? PR.coachInitialsFromDisplayName(coachObj.displayName || coachObj.name)
+            : '?';
+        }
         var span = document.createElement('span');
         span.dir = 'auto';
         span.className = 'coach-name-bidi';

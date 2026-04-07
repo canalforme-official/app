@@ -899,6 +899,16 @@
       margin-bottom: 0;
     }
 
+    .single-coach .coach-avatar-placeholder {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      margin-right: 4px;
+      margin-left: 2px;
+      margin-bottom: 0;
+      font-size: 0.55em;
+    }
+
     /* Couleur des noms de coachs selon le type de cours */
     .course-block.piscine .single-coach span {
       color: var(--text-light);
@@ -919,6 +929,13 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
+    }
+
+    .multiple-coaches .coach-avatar-placeholder {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.55em;
     }
 
     /* Cacher les coachs si le filtre est décoché */
@@ -1322,6 +1339,23 @@
       background-color: rgba(72, 6, 7, 0.1);
     }
 
+    .coach-avatar-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.95);
+      background: linear-gradient(145deg, #8a8a8e 0%, #4a4a52 50%, #6b6b72 100%);
+      box-sizing: border-box;
+      line-height: 1;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .coach-dropdown-option-photo.coach-avatar-placeholder {
+      font-size: 0.75rem;
+    }
+
     .coach-dropdown-option label span:first-of-type {
       flex: 1;
       font-size: 1.15em;
@@ -1687,6 +1721,13 @@
       .coach-image {
         width: 20px;
         height: 20px;
+      }
+
+      .single-coach .coach-avatar-placeholder,
+      .multiple-coaches .coach-avatar-placeholder {
+        width: 20px;
+        height: 20px;
+        font-size: 0.5em;
       }
 
       .countdown-pill {

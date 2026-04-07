@@ -958,6 +958,19 @@
       background-color: var(--background-card);
     }
 
+    .coach-image.coach-avatar-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      object-fit: unset;
+      background: linear-gradient(145deg, #8a8a8e 0%, #4a4a52 50%, #6b6b72 100%);
+      font-weight: 600;
+      font-size: 0.58rem;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1;
+      user-select: none;
+    }
+
     .coach-name {
       font-family: var(--font-text);
       font-size: 0.65em;
@@ -1298,6 +1311,10 @@
         height: 26px;
       }
 
+      .coach-image.coach-avatar-placeholder {
+        font-size: 0.52rem;
+      }
+
       .coach-name {
         font-size: 0.6em;
       }
@@ -1404,6 +1421,10 @@
         height: 24px;
       }
 
+      .coach-image.coach-avatar-placeholder {
+        font-size: 0.48rem;
+      }
+
       .coach-name {
         font-size: 0.55em;
       }
@@ -1469,6 +1490,10 @@
       .coach-image {
         width: 28px;
         height: 28px;
+      }
+
+      .coach-image.coach-avatar-placeholder {
+        font-size: 0.58rem;
       }
 
       .coach-name {
@@ -1764,6 +1789,28 @@
         return String(coach.nomCaricature).trim();
       }
       return coach.name || '';
+    }
+
+    function coachInitialsFromDisplayName(displayName) {
+      if (displayName == null || displayName === '') return '?';
+      var s = String(displayName).trim();
+      if (!s) return '?';
+      var parts = s.split(/\s+/).filter(function(p) {
+        return p.length > 0;
+      });
+      function firstUpper(segment) {
+        if (!segment) return '';
+        var ch = segment.charAt(0);
+        try {
+          return ch.toLocaleUpperCase('fr-FR');
+        } catch (e) {
+          return ch.toUpperCase();
+        }
+      }
+      if (parts.length >= 2) {
+        return (firstUpper(parts[0]) + firstUpper(parts[parts.length - 1])).slice(0, 2);
+      }
+      return firstUpper(parts[0]).slice(0, 1) || '?';
     }
 
     function initPlanningView(data) {
@@ -2475,9 +2522,37 @@
         if (!coachData) return;
         var coachCard = document.createElement('div');
         coachCard.className = 'coach-card';
-        var coachImage = coachPhotoUrl(coachData) || 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png';
+        var coachUrl = coachPhotoUrl(coachData);
         var disp = coachDisplayName(coachData);
-        coachCard.innerHTML = '<img src="' + coachImage + '" alt="' + escapeHtml(disp) + '" class="coach-image" onerror="this.src=\'https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png\'"><div class="coach-name coach-name-bidi" dir="auto">' + escapeHtml(disp) + '</div>';
+        var initials = coachInitialsFromDisplayName(disp);
+        if (coachUrl) {
+          var imgEl = document.createElement('img');
+          imgEl.src = coachUrl;
+          imgEl.alt = disp;
+          imgEl.className = 'coach-image';
+          imgEl.addEventListener('error', function onCoachBarImgErr() {
+            imgEl.removeEventListener('error', onCoachBarImgErr);
+            var ph = document.createElement('div');
+            ph.className = 'coach-image coach-avatar-placeholder';
+            ph.setAttribute('role', 'img');
+            ph.setAttribute('aria-label', disp);
+            ph.textContent = initials;
+            imgEl.replaceWith(ph);
+          });
+          coachCard.appendChild(imgEl);
+        } else {
+          var phEl = document.createElement('div');
+          phEl.className = 'coach-image coach-avatar-placeholder';
+          phEl.setAttribute('role', 'img');
+          phEl.setAttribute('aria-label', disp);
+          phEl.textContent = initials;
+          coachCard.appendChild(phEl);
+        }
+        var nameEl = document.createElement('div');
+        nameEl.className = 'coach-name coach-name-bidi';
+        nameEl.dir = 'auto';
+        nameEl.textContent = disp;
+        coachCard.appendChild(nameEl);
         coachesSection.appendChild(coachCard);
       });
 
