@@ -278,7 +278,16 @@
       });
 
       blockCourses.forEach(function(bc) {
-        courses.push(bc);
+        var merged = {};
+        var k;
+        for (k in bc) {
+          if (Object.prototype.hasOwnProperty.call(bc, k)) merged[k] = bc[k];
+        }
+        merged.isPlanningEventCourse = true;
+        if (block.label && String(block.label).trim()) {
+          merged.eventLabel = String(block.label).trim();
+        }
+        courses.push(merged);
       });
     });
 
@@ -336,6 +345,36 @@
     var div = document.createElement('div');
     div.textContent = text == null ? '' : String(text);
     return div.innerHTML;
+  }
+
+  /**
+   * Nom affichable quand l’id n’a pas de fiche dans la feuille Cours (ex. cours ajouté seulement en événement).
+   * Ex. cours-bodyjam → « Bodyjam » (segments après le préfixe cours-).
+   */
+  function formatCourseNameFromCoursId(coursId) {
+    if (coursId == null || coursId === '') return 'Cours';
+    var parts = String(coursId).split('-');
+    if (parts[0] === 'cours') parts = parts.slice(1);
+    return parts.filter(Boolean).map(function(seg) {
+      if (!seg.length) return '';
+      return seg.charAt(0).toUpperCase() + seg.slice(1).toLowerCase();
+    }).join(' ').trim() || 'Cours';
+  }
+
+  /**
+   * Fiche cours du catalogue ou objet minimal { id, name, logo } pour l’affichage.
+   */
+  function courseDisplayFromCoursId(coursId, coursCatalog) {
+    var catalog = coursCatalog || [];
+    var found = catalog.find(function(c) {
+      return c && c.id === coursId;
+    });
+    if (found) return found;
+    return {
+      id: coursId,
+      name: formatCourseNameFromCoursId(coursId),
+      logo: ''
+    };
   }
 
   /** Caricatures : date réelle du téléphone du 1er au 7 avril */
@@ -403,6 +442,56 @@
   }
 
   /**
+   * Particules confetti sur les blocs cours événement (daily / grid / weekly).
+   * @param {HTMLElement|Document} root
+   * @param {Object} [options]
+   * @param {string} [options.variant] 'daily' = particules plus grosses et plus nombreuses (timeline) ; 'compact' = moins nombreuses (grille, hebdo)
+   */
+  function fillPlanningEventConfetti(root, options) {
+    if (!root || !root.querySelectorAll) return;
+    options = options || {};
+    var variant = options.variant === 'daily' ? 'daily' : 'compact';
+    var n = variant === 'daily' ? 32 : 16;
+    var sel = '.course-block--planning-event, .course-card--planning-event';
+    root.querySelectorAll(sel).forEach(function(block) {
+      if (block.querySelector('.planning-event-fx')) return;
+      var fx = document.createElement('div');
+      fx.className = 'planning-event-fx' + (variant === 'daily' ? ' planning-event-fx--daily' : '');
+      fx.setAttribute('aria-hidden', 'true');
+      var colors = ['#e8b4a0', '#c9a8e8', '#7ec8e3', '#f5d08a', '#9dd5b8', '#f0a8c8', '#c4b5fd', '#fcd34d', '#fb7185', '#a3e635', '#f472b6', '#38bdf8'];
+      var i;
+      for (i = 0; i < n; i++) {
+        var s = document.createElement('span');
+        if (variant === 'daily') {
+          var mod = i % 3;
+          s.className =
+            'planning-event-fx__piece planning-event-fx__piece--daily' +
+            (mod === 0 ? ' planning-event-fx__piece--daily-pop' : mod === 1 ? ' planning-event-fx__piece--daily-fall' : ' planning-event-fx__piece--daily-wobble');
+          s.style.setProperty('--px-drift', (Math.random() * 28 - 14).toFixed(1) + 'px');
+          s.style.left = (2 + Math.random() * 96) + '%';
+          if (mod === 1) {
+            s.style.top = (Math.random() * 22) + '%';
+          } else if (mod === 0) {
+            s.style.top = (35 + Math.random() * 50) + '%';
+          } else {
+            s.style.top = (15 + Math.random() * 65) + '%';
+          }
+          s.style.animationDuration = (3.2 + Math.random() * 1.8).toFixed(2) + 's';
+        } else {
+          s.className = 'planning-event-fx__piece' + (i % 3 === 0 ? ' planning-event-fx__piece--wave' : (i % 3 === 1 ? ' planning-event-fx__piece--drift' : ''));
+          s.style.left = (2 + Math.random() * 96) + '%';
+          s.style.top = (2 + Math.random() * 92) + '%';
+        }
+        s.style.background = colors[i % colors.length];
+        s.style.animationDelay = (i * 0.05 + Math.random() * 0.35) + 's';
+        s.style.setProperty('--pe-rot', (Math.random() * 360 | 0) + 'deg');
+        fx.appendChild(s);
+      }
+      block.insertBefore(fx, block.firstChild);
+    });
+  }
+
+  /**
    * Initiales pour avatar sans photo : première lettre du prénom + première lettre du nom si plusieurs mots,
    * sinon une seule lettre.
    */
@@ -452,12 +541,15 @@
     applyPlanningEventsToResolvedView: applyPlanningEventsToResolvedView,
     pickOpeningHoursForDay: pickOpeningHoursForDay,
     escapeHtml: escapeHtml,
+    formatCourseNameFromCoursId: formatCourseNameFromCoursId,
+    courseDisplayFromCoursId: courseDisplayFromCoursId,
     useCaricatureCoachPhotos: useCaricatureCoachPhotos,
     coachPhotoUrl: coachPhotoUrl,
     coachBigPhotoUrl: coachBigPhotoUrl,
     coachHeroBackgroundUrl: coachHeroBackgroundUrl,
     coachDisplayName: coachDisplayName,
-    coachInitialsFromDisplayName: coachInitialsFromDisplayName
+    coachInitialsFromDisplayName: coachInitialsFromDisplayName,
+    fillPlanningEventConfetti: fillPlanningEventConfetti
   };
 
   global.PlanningResolve = api;

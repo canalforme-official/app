@@ -2489,7 +2489,13 @@
           } else {
             studioCourses.forEach(function(course) {
               var coursIdStr = (course.coursId || '').toString();
-              var courseName = coursIdStr.split('-').slice(1).join(' ').toUpperCase();
+              var courseName;
+              if (window.PlanningResolve && window.PlanningResolve.courseDisplayFromCoursId) {
+                var cd = window.PlanningResolve.courseDisplayFromCoursId(course.coursId, allData.cours);
+                courseName = (cd && cd.name ? cd.name : '').toUpperCase();
+              } else {
+                courseName = coursIdStr.split('-').slice(1).join(' ').toUpperCase();
+              }
               var coachIds = course.coachIds || [];
               var coachList = allData.coachs || [];
               var courseCoaches = coachIds.map(function(coachId) {
@@ -2515,6 +2521,7 @@
               }
               var courseCard = document.createElement('div');
               courseCard.className = 'course-card';
+              if (course.isPlanningEventCourse) courseCard.classList.add('course-card--planning-event');
               courseCard.setAttribute('data-start-time', startTimeStr);
               courseCard.setAttribute('data-end-time', endTimeStr);
               var courseType = (course.type || '').toString().toLowerCase();
@@ -2534,6 +2541,11 @@
       }
 
       updateCourseCardsState();
+
+      if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
+        var sc = document.getElementById('studiosContainer');
+        if (sc) window.PlanningResolve.fillPlanningEventConfetti(sc, { variant: 'compact' });
+      }
 
       var uniqueCoachIds = [];
       todaysCourses.forEach(function(course) {

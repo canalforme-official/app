@@ -152,13 +152,14 @@
             return coachs.find(function(c) { return c.id === coachId; });
           });
           scheduleByTimeAndDay[startTime][col.ymd].push({
-            courseName: courseInfo ? courseInfo.name : 'Cours inconnu',
+            courseName: courseInfo ? courseInfo.name : (PR.formatCourseNameFromCoursId ? PR.formatCourseNameFromCoursId(course.coursId) : 'Cours'),
             logo: courseInfo ? courseInfo.logo : '',
             studio: studioInfo ? studioInfo.name : 'Studio inconnu',
             endTime: course.endTime,
             startTime: course.startTime,
             duration: course.duration,
             type: course.type,
+            isPlanningEventCourse: !!course.isPlanningEventCourse,
             coachs: coachsInfo.map(function(coach) {
               var nm = coach ? coach.name : 'Coach inconnu';
               var disp = coach && PR.coachDisplayName ? PR.coachDisplayName(coach) : nm;
@@ -391,6 +392,7 @@
               if (isPastCourse) courseClasses += ' past';
               else if (isStartingSoon) courseClasses += ' starting-soon';
               else if (isInProgress) courseClasses += ' current';
+              if (course.isPlanningEventCourse) courseClasses += ' course-block--planning-event';
 
               courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
               if (isStartingSoon) {
@@ -491,6 +493,9 @@
       if (!el) return;
       el.innerHTML = generateWeeklyScheduleHtml();
       wireWeeklyCoachPhotoFallbacks();
+      if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
+        window.PlanningResolve.fillPlanningEventConfetti(el, { variant: 'compact' });
+      }
       applyWeeklyBodyPlanningTheme();
       updateNavButtonsStateWeek();
       if (scheduleData) renderPlanningViewSwitcher(scheduleData);
@@ -573,6 +578,9 @@
 
         document.getElementById('weeklySchedule').innerHTML = generateWeeklyScheduleHtml();
         wireWeeklyCoachPhotoFallbacks();
+        if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
+          window.PlanningResolve.fillPlanningEventConfetti(document.getElementById('weeklySchedule'), { variant: 'compact' });
+        }
 
         (function setupStickyDaysBar() {
           var mainTable = document.querySelector('#weeklySchedule .weekly-schedule');

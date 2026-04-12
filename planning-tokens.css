@@ -40,3 +40,212 @@
   --planning-ete-time: rgba(184, 134, 11, 0.75);
   --planning-weekly-header-ete-gradient: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%);
 }
+
+/* Confettis cours événement (planningEventsByDate) — libellé texte uniquement dans daily.html */
+@keyframes planning-event-piece {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translate3d(0, 0, 0) rotate(var(--pe-rot, 0deg)) scale(0.7);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate3d(0, -12px, 0) rotate(calc(var(--pe-rot, 0deg) + 22deg)) scale(1.05);
+  }
+}
+
+@keyframes planning-event-piece-wave {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: translate3d(0, 4px, 0) rotate(var(--pe-rot, 0deg)) scale(0.65);
+  }
+  40% {
+    opacity: 0.75;
+    transform: translate3d(6px, -14px, 0) rotate(calc(var(--pe-rot, 0deg) - 30deg)) scale(1.1);
+  }
+  70% {
+    opacity: 0.5;
+    transform: translate3d(-4px, -6px, 0) rotate(calc(var(--pe-rot, 0deg) + 40deg)) scale(0.9);
+  }
+}
+
+@keyframes planning-event-piece-drift {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translate3d(0, 0, 0) rotate(var(--pe-rot, 0deg));
+  }
+  33% {
+    opacity: 0.8;
+    transform: translate3d(-10px, -10px, 0) rotate(calc(var(--pe-rot, 0deg) + 45deg)) scale(1.15);
+  }
+  66% {
+    opacity: 0.45;
+    transform: translate3d(8px, 4px, 0) rotate(calc(var(--pe-rot, 0deg) - 20deg)) scale(0.8);
+  }
+}
+
+/* daily.html : rectangles comme la grille (×2) + trajectoires plus naturelles (gravité, inertie) */
+@keyframes planning-event-daily-pop {
+  0% {
+    opacity: 0.35;
+    transform: translate3d(0, 6px, 0) rotate(var(--pe-rot, 0deg));
+  }
+  22% {
+    opacity: 0.85;
+    transform: translate3d(calc(var(--px-drift, 0px) * 0.2), -18px, 0) rotate(calc(var(--pe-rot, 0deg) + 45deg));
+  }
+  48% {
+    opacity: 1;
+    transform: translate3d(calc(var(--px-drift, 0px) * 0.45), -34px, 0) rotate(calc(var(--pe-rot, 0deg) + 95deg));
+  }
+  72% {
+    opacity: 0.75;
+    transform: translate3d(calc(var(--px-drift, 0px) * 0.75), -8px, 0) rotate(calc(var(--pe-rot, 0deg) + 155deg));
+  }
+  100% {
+    opacity: 0.28;
+    transform: translate3d(var(--px-drift, 0px), 36px, 0) rotate(calc(var(--pe-rot, 0deg) + 220deg));
+  }
+}
+
+@keyframes planning-event-daily-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(calc(var(--px-drift, 0px) * -0.3), -48px, 0) rotate(var(--pe-rot, 0deg));
+  }
+  12% {
+    opacity: 0.88;
+  }
+  45% {
+    opacity: 0.95;
+    transform: translate3d(calc(var(--px-drift, 0px) * 0.4), 8px, 0) rotate(calc(var(--pe-rot, 0deg) + 95deg));
+  }
+  78% {
+    opacity: 0.55;
+    transform: translate3d(var(--px-drift, 0px), 48px, 0) rotate(calc(var(--pe-rot, 0deg) + 200deg));
+  }
+  100% {
+    opacity: 0.18;
+    transform: translate3d(calc(var(--px-drift, 0px) * 1.05), 68px, 0) rotate(calc(var(--pe-rot, 0deg) + 265deg));
+  }
+}
+
+@keyframes planning-event-daily-wobble {
+  0% {
+    opacity: 0.38;
+    transform: translate3d(0, 12px, 0) rotate(var(--pe-rot, 0deg));
+  }
+  20% {
+    opacity: 0.92;
+    transform: translate3d(8px, -12px, 0) rotate(calc(var(--pe-rot, 0deg) + 55deg));
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(-6px, -22px, 0) rotate(calc(var(--pe-rot, 0deg) + 110deg));
+  }
+  62% {
+    opacity: 0.72;
+    transform: translate3d(-12px, 4px, 0) rotate(calc(var(--pe-rot, 0deg) + 175deg));
+  }
+  82% {
+    opacity: 0.48;
+    transform: translate3d(4px, 28px, 0) rotate(calc(var(--pe-rot, 0deg) + 240deg));
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate3d(2px, 44px, 0) rotate(calc(var(--pe-rot, 0deg) + 300deg));
+  }
+}
+
+.planning-event-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.planning-event-fx__piece {
+  position: absolute;
+  width: 4px;
+  height: 6px;
+  border-radius: 1px;
+  opacity: 0.75;
+  animation: planning-event-piece 2.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.planning-event-fx__piece--wave {
+  width: 5px;
+  height: 4px;
+  border-radius: 2px;
+  animation: planning-event-piece-wave 3.1s ease-in-out infinite;
+}
+
+.planning-event-fx__piece--drift {
+  width: 3px;
+  height: 7px;
+  border-radius: 0;
+  animation: planning-event-piece-drift 2.9s ease-in-out infinite;
+}
+
+/* daily.html : taille −20 % vs précédent (×0,8 sur 8×12, 10×8, 6×14) */
+.planning-event-fx--daily .planning-event-fx__piece--daily-pop {
+  width: 6.4px;
+  height: 9.6px;
+  border-radius: 0;
+  animation: planning-event-daily-pop 3.4s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+.planning-event-fx--daily .planning-event-fx__piece--daily-fall {
+  width: 8px;
+  height: 6.4px;
+  border-radius: 0;
+  animation: planning-event-daily-fall 3.1s cubic-bezier(0.33, 0.02, 0.55, 0.98) infinite;
+}
+
+.planning-event-fx--daily .planning-event-fx__piece--daily-wobble {
+  width: 4.8px;
+  height: 11.2px;
+  border-radius: 0;
+  animation: planning-event-daily-wobble 3.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.course-block--planning-event,
+.course-card--planning-event {
+  position: relative;
+  overflow: visible;
+}
+
+/* Ne pas toucher à .course-studio (position absolute bas-droite dans daily) */
+.course-block--planning-event .course-title,
+.course-block--planning-event .course-coach,
+.course-block--planning-event .course-event-label,
+.course-block--planning-event .countdown {
+  position: relative;
+  z-index: 2;
+}
+
+.course-block--planning-event .course-type {
+  z-index: 3;
+}
+
+.weekly-schedule .course-block--planning-event .course-info,
+.weekly-schedule .course-block--planning-event .single-coach,
+.weekly-schedule .course-block--planning-event .multiple-coaches {
+  position: relative;
+  z-index: 2;
+}
+
+.weekly-schedule .course-block--planning-event .countdown-pill {
+  z-index: 3;
+}
+
+.course-card--planning-event .course-time,
+.course-card--planning-event .course-name,
+.course-card--planning-event .course-coach {
+  position: relative;
+  z-index: 2;
+}

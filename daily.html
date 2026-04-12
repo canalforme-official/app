@@ -833,6 +833,8 @@
     .course-title h3 {
       margin: 0;
       padding: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .course-title img {
@@ -840,6 +842,35 @@
       max-height: 55px;
       object-fit: contain;
       margin-bottom: 12px;
+    }
+
+    /* Libellé événement : bas du bloc, aligné à gauche, bordeaux, discret */
+    .course-block--has-event-label {
+      padding-bottom: 36px;
+    }
+
+    .course-block--has-event-label .countdown {
+      bottom: 34px;
+    }
+
+    .course-block--planning-event .course-event-label {
+      font-family: var(--font-title);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--primary-color);
+      text-align: left;
+      line-height: 1.25;
+      margin: 0;
+      padding: 0 88px 0 18px;
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      z-index: 4;
+      background: none;
+      text-shadow: none;
     }
 
     /* Styles pour le type de cours */
@@ -3471,12 +3502,14 @@
       var scheduleHTML = '';
 
       courses.forEach(function(course) {
-        var cours = allData.cours.find(function(c) { return c.id === course.coursId; });
+        var cours = window.PlanningResolve && window.PlanningResolve.courseDisplayFromCoursId
+          ? window.PlanningResolve.courseDisplayFromCoursId(course.coursId, allData.cours)
+          : (allData.cours.find(function(c) { return c.id === course.coursId; }) || { id: course.coursId, name: 'Cours', logo: '' });
         var coachs = course.coachIds.map(function(coachId) { return allData.coachs.find(function(c) { return c.id === coachId; }); }).filter(Boolean);
         var isMultipleCoachs = coachs.length > 1;
         var studio = allData.studios.find(function(s) { return s.id === course.studioId; });
 
-        if (!cours || !coachs.length || !studio) {
+        if (!coachs.length || !studio) {
           console.error('Données manquantes pour le cours:', course);
           return;
         }
@@ -3540,10 +3573,17 @@
             '</div>';
         }).join('');
 
+        var hasEvLabel = course.eventLabel && String(course.eventLabel).trim();
+        var peClass = course.isPlanningEventCourse ? ' course-block--planning-event' : '';
+        peClass += hasEvLabel ? ' course-block--has-event-label' : '';
+        var eventLabelHtml = hasEvLabel
+          ? '<div class="course-event-label">' + escapeHtml(String(course.eventLabel).trim()) + '</div>'
+          : '';
+
         scheduleHTML +=
           '<div class="timeline-block ' + (courseStatusClass.indexOf('past') !== -1 ? 'past' : '') + ' ' + (courseStatusClass.indexOf('current') !== -1 ? 'current' : '') + '" data-start-time="' + course.startTime + '" data-end-time="' + course.endTime + '">' +
             '<div class="time">' + course.startTime + ' - ' + course.endTime + '</div>' +
-            '<div class="course-block ' + courseTypeClass + ' ' + courseStatusClass + '" id="' + (courseStatusClass.indexOf('focus') !== -1 ? 'focus-course' : '') + '">' +
+            '<div class="course-block ' + courseTypeClass + ' ' + courseStatusClass + peClass + '" id="' + (courseStatusClass.indexOf('focus') !== -1 ? 'focus-course' : '') + '">' +
               '<div class="course-studio">' +
                 (studio.imageUrl ? '<img src="' + studio.imageUrl + '" alt="' + escapeHtml(studio.name) + '">' : '') +
               '</div>' +
@@ -3555,11 +3595,15 @@
               '</div>' +
               '<div class="course-coach"><div class="coach-images">' + coachImagesHTML + '</div></div>' +
               (courseStatusClass.indexOf('starting-soon') !== -1 ? '<div class="countdown" data-start-time="' + course.startTime + '"></div>' : '') +
+              eventLabelHtml +
             '</div>' +
           '</div>';
       });
 
       scheduleContainer.innerHTML = scheduleHTML;
+      if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
+        window.PlanningResolve.fillPlanningEventConfetti(scheduleContainer, { variant: 'daily' });
+      }
       scheduleContainer.querySelectorAll('img.coach-photo[src]').forEach(function(img) {
         if (img.getAttribute('data-coach-fallback-wired')) return;
         img.setAttribute('data-coach-fallback-wired', '1');
