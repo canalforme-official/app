@@ -517,6 +517,32 @@
     return firstUpper(parts[0]).slice(0, 1) || '?';
   }
 
+  /**
+   * Remplace les img portant data-planning-fallback-text si le chargement échoue (logo cours, icône studio, etc.).
+   * Optionnel : data-planning-fallback-tag (défaut span), data-planning-fallback-class, data-planning-fallback-dir.
+   * Le texte d’attribut est attendu échappé pour HTML (ex. via escapeHtml).
+   */
+  function wirePlanningImgTextFallbacks(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('img[data-planning-fallback-text]').forEach(function (img) {
+      if (img.getAttribute('data-planning-img-fallback-wired')) return;
+      img.setAttribute('data-planning-img-fallback-wired', '1');
+      img.addEventListener('error', function onPlanningImgErr() {
+        img.removeEventListener('error', onPlanningImgErr);
+        var text = img.getAttribute('data-planning-fallback-text') || '';
+        var tag = (img.getAttribute('data-planning-fallback-tag') || 'span').toLowerCase();
+        if (!/^[a-z][a-z0-9]*$/.test(tag)) tag = 'span';
+        var el = document.createElement(tag);
+        var cls = img.getAttribute('data-planning-fallback-class');
+        if (cls) el.className = cls;
+        var dir = img.getAttribute('data-planning-fallback-dir');
+        if (dir) el.setAttribute('dir', dir);
+        el.textContent = text;
+        img.replaceWith(el);
+      });
+    });
+  }
+
   var api = {
     NAV_DAYS_LIMIT: NAV_DAYS_LIMIT,
     ymdFromDate: ymdFromDate,
@@ -549,6 +575,7 @@
     coachHeroBackgroundUrl: coachHeroBackgroundUrl,
     coachDisplayName: coachDisplayName,
     coachInitialsFromDisplayName: coachInitialsFromDisplayName,
+    wirePlanningImgTextFallbacks: wirePlanningImgTextFallbacks,
     fillPlanningEventConfetti: fillPlanningEventConfetti
   };
 

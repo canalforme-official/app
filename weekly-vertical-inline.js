@@ -335,7 +335,14 @@
               courseDisplay = '';
               logoUrl = course.logo || '';
               if (SHOW_COURSE_IMAGES && logoUrl) {
-                courseNameDisplay = '<img class="logo-cours" src="' + PR.escapeHtml(logoUrl) + '" alt="' + PR.escapeHtml(course.courseName) + ' Logo" draggable="false">';
+                courseNameDisplay =
+                  '<img class="logo-cours" src="' +
+                  PR.escapeHtml(logoUrl) +
+                  '" alt="' +
+                  PR.escapeHtml(course.courseName) +
+                  ' Logo" draggable="false" data-planning-fallback-text="' +
+                  PR.escapeHtml(course.courseName) +
+                  '" data-planning-fallback-tag="div" data-planning-fallback-class="course-name-text" data-planning-fallback-dir="auto">';
               } else {
                 courseNameDisplay = '<div class="course-name-text">' + PR.escapeHtml(course.courseName) + '</div>';
               }
@@ -357,7 +364,7 @@
                   var dispM = coach.displayName || coach.name;
                   var iniM = PR.coachInitialsFromDisplayName ? PR.coachInitialsFromDisplayName(dispM) : '?';
                   if (coach.imageUrl) {
-                    coachImagesHtml += '<img src="' + PR.escapeHtml(coach.imageUrl) + '" alt="" class="coach-image" draggable="false">';
+                    coachImagesHtml += '<img src="' + PR.escapeHtml(coach.imageUrl) + '" alt="' + PR.escapeHtml(dispM) + '" class="coach-image" draggable="false">';
                   } else {
                     coachImagesHtml += '<div class="coach-image ' + coachAvatarPlaceholderClass(iniM) + '" role="img" aria-label="' + PR.escapeHtml(dispM) + '">' + PR.escapeHtml(iniM) + '</div>';
                   }
@@ -493,6 +500,8 @@
       if (!el) return;
       el.innerHTML = generateWeeklyScheduleHtml();
       wireWeeklyCoachPhotoFallbacks();
+      var PRfb = getPR();
+      if (PRfb && PRfb.wirePlanningImgTextFallbacks) PRfb.wirePlanningImgTextFallbacks(el);
       if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
         window.PlanningResolve.fillPlanningEventConfetti(el, { variant: 'compact' });
       }

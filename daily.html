@@ -1108,6 +1108,24 @@
       display: block;
     }
 
+    .course-studio .course-studio-fallback {
+      display: block;
+      max-width: 68px;
+      font-family: var(--font-title);
+      font-size: 0.65rem;
+      font-weight: 500;
+      line-height: 1.1;
+      text-align: right;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--primary-color);
+    }
+
+    .course-block.women-only:not(.piscine) .course-studio .course-studio-fallback,
+    .course-block.piscine .course-studio .course-studio-fallback {
+      color: var(--text-light);
+    }
+
     /* Styles pour le compte à rebours */
     .countdown {
       font-family: var(--font-title);
@@ -1517,6 +1535,11 @@
       .course-studio img {
         width: 56px;
         height: 56px;
+      }
+
+      .course-studio .course-studio-fallback {
+        max-width: 56px;
+        font-size: 0.58rem;
       }
 
       .logo img {
@@ -3585,13 +3608,27 @@
             '<div class="time">' + course.startTime + ' - ' + course.endTime + '</div>' +
             '<div class="course-block ' + courseTypeClass + ' ' + courseStatusClass + peClass + '" id="' + (courseStatusClass.indexOf('focus') !== -1 ? 'focus-course' : '') + '">' +
               '<div class="course-studio">' +
-                (studio.imageUrl ? '<img src="' + studio.imageUrl + '" alt="' + escapeHtml(studio.name) + '">' : '') +
+                (studio.imageUrl
+                  ? '<img class="course-studio-icon" src="' +
+                    escapeHtml(studio.imageUrl) +
+                    '" alt="' +
+                    escapeHtml(studio.name) +
+                    '" data-planning-fallback-text="' +
+                    escapeHtml(studio.name) +
+                    '" data-planning-fallback-tag="span" data-planning-fallback-class="course-studio-fallback" data-planning-fallback-dir="auto">'
+                  : '<span class="course-studio-fallback" dir="auto">' + escapeHtml(studio.name) + '</span>') +
               '</div>' +
               '<div class="course-type">' + escapeHtml(courseTypeText) + '</div>' +
               '<div class="course-title">' +
                 (SHOW_COURSE_IMAGES && cours.logo
-                  ? '<img src="' + cours.logo + '" alt="' + escapeHtml(cours.name) + '" style="max-width: 150px; max-height: 55px;" />'
-                  : '<h3>' + escapeHtml(cours.name) + '</h3>') +
+                  ? '<img src="' +
+                    escapeHtml(cours.logo) +
+                    '" alt="' +
+                    escapeHtml(cours.name) +
+                    '" class="course-logo-img" style="max-width: 150px; max-height: 55px;" data-planning-fallback-text="' +
+                    escapeHtml(cours.name) +
+                    '" data-planning-fallback-tag="h3" data-planning-fallback-dir="auto" />'
+                  : '<h3 dir="auto">' + escapeHtml(cours.name) + '</h3>') +
               '</div>' +
               '<div class="course-coach"><div class="coach-images">' + coachImagesHTML + '</div></div>' +
               (courseStatusClass.indexOf('starting-soon') !== -1 ? '<div class="countdown" data-start-time="' + course.startTime + '"></div>' : '') +
@@ -3603,6 +3640,9 @@
       scheduleContainer.innerHTML = scheduleHTML;
       if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
         window.PlanningResolve.fillPlanningEventConfetti(scheduleContainer, { variant: 'daily' });
+      }
+      if (window.PlanningResolve && window.PlanningResolve.wirePlanningImgTextFallbacks) {
+        window.PlanningResolve.wirePlanningImgTextFallbacks(scheduleContainer);
       }
       scheduleContainer.querySelectorAll('img.coach-photo[src]').forEach(function(img) {
         if (img.getAttribute('data-coach-fallback-wired')) return;
