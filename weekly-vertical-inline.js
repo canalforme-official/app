@@ -113,14 +113,18 @@
         dayLower = weekDaysOrder[i];
         rv = PR.resolveDailyView(ymd, data);
         listed = PR.isWeekdayListedInBasePlannings(data, dayLower);
+        var hasEv = PR.hasPlanningEventsForDate && PR.hasPlanningEventsForDate(ymd, data);
         /* Jour sans aucun cours en base mais période été : afficher quand même la colonne « à déterminer ». */
-        if (!listed && rv.planningKey !== 'ete') continue;
+        if (!listed && rv.planningKey !== 'ete' && !hasEv) continue;
+        var rvMerged = PR.applyPlanningEventsToResolvedView
+          ? PR.applyPlanningEventsToResolvedView(ymd, rv, data)
+          : rv;
         columns.push({
           ymd: ymd,
           dayKey: dayLower,
           label: weekDaysCap[i],
           dateLabel: PR.formatDateJjMmmm(ymd),
-          rv: rv,
+          rv: rvMerged,
           pk: rv.planningKey
         });
       }

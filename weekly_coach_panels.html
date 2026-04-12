@@ -708,7 +708,10 @@
       var ymd = PR.addDaysToYmd(mondayYmd, i);
       var rv = PR.resolveDailyView(ymd, data);
       if (rv.closed) continue;
-      var courses = rv.courses || [];
+      var rvM = PR.applyPlanningEventsToResolvedView
+        ? PR.applyPlanningEventsToResolvedView(ymd, rv, data)
+        : rv;
+      var courses = rvM.courses || [];
       var dayShort = capitalizeDayFr(rv.dayName);
       courses.forEach(function (course) {
         var ids = course.coachIds || [];

@@ -208,6 +208,100 @@
   }
 
   /**
+   * Indique si le JSON contient au moins un bloc événement pour cette date (affichage weekly).
+   */
+  function hasPlanningEventsForDate(dateStr, data) {
+    var ev = data && data.planningEventsByDate && data.planningEventsByDate[dateStr];
+    return Array.isArray(ev) && ev.length > 0;
+  }
+
+  /**
+   * Applique les événements planning par-dessus la vue résolue (fermé / férié exclus).
+   * Fermé et jour férié : inchangé. Sinon : dans chaque plage + studios, masque les cours de base
+   * qui chevauchent et ajoute les cours événement (ordre des blocs = ordre JSON ; dernier gagne en cas de chevauchement).
+   * @param {string} dateStr yyyy-MM-dd
+   * @param {Object} resolvedView résultat de resolveDailyView
+   * @param {Object} data payload planning-v2
+   * @returns {Object} copie de la vue avec courses fusionnés et optionnellement planningEventLabels
+   */
+  function applyPlanningEventsToResolvedView(dateStr, resolvedView, data) {
+    var rv = resolvedView;
+    if (!rv || !data) return rv;
+    if (rv.closed) return rv;
+    if (rv.planningKey === 'ferie') return rv;
+
+    var blocks = data.planningEventsByDate && data.planningEventsByDate[dateStr];
+    if (!blocks || !blocks.length) return rv;
+
+    var courses = (rv.courses || []).slice();
+    var studios = data.studios || [];
+    var studioNameToId = {};
+    studios.forEach(function(s) {
+      studioNameToId[String(s.name).trim().toLowerCase()] = s.id;
+    });
+
+    function blockStudioIds(block) {
+      var ids = {};
+      (block.studios || []).forEach(function(name) {
+        var id = studioNameToId[String(name).trim().toLowerCase()];
+        if (id) ids[id] = true;
+      });
+      return ids;
+    }
+
+    function intervalsOverlap(s1, e1, s2, e2) {
+      return s1 < e2 && e1 > s2;
+    }
+
+    var eventLabels = [];
+
+    blocks.forEach(function(block) {
+      var ws = block.startTime;
+      var we = block.endTime;
+      if (!ws || !we) return;
+      var idSet = blockStudioIds(block);
+      if (!Object.keys(idSet).length) return;
+
+      var blockCourses = (block.courses || []).filter(function(c) {
+        if (!c.startTime || !c.endTime) return false;
+        return c.startTime >= ws && c.endTime <= we;
+      });
+
+      if (block.label && String(block.label).trim()) {
+        eventLabels.push(String(block.label).trim());
+      }
+
+      courses = courses.filter(function(c) {
+        if (!c.studioId) return true;
+        if (!idSet[c.studioId]) return true;
+        return !intervalsOverlap(c.startTime, c.endTime, ws, we);
+      });
+
+      blockCourses.forEach(function(bc) {
+        courses.push(bc);
+      });
+    });
+
+    courses.sort(function(a, b) {
+      var t = a.startTime.localeCompare(b.startTime);
+      return t !== 0 ? t : (a.duration || 0) - (b.duration || 0);
+    });
+
+    var out = {};
+    for (var k in rv) {
+      if (Object.prototype.hasOwnProperty.call(rv, k)) out[k] = rv[k];
+    }
+    out.courses = courses;
+    if (out.indetermine && courses.length && out.planningKey === 'ete') {
+      out.indetermine = false;
+    }
+    if (eventLabels.length) {
+      out.planningEventLabels = eventLabels;
+    }
+    return out;
+  }
+
+  /**
    * Bloc créneaux pour un mode planning et un jour (fr minuscule : lundi … dimanche).
    * @param {Object|null} horairesMeta metadata.horaires
    * @param {string} planningKey regulier | ramadan | ete | ferie
@@ -354,6 +448,8 @@
     getEffectivePeriodForDate: getEffectivePeriodForDate,
     isWeekdayListedInBasePlannings: isWeekdayListedInBasePlannings,
     resolveDailyView: resolveDailyView,
+    hasPlanningEventsForDate: hasPlanningEventsForDate,
+    applyPlanningEventsToResolvedView: applyPlanningEventsToResolvedView,
     pickOpeningHoursForDay: pickOpeningHoursForDay,
     escapeHtml: escapeHtml,
     useCaricatureCoachPhotos: useCaricatureCoachPhotos,

@@ -1616,6 +1616,7 @@
     </div>
   </div>
 
+  <script src="./planning-resolve.js"></script>
   <script>
     (function() {
       var d = new Date();
@@ -1950,10 +1951,11 @@
       spawnConfettiBurst(colors);
     }
 
-    function updatePlanningTypeLabelFromView(rv) {
+    function updatePlanningTypeLabelFromView(rvBase, rvMerged) {
       var label = document.getElementById('planningTypeLabel');
       var labelText = '';
       var hor = allData && allData.metadata && allData.metadata.horaires ? allData.metadata.horaires : null;
+      var rv = rvBase;
       if (rv.closed) {
         labelText = rv.periodName ? ('Fermé — ' + rv.periodName) : 'Club fermé';
       } else if (rv.planningKey === 'ferie') {
@@ -1974,6 +1976,9 @@
         var lreg = hor && hor.regulier && hor.regulier.planningLabel;
         labelText = (lreg && String(lreg).trim()) ? String(lreg).trim() : 'Planning régulier';
         if (/^planning$/i.test(labelText)) labelText = 'Planning régulier';
+      }
+      if (rvMerged && rvMerged.planningEventLabels && rvMerged.planningEventLabels.length) {
+        labelText = labelText + ' — ' + rvMerged.planningEventLabels.join(' · ');
       }
       if (label) label.textContent = labelText;
     }
@@ -2388,31 +2393,34 @@
       if (dayNameEl) dayNameEl.textContent = displayDayOfWeek;
       if (dateStrEl) dateStrEl.textContent = dateLabel;
 
-      var rv = resolveDailyView(selectedDateYmd, allData);
-      document.body.classList.toggle('planning-ramadan', rv.planningKey === 'ramadan');
-      document.body.classList.toggle('planning-ferie', rv.planningKey === 'ferie' || rv.planningKey === 'ferme');
-      document.body.classList.toggle('planning-ete', rv.planningKey === 'ete');
-      updatePlanningTypeLabelFromView(rv);
+      var rvBase = resolveDailyView(selectedDateYmd, allData);
+      var rv = window.PlanningResolve
+        ? window.PlanningResolve.applyPlanningEventsToResolvedView(selectedDateYmd, rvBase, allData)
+        : rvBase;
+      document.body.classList.toggle('planning-ramadan', rvBase.planningKey === 'ramadan');
+      document.body.classList.toggle('planning-ferie', rvBase.planningKey === 'ferie' || rvBase.planningKey === 'ferme');
+      document.body.classList.toggle('planning-ete', rvBase.planningKey === 'ete');
+      updatePlanningTypeLabelFromView(rvBase, rv);
 
       updateMaghribBadge();
-      if (rv.planningKey === 'ramadan' && (!window.prayerTimesData || !window.prayerTimesData.prayerTimes)) {
+      if (rvBase.planningKey === 'ramadan' && (!window.prayerTimesData || !window.prayerTimesData.prayerTimes)) {
         loadPrayerTimes();
       }
       renderPlanningViewSwitcher(allData);
-      triggerPlanningModeConfetti(rv.planningKey);
+      triggerPlanningModeConfetti(rvBase.planningKey);
 
       var studiosContainer = document.getElementById('studiosContainer');
       studiosContainer.innerHTML = '';
 
-      if (rv.closed) {
-        studiosContainer.innerHTML = displayClosedMessage(rv);
+      if (rvBase.closed) {
+        studiosContainer.innerHTML = displayClosedMessage(rvBase);
         document.getElementById('coachesSection').innerHTML = '';
         updateNavButtonsState();
         document.body.setAttribute('data-daily-grid-ready', 'true');
         return;
       }
       if (rv.indetermine) {
-        studiosContainer.innerHTML = displayIndetermineMessage(rv);
+        studiosContainer.innerHTML = displayIndetermineMessage(rvBase);
         document.getElementById('coachesSection').innerHTML = '';
         updateNavButtonsState();
         document.body.setAttribute('data-daily-grid-ready', 'true');
