@@ -655,7 +655,21 @@
     .weekly-schedule td.time-cell {
       position: sticky;
       left: 0;
-      z-index: 2;
+      z-index: 40;
+    }
+
+    /* La colonne des heures doit toujours rester au-dessus des blocs cours */
+    .sticky-days-bar .weekly-schedule-header th:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 46;
+      background-color: var(--background-main);
+    }
+
+    /* En vue weekly vertical, on clippe les effets des cours événement pour éviter le chevauchement à gauche */
+    .weekly-schedule .course-block--planning-event {
+      overflow: hidden;
+      isolation: isolate;
     }
 
     /* Alternance blanc / gris par tranche horaire uniquement (pas par colonne de jour) */
