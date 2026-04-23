@@ -1,6 +1,7 @@
     const SHOW_COURSE_IMAGES = true;
     var scheduleData = null;
     var weekMondayYmd = '';
+    var forcedUrlFilter = null;
 
     function getPR() {
       return window.PlanningResolve;
@@ -21,6 +22,15 @@
         return PR.clampWeekMonday(mon);
       }
       return PR.clampWeekMonday(PR.mondayOfWeekContaining(PR.ymdFromDate(new Date())));
+    }
+
+    function parseForcedFilterFromUrl() {
+      var params = new URLSearchParams(window.location.search);
+      var filter = (params.get('filter') || '').toLowerCase();
+      if (filter === 'aqua' || filter === 'aquatique' || filter === 'piscine') {
+        return 'aqua';
+      }
+      return null;
     }
 
     function updateUrlWeekParam() {
@@ -576,6 +586,7 @@
         return;
       }
       weekMondayYmd = parseWeekFromUrl();
+      forcedUrlFilter = parseForcedFilterFromUrl();
       updateUrlWeekParam();
 
       fetchWeeklyData().then(function(data) {
@@ -897,7 +908,8 @@
       }
       const showMixte = chk('filter-mixte');
       const showWomenOnly = chk('filter-women-only');
-      const showPiscine = chk('filter-piscine');
+      const forceAquaOnly = forcedUrlFilter === 'aqua';
+      const showPiscine = forceAquaOnly ? true : chk('filter-piscine');
       const showCoachImages = chk('filter-coach');
       const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"], #coachDropdownContent input[type="checkbox"]');
       const selectedCoaches = Array.from(coachCheckboxes)
@@ -919,7 +931,8 @@
           (courseType.contains('women-only') && showWomenOnly)
         );
 
-        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine)) ? 'block' : 'none';
+        const showByAquaParam = !forceAquaOnly || isPiscine;
+        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine) && showByAquaParam) ? 'block' : 'none';
       }
 
       if (showCoachImages) {
