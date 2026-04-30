@@ -1627,8 +1627,10 @@
     /* Overlay de chargement au démarrage : true = activé, false = désactivé (par défaut) */
     const SHOW_LOADING_OVERLAY = false;
 
-    /* Afficher ou masquer la barre « Prochaine mise à jour » (true = affichée, false = masquée) */
-    const SHOW_COUNTDOWN = true;
+    /* Détection d'exécution automatisée (ex: Puppeteer) */
+    const IS_PUPPETEER_MODE = navigator.webdriver === true;
+    /* Afficher ou masquer la barre « Prochaine mise à jour » (masquée en mode Puppeteer) */
+    const SHOW_COUNTDOWN = !IS_PUPPETEER_MODE;
     /* Durée du compte à rebours et mise à jour automatique (en secondes) */
     const COUNTDOWN_SECONDS = 300;
 
