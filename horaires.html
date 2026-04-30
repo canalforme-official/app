@@ -150,9 +150,13 @@
       font-size: clamp(1.4rem, 4vw, 1.65rem);
       letter-spacing: 0.03em;
       text-transform: uppercase;
-      color: var(--primary);
+      color: #fff;
       margin: 0;
       line-height: 1.15;
+      text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.55),
+        0 0 1px rgba(0, 0, 0, 0.8);
+      -webkit-text-stroke: 0.35px rgba(0, 0, 0, 0.45);
     }
     /** Logo en calque : le flux du bloc reste celui d’une carte normale (pas de padding imposé par le logo). */
     .card.horaires-hero-card {
@@ -717,6 +721,55 @@
     })();
   }
 
+  // TODO: Migrer cette liste hardcodée vers une source distante (ex: backgrounds.json via CDN/storage).
+  // Pour l'instant, on garde une implémentation simple en dur demandée par le projet.
+  var BACKGROUND_IMAGES = [
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/f08922e6-dc5e-c477-8dc8-9965ee8eeb15.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/36accb69-741b-b430-c473-3857221e0b5d.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/337cb80e-3d2b-1659-af7b-a3f2b298ab54.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/33541086-ca70-2933-4ca6-a4ab1c023895.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8ae46cc9-0689-18c3-e61b-72c25230f77f.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/d8b09d3a-30ec-ea94-f32c-7bb975b84626.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/29928305-f166-be9e-6969-abf5567515bd.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/7df851b0-1635-05f0-2d6a-c1a14344df68.jpg'
+  ];
+
+  function pickDailyBackgroundUrl(ymd) {
+    if (!BACKGROUND_IMAGES.length) return '';
+    // Index stable par date (YYYY-MM-DD) => même image pour toute la journée.
+    var seed = String(ymd || '').replace(/-/g, '');
+    var n = Number(seed);
+    if (!Number.isFinite(n)) n = Date.now();
+    var idx = Math.abs(n) % BACKGROUND_IMAGES.length;
+    return BACKGROUND_IMAGES[idx];
+  }
+
+  function applyDailyBackground(ymd) {
+    var bg = document.querySelector('.horaires-bg-tiles');
+    var veil = document.querySelector('.horaires-bg-veil');
+    if (!bg) return;
+    var url = pickDailyBackgroundUrl(ymd);
+    if (!url) return;
+
+    // Photo plein écran (hauteur/largeur viewport), noir & blanc.
+    bg.style.backgroundImage = 'url("' + url + '")';
+    bg.style.backgroundSize = 'cover';
+    bg.style.backgroundPosition = 'center center';
+    bg.style.backgroundRepeat = 'no-repeat';
+    bg.style.opacity = '0.86';
+    bg.style.filter = 'grayscale(1) saturate(0) contrast(1.05)';
+
+    // Pattern au-dessus de la photo (uniformisé, quel que soit le thème).
+    if (veil) {
+      veil.style.display = 'block';
+      veil.style.backgroundImage = 'var(--planning-pattern-mosaic-url)';
+      veil.style.backgroundRepeat = 'repeat';
+      veil.style.backgroundSize = '128px 128px';
+      veil.style.backgroundPosition = '0 0';
+      veil.style.opacity = '0.04';
+    }
+  }
+
   function getSelectedYmd() {
     var ymd = PR.ymdFromDate(new Date());
     try {
@@ -758,6 +811,7 @@
     var root = document.getElementById('app');
     var resolved = PR.resolveDailyView(ymd, data);
     setBodyTheme(resolved.planningKey);
+    applyDailyBackground(ymd);
 
     var horairesMeta = data.metadata && data.metadata.horaires;
     var oh = PR.pickOpeningHoursForDay(horairesMeta, resolved.planningKey, resolved.dayName);
