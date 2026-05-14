@@ -66,6 +66,12 @@
       position: relative;
     }
 
+    /*
+     * Couches d'arrière-plan (z-index négatifs) :
+     * Le pattern et l'overlay teinte sont TOUJOURS en dessous de tout le contenu.
+     * Tout élément visible du DOM a naturellement un z-index supérieur (≥ auto).
+     * Ne JAMAIS donner un z-index positif au pattern/overlay.
+     */
     body::before {
       content: '';
       position: fixed;
@@ -73,7 +79,7 @@
       background-image: var(--pattern-url);
       background-size: 128px 128px;
       background-repeat: repeat;
-      z-index: 0;
+      z-index: -2;
       pointer-events: none;
     }
 
@@ -82,7 +88,7 @@
       position: fixed;
       inset: 0;
       background-color: rgba(var(--primary-rgb), 0.08);
-      z-index: 1;
+      z-index: -1;
       pointer-events: none;
     }
 
@@ -147,6 +153,38 @@
       height: 0 !important;
       padding: 0 !important;
       margin: 0 !important;
+    }
+
+    /* --- Mode Puppeteer --- */
+    .puppeteer-logo {
+      display: none;
+      text-align: center;
+      padding: 8px 0 0;
+    }
+    .puppeteer-logo img {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    body.puppeteer-mode .puppeteer-logo {
+      display: block;
+    }
+    body.puppeteer-mode .competition-container {
+      display: none !important;
+    }
+    .puppeteer-challenge-winner {
+      display: none;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 400;
+      color: #4a0e0e;
+      margin: 2px 0 4px;
+      letter-spacing: 0.2px;
+    }
+    body.puppeteer-mode .puppeteer-challenge-winner {
+      display: block;
     }
 
     /* Contrôle direct sur l'image du logo */
@@ -1512,6 +1550,11 @@
 </head>
 
 <body>
+  <!-- Logo Canal Forme (mode Puppeteer uniquement) -->
+  <div class="puppeteer-logo" aria-hidden="true">
+    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4b11fb69-1858-5b3c-d5b1-b5e5bb46ac22.jpg" alt="Canal Forme" width="56" height="56">
+  </div>
+
   <!-- pull to refresh -->
   <div id="pullToRefresh" class="pull-to-refresh">
     <div class="loading-spinner"></div>
@@ -1554,6 +1597,8 @@
 
   <!-- Titre du mois actuel -->
   <div id="currentMonthTitle" class="month-title"></div>
+  <!-- Résumé challenge H/F (mode Puppeteer uniquement, sous le titre) -->
+  <div id="puppeteerChallengeWinner" class="puppeteer-challenge-winner"></div>
 
   <!-- Section du mois actuel -->
   <div class="container" id="currentMonthContainer">
@@ -1627,8 +1672,10 @@
     /* Overlay de chargement au démarrage : true = activé, false = désactivé (par défaut) */
     const SHOW_LOADING_OVERLAY = false;
 
-    /* Détection d'exécution automatisée (ex: Puppeteer) */
-    const IS_PUPPETEER_MODE = navigator.webdriver === true;
+    /* Détection d'exécution automatisée (ex: Puppeteer) ou paramètre URL ?puppeteer=1 pour tester */
+    const IS_PUPPETEER_MODE = navigator.webdriver === true
+      || new URLSearchParams(window.location.search).get('puppeteer') === '1';
+    if (IS_PUPPETEER_MODE) document.body.classList.add('puppeteer-mode');
     /* Afficher ou masquer la barre « Prochaine mise à jour » (masquée en mode Puppeteer) */
     const SHOW_COUNTDOWN = !IS_PUPPETEER_MODE;
     /* Durée du compte à rebours et mise à jour automatique (en secondes) */
@@ -1965,6 +2012,22 @@
       });
       if (!ok) {
         console.warn('updateMenWomenBar: données manquantes (meps_averages / active_users / inactive_users)');
+      }
+      if (IS_PUPPETEER_MODE) updatePuppeteerChallenge(data.current);
+    }
+
+    function updatePuppeteerChallenge(periodData) {
+      const el = document.getElementById('puppeteerChallengeWinner');
+      if (!el || !periodData || !periodData.meps_averages) return;
+      const maleMEPs = parseFloat(periodData.meps_averages.male) || 0;
+      const femaleMEPs = parseFloat(periodData.meps_averages.female) || 0;
+      const fmt = (n) => Math.round(n).toLocaleString('fr-FR');
+      if (maleMEPs > femaleMEPs) {
+        el.innerHTML = '<span class="winner-emoji">👨</span> Hommes en tête — ' + fmt(maleMEPs) + ' vs ' + fmt(femaleMEPs) + ' MEPs';
+      } else if (femaleMEPs > maleMEPs) {
+        el.innerHTML = '<span class="winner-emoji">👩</span> Femmes en tête — ' + fmt(femaleMEPs) + ' vs ' + fmt(maleMEPs) + ' MEPs';
+      } else {
+        el.innerHTML = '👨👩 Égalité — ' + fmt(maleMEPs) + ' MEPs';
       }
     }
 
