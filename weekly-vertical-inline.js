@@ -24,9 +24,14 @@
       return PR.clampWeekMonday(PR.mondayOfWeekContaining(PR.ymdFromDate(new Date())));
     }
 
+    function isWomenCourseType(type) {
+      var s = String(type || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      return s === '100% femmes' || /^100\s*%\s*femmes/.test(s) || (s.indexOf('100') !== -1 && s.indexOf('femme') !== -1);
+    }
+
     function parseForcedFilterFromUrl() {
       var params = new URLSearchParams(window.location.search);
-      var filter = (params.get('filter') || '').toLowerCase();
+      var filter = decodeURIComponent(params.get('filter') || '').toLowerCase();
       if (filter === 'aqua' || filter === 'aquatique' || filter === 'piscine') {
         return 'aqua';
       }
@@ -406,7 +411,7 @@
                 coachImagesHtml += '</div>';
               }
               courseClasses = 'course-block';
-              if (course.type === '100% Femmes') courseClasses += ' women-only';
+              if (isWomenCourseType(course.type)) courseClasses += ' women-only';
               else courseClasses += ' mixte';
               if (course.studio.toLowerCase().indexOf('piscine') !== -1 || course.studio.toLowerCase().indexOf('aqua') !== -1) {
                 courseClasses += ' piscine';
@@ -728,6 +733,16 @@
 
         applyForcedFilterCheckboxes();
         applyFilters();
+        if (forcedUrlFilter === 'femmes' || forcedUrlFilter === 'aqua') {
+          setTimeout(function() {
+            applyForcedFilterCheckboxes();
+            applyFilters();
+          }, 0);
+          setTimeout(function() {
+            applyForcedFilterCheckboxes();
+            applyFilters();
+          }, 350);
+        }
         setTimeout(function() { scrollToCurrentTime(); }, 500);
         updateCountdownCircles();
         setInterval(updateCountdownCircles, 1000);
