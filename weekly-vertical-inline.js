@@ -30,7 +30,31 @@
       if (filter === 'aqua' || filter === 'aquatique' || filter === 'piscine') {
         return 'aqua';
       }
+      if (filter === 'femmes' || filter === 'women' || filter === '100-femmes' || filter === '100%femmes') {
+        return 'femmes';
+      }
       return null;
+    }
+
+    /** Même principe que ?filter=aqua : cases cochées + applyFilters masque le reste. */
+    function applyForcedFilterCheckboxes() {
+      if (forcedUrlFilter === 'aqua') {
+        var mixteAqua = document.getElementById('filter-mixte') || document.getElementById('filter-mixte-sidebar');
+        var womenAqua = document.getElementById('filter-women-only') || document.getElementById('filter-women-only-sidebar');
+        var piscineAqua = document.getElementById('filter-piscine') || document.getElementById('filter-piscine-sidebar');
+        if (mixteAqua) mixteAqua.checked = false;
+        if (womenAqua) womenAqua.checked = false;
+        if (piscineAqua) piscineAqua.checked = true;
+        return;
+      }
+      if (forcedUrlFilter === 'femmes') {
+        var mixteEl = document.getElementById('filter-mixte') || document.getElementById('filter-mixte-sidebar');
+        var womenEl = document.getElementById('filter-women-only') || document.getElementById('filter-women-only-sidebar');
+        var piscineEl = document.getElementById('filter-piscine') || document.getElementById('filter-piscine-sidebar');
+        if (mixteEl) mixteEl.checked = false;
+        if (womenEl) womenEl.checked = true;
+        if (piscineEl) piscineEl.checked = true;
+      }
     }
 
     function updateUrlWeekParam() {
@@ -702,6 +726,7 @@
 
         populateCoachDropdown();
 
+        applyForcedFilterCheckboxes();
         applyFilters();
         setTimeout(function() { scrollToCurrentTime(); }, 500);
         updateCountdownCircles();
@@ -906,10 +931,11 @@
         var el = document.getElementById(id + '-sidebar') || document.getElementById(id);
         return el ? el.checked : true;
       }
-      const showMixte = chk('filter-mixte');
-      const showWomenOnly = chk('filter-women-only');
       const forceAquaOnly = forcedUrlFilter === 'aqua';
-      const showPiscine = forceAquaOnly ? true : chk('filter-piscine');
+      const forceFemmesOnly = forcedUrlFilter === 'femmes';
+      const showMixte = forceFemmesOnly ? false : chk('filter-mixte');
+      const showWomenOnly = forceFemmesOnly ? true : chk('filter-women-only');
+      const showPiscine = forceAquaOnly || forceFemmesOnly ? true : chk('filter-piscine');
       const showCoachImages = chk('filter-coach');
       const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"], #coachDropdownContent input[type="checkbox"]');
       const selectedCoaches = Array.from(coachCheckboxes)
@@ -926,10 +952,12 @@
           courseCoaches.some(coach => selectedCoaches.includes(coach));
         const isPiscine = block.classList.contains('piscine');
         const courseType = block.classList;
-        const showByType = (
-          (courseType.contains('mixte') && showMixte) ||
-          (courseType.contains('women-only') && showWomenOnly)
-        );
+        const showByType = forceFemmesOnly
+          ? courseType.contains('women-only')
+          : (
+            (courseType.contains('mixte') && showMixte) ||
+            (courseType.contains('women-only') && showWomenOnly)
+          );
 
         const showByAquaParam = !forceAquaOnly || isPiscine;
         block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine) && showByAquaParam) ? 'block' : 'none';

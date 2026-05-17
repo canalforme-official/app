@@ -90,6 +90,16 @@ Exemples si le site expose la racine du dépôt `frontend/` :
 
 Adapter le préfixe selon l’URL réelle de déploiement (domaine, sous-chemin).
 
+### Paramètres URL (`weekly_vertical.html` et variantes hebdo)
+
+| Paramètre | Valeurs | Effet |
+|-----------|---------|--------|
+| `filter` | `aqua`, `aquatique`, `piscine` | Affiche uniquement les cours **piscine** (filtre « Piscine » forcé). Utilisé par le site Canal Forme (page piscine). |
+| `filter` | `femmes`, `women`, `100-femmes` | Affiche uniquement les cours **100 % Femmes** (classe `.women-only`). Utilisé par le site (bouton planning femmes). |
+| `week` | `YYYY-MM-DD` (lundi de la semaine) | Semaine affichée |
+
+Exemple : `weekly_vertical.html?filter=femmes`
+
 ---
 
 ## Structure actuelle du dossier
