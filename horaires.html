@@ -814,7 +814,7 @@
     applyDailyBackground(ymd);
 
     var horairesMeta = data.metadata && data.metadata.horaires;
-    var oh = PR.pickOpeningHoursForDay(horairesMeta, resolved.planningKey, resolved.dayName);
+    var oh = PR.pickOpeningHoursForDate(ymd, data, resolved.planningKey, resolved.dayName);
     var todayParts = openingParts(oh);
 
     var pl = periodLabel(resolved);
@@ -835,9 +835,15 @@
       '</div>';
 
     var todayBlock = '';
+    var exEntry = PR.getHorairesExceptionnelsEntryForDate
+      ? PR.getHorairesExceptionnelsEntryForDate(ymd, data)
+      : null;
     if (resolved.closed) {
       todayBlock =
         '<p class="warn-msg">La salle est fermée ce jour.</p>';
+    } else if (exEntry && exEntry.name) {
+      todayBlock =
+        '<p class="warn-msg">Horaires exceptionnels — ' + PR.escapeHtml(exEntry.name) + '.</p>';
     } else if (resolved.indetermine && resolved.planningKey === 'ferie') {
       todayBlock =
         '<p class="warn-msg">Horaires d’ouverture indicatifs pour ce jour férié.</p>';
@@ -860,7 +866,7 @@
     for (var d = 0; d < 7; d++) {
       var y = PR.addDaysToYmd(mon, d);
       var rv = PR.resolveDailyView(y, data);
-      var slotW = PR.pickOpeningHoursForDay(horairesMeta, rv.planningKey, rv.dayName);
+      var slotW = PR.pickOpeningHoursForDate(y, data, rv.planningKey, rv.dayName);
       var pW = openingParts(slotW);
       weekDays.push({ ymd: y, rv: rv, p: pW, sig: hoursSignature(rv, pW) });
     }

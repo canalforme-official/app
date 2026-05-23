@@ -155,9 +155,11 @@
         var hasEv = PR.hasPlanningEventsForDate && PR.hasPlanningEventsForDate(ymd, data);
         /* Jour sans aucun cours en base mais période été : afficher quand même la colonne « à déterminer ». */
         if (!listed && rv.planningKey !== 'ete' && !hasEv) continue;
-        var rvMerged = PR.applyPlanningEventsToResolvedView
-          ? PR.applyPlanningEventsToResolvedView(ymd, rv, data)
-          : rv;
+        var rvMerged = PR.mergeResolvedViewForDate
+          ? PR.mergeResolvedViewForDate(ymd, data)
+          : (PR.applyPlanningEventsToResolvedView
+            ? PR.applyPlanningEventsToResolvedView(ymd, rv, data)
+            : rv);
         columns.push({
           ymd: ymd,
           dayKey: dayLower,

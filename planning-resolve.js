@@ -341,6 +341,125 @@
     return null;
   }
 
+  /**
+   * Entrée horaires exceptionnels pour une date (metadata.horairesExceptionnelsByDate).
+   * @param {string} dateStr yyyy-MM-dd
+   * @param {Object|null} data payload planning-v2
+   * @returns {Object|null}
+   */
+  function getHorairesExceptionnelsEntryForDate(dateStr, data) {
+    if (!dateStr || !data || !data.metadata) return null;
+    var map = data.metadata.horairesExceptionnelsByDate;
+    if (!map || typeof map !== 'object') return null;
+    var ex = map[dateStr];
+    return ex && typeof ex === 'object' ? ex : null;
+  }
+
+  /**
+   * Créneaux club effectifs : Fermé → null ; horaires exceptionnels[date] → priorité ; sinon mode × jour.
+   * @param {string} dateStr yyyy-MM-dd
+   * @param {Object|null} data payload planning-v2
+   * @param {string} planningKey
+   * @param {string} dayNameFrLower
+   * @returns {Object|null}
+   */
+  function pickOpeningHoursForDate(dateStr, data, planningKey, dayNameFrLower) {
+    if (planningKey === 'ferme') return null;
+    var ex = getHorairesExceptionnelsEntryForDate(dateStr, data);
+    if (ex) {
+      return {
+        open1Label: ex.open1Label,
+        open1: ex.open1,
+        close1: ex.close1,
+        open2Label: ex.open2Label,
+        open2: ex.open2,
+        close2: ex.close2
+      };
+    }
+    var horairesMeta = data && data.metadata ? data.metadata.horaires : null;
+    return pickOpeningHoursForDay(horairesMeta, planningKey, dayNameFrLower);
+  }
+
+  /**
+   * Dernière heure de fermeture (HH:mm) d’un bloc créneaux.
+   * @param {Object|null} slot
+   * @returns {string|null}
+   */
+  function getLatestCloseTimeFromSlot(slot) {
+    if (!slot || typeof slot !== 'object') return null;
+    var times = [];
+    if (slot.close1 && String(slot.close1).trim()) times.push(String(slot.close1).trim());
+    if (slot.close2 && String(slot.close2).trim()) times.push(String(slot.close2).trim());
+    if (!times.length) return null;
+    times.sort();
+    return times[times.length - 1];
+  }
+
+  /**
+   * Retire les cours dont endTime dépasse la dernière fermeture du bloc.
+   * @param {Array} courses
+   * @param {Object|null} slot
+   * @returns {Array}
+   */
+  function filterCoursesAfterCloseTime(courses, slot) {
+    var latestClose = getLatestCloseTimeFromSlot(slot);
+    if (!latestClose) return courses ? courses.slice() : [];
+    var list = courses || [];
+    return list.filter(function (c) {
+      if (!c || !c.endTime) return true;
+      return String(c.endTime) <= latestClose;
+    });
+  }
+
+  /**
+   * Applique horaires exceptionnels : filtre cours après fermeture si filterCoursesAfterClose (défaut true).
+   * Ignoré si jour fermé. S’applique après resolveDailyView et applyPlanningEventsToResolvedView.
+   * @param {string} dateStr yyyy-MM-dd
+   * @param {Object} resolvedView
+   * @param {Object} data payload planning-v2
+   * @returns {Object}
+   */
+  function applyExceptionnelHorairesToResolvedView(dateStr, resolvedView, data) {
+    var rv = resolvedView;
+    if (!rv || !data || rv.closed) return rv;
+    var ex = getHorairesExceptionnelsEntryForDate(dateStr, data);
+    if (!ex) return rv;
+
+    var out = {};
+    var k;
+    for (k in rv) {
+      if (Object.prototype.hasOwnProperty.call(rv, k)) out[k] = rv[k];
+    }
+    out.hasExceptionnelHoraires = true;
+    if (ex.name && String(ex.name).trim()) {
+      out.exceptionnelName = String(ex.name).trim();
+    }
+
+    if (ex.filterCoursesAfterClose === false) return out;
+
+    var slot = {
+      open1: ex.open1,
+      close1: ex.close1,
+      open2: ex.open2,
+      close2: ex.close2
+    };
+    out.courses = filterCoursesAfterCloseTime(out.courses || [], slot);
+    return out;
+  }
+
+  /**
+   * Chaîne complète : mode → événements → horaires exceptionnels (filtre cours).
+   * @param {string} dateStr yyyy-MM-dd
+   * @param {Object} data payload planning-v2
+   * @returns {Object}
+   */
+  function mergeResolvedViewForDate(dateStr, data) {
+    var rv = resolveDailyView(dateStr, data);
+    rv = applyPlanningEventsToResolvedView(dateStr, rv, data);
+    rv = applyExceptionnelHorairesToResolvedView(dateStr, rv, data);
+    return rv;
+  }
+
   function escapeHtml(text) {
     var div = document.createElement('div');
     div.textContent = text == null ? '' : String(text);
@@ -565,7 +684,13 @@
     resolveDailyView: resolveDailyView,
     hasPlanningEventsForDate: hasPlanningEventsForDate,
     applyPlanningEventsToResolvedView: applyPlanningEventsToResolvedView,
+    getHorairesExceptionnelsEntryForDate: getHorairesExceptionnelsEntryForDate,
     pickOpeningHoursForDay: pickOpeningHoursForDay,
+    pickOpeningHoursForDate: pickOpeningHoursForDate,
+    getLatestCloseTimeFromSlot: getLatestCloseTimeFromSlot,
+    filterCoursesAfterCloseTime: filterCoursesAfterCloseTime,
+    applyExceptionnelHorairesToResolvedView: applyExceptionnelHorairesToResolvedView,
+    mergeResolvedViewForDate: mergeResolvedViewForDate,
     escapeHtml: escapeHtml,
     formatCourseNameFromCoursId: formatCourseNameFromCoursId,
     courseDisplayFromCoursId: courseDisplayFromCoursId,

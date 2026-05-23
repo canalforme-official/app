@@ -708,9 +708,11 @@
       var ymd = PR.addDaysToYmd(mondayYmd, i);
       var rv = PR.resolveDailyView(ymd, data);
       if (rv.closed) continue;
-      var rvM = PR.applyPlanningEventsToResolvedView
-        ? PR.applyPlanningEventsToResolvedView(ymd, rv, data)
-        : rv;
+      var rvM = PR.mergeResolvedViewForDate
+        ? PR.mergeResolvedViewForDate(ymd, data)
+        : (PR.applyPlanningEventsToResolvedView
+          ? PR.applyPlanningEventsToResolvedView(ymd, rv, data)
+          : rv);
       var courses = rvM.courses || [];
       var dayShort = capitalizeDayFr(rv.dayName);
       courses.forEach(function (course) {

@@ -1980,6 +1980,9 @@
       if (rvMerged && rvMerged.planningEventLabels && rvMerged.planningEventLabels.length) {
         labelText = labelText + ' — ' + rvMerged.planningEventLabels.join(' · ');
       }
+      if (rvMerged && rvMerged.exceptionnelName) {
+        labelText = labelText + ' — ' + rvMerged.exceptionnelName;
+      }
       if (label) label.textContent = labelText;
     }
 
@@ -2394,9 +2397,11 @@
       if (dateStrEl) dateStrEl.textContent = dateLabel;
 
       var rvBase = resolveDailyView(selectedDateYmd, allData);
-      var rv = window.PlanningResolve
-        ? window.PlanningResolve.applyPlanningEventsToResolvedView(selectedDateYmd, rvBase, allData)
-        : rvBase;
+      var rv = window.PlanningResolve && window.PlanningResolve.mergeResolvedViewForDate
+        ? window.PlanningResolve.mergeResolvedViewForDate(selectedDateYmd, allData)
+        : (window.PlanningResolve
+          ? window.PlanningResolve.applyPlanningEventsToResolvedView(selectedDateYmd, rvBase, allData)
+          : rvBase);
       document.body.classList.toggle('planning-ramadan', rvBase.planningKey === 'ramadan');
       document.body.classList.toggle('planning-ferie', rvBase.planningKey === 'ferie' || rvBase.planningKey === 'ferme');
       document.body.classList.toggle('planning-ete', rvBase.planningKey === 'ete');

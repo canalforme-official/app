@@ -2842,9 +2842,11 @@
     function collectDistinctCoachBigUrlsForYmd(ymd, data, skipIfBigEqualsThumb) {
       if (!data || !ymd) return [];
       var rvBase = resolveDailyView(ymd, data);
-      var rv = window.PlanningResolve
-        ? window.PlanningResolve.applyPlanningEventsToResolvedView(ymd, rvBase, data)
-        : rvBase;
+      var rv = window.PlanningResolve && window.PlanningResolve.mergeResolvedViewForDate
+        ? window.PlanningResolve.mergeResolvedViewForDate(ymd, data)
+        : (window.PlanningResolve
+          ? window.PlanningResolve.applyPlanningEventsToResolvedView(ymd, rvBase, data)
+          : rvBase);
       if (rv.closed || rv.indetermine || !(rv.courses && rv.courses.length)) return [];
       var coachsList = data.coachs || [];
       var ordered = [];
@@ -3009,6 +3011,9 @@
       }
       if (rvMerged && rvMerged.planningEventLabels && rvMerged.planningEventLabels.length) {
         labelText = labelText + ' — ' + rvMerged.planningEventLabels.join(' · ');
+      }
+      if (rvMerged && rvMerged.exceptionnelName) {
+        labelText = labelText + ' — ' + rvMerged.exceptionnelName;
       }
       if (label) label.textContent = labelText;
       if (stickyLabel) stickyLabel.textContent = '';
@@ -3240,42 +3245,22 @@
       if (stickyBadge) stickyBadge.classList.add('hidden');
       if (!allData || !allData.planning) return;
       var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
-      renderOpeningHoursBar(resolveDailyView(ymd, allData));
+      var rvOh = resolveDailyView(ymd, allData);
+      renderOpeningHoursBar(rvOh, ymd);
     }
 
-    /** Aligné sur PlanningResolve.pickOpeningHoursForDay (metadata.horaires avec byDay ou plat). */
-    function pickOpeningHoursForDay(horairesMeta, planningKey, dayNameFrLower) {
-      if (!horairesMeta || !planningKey) return null;
-      var hk = planningKey;
-      if (hk === 'ete' && !horairesMeta.ete) hk = 'regulier';
-      var block = horairesMeta[hk];
-      if (!block || typeof block !== 'object') return null;
-      var day = dayNameFrLower ? String(dayNameFrLower).trim().toLowerCase() : '';
-      if (block.byDay && day && block.byDay[day]) {
-        var slot = block.byDay[day];
-        if (slot && typeof slot === 'object') return slot;
-      }
-      if (block.open1 || block.close1 || block.open2 || block.close2) {
-        return {
-          open1Label: block.open1Label,
-          open1: block.open1,
-          close1: block.close1,
-          open2Label: block.open2Label,
-          open2: block.open2,
-          close2: block.close2
-        };
-      }
-      return null;
-    }
-
-    function renderOpeningHoursBar(rv) {
+    function renderOpeningHoursBar(rv, dateYmd) {
       var ohBar = document.getElementById('openingHoursBar');
       if (!ohBar) return;
-      if (!rv || rv.closed || !allData.metadata || !allData.metadata.horaires) {
+      if (!rv || rv.closed || !allData || !allData.metadata) {
         ohBar.innerHTML = '';
         return;
       }
-      var hk = pickOpeningHoursForDay(allData.metadata.horaires, rv.planningKey, rv.dayName);
+      var ymd = dateYmd || ((typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date()));
+      var hk = null;
+      if (window.PlanningResolve && window.PlanningResolve.pickOpeningHoursForDate) {
+        hk = window.PlanningResolve.pickOpeningHoursForDate(ymd, allData, rv.planningKey, rv.dayName);
+      }
       var maghribForBar = '';
       if (rv.planningKey === 'ramadan' && window.prayerTimesData && window.prayerTimesData.prayerTimes) {
         var ymd = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : ymdFromDate(new Date());
@@ -3475,9 +3460,11 @@
       if (stickyDayDateSpan) stickyDayDateSpan.innerText = dateLabel;
 
       var rvBase = resolveDailyView(selectedDateYmd, allData);
-      var rv = window.PlanningResolve
-        ? window.PlanningResolve.applyPlanningEventsToResolvedView(selectedDateYmd, rvBase, allData)
-        : rvBase;
+      var rv = window.PlanningResolve && window.PlanningResolve.mergeResolvedViewForDate
+        ? window.PlanningResolve.mergeResolvedViewForDate(selectedDateYmd, allData)
+        : (window.PlanningResolve
+          ? window.PlanningResolve.applyPlanningEventsToResolvedView(selectedDateYmd, rvBase, allData)
+          : rvBase);
       document.body.classList.toggle('planning-ramadan', rvBase.planningKey === 'ramadan');
       document.body.classList.toggle('planning-ferie', rvBase.planningKey === 'ferie' || rvBase.planningKey === 'ferme');
       document.body.classList.toggle('planning-ete', rvBase.planningKey === 'ete');
