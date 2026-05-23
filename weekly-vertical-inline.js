@@ -78,6 +78,13 @@
       refreshPlanningDisplay();
     }
 
+    function isViewingCurrentWeek() {
+      var PR = getPR();
+      if (!PR || !weekMondayYmd) return true;
+      var currentMonday = PR.clampWeekMonday(PR.mondayOfWeekContaining(PR.ymdFromDate(new Date())));
+      return weekMondayYmd === currentMonday;
+    }
+
     function updateNavButtonsStateWeek() {
       var PR = getPR();
       var today = PR.ymdFromDate(new Date());
@@ -609,6 +616,7 @@
       markMultilineCourseNames();
       refreshWeeklyFerieSparklesAfterLayout();
       forceWeeklyVerticalScrollLayersSync();
+      setTimeout(function() { scrollToCurrentTime(); }, 300);
     }
 
     function initializeWeeklyPage() {
@@ -1243,54 +1251,69 @@
           const scrollWrapper = document.getElementById('scheduleScrollWrapper');
           if (!contentWrapper) return;
 
-          let targetRow = document.querySelector('.course-block.current')?.closest('tr');
-          if (!targetRow) {
-            targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
-          }
-          if (!targetRow) {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMinutes = now.getMinutes();
-            const times = document.querySelectorAll('.time-cell');
-            for (let i = 0; i < times.length; i++) {
-              const timeText = times[i].textContent.trim();
-              if (!timeText) continue;
-              const parts = timeText.split(':').map(Number);
-              const hour = parts[0];
-              const minute = parts[1] || 0;
-              if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
-                targetRow = times[i].parentElement;
-                break;
+          const viewingCurrentWeek = isViewingCurrentWeek();
+
+          if (viewingCurrentWeek) {
+            let targetRow = document.querySelector('.course-block.current')?.closest('tr');
+            if (!targetRow) {
+              targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
+            }
+            if (!targetRow) {
+              const now = new Date();
+              const currentHour = now.getHours();
+              const currentMinutes = now.getMinutes();
+              const times = document.querySelectorAll('.time-cell');
+              for (let i = 0; i < times.length; i++) {
+                const timeText = times[i].textContent.trim();
+                if (!timeText) continue;
+                const parts = timeText.split(':').map(Number);
+                const hour = parts[0];
+                const minute = parts[1] || 0;
+                if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+                  targetRow = times[i].parentElement;
+                  break;
+                }
               }
             }
-          }
 
-          if (targetRow) {
-            const thead = document.querySelector('.weekly-schedule thead');
-            const theadHeight = thead ? thead.offsetHeight : 0;
-            const targetPosition = targetRow.offsetTop - theadHeight - 10;
+            if (targetRow) {
+              const thead = document.querySelector('.weekly-schedule thead');
+              const theadHeight = thead ? thead.offsetHeight : 0;
+              const targetPosition = targetRow.offsetTop - theadHeight - 10;
+              setTimeout(function() {
+                contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
+              }, 100);
+            }
+          } else {
             setTimeout(function() {
-              contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
+              contentWrapper.scrollTo({ top: 0, behavior: 'smooth' });
             }, 100);
           }
 
           if (scrollWrapper) {
-            var todayTh = document.querySelector('.weekly-schedule thead th.today');
-            if (todayTh) {
-              var targetLeft = todayTh.offsetLeft - (scrollWrapper.clientWidth / 2) + (todayTh.offsetWidth / 2);
-              if (targetLeft < 0) targetLeft = 0;
-              var maxLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
-              if (targetLeft > maxLeft) targetLeft = maxLeft;
-              setTimeout(function() {
-                scrollWrapper.scrollTo({ left: targetLeft, behavior: 'smooth' });
-              }, 300);
-            }
+            setTimeout(function() {
+              if (viewingCurrentWeek) {
+                var todayTh = document.querySelector('.weekly-schedule thead th.today') ||
+                  document.querySelector('#stickyHeaderContent th.today');
+                if (todayTh) {
+                  var targetLeft = todayTh.offsetLeft - (scrollWrapper.clientWidth / 2) + (todayTh.offsetWidth / 2);
+                  if (targetLeft < 0) targetLeft = 0;
+                  var maxLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
+                  if (targetLeft > maxLeft) targetLeft = maxLeft;
+                  scrollWrapper.scrollTo({ left: targetLeft, behavior: 'smooth' });
+                  return;
+                }
+              }
+              scrollWrapper.scrollTo({ left: 0, behavior: 'smooth' });
+            }, 300);
           }
         });
       }, 500);
     }
 
-    setInterval(scrollToCurrentTime, 900000);
+    setInterval(function() {
+      if (isViewingCurrentWeek()) scrollToCurrentTime();
+    }, 900000);
     setInterval(function() { location.reload(); }, 3600000);
 
     function checkCourseStates() {
