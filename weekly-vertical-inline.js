@@ -85,6 +85,29 @@
       return weekMondayYmd === currentMonday;
     }
 
+    /** Aujourd'hui a-t-il des cours affichés (semaine courante) ? */
+    function currentWeekTodayHasCourses() {
+      var PR = getPR();
+      if (!PR || !isViewingCurrentWeek()) return true;
+      var todayYmd = PR.ymdFromDate(new Date());
+
+      /* Colonne entière en statut : fermé, férié, à déterminer… */
+      if (document.querySelector('td.course-cell--status-msg[data-ymd="' + todayYmd + '"]')) {
+        return false;
+      }
+      if (document.querySelector('.course-block[data-ymd="' + todayYmd + '"]')) {
+        return true;
+      }
+      if (!scheduleData) return false;
+      var rv = PR.mergeResolvedViewForDate
+        ? PR.mergeResolvedViewForDate(todayYmd, scheduleData)
+        : (PR.applyPlanningEventsToResolvedView
+          ? PR.applyPlanningEventsToResolvedView(todayYmd, PR.resolveDailyView(todayYmd, scheduleData), scheduleData)
+          : PR.resolveDailyView(todayYmd, scheduleData));
+      if (!rv || rv.closed || rv.indetermine) return false;
+      return (rv.courses || []).length > 0;
+    }
+
     function updateNavButtonsStateWeek() {
       var PR = getPR();
       var today = PR.ymdFromDate(new Date());
@@ -1252,42 +1275,50 @@
           if (!contentWrapper) return;
 
           const viewingCurrentWeek = isViewingCurrentWeek();
+          /* Semaine courante + aujourd'hui sans cours → horizontal uniquement (vers aujourd'hui). */
+          const shouldScrollVertical = !viewingCurrentWeek || currentWeekTodayHasCourses();
 
-          if (viewingCurrentWeek) {
-            let targetRow = document.querySelector('.course-block.current')?.closest('tr');
-            if (!targetRow) {
-              targetRow = document.querySelector('.course-block.starting-soon')?.closest('tr');
-            }
-            if (!targetRow) {
-              const now = new Date();
-              const currentHour = now.getHours();
-              const currentMinutes = now.getMinutes();
-              const times = document.querySelectorAll('.time-cell');
-              for (let i = 0; i < times.length; i++) {
-                const timeText = times[i].textContent.trim();
-                if (!timeText) continue;
-                const parts = timeText.split(':').map(Number);
-                const hour = parts[0];
-                const minute = parts[1] || 0;
-                if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
-                  targetRow = times[i].parentElement;
-                  break;
+          if (shouldScrollVertical) {
+            if (viewingCurrentWeek) {
+              var focusYmd = getPR().ymdFromDate(new Date());
+              let targetRow = document.querySelector('.course-block.current[data-ymd="' + focusYmd + '"]')?.closest('tr');
+              if (!targetRow) {
+                targetRow = document.querySelector('.course-block.starting-soon[data-ymd="' + focusYmd + '"]')?.closest('tr');
+              }
+              if (!targetRow) {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinutes = now.getMinutes();
+                const times = document.querySelectorAll('.time-cell');
+                for (let i = 0; i < times.length; i++) {
+                  const timeText = times[i].textContent.trim();
+                  if (!timeText) continue;
+                  const parts = timeText.split(':').map(Number);
+                  const hour = parts[0];
+                  const minute = parts[1] || 0;
+                  if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+                    var candidateRow = times[i].parentElement;
+                    if (candidateRow && candidateRow.querySelector('.course-block[data-ymd="' + focusYmd + '"]')) {
+                      targetRow = candidateRow;
+                      break;
+                    }
+                  }
                 }
               }
-            }
 
-            if (targetRow) {
-              const thead = document.querySelector('.weekly-schedule thead');
-              const theadHeight = thead ? thead.offsetHeight : 0;
-              const targetPosition = targetRow.offsetTop - theadHeight - 10;
+              if (targetRow) {
+                const thead = document.querySelector('.weekly-schedule thead');
+                const theadHeight = thead ? thead.offsetHeight : 0;
+                const targetPosition = targetRow.offsetTop - theadHeight - 10;
+                setTimeout(function() {
+                  contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                }, 100);
+              }
+            } else {
               setTimeout(function() {
-                contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                contentWrapper.scrollTo({ top: 0, behavior: 'smooth' });
               }, 100);
             }
-          } else {
-            setTimeout(function() {
-              contentWrapper.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 100);
           }
 
           if (scrollWrapper) {
