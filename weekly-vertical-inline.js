@@ -70,6 +70,21 @@
       } catch (e) {}
     }
 
+    /** Préserve semaine + filtre (aqua, femmes, etc.) lors du passage vertical ↔ horizontal. */
+    function buildPlanningViewQuery() {
+      var params = new URLSearchParams(window.location.search);
+      if (weekMondayYmd) {
+        params.set('week', weekMondayYmd);
+      } else {
+        params.delete('week');
+      }
+      if (forcedUrlFilter && !params.get('filter')) {
+        params.set('filter', forcedUrlFilter);
+      }
+      var qs = params.toString();
+      return qs ? ('?' + qs) : '';
+    }
+
     function changeWeek(delta) {
       var PR = getPR();
       weekMondayYmd = PR.addDaysToYmd(weekMondayYmd, delta * 7);
@@ -1450,13 +1465,11 @@
     }
 
     function goToWeekly() {
-      var q = weekMondayYmd ? ('?week=' + encodeURIComponent(weekMondayYmd)) : '';
-      window.location.href = './weekly.html' + q;
+      window.location.href = './weekly.html' + buildPlanningViewQuery();
     }
 
     function goToWeeklyVertical() {
-      var q = weekMondayYmd ? ('?week=' + encodeURIComponent(weekMondayYmd)) : '';
-      window.location.href = './weekly_vertical.html' + q;
+      window.location.href = './weekly_vertical.html' + buildPlanningViewQuery();
     }
 
     (function initRotationButtonTapAnimation() {
