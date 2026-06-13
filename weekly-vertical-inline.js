@@ -47,8 +47,8 @@
         var mixteAqua = document.getElementById('filter-mixte') || document.getElementById('filter-mixte-sidebar');
         var womenAqua = document.getElementById('filter-women-only') || document.getElementById('filter-women-only-sidebar');
         var piscineAqua = document.getElementById('filter-piscine') || document.getElementById('filter-piscine-sidebar');
-        if (mixteAqua) mixteAqua.checked = false;
-        if (womenAqua) womenAqua.checked = false;
+        if (mixteAqua) mixteAqua.checked = true;
+        if (womenAqua) womenAqua.checked = true;
         if (piscineAqua) piscineAqua.checked = true;
         return;
       }
