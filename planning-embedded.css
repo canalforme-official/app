@@ -13,45 +13,90 @@ body.embedded #ramadanSwitchButton {
   opacity: 0 !important;
 }
 
-/* weekly_vertical : filtre en bas à droite (comme le site) */
+/* weekly_vertical (app) : filtre au-dessus de la tab bar glass, pas sous elle */
 body.embedded.embedded-weekly-vertical .filters-sidebar {
   top: auto !important;
-  bottom: 20px !important;
-  right: 20px !important;
+  left: auto !important;
+  right: 16px !important;
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 10050 !important;
 }
 
 body.embedded.embedded-weekly-vertical .filters-sidebar.open {
-  width: calc(100% - 40px) !important;
+  width: calc(100% - 32px) !important;
+  right: 16px !important;
+  left: 16px !important;
 }
 
-/* daily_grid — en-tête glass (app mobile, pas Puppeteer / TV) */
+/* daily_grid — en-tête frost glass iOS (app, pas Puppeteer / TV) */
 body.embedded.embedded-daily-grid:not(.puppeteer-view) .header {
-  background: rgba(72, 6, 7, 0.58) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.22);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 4px 24px rgba(72, 6, 7, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  overflow: visible !important;
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  isolation: isolate;
 }
 
-body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header {
-  background: rgba(38, 70, 45, 0.58) !important;
+body.embedded.embedded-daily-grid:not(.puppeteer-view) .header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.55);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 4px 24px rgba(38, 70, 45, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 4px 24px rgba(72, 6, 7, 0.08);
+  pointer-events: none;
 }
 
-body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header {
-  background: rgba(30, 90, 138, 0.58) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 4px 24px rgba(30, 90, 138, 0.12);
+body.embedded.embedded-daily-grid:not(.puppeteer-view) .header-center .day-name,
+body.embedded.embedded-daily-grid:not(.puppeteer-view) .header-right .date-str,
+body.embedded.embedded-daily-grid:not(.puppeteer-view) .planning-type-label,
+body.embedded.embedded-daily-grid:not(.puppeteer-view) .maghrib-badge {
+  color: var(--primary-color) !important;
 }
 
-body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header {
-  background: rgba(184, 134, 11, 0.52) !important;
+body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header::before {
+  background: rgba(255, 255, 255, 0.52);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    0 4px 24px rgba(184, 134, 11, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 4px 24px rgba(38, 70, 45, 0.1);
+}
+
+body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header-center .day-name,
+body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header-right .date-str,
+body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .planning-type-label {
+  color: #26462d !important;
+}
+
+body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header::before {
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 4px 24px rgba(30, 90, 138, 0.1);
+}
+
+body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header-center .day-name,
+body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header-right .date-str,
+body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .planning-type-label {
+  color: #1e5a8a !important;
+}
+
+body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header::before {
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.74),
+    0 4px 24px rgba(184, 134, 11, 0.12);
+}
+
+body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header-center .day-name,
+body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header-right .date-str,
+body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .planning-type-label {
+  color: #b8860b !important;
 }
