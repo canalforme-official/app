@@ -4,6 +4,8 @@
 (function () {
   'use strict';
 
+  var booted = false;
+
   function isEmbedded() {
     try {
       return new URLSearchParams(window.location.search).get('embedded') === '1';
@@ -12,15 +14,18 @@
     }
   }
 
-  if (!isEmbedded()) return;
+  function pageFileName() {
+    var path = window.location.pathname || '';
+    return path.split('/').pop() || '';
+  }
 
-  document.documentElement.classList.add('embedded');
-  if (document.body) {
-    document.body.classList.add('embedded');
-  } else {
-    document.addEventListener('DOMContentLoaded', function () {
-      document.body.classList.add('embedded');
-    });
+  function applyEmbeddedPageClass() {
+    var file = pageFileName();
+    if (file.indexOf('weekly_vertical') !== -1) {
+      document.body.classList.add('embedded-weekly-vertical');
+    } else if (file === 'weekly.html') {
+      document.body.classList.add('embedded-weekly-horizontal');
+    }
   }
 
   function postPrayerVisible(visible) {
@@ -61,9 +66,24 @@
     setInterval(readPrayerButtonVisible, 2500);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', watchPrayerButton);
-  } else {
+  function bootEmbeddedFeatures() {
+    if (booted) return;
+    booted = true;
     watchPrayerButton();
+  }
+
+  function initEmbeddedShell() {
+    document.documentElement.classList.add('embedded');
+    document.body.classList.add('embedded');
+    applyEmbeddedPageClass();
+    bootEmbeddedFeatures();
+  }
+
+  if (!isEmbedded()) return;
+
+  if (document.body) {
+    initEmbeddedShell();
+  } else {
+    document.addEventListener('DOMContentLoaded', initEmbeddedShell);
   }
 })();

@@ -13,12 +13,13 @@ body.embedded #ramadanSwitchButton {
   opacity: 0 !important;
 }
 
-body.embedded .filters-sidebar {
+/* weekly_vertical : filtre en haut, décalé d'une hauteur de bouton */
+body.embedded.embedded-weekly-vertical .filters-sidebar {
   bottom: auto !important;
-  top: max(12px, env(safe-area-inset-top, 0px));
-  right: 16px;
+  top: calc(max(12px, env(safe-area-inset-top, 0px)) + 50px) !important;
+  right: 16px !important;
 }
 
-body.embedded .filters-sidebar.open {
+body.embedded.embedded-weekly-vertical .filters-sidebar.open {
   width: calc(100% - 32px) !important;
 }
