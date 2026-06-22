@@ -21,7 +21,9 @@
 
   function applyEmbeddedPageClass() {
     var file = pageFileName();
-    if (file.indexOf('weekly_vertical') !== -1) {
+    if (file === 'daily_grid.html') {
+      document.body.classList.add('embedded-daily-grid');
+    } else if (file.indexOf('weekly_vertical') !== -1) {
       document.body.classList.add('embedded-weekly-vertical');
     } else if (file === 'weekly.html') {
       document.body.classList.add('embedded-weekly-horizontal');
