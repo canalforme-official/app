@@ -1,0 +1,24 @@
+/**
+ * Mode app Canal Forme — activé via ?embedded=1
+ * Masquage CSS uniquement : le site public sans ce paramètre reste inchangé.
+ */
+body.embedded .daily-grid-view-button,
+body.embedded .weekly-view-button,
+body.embedded .today-view-button,
+body.embedded .rotation-view-button,
+body.embedded .ramadan-switch-button,
+body.embedded #ramadanSwitchButton {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+body.embedded .filters-sidebar {
+  bottom: auto !important;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: 16px;
+}
+
+body.embedded .filters-sidebar.open {
+  width: calc(100% - 32px) !important;
+}
