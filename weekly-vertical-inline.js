@@ -940,8 +940,12 @@
             var spaceBelow = window.innerHeight - buttonRect.bottom;
             var spaceAbove = buttonRect.top;
             var contentHeight = 200;
-            if (spaceBelow < contentHeight && spaceAbove > spaceBelow) content.classList.add('open-up');
-            else content.classList.remove('open-up');
+            var preferUp = window.matchMedia('(max-width: 768px)').matches;
+            if (preferUp || (spaceBelow < contentHeight && spaceAbove > spaceBelow)) {
+              content.classList.add('open-up');
+            } else {
+              content.classList.remove('open-up');
+            }
           } else {
             content.classList.remove('open-up');
           }

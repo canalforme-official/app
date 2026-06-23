@@ -1169,6 +1169,9 @@
 
     .filters-sidebar.open {
       width: calc(100% - 40px);
+      height: 50px;
+      min-height: 50px;
+      max-height: 50px;
       border-radius: 25px;
       overflow: visible;
     }
@@ -1180,8 +1183,11 @@
       justify-content: center;
       gap: 8px;
       flex: 1;
+      min-width: 0;
+      height: 50px;
       padding: 0 60px 0 15px;
       white-space: nowrap;
+      overflow: visible;
     }
 
     .filters-sidebar.open .filters-sidebar-content {
@@ -1198,7 +1204,10 @@
       gap: 8px;
       align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      min-width: 0;
+      height: 100%;
+      overflow: visible;
     }
 
     .filters-sidebar .filters label {
@@ -1245,10 +1254,13 @@
       background-color: rgba(255, 255, 255, 0.9);
     }
     
-    /* Style pour la liste déroulante personnalisée des coachs */
-    .coach-dropdown {
+    /* Liste coachs : hors du flux de la bande (évite le crop par overflow) */
+    .filters-sidebar .coach-dropdown {
       position: relative;
       min-width: 140px;
+      flex-shrink: 0;
+      overflow: visible;
+      z-index: 1002;
     }
     
     .coach-dropdown-button {
@@ -1284,12 +1296,12 @@
       top: 100%;
       left: 0;
       right: 0;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, 0.95);
       border: 1px solid #ffffff;
       border-radius: 8px;
       max-height: 200px;
       overflow-y: auto;
-      z-index: 1002;
+      z-index: 10060;
       margin-top: 2px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       visibility: hidden;
@@ -1637,6 +1649,20 @@
       0% { transform: scale(1) translateZ(0); }
       50% { transform: scale(0.95) translateZ(0); }
       100% { transform: scale(1) translateZ(0); }
+    }
+
+    /* Mobile : filtre plus bas (~hauteur du bouton) + bande à hauteur fixe */
+    @media screen and (max-width: 768px) {
+      .filters-sidebar {
+        bottom: max(10px, env(safe-area-inset-bottom, 0px));
+      }
+
+      .filters-sidebar,
+      .filters-sidebar.open {
+        height: 50px;
+        min-height: 50px;
+        max-height: 50px;
+      }
     }
 
     /* Styles responsives pour différentes tailles d'écran */

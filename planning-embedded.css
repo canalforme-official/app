@@ -18,7 +18,7 @@ body.embedded.embedded-weekly-vertical .filters-sidebar {
   top: auto !important;
   left: auto !important;
   right: 16px !important;
-  bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(38px + env(safe-area-inset-bottom, 0px)) !important;
   z-index: 10050 !important;
 }
 
