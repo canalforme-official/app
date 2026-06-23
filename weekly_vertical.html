@@ -1036,7 +1036,7 @@
       will-change: transform, opacity;
     }
 
-    /* Bouton de filtre intégré dans la barre */
+    /* Bouton de filtre intégré dans la barre — toujours au-dessus du contenu */
     .filters-sidebar .filter-button {
       position: absolute;
       right: 0;
@@ -1059,8 +1059,14 @@
       box-shadow: none;
       margin: 0;
       padding: 0;
-      z-index: 1001;
+      z-index: 10072;
       pointer-events: all;
+    }
+
+    .filters-sidebar.open .filter-button {
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.45);
     }
 
     .filters-sidebar .filter-button:hover {
@@ -1070,6 +1076,7 @@
 
     .filters-sidebar.open .filter-button:hover {
       background: var(--primary-color);
+      transform: translateY(-50%) scale(1.05);
     }
 
     .filters-sidebar.open .filter-button:hover .filter-icon::before,
@@ -1080,6 +1087,10 @@
 
     .filters-sidebar .filter-button:active {
       transform: scale(0.95);
+    }
+
+    .filters-sidebar.open .filter-button:active {
+      transform: translateY(-50%) scale(0.95);
     }
 
     .filter-icon {
@@ -1156,7 +1167,7 @@
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(10px);
       border-radius: 25px;
-      z-index: 1000;
+      z-index: 10070;
       transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       overflow: hidden;
       padding: 0;
@@ -1169,11 +1180,12 @@
 
     .filters-sidebar.open {
       width: calc(100% - 40px);
-      height: 50px;
+      height: auto;
       min-height: 50px;
-      max-height: 50px;
+      max-height: none;
       border-radius: 25px;
       overflow: visible;
+      align-items: stretch;
     }
 
     .filters-sidebar-content {
@@ -1181,12 +1193,13 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 4px;
       flex: 1;
       min-width: 0;
-      height: 50px;
-      padding: 0 60px 0 15px;
-      white-space: nowrap;
+      height: auto;
+      min-height: 50px;
+      padding: 6px 56px 6px 10px;
+      white-space: normal;
       overflow: visible;
     }
 
@@ -1201,12 +1214,14 @@
     .filters-sidebar .filters {
       display: flex;
       flex-direction: row;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 4px 10px;
       align-items: center;
       justify-content: center;
-      flex-wrap: nowrap;
+      align-content: center;
       min-width: 0;
-      height: 100%;
+      width: 100%;
+      height: auto;
       overflow: visible;
     }
 
@@ -1218,6 +1233,7 @@
       align-items: center;
       gap: 5px;
       white-space: nowrap;
+      flex: 0 0 auto;
     }
 
     .filters-sidebar .filters input[type="checkbox"] {
@@ -1254,13 +1270,20 @@
       background-color: rgba(255, 255, 255, 0.9);
     }
     
-    /* Liste coachs : hors du flux de la bande (évite le crop par overflow) */
+    /* Ligne 2 : sélecteur coach sur toute la largeur disponible */
     .filters-sidebar .coach-dropdown {
       position: relative;
-      min-width: 140px;
-      flex-shrink: 0;
+      flex: 1 1 100%;
+      min-width: 0;
+      max-width: 100%;
       overflow: visible;
-      z-index: 1002;
+      z-index: 10071;
+      display: flex;
+      justify-content: center;
+    }
+
+    .filters-sidebar .coach-dropdown-button {
+      max-width: min(240px, calc(100% - 8px));
     }
     
     .coach-dropdown-button {
@@ -1651,17 +1674,22 @@
       100% { transform: scale(1) translateZ(0); }
     }
 
-    /* Mobile : filtre plus bas (~hauteur du bouton) + bande à hauteur fixe */
+    /* Mobile : filtre plus bas ; fermé = pastille, ouvert = 2 lignes */
     @media screen and (max-width: 768px) {
       .filters-sidebar {
         bottom: max(10px, env(safe-area-inset-bottom, 0px));
       }
 
-      .filters-sidebar,
-      .filters-sidebar.open {
+      .filters-sidebar:not(.open) {
         height: 50px;
         min-height: 50px;
         max-height: 50px;
+      }
+
+      .filters-sidebar.open {
+        height: auto;
+        min-height: 50px;
+        max-height: none;
       }
     }
 
@@ -1804,7 +1832,7 @@
         font-size: 0.55em;
       }
 
-      /* Réduire de 15% les éléments du filtre pour qu'ils tiennent sur une ligne */
+      /* Réduire légèrement les éléments du filtre (2 lignes) */
       .filters-sidebar .filters label {
         font-size: 0.7225em; /* 0.85em * 0.85 */
         gap: 4.25px; /* 5px * 0.85 */
@@ -1819,17 +1847,14 @@
         font-size: 10.2px; /* 12px * 0.85 */
       }
 
-      .coach-dropdown {
-        min-width: 119px; /* 140px * 0.85 */
-      }
-
-      .coach-dropdown-button {
+      .filters-sidebar .coach-dropdown-button {
         padding: 5.1px 23.8px 5.1px 10.2px; /* 6px 28px 6px 12px * 0.85 */
         font-size: 0.7225em; /* 0.85em * 0.85 */
+        max-width: min(200px, calc(100% - 8px));
       }
 
       .filters-sidebar .filters {
-        gap: 6.8px; /* 8px * 0.85 */
+        gap: 3px 6.8px; /* 8px * 0.85 */
       }
     }
 
