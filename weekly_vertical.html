@@ -1036,11 +1036,12 @@
       will-change: transform, opacity;
     }
 
-    /* Bouton de filtre intégré dans la barre — toujours au-dessus du contenu */
+    /* Bouton de filtre — ancré en bas à droite, ne bouge pas à l'ouverture */
     .filters-sidebar .filter-button {
       position: absolute;
       right: 0;
-      top: 0;
+      bottom: 0;
+      top: auto;
       background: transparent;
       border: none;
       border-radius: 50%;
@@ -1053,7 +1054,7 @@
       justify-content: center;
       cursor: pointer;
       outline: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background 0.25s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       box-shadow: none;
@@ -1064,8 +1065,6 @@
     }
 
     .filters-sidebar.open .filter-button {
-      top: 50%;
-      transform: translateY(-50%);
       background: rgba(255, 255, 255, 0.45);
     }
 
@@ -1076,7 +1075,7 @@
 
     .filters-sidebar.open .filter-button:hover {
       background: var(--primary-color);
-      transform: translateY(-50%) scale(1.05);
+      transform: scale(1.05);
     }
 
     .filters-sidebar.open .filter-button:hover .filter-icon::before,
@@ -1087,10 +1086,6 @@
 
     .filters-sidebar .filter-button:active {
       transform: scale(0.95);
-    }
-
-    .filters-sidebar.open .filter-button:active {
-      transform: translateY(-50%) scale(0.95);
     }
 
     .filter-icon {
@@ -1160,20 +1155,24 @@
     /* Barre de filtres qui part du bouton */
     .filters-sidebar {
       position: fixed;
-      bottom: 20px;
+      bottom: 14px;
       right: 20px;
       width: 50px;
       height: 50px;
+      max-height: 50px;
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(10px);
       border-radius: 25px;
       z-index: 10070;
-      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition:
+        width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+        max-height 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+        border-radius 0.45s cubic-bezier(0.32, 0.72, 0, 1);
       overflow: hidden;
       padding: 0;
       box-sizing: border-box;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: flex-end;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
@@ -1182,29 +1181,38 @@
       width: calc(100% - 40px);
       height: auto;
       min-height: 50px;
-      max-height: none;
+      max-height: 100px;
       border-radius: 25px;
       overflow: visible;
-      align-items: stretch;
+      align-items: flex-end;
     }
 
     .filters-sidebar-content {
-      display: none;
+      display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: center;
       gap: 4px;
       flex: 1;
       min-width: 0;
-      height: auto;
-      min-height: 50px;
-      padding: 6px 56px 6px 10px;
+      height: 0;
+      min-height: 0;
+      padding: 0 56px 0 10px;
       white-space: normal;
-      overflow: visible;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, padding 0.45s cubic-bezier(0.32, 0.72, 0, 1);
     }
 
     .filters-sidebar.open .filters-sidebar-content {
-      display: flex;
+      height: auto;
+      min-height: 50px;
+      padding: 8px 56px 2px 10px;
+      overflow: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.35s ease 0.12s, padding 0.45s cubic-bezier(0.32, 0.72, 0, 1);
     }
 
     .filters-sidebar h2 {
@@ -1674,10 +1682,10 @@
       100% { transform: scale(1) translateZ(0); }
     }
 
-    /* Mobile : filtre plus bas ; fermé = pastille, ouvert = 2 lignes */
+    /* Mobile : filtre un peu plus bas ; fermé = pastille, ouvert = 2 lignes fluides */
     @media screen and (max-width: 768px) {
       .filters-sidebar {
-        bottom: max(10px, env(safe-area-inset-bottom, 0px));
+        bottom: max(6px, env(safe-area-inset-bottom, 0px));
       }
 
       .filters-sidebar:not(.open) {
@@ -1689,7 +1697,7 @@
       .filters-sidebar.open {
         height: auto;
         min-height: 50px;
-        max-height: none;
+        max-height: 100px;
       }
     }
 
