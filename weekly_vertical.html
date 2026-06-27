@@ -1036,21 +1036,23 @@
       will-change: transform, opacity;
     }
 
-    /* Bouton filtre — calé dans la pastille (même repère que le fond glass) */
-    .filters-sidebar .filter-button {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      top: auto;
-      left: auto;
+    /* Unité filtre : bouton fixe viewport, panneau glass seul s'anime en largeur (droite → gauche) */
+    .filters-bar-unit {
+      --filter-bar-bottom: 14px;
+      --filter-bar-right: 20px;
+    }
+
+    .filters-bar-unit .filter-button {
+      position: fixed;
+      bottom: var(--filter-bar-bottom);
+      right: var(--filter-bar-right);
       background: transparent;
       border: none;
-      border-radius: 50%;
+      border-radius: 25px;
       width: 50px;
       height: 50px;
       min-width: 50px;
       min-height: 50px;
-      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1058,53 +1060,38 @@
       outline: none;
       appearance: none;
       -webkit-appearance: none;
-      transition: background 0.25s ease;
+      transition: background 0.25s ease, border-radius 0.25s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       box-shadow: none;
       margin: 0;
       padding: 0;
-      z-index: 2;
+      z-index: 10072;
       pointer-events: all;
     }
 
-    .filters-sidebar:not(.open) .filter-button {
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 25px;
-    }
-
-    .filters-sidebar.open .filter-button {
-      position: relative;
-      inset: auto;
-      right: auto;
-      bottom: auto;
-      flex: 0 0 50px;
-      width: 50px;
-      height: 50px;
-      align-self: center;
-      background: rgba(255, 255, 255, 0.45);
+    .filters-bar-unit.open .filter-button {
       border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
     }
 
-    .filters-sidebar .filter-button:hover {
+    .filters-bar-unit .filter-button:hover {
       background: rgba(255, 255, 255, 0.2);
     }
 
-    .filters-sidebar.open .filter-button:hover {
+    .filters-bar-unit.open .filter-button:hover {
       background: var(--primary-color);
     }
 
-    .filters-sidebar.open .filter-button:hover .filter-bar {
+    .filters-bar-unit.open .filter-button:hover .filter-bar {
       background: white;
     }
 
-    .filters-sidebar .filter-button:active {
+    .filters-bar-unit .filter-button:active {
       background: rgba(255, 255, 255, 0.35);
     }
 
-    .filters-sidebar.open .filter-button:active {
+    .filters-bar-unit.open .filter-button:active {
       background: var(--primary-light);
     }
 
@@ -1135,14 +1122,12 @@
     }
 
     /* Panneau fermé : annule le :hover collant sur mobile au 2e clic */
-    .filters-sidebar:not(.open) .filter-bar {
+    .filters-bar-unit:not(.open) .filter-bar {
       background: var(--primary-color) !important;
     }
 
-    /* Barre de filtres — fermée = pastille 50×50, ouvert = s'étend vers la gauche */
-    .filters-sidebar {
-      --filter-bar-bottom: 14px;
-      --filter-bar-right: 20px;
+    /* Panneau glass — se rétracte / se déploie horizontalement, bord droit fixe */
+    .filters-bar-unit .filters-sidebar {
       position: fixed;
       bottom: var(--filter-bar-bottom);
       right: var(--filter-bar-right);
@@ -1160,18 +1145,17 @@
       padding: 0;
       box-sizing: border-box;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      pointer-events: none;
     }
 
-    .filters-sidebar.open {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
+    .filters-bar-unit.open .filters-sidebar {
       width: calc(100% - 40px);
       height: auto;
       min-height: 50px;
       max-height: none;
       border-radius: 25px;
       overflow: visible;
+      pointer-events: auto;
     }
 
     .filters-sidebar-content {
@@ -1181,15 +1165,15 @@
       justify-content: center;
       gap: 4px;
       min-width: 0;
-      padding: 6px 0 6px 10px;
+      padding: 6px 50px 6px 10px;
       white-space: normal;
       overflow: hidden;
       box-sizing: border-box;
+      pointer-events: auto;
     }
 
-    .filters-sidebar.open .filters-sidebar-content {
+    .filters-bar-unit.open .filters-sidebar-content {
       display: flex;
-      flex: 1;
       overflow: visible;
     }
 
@@ -1662,7 +1646,7 @@
 
     /* Mobile : filtre un peu plus bas ; fermé = pastille 50×50, ouvert = 2 lignes fluides */
     @media screen and (max-width: 768px) {
-      .filters-sidebar {
+      .filters-bar-unit {
         --filter-bar-bottom: max(6px, env(safe-area-inset-bottom, 0px));
       }
     }
@@ -2188,33 +2172,35 @@
     <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Horaires de prière" class="ramadan-icon">
   </a>
 
-  <!-- Barre de filtres en bas avec le bouton intégré -->
-  <div class="filters-sidebar" id="filtersSidebar">
-    <div class="filters-sidebar-content">
-      <div class="filters">
-        <label>
-          <input type="checkbox" id="filter-mixte" checked>
-          Mixte
-        </label>
-        <label>
-          <input type="checkbox" id="filter-women-only" checked>
-          Femmes
-        </label>
-        <label>
-          <input type="checkbox" id="filter-piscine" checked>
-          Piscine
-        </label>
-        <label>
-          <input type="checkbox" id="filter-coach" checked>
-          Coach
-        </label>
-        <div class="coach-dropdown">
-          <button class="coach-dropdown-button" id="coachDropdownButton">
-            <span id="coachDropdownText">Sélection coach</span>
-            <span class="coach-dropdown-arrow">▼</span>
-          </button>
-          <div class="coach-dropdown-content" id="coachDropdownContent">
-            <!-- Les options seront ajoutées ici dynamiquement -->
+  <!-- Barre de filtres : panneau animé + bouton fixe séparé -->
+  <div class="filters-bar-unit" id="filtersSidebar">
+    <div class="filters-sidebar">
+      <div class="filters-sidebar-content">
+        <div class="filters">
+          <label>
+            <input type="checkbox" id="filter-mixte" checked>
+            Mixte
+          </label>
+          <label>
+            <input type="checkbox" id="filter-women-only" checked>
+            Femmes
+          </label>
+          <label>
+            <input type="checkbox" id="filter-piscine" checked>
+            Piscine
+          </label>
+          <label>
+            <input type="checkbox" id="filter-coach" checked>
+            Coach
+          </label>
+          <div class="coach-dropdown">
+            <button class="coach-dropdown-button" id="coachDropdownButton">
+              <span id="coachDropdownText">Sélection coach</span>
+              <span class="coach-dropdown-arrow">▼</span>
+            </button>
+            <div class="coach-dropdown-content" id="coachDropdownContent">
+              <!-- Les options seront ajoutées ici dynamiquement -->
+            </div>
           </div>
         </div>
       </div>

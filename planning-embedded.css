@@ -14,20 +14,21 @@ body.embedded #ramadanSwitchButton {
 }
 
 /* weekly_vertical (app) : filtre au-dessus de la tab bar glass, pas sous elle */
-body.embedded.embedded-weekly-vertical .filters-sidebar {
+body.embedded.embedded-weekly-vertical .filters-bar-unit {
   --filter-bar-bottom: calc(38px + env(safe-area-inset-bottom, 0px));
   --filter-bar-right: 16px;
-  top: auto !important;
-  left: auto !important;
-  right: var(--filter-bar-right) !important;
+}
+
+body.embedded.embedded-weekly-vertical .filters-bar-unit .filters-sidebar,
+body.embedded.embedded-weekly-vertical .filters-bar-unit .filter-button {
   bottom: var(--filter-bar-bottom) !important;
+  right: var(--filter-bar-right) !important;
   z-index: 10050 !important;
 }
 
-body.embedded.embedded-weekly-vertical .filters-sidebar.open {
+body.embedded.embedded-weekly-vertical .filters-bar-unit.open .filters-sidebar {
   width: calc(100% - 32px) !important;
-  right: 16px !important;
-  left: 16px !important;
+  left: auto !important;
 }
 
 /* daily_grid — en-tête frost glass iOS (app, pas Puppeteer / TV) */
