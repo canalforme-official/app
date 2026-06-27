@@ -742,12 +742,14 @@
       width: 98%;
       max-width: 620px;
       padding: 18px 20px;
+      padding-top: 34px;
       border-radius: 16px;
       background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.18) 0%, rgba(var(--primary-rgb), 0.08) 100%);
       box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.2);
       display: none;
       margin-top: 16px;
       border: 1px solid rgba(var(--primary-rgb), 0.25);
+      contain: layout style;
     }
 
     .competition-container--previous {
@@ -1229,7 +1231,7 @@
     /* On place .labels-container ABSOLUMENT dans .competition-container */
     .labels-container {
       position: absolute;
-      top: 0;
+      top: 10px;
       /* Retour à la position d'origine */
       left: 0;
       right: 0;
@@ -1266,13 +1268,16 @@
       position: absolute;
       right: -20px;
       top: 50%;
-      transform: translateY(-50%) scale(0);
+      transform: translateY(-50%);
       width: 1.65rem;
       height: 1.65rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
+    }
+
+    .men-label .trophy-svg.trophy-svg--animate {
+      animation: trophy-grow 0.5s ease-out forwards;
     }
 
     .men-label .trophy-svg svg {
@@ -1286,13 +1291,16 @@
       position: absolute;
       left: -20px;
       top: 50%;
-      transform: translateY(-50%) scale(0);
+      transform: translateY(-50%);
       width: 1.65rem;
       height: 1.65rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      animation: trophy-grow 0.5s ease-out forwards, trophy-pulse 1.8s ease-in-out 0.6s infinite;
+    }
+
+    .women-label .trophy-svg.trophy-svg--animate {
+      animation: trophy-grow 0.5s ease-out forwards;
     }
 
     .women-label .trophy-svg svg {
@@ -1303,12 +1311,8 @@
 
     @keyframes trophy-grow {
       0% {
-        transform: translateY(-50%) scale(0);
+        transform: translateY(-50%) scale(0.6);
         opacity: 0;
-      }
-      70% {
-        transform: translateY(-50%) scale(1.2);
-        opacity: 1;
       }
       100% {
         transform: translateY(-50%) scale(1);
@@ -1316,12 +1320,10 @@
       }
     }
 
-    @keyframes trophy-pulse {
-      0%, 100% {
-        transform: translateY(-50%) scale(1);
-      }
-      50% {
-        transform: translateY(-50%) scale(1.15);
+    @media (prefers-reduced-motion: reduce) {
+      .men-label .trophy-svg.trophy-svg--animate,
+      .women-label .trophy-svg.trophy-svg--animate {
+        animation: none;
       }
     }
 
@@ -1355,7 +1357,7 @@
       border-radius: 15px;
       overflow: hidden;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     /* Segments Homme/Femme — même dégradé rouge→bordeaux que le tableau */
@@ -1369,7 +1371,7 @@
     .progress-bar .male {
       border-radius: 15px 0 0 5px;
       background: var(--leaderboard-gradient);
-      transition: width 1.5s ease-in-out;
+      transition: width 1.2s ease-out;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1384,7 +1386,7 @@
     .progress-bar .female {
       border-radius: 0 5px 15px 0;
       background: linear-gradient(90deg, #8B4513 0%, #CD7F32 50%, #B87333 100%);
-      transition: width 1.5s ease-in-out;
+      transition: width 1.2s ease-out;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1407,31 +1409,26 @@
       letter-spacing: 0.1em;
     }
 
-    /* Animation halo pour l'équipe gagnante */
-    @keyframes winner-pulse {
-      0%, 100% {
-        box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 215, 0, 0.25);
-      }
-      50% {
-        box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3), 0 0 14px 3px rgba(255, 215, 0, 0.45);
-      }
-    }
-
-    @keyframes winner-pulse-female {
-      0%, 100% {
-        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.25);
-      }
-      50% {
-        box-shadow: 0 0 14px 3px rgba(255, 215, 0, 0.45);
-      }
-    }
-
+    /* Halo statique pour l'équipe gagnante (pas d'animation infinie : provoque clignotement / repaint sur Android WebView) */
     .progress-bar .male.winner {
-      animation: winner-pulse 2s ease-in-out infinite;
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3), 0 0 10px 2px rgba(255, 215, 0, 0.35);
     }
 
     .progress-bar .female.winner {
-      animation: winner-pulse-female 2s ease-in-out infinite;
+      box-shadow: 0 0 10px 2px rgba(255, 215, 0, 0.35);
+    }
+
+    /* Après la 1re mise en page : figer les largeurs (évite les transitions lors des refresh JSON) */
+    .progress-bar.challenge-ready .male,
+    .progress-bar.challenge-ready .female {
+      transition: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .progress-bar .male,
+      .progress-bar .female {
+        transition: none;
+      }
     }
 
     /* Icône (éclair) */
@@ -1900,6 +1897,89 @@
 
     /** Empêche de réécrire le DOM challenge H/F si les données n’ont pas changé (évite le clignotement). */
     const challengeBarCache = {};
+    let challengeBarsFrozen = false;
+
+    function roundChallengePct(value) {
+      return Math.round(value * 10) / 10;
+    }
+
+    function challengeWinnerSide(maleMEPs, femaleMEPs, malePercentage) {
+      if (maleMEPs > femaleMEPs) return 'male';
+      if (femaleMEPs > maleMEPs) return 'female';
+      return malePercentage >= 50 ? 'male' : 'female';
+    }
+
+    function applyChallengeWinnerClasses(menLabel, womenLabel, maleBar, femaleBar, winnerSide) {
+      const menWin = winnerSide === 'male';
+      const womenWin = winnerSide === 'female';
+      menLabel.classList.toggle('winner', menWin);
+      womenLabel.classList.toggle('winner', womenWin);
+      maleBar.classList.toggle('winner', menWin);
+      femaleBar.classList.toggle('winner', womenWin);
+    }
+
+    function updateChallengeMepsBar(barEl, mepsFormatted) {
+      let numEl = barEl.querySelector('.challenge-meps-number');
+      if (!numEl) {
+        barEl.innerHTML = '<strong><span class="challenge-meps-number"></span> MEPs</strong>';
+        numEl = barEl.querySelector('.challenge-meps-number');
+      }
+      if (numEl && numEl.textContent !== mepsFormatted) {
+        numEl.textContent = mepsFormatted;
+      }
+    }
+
+    function updateChallengeUserLabel(labelEl, text, showTrophy, trophyPosition) {
+      let textEl = labelEl.querySelector('.challenge-label-text');
+      if (!textEl) {
+        labelEl.textContent = '';
+        textEl = document.createElement('span');
+        textEl.className = 'challenge-label-text';
+        labelEl.appendChild(textEl);
+      }
+      if (textEl.textContent !== text) {
+        textEl.textContent = text;
+      }
+      const existingTrophy = labelEl.querySelector('.trophy-svg');
+      if (showTrophy) {
+        if (!existingTrophy) {
+          const tro = document.createElement('span');
+          tro.className = 'trophy-svg trophy-svg--animate';
+          tro.setAttribute('aria-hidden', 'true');
+          tro.innerHTML = CHALLENGE_TROPHY_SVG;
+          if (trophyPosition === 'before') {
+            labelEl.insertBefore(tro, textEl);
+          } else {
+            labelEl.appendChild(tro);
+          }
+        }
+      } else if (existingTrophy) {
+        existingTrophy.remove();
+      }
+    }
+
+    function updateChallengeDynamicIcon(dynamicIcon, iconUrl, malePercentage) {
+      let img = dynamicIcon.querySelector('img');
+      if (!img) {
+        dynamicIcon.innerHTML = '<img src="" alt="">';
+        img = dynamicIcon.querySelector('img');
+      }
+      if (img && img.getAttribute('src') !== iconUrl) {
+        img.setAttribute('src', iconUrl);
+      }
+      const left = 'calc(' + roundChallengePct(malePercentage) + '% + 3px)';
+      if (dynamicIcon.style.left !== left) {
+        dynamicIcon.style.left = left;
+      }
+    }
+
+    function freezeChallengeBarTransitions() {
+      if (challengeBarsFrozen) return;
+      challengeBarsFrozen = true;
+      document.querySelectorAll('.progress-bar').forEach(function (bar) {
+        bar.classList.add('challenge-ready');
+      });
+    }
 
     /**
      * Remplit la barre challenge H / F à partir d'un bloc période (current ou previous).
@@ -1923,7 +2003,9 @@
       const maleTotalUsers = maleUsers + maleInactiveUsers;
       const femaleTotalUsers = femaleUsers + femaleInactiveUsers;
 
-      const malePercentage = (maleMEPs / totalMEPs) * 100 || 50;
+      const malePercentage = roundChallengePct((maleMEPs / totalMEPs) * 100 || 50);
+      const femalePercentage = roundChallengePct(100 - malePercentage);
+      const winnerSide = challengeWinnerSide(maleMEPs, femaleMEPs, malePercentage);
 
       const maleBar = document.getElementById(ids.maleBarId);
       const femaleBar = document.getElementById(ids.femaleBarId);
@@ -1937,62 +2019,41 @@
       const cacheKey = ids.maleBarId;
       const fingerprint = [
         maleMEPs, femaleMEPs, maleUsers, femaleUsers,
-        maleInactiveUsers, femaleInactiveUsers, malePercentage
+        maleInactiveUsers, femaleInactiveUsers, malePercentage, winnerSide
       ].join('|');
       if (challengeBarCache[cacheKey] === fingerprint) {
         return true;
       }
       challengeBarCache[cacheKey] = fingerprint;
 
-      maleBar.style.width = `${malePercentage}%`;
-      femaleBar.style.width = `${100 - malePercentage}%`;
+      const maleWidth = malePercentage + '%';
+      const femaleWidth = femalePercentage + '%';
+      if (maleBar.style.width !== maleWidth) maleBar.style.width = maleWidth;
+      if (femaleBar.style.width !== femaleWidth) femaleBar.style.width = femaleWidth;
 
-      menLabel.classList.remove('winner');
-      womenLabel.classList.remove('winner');
-      maleBar.classList.remove('winner');
-      femaleBar.classList.remove('winner');
-
-      if (maleMEPs > femaleMEPs) {
-        menLabel.classList.add('winner');
-        maleBar.classList.add('winner');
-      } else if (femaleMEPs > maleMEPs) {
-        womenLabel.classList.add('winner');
-        femaleBar.classList.add('winner');
-      } else {
-        if (malePercentage >= 50) {
-          maleBar.classList.add('winner');
-        } else {
-          femaleBar.classList.add('winner');
-        }
-      }
+      applyChallengeWinnerClasses(menLabel, womenLabel, maleBar, femaleBar, winnerSide);
 
       const maleLabel = maleUsers === 1 ? 'Actif' : 'Actifs';
       const femaleLabel = femaleUsers === 1 ? 'Active' : 'Actives';
+      const menText = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}`;
+      const womenText = `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
 
       if (trophyAboveBarId) {
-        menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}`;
-        womenLabel.innerHTML = `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+        updateChallengeUserLabel(menLabel, menText, false);
+        updateChallengeUserLabel(womenLabel, womenText, false);
         var anchor = document.getElementById(trophyAboveBarId);
         if (anchor) {
-          var trophySideLeftPct;
-          if (menLabel.classList.contains('winner')) {
-            trophySideLeftPct = malePercentage / 2;
-          } else if (womenLabel.classList.contains('winner')) {
-            trophySideLeftPct = malePercentage + (100 - malePercentage) / 2;
-          } else if (maleBar.classList.contains('winner')) {
-            trophySideLeftPct = malePercentage / 2;
-          } else {
-            trophySideLeftPct = malePercentage + (100 - malePercentage) / 2;
-          }
-          var winnerIsMale = menLabel.classList.contains('winner')
-            ? true
-            : womenLabel.classList.contains('winner')
-              ? false
-              : maleBar.classList.contains('winner');
-          var winCls = winnerIsMale
+          var trophySideLeftPct = winnerSide === 'male'
+            ? malePercentage / 2
+            : malePercentage + femalePercentage / 2;
+          var winCls = winnerSide === 'male'
             ? 'previous-month-trophy-static--winner-male'
             : 'previous-month-trophy-static--winner-female';
-          anchor.innerHTML = '<span class="previous-month-trophy-static ' + winCls + '" aria-hidden="true" data-bar-left-pct="' + trophySideLeftPct + '">' + CHALLENGE_TROPHY_SVG + '</span>';
+          var trophyFingerprint = winCls + '|' + trophySideLeftPct;
+          if (anchor.getAttribute('data-trophy-fp') !== trophyFingerprint) {
+            anchor.setAttribute('data-trophy-fp', trophyFingerprint);
+            anchor.innerHTML = '<span class="previous-month-trophy-static ' + winCls + '" aria-hidden="true" data-bar-left-pct="' + trophySideLeftPct + '">' + CHALLENGE_TROPHY_SVG + '</span>';
+          }
           var troEl = anchor.querySelector('.previous-month-trophy-static');
           if (troEl) {
             if (window.innerWidth > 600) {
@@ -2000,22 +2061,18 @@
               troEl.style.transform = 'translateX(-50%)';
             } else {
               troEl.style.left = '';
-              setTimeout(function () {
-                positionPreviousMonthTrophyMobile();
-                requestAnimationFrame(positionPreviousMonthTrophyMobile);
-              }, 50);
+              requestAnimationFrame(positionPreviousMonthTrophyMobile);
             }
           }
         }
       } else {
-        var trophyWinner = '<span class="trophy-svg" aria-hidden="true">' + CHALLENGE_TROPHY_SVG + '</span>';
-        menLabel.innerHTML = `👨 ${maleUsers} ${maleLabel} / ${maleTotalUsers}` + (menLabel.classList.contains('winner') ? trophyWinner : '');
-        womenLabel.innerHTML = (womenLabel.classList.contains('winner') ? trophyWinner : '') + `👩 ${femaleUsers} ${femaleLabel} / ${femaleTotalUsers}`;
+        updateChallengeUserLabel(menLabel, menText, winnerSide === 'male', 'after');
+        updateChallengeUserLabel(womenLabel, womenText, winnerSide === 'female', 'before');
       }
 
       const formatMEPs = (n) => Math.round(n).toLocaleString('fr-FR', { useGrouping: true, maximumFractionDigits: 0 });
-      maleBar.innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(maleMEPs)}</span> MEPs</strong>`;
-      femaleBar.innerHTML = `<strong><span class="challenge-meps-number">${formatMEPs(femaleMEPs)}</span> MEPs</strong>`;
+      updateChallengeMepsBar(maleBar, formatMEPs(maleMEPs));
+      updateChallengeMepsBar(femaleBar, formatMEPs(femaleMEPs));
 
       let iconUrl = '';
       if (maleMEPs > femaleMEPs) {
@@ -2026,8 +2083,11 @@
         iconUrl = 'https://mcusercontent.com/74abea872abd45d46efed5d41/images/d45bac30-41fd-6f61-ce4b-8f65a4f76fd2.png';
       }
 
-      dynamicIcon.innerHTML = `<img src="${iconUrl}" alt="">`;
-      dynamicIcon.style.left = `calc(${malePercentage}% + 3px)`;
+      updateChallengeDynamicIcon(dynamicIcon, iconUrl, malePercentage);
+
+      if (!challengeBarsFrozen) {
+        setTimeout(freezeChallengeBarTransitions, 1300);
+      }
       return true;
     }
 
