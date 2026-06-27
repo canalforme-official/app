@@ -471,27 +471,19 @@
       padding: 0 0 10px;
       margin: 0;
       min-height: 1.2em;
-      /* Couche GPU dédiée : limite les repaints du bloc translucide parent sur Android WebView */
-      contain: layout style paint;
-      transform: translateZ(0);
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
+      line-height: 1.2;
     }
 
-    .countdown-idle,
-    .countdown-updating {
+    .countdown-label,
+    .countdown-time {
       display: inline;
     }
 
-    .countdown-updating[hidden] {
-      display: none;
-    }
-
     .countdown-time {
+      font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
       font-variant-numeric: tabular-nums;
-      display: inline-block;
-      min-width: 2.75em;
-      text-align: left;
+      letter-spacing: 0.02em;
+      min-width: 2.85em;
     }
 
     /* Overlay de chargement (masqué par défaut : évite un flash avant que JS n’applique SHOW_LOADING_OVERLAY) */
@@ -1619,10 +1611,7 @@
   <div class="container" id="currentMonthContainer">
     <div class="month-block current-month-block">
       <div id="countdown" class="countdown-in-block" aria-live="off">
-        <span id="countdownIdle" class="countdown-idle">
-          <span class="countdown-label">Prochaine mise à jour dans : </span><span id="countdownTime" class="countdown-time">05:00</span>
-        </span>
-        <span id="countdownUpdating" class="countdown-updating" hidden aria-live="polite">Mise à jour en cours.</span>
+        <span id="countdownLabel" class="countdown-label">Prochaine mise à jour dans : </span><span id="countdownTime" class="countdown-time">05:00</span>
       </div>
       <div id="currentMonthEmptyState" class="leaderboard-empty-state" style="display: none;" aria-live="polite">En attente du premier entraînement Myzone du mois</div>
       <div id="currentMonthLeaderboard"></div>
@@ -1705,13 +1694,11 @@
     let startY = 0;
     let isPulling = false;
     const pullThreshold = 120;
-    let timer = COUNTDOWN_SECONDS;
     let isFirstLoad = true;
     let isLeaderboardFetching = false;
+    let isCountdownUpdating = false;
     let countdownInterval;
-    let updatingDotsInterval = null;
     let updatingRetryTimeout = null;
-    const UPDATING_DOTS_MS = 400;
     const UPDATING_RETRY_MS = 5000;
     let previousData = {};
     /** Dernier classement du mois actuel (entre deux mises à jour JSON) : usrGUID -> position */
@@ -1723,17 +1710,11 @@
 
     const loadingOverlay = document.getElementById('loadingOverlay');
 
-    // Fonction pour redémarrer le compteur de rafraîchissement automatique
-    function resetCountdown() {
-      clearInterval(countdownInterval);
-      timer = COUNTDOWN_SECONDS;
-      countdownInterval = setInterval(() => {
-        timer--;
-        if (timer <= 0) {
-          refreshLeaderboard();
-          timer = COUNTDOWN_SECONDS;
-        }
-      }, 1000);
+    function setCountdownVisible(visible) {
+      const el = document.getElementById('countdown');
+      if (!el) return;
+      const next = visible ? 'block' : 'none';
+      if (el.style.display !== next) el.style.display = next;
     }
 
     // Détecte le début du tirage (uniquement en haut de page pour éviter les rechargements involontaires)
@@ -1892,8 +1873,8 @@
             stopUpdatingMessage();
             hideLoadingOverlay();
             isFirstLoad = false;
-          } else if (document.getElementById('countdownUpdating') && !document.getElementById('countdownUpdating').hidden) {
-            // Compte à rebours à 0 sans connexion : on garde "Mise à jour en cours..." et on réessaie dans 5 s
+          } else if (isCountdownUpdating) {
+            // Compte à rebours à 0 sans connexion : message fixe et nouvel essai dans 5 s
             updatingRetryTimeout = setTimeout(loadLeaderboard, UPDATING_RETRY_MS);
           }
         })
@@ -2148,40 +2129,31 @@
     }
 
     /**
-     * Affiche "Mise à jour en cours." avec animation des points (., .., ...) en boucle
+     * Affiche un message de mise à jour fixe (sans animation de points : provoque clignotement sur WebView Android).
      */
     function showUpdatingMessage() {
-      stopUpdatingMessage();
-      const countdownIdle = document.getElementById('countdownIdle');
-      const countdownUpdating = document.getElementById('countdownUpdating');
-      if (!countdownIdle || !countdownUpdating) return;
-      countdownIdle.hidden = true;
-      countdownUpdating.hidden = false;
-      const dots = ['.', '..', '...'];
-      let i = 0;
-      countdownUpdating.textContent = 'Mise à jour en cours' + dots[0];
-      updatingDotsInterval = setInterval(() => {
-        i = (i + 1) % 3;
-        countdownUpdating.textContent = 'Mise à jour en cours' + dots[i];
-      }, UPDATING_DOTS_MS);
-    }
-
-    /**
-     * Arrête le message "Mise à jour en cours" et l'animation des points
-     */
-    function stopUpdatingMessage() {
-      if (updatingDotsInterval) {
-        clearInterval(updatingDotsInterval);
-        updatingDotsInterval = null;
-      }
       if (updatingRetryTimeout) {
         clearTimeout(updatingRetryTimeout);
         updatingRetryTimeout = null;
       }
-      const countdownIdle = document.getElementById('countdownIdle');
-      const countdownUpdating = document.getElementById('countdownUpdating');
-      if (countdownIdle) countdownIdle.hidden = false;
-      if (countdownUpdating) countdownUpdating.hidden = true;
+      isCountdownUpdating = true;
+      const labelEl = document.getElementById('countdownLabel');
+      const timeEl = document.getElementById('countdownTime');
+      if (labelEl) labelEl.textContent = 'Mise à jour en cours…';
+      if (timeEl) timeEl.textContent = '';
+    }
+
+    /**
+     * Restaure le libellé du compte à rebours
+     */
+    function stopUpdatingMessage() {
+      if (updatingRetryTimeout) {
+        clearTimeout(updatingRetryTimeout);
+        updatingRetryTimeout = null;
+      }
+      isCountdownUpdating = false;
+      const labelEl = document.getElementById('countdownLabel');
+      if (labelEl) labelEl.textContent = 'Prochaine mise à jour dans : ';
     }
 
     /**
@@ -2191,39 +2163,33 @@
     function startCountdown(duration) {
       if (countdownInterval) {
         clearInterval(countdownInterval);
+        countdownInterval = null;
       }
       stopUpdatingMessage();
 
       let timer = duration;
       const countdownTimeEl = document.getElementById('countdownTime');
-      const countdownIdle = document.getElementById('countdownIdle');
-      const countdownUpdating = document.getElementById('countdownUpdating');
 
       function updateCountdown() {
-        let minutes = Math.floor(timer / 60);
-        let seconds = timer % 60;
+        const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+        const seconds = String(timer % 60).padStart(2, '0');
+        const nextTime = minutes + ':' + seconds;
 
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        if (countdownTimeEl) {
-          const nextTime = minutes + ":" + seconds;
-          if (countdownTimeEl.textContent !== nextTime) {
-            countdownTimeEl.textContent = nextTime;
-          }
+        if (countdownTimeEl && countdownTimeEl.textContent !== nextTime) {
+          countdownTimeEl.textContent = nextTime;
         }
 
         if (--timer < 0) {
           clearInterval(countdownInterval);
+          countdownInterval = null;
           showUpdatingMessage();
           if (!isLeaderboardFetching) {
             loadLeaderboard();
           }
+          return;
         }
       }
 
-      if (countdownIdle) countdownIdle.hidden = false;
-      if (countdownUpdating) countdownUpdating.hidden = true;
       updateCountdown();
       countdownInterval = setInterval(updateCountdown, 1000);
     }
@@ -2345,9 +2311,9 @@
           });
 
           if (SHOW_COUNTDOWN) {
-            document.getElementById('countdown').style.display = 'block';
+            setCountdownVisible(true);
           } else {
-            document.getElementById('countdown').style.display = 'none';
+            setCountdownVisible(false);
           }
         } else {
           // Aucun MEP encore : afficher le message d'attente
@@ -2357,9 +2323,9 @@
           document.getElementById('podiumWrapper').style.display = 'none';
           document.getElementById('podiumWrapper').innerHTML = '';
           if (SHOW_COUNTDOWN) {
-            document.getElementById('countdown').style.display = 'block';
+            setCountdownVisible(true);
           } else {
-            document.getElementById('countdown').style.display = 'none';
+            setCountdownVisible(false);
           }
         }
       } else {
