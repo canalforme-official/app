@@ -1453,6 +1453,10 @@
       const sidebar = document.getElementById('filtersSidebar');
       if (!sidebar) return;
       sidebar.classList.toggle('open');
+      const toggleBtn = document.getElementById('filterToggleButton');
+      if (toggleBtn) {
+        toggleBtn.setAttribute('aria-expanded', sidebar.classList.contains('open') ? 'true' : 'false');
+      }
     }
 
     document.addEventListener('click', function(event) {
@@ -1461,6 +1465,9 @@
       if (!sidebar || !sidebar.classList.contains('open')) return;
       if (!sidebar.contains(event.target) && filterButton && !filterButton.contains(event.target)) {
         sidebar.classList.remove('open');
+        if (filterButton.hasAttribute('aria-expanded')) {
+          filterButton.setAttribute('aria-expanded', 'false');
+        }
       }
     });
 

@@ -1036,183 +1036,161 @@
       will-change: transform, opacity;
     }
 
-    /* Bouton de filtre — ancré en bas à droite, ne bouge pas à l'ouverture */
+    /* Bouton filtre — calé dans la pastille (même repère que le fond glass) */
     .filters-sidebar .filter-button {
       position: absolute;
       right: 0;
       bottom: 0;
       top: auto;
+      left: auto;
       background: transparent;
       border: none;
       border-radius: 50%;
       width: 50px;
       height: 50px;
       min-width: 50px;
+      min-height: 50px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       outline: none;
-      transition: background 0.25s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      appearance: none;
+      -webkit-appearance: none;
+      transition: background 0.25s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       box-shadow: none;
       margin: 0;
       padding: 0;
-      z-index: 10072;
+      z-index: 2;
       pointer-events: all;
     }
 
+    .filters-sidebar:not(.open) .filter-button {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 25px;
+    }
+
     .filters-sidebar.open .filter-button {
+      position: relative;
+      inset: auto;
+      right: auto;
+      bottom: auto;
+      flex: 0 0 50px;
+      width: 50px;
+      height: 50px;
+      align-self: center;
       background: rgba(255, 255, 255, 0.45);
+      border-radius: 50%;
     }
 
     .filters-sidebar .filter-button:hover {
       background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.05);
     }
 
     .filters-sidebar.open .filter-button:hover {
       background: var(--primary-color);
-      transform: scale(1.05);
     }
 
-    .filters-sidebar.open .filter-button:hover .filter-icon::before,
-    .filters-sidebar.open .filter-button:hover .filter-icon::after,
-    .filters-sidebar.open .filter-button:hover .filter-icon span {
+    .filters-sidebar.open .filter-button:hover .filter-bar {
       background: white;
     }
 
     .filters-sidebar .filter-button:active {
-      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.35);
     }
 
+    .filters-sidebar.open .filter-button:active {
+      background: var(--primary-light);
+    }
+
+    /* Icône filtre — 3 barres égales, toujours centrées (même rendu fermé / ouvert) */
     .filter-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
       width: 24px;
       height: 24px;
-      position: relative;
+      flex-shrink: 0;
+      pointer-events: none;
+    }
+
+    .filter-bar {
       display: block;
-    }
-
-    /* Trois barres horizontales qui diminuent de taille */
-    .filter-icon::before {
-      content: '';
-      position: absolute;
-      top: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 18px;
+      width: 16px;
       height: 2.5px;
+      border-radius: 2px;
       background: var(--primary-color);
-      border-radius: 1px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
+      transition: background 0.2s ease;
     }
 
-    .filter-icon::after {
-      content: '';
-      position: absolute;
-      top: 11px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 14px;
-      height: 2.5px;
-      background: var(--primary-color);
-      border-radius: 1px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
-    }
-
-    /* Troisième barre (la plus petite) via un span dans le HTML */
-    .filter-icon span {
-      position: absolute;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 10px;
-      height: 2.5px;
-      background: var(--primary-color);
-      border-radius: 1px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: block;
-      z-index: 1;
-    }
-
-    .filter-button:hover .filter-icon::before,
-    .filter-button:hover .filter-icon::after,
-    .filter-button:hover .filter-icon span {
+    .filter-button:hover .filter-bar {
       background: white;
     }
 
-    /* Panneau fermé : forcer les barres en bordeaux (annule le :hover collant sur mobile au 2e clic) */
-    .filters-sidebar:not(.open) .filter-icon::before,
-    .filters-sidebar:not(.open) .filter-icon::after,
-    .filters-sidebar:not(.open) .filter-icon span {
+    /* Panneau fermé : annule le :hover collant sur mobile au 2e clic */
+    .filters-sidebar:not(.open) .filter-bar {
       background: var(--primary-color) !important;
     }
 
-    /* Barre de filtres qui part du bouton */
+    /* Barre de filtres — fermée = pastille 50×50, ouvert = s'étend vers la gauche */
     .filters-sidebar {
+      --filter-bar-bottom: 14px;
+      --filter-bar-right: 20px;
       position: fixed;
-      bottom: 14px;
-      right: 20px;
+      bottom: var(--filter-bar-bottom);
+      right: var(--filter-bar-right);
       width: 50px;
       height: 50px;
+      min-height: 50px;
       max-height: 50px;
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius: 25px;
       z-index: 10070;
-      transition:
-        width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-        max-height 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-        border-radius 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+      transition: width 0.45s cubic-bezier(0.32, 0.72, 0, 1);
       overflow: hidden;
       padding: 0;
       box-sizing: border-box;
-      display: flex;
-      align-items: flex-end;
-      justify-content: flex-end;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .filters-sidebar.open {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       width: calc(100% - 40px);
       height: auto;
       min-height: 50px;
-      max-height: 100px;
+      max-height: none;
       border-radius: 25px;
       overflow: visible;
-      align-items: flex-end;
     }
 
     .filters-sidebar-content {
-      display: flex;
+      display: none;
       flex-direction: row;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      flex: 1;
       min-width: 0;
-      height: 0;
-      min-height: 0;
-      padding: 0 56px 0 10px;
+      padding: 6px 0 6px 10px;
       white-space: normal;
       overflow: hidden;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease, padding 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+      box-sizing: border-box;
     }
 
     .filters-sidebar.open .filters-sidebar-content {
-      height: auto;
-      min-height: 50px;
-      padding: 8px 56px 2px 10px;
+      display: flex;
+      flex: 1;
       overflow: visible;
-      opacity: 1;
-      pointer-events: auto;
-      transition: opacity 0.35s ease 0.12s, padding 0.45s cubic-bezier(0.32, 0.72, 0, 1);
     }
 
     .filters-sidebar h2 {
@@ -1682,22 +1660,10 @@
       100% { transform: scale(1) translateZ(0); }
     }
 
-    /* Mobile : filtre un peu plus bas ; fermé = pastille, ouvert = 2 lignes fluides */
+    /* Mobile : filtre un peu plus bas ; fermé = pastille 50×50, ouvert = 2 lignes fluides */
     @media screen and (max-width: 768px) {
       .filters-sidebar {
-        bottom: max(6px, env(safe-area-inset-bottom, 0px));
-      }
-
-      .filters-sidebar:not(.open) {
-        height: 50px;
-        min-height: 50px;
-        max-height: 50px;
-      }
-
-      .filters-sidebar.open {
-        height: auto;
-        min-height: 50px;
-        max-height: 100px;
+        --filter-bar-bottom: max(6px, env(safe-area-inset-bottom, 0px));
       }
     }
 
@@ -2224,9 +2190,6 @@
 
   <!-- Barre de filtres en bas avec le bouton intégré -->
   <div class="filters-sidebar" id="filtersSidebar">
-    <button class="filter-button" onclick="toggleFiltersSidebar(event)">
-      <div class="filter-icon"><span></span></div>
-    </button>
     <div class="filters-sidebar-content">
       <div class="filters">
         <label>
@@ -2256,6 +2219,13 @@
         </div>
       </div>
     </div>
+    <button type="button" class="filter-button" id="filterToggleButton" aria-label="Filtres" aria-expanded="false" aria-controls="filtersSidebar" onclick="toggleFiltersSidebar(event)">
+      <span class="filter-icon" aria-hidden="true">
+        <span class="filter-bar"></span>
+        <span class="filter-bar"></span>
+        <span class="filter-bar"></span>
+      </span>
+    </button>
   </div>
 
   <script src="./planning-embedded.js"></script>
