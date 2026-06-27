@@ -1372,7 +1372,7 @@
       }
     }
 
-    /* Overlay de chargement */
+    /* Overlay de chargement (masqué par défaut : évite un flash avant que JS n’applique SHOW_LOADING_OVERLAY) */
     #loadingOverlay {
       position: fixed !important;
       top: 0 !important;
@@ -1383,7 +1383,7 @@
       height: 100vh !important;
       background-color: var(--primary-overlay) !important;
       z-index: 999999 !important;
-      display: flex;
+      display: none;
       overflow: hidden !important;
       pointer-events: all !important;
       opacity: 1 !important;
@@ -2374,7 +2374,7 @@
       transform: translateY(0);
     }
 
-    /* Styles pour l'overlay de chargement */
+    /* Styles pour l'overlay de chargement (masqué par défaut — cf. bloc plus haut) */
     #loadingOverlay {
       position: fixed !important;
       top: 0 !important;
@@ -2385,7 +2385,7 @@
       height: 100vh !important;
       background-color: var(--primary-overlay) !important;
       z-index: 999999 !important;
-      display: flex;
+      display: none;
       overflow: hidden !important;
       pointer-events: all !important;
       opacity: 1 !important;
@@ -2436,21 +2436,6 @@
       }
     }
 
-    /* Désactivation temporaire de l'overlay de chargement pour mobile uniquement */
-    @media screen and (max-width: 768px) {
-      #loadingOverlay {
-        display: none !important;
-      }
-      
-      body.loading {
-        opacity: 1 !important;
-      }
-      
-      .modal-center-container {
-        display: none !important;
-      }
-    }
-
     @media (min-width: 768px) {
       .loading-logo img {
         width: 100px;
@@ -2465,7 +2450,7 @@
 
   </style>
 </head>
-<body onload="initializePage();" class="loading">
+<body onload="initializePage();">
   <!-- Bloc de texte collant pour le nom du jour -->
   <div id="stickyDayName" class="sticky-day-name">
     <div class="sticky-left">
@@ -2537,8 +2522,8 @@
     <!-- Les cours seront injectés ici -->
   </div>
 
-  <!-- Overlay de chargement -->
-  <div id="loadingOverlay">
+  <!-- Overlay de chargement (display:none par défaut dans le CSS pour éviter le flash au 1er rendu) -->
+  <div id="loadingOverlay" hidden aria-hidden="true">
     <div class="modal-center-container">
       <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
     </div>
@@ -2557,6 +2542,13 @@
   <script src="./planning-resolve.js"></script>
   <script>
     var NAV_DAYS_LIMIT = 180;
+    /** Overlay au démarrage : false en app (?embedded=1) et sur mobile */
+    const SHOW_LOADING_OVERLAY = (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embedded') === '1') return false;
+      } catch (e) {}
+      return !(window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+    })();
     let allData = [];
     /** Date affichée (YYYY-MM-DD), navigation ±N jours autour d’aujourd’hui */
     var selectedDateYmd = '';
@@ -3085,11 +3077,19 @@
       const loadingOverlay = document.getElementById('loadingOverlay');
       const modalContainer = document.querySelector('.modal-center-container');
 
-      if (modalContainer) {
-        modalContainer.style.display = 'none';
-      }
+      document.body.classList.remove('loading');
 
-      loadingOverlay.classList.add('fade-out');
+      if (SHOW_LOADING_OVERLAY && loadingOverlay) {
+        if (modalContainer) {
+          modalContainer.style.display = 'none';
+        }
+        loadingOverlay.classList.add('fade-out');
+      } else if (loadingOverlay) {
+        loadingOverlay.classList.remove('fade-out');
+        loadingOverlay.style.display = 'none';
+        loadingOverlay.hidden = true;
+        loadingOverlay.setAttribute('aria-hidden', 'true');
+      }
 
       const isMobile = window.innerWidth <= 1024;
       const navigation = document.querySelector('.navigation');
@@ -3112,13 +3112,15 @@
         }
       }
 
-      document.body.classList.remove('loading');
-
       updateTodayButtonPosition();
 
-      setTimeout(() => {
-        loadingOverlay.style.display = 'none';
-      }, 300);
+      if (SHOW_LOADING_OVERLAY && loadingOverlay) {
+        setTimeout(() => {
+          loadingOverlay.style.display = 'none';
+          loadingOverlay.hidden = true;
+          loadingOverlay.setAttribute('aria-hidden', 'true');
+        }, 300);
+      }
     }
 
     async function fetchAllData() {
@@ -3941,17 +3943,28 @@
     }
 
     function initializePage() {
-      document.body.classList.add('loading');
-      
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (SHOW_LOADING_OVERLAY) {
+        document.body.classList.add('loading');
+        if (loadingOverlay) {
+          loadingOverlay.hidden = false;
+          loadingOverlay.removeAttribute('aria-hidden');
+          loadingOverlay.style.display = 'flex';
+          loadingOverlay.classList.remove('fade-out');
+        }
+      } else {
+        document.body.classList.remove('loading');
+        if (loadingOverlay) {
+          loadingOverlay.style.display = 'none';
+          loadingOverlay.hidden = true;
+          loadingOverlay.setAttribute('aria-hidden', 'true');
+        }
+      }
+
       const todayButton = document.getElementById('todayViewButton');
       if (todayButton) {
         todayButton.style.display = 'none';
         todayButton.classList.remove('visible');
-      }
-      
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      if (loadingOverlay) {
-        loadingOverlay.style.display = 'flex';
       }
 
       fetchAllData().then(() => {
