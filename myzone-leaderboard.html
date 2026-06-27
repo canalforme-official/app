@@ -470,11 +470,28 @@
       font-weight: 600;
       padding: 0 0 10px;
       margin: 0;
+      min-height: 1.2em;
+      /* Couche GPU dédiée : limite les repaints du bloc translucide parent sur Android WebView */
+      contain: layout style paint;
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
     }
 
-    /* État "Mise à jour en cours" */
-    .countdown-in-block.updating {
-      min-height: 1.2em;
+    .countdown-idle,
+    .countdown-updating {
+      display: inline;
+    }
+
+    .countdown-updating[hidden] {
+      display: none;
+    }
+
+    .countdown-time {
+      font-variant-numeric: tabular-nums;
+      display: inline-block;
+      min-width: 2.75em;
+      text-align: left;
     }
 
     /* Overlay de chargement (masqué par défaut : évite un flash avant que JS n’applique SHOW_LOADING_OVERLAY) */
@@ -573,15 +590,20 @@
         margin: 0 !important;
       }
 
-      /* Bloc classement même largeur que le bloc challenge homme/femme (98 %) */
+      /* Bloc classement aligné avec le bloc challenge homme/femme (98 %) */
       .container {
         width: 98%;
         max-width: 620px;
         margin-left: auto;
         margin-right: auto;
-        padding-left: 1%;
-        padding-right: 1%;
+        padding: 12px 0 20px;
         box-sizing: border-box;
+      }
+
+      .competition-container,
+      .competition-container--previous {
+        padding-left: 15px;
+        padding-right: 15px;
       }
 
       .month-block {
@@ -741,8 +763,7 @@
       margin: 0 auto;
       width: 98%;
       max-width: 620px;
-      padding: 18px 20px;
-      padding-top: 34px;
+      padding: 14px 20px 16px;
       border-radius: 16px;
       background: linear-gradient(180deg, rgba(var(--primary-rgb), 0.18) 0%, rgba(var(--primary-rgb), 0.08) 100%);
       box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.2);
@@ -762,7 +783,7 @@
     /* Mois précédent : barre MEPs + trophée en calque (hors flux, n’agence pas les pills ni la barre) */
     .previous-competition-bar-wrap {
       position: relative;
-      margin-top: 8px;
+      margin-top: 0;
       z-index: 1;
     }
 
@@ -1228,17 +1249,15 @@
       /* S'assurer qu'elle est au-dessus des autres éléments */
     }
 
-    /* On place .labels-container ABSOLUMENT dans .competition-container */
+    /* Challenge H/F : pills actifs juste au-dessus de la barre (1 px d’écart) */
     .labels-container {
-      position: absolute;
-      top: 10px;
-      /* Retour à la position d'origine */
-      left: 0;
-      right: 0;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 3px 15px;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 0;
+      margin: 0 0 1px;
+      line-height: 1;
     }
 
     .men-label,
@@ -1256,6 +1275,7 @@
       border-radius: 8px;
       border: 1px solid rgba(var(--primary-rgb), 0.2);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      margin: 0;
     }
 
     .men-label.winner,
@@ -1339,13 +1359,11 @@
     }
 
     .men-label {
-      left: 0px;
-      margin-left: 18px;
+      margin-left: 0;
     }
 
     .women-label {
-      right: 0;
-      margin-right: 5px;
+      margin-right: 0;
     }
 
     /* Barre de progression — fond neutre (pas de bande rouge derrière) */
@@ -1357,7 +1375,7 @@
       border-radius: 15px;
       overflow: hidden;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-      margin-top: 4px;
+      margin-top: 0;
     }
 
     /* Segments Homme/Femme — même dégradé rouge→bordeaux que le tableau */
@@ -1600,7 +1618,12 @@
   <!-- Section du mois actuel -->
   <div class="container" id="currentMonthContainer">
     <div class="month-block current-month-block">
-      <div id="countdown" class="countdown-in-block" aria-live="polite"></div>
+      <div id="countdown" class="countdown-in-block" aria-live="off">
+        <span id="countdownIdle" class="countdown-idle">
+          <span class="countdown-label">Prochaine mise à jour dans : </span><span id="countdownTime" class="countdown-time">05:00</span>
+        </span>
+        <span id="countdownUpdating" class="countdown-updating" hidden aria-live="polite">Mise à jour en cours.</span>
+      </div>
       <div id="currentMonthEmptyState" class="leaderboard-empty-state" style="display: none;" aria-live="polite">En attente du premier entraînement Myzone du mois</div>
       <div id="currentMonthLeaderboard"></div>
     </div>
@@ -1869,7 +1892,7 @@
             stopUpdatingMessage();
             hideLoadingOverlay();
             isFirstLoad = false;
-          } else if (document.getElementById('countdown').classList.contains('updating')) {
+          } else if (document.getElementById('countdownUpdating') && !document.getElementById('countdownUpdating').hidden) {
             // Compte à rebours à 0 sans connexion : on garde "Mise à jour en cours..." et on réessaie dans 5 s
             updatingRetryTimeout = setTimeout(loadLeaderboard, UPDATING_RETRY_MS);
           }
@@ -2129,15 +2152,17 @@
      */
     function showUpdatingMessage() {
       stopUpdatingMessage();
-      const countdownElement = document.getElementById('countdown');
-      if (!countdownElement) return;
-      countdownElement.classList.add('updating');
+      const countdownIdle = document.getElementById('countdownIdle');
+      const countdownUpdating = document.getElementById('countdownUpdating');
+      if (!countdownIdle || !countdownUpdating) return;
+      countdownIdle.hidden = true;
+      countdownUpdating.hidden = false;
       const dots = ['.', '..', '...'];
       let i = 0;
-      countdownElement.textContent = 'Mise à jour en cours' + dots[0];
+      countdownUpdating.textContent = 'Mise à jour en cours' + dots[0];
       updatingDotsInterval = setInterval(() => {
         i = (i + 1) % 3;
-        countdownElement.textContent = 'Mise à jour en cours' + dots[i];
+        countdownUpdating.textContent = 'Mise à jour en cours' + dots[i];
       }, UPDATING_DOTS_MS);
     }
 
@@ -2153,8 +2178,10 @@
         clearTimeout(updatingRetryTimeout);
         updatingRetryTimeout = null;
       }
-      const countdownElement = document.getElementById('countdown');
-      if (countdownElement) countdownElement.classList.remove('updating');
+      const countdownIdle = document.getElementById('countdownIdle');
+      const countdownUpdating = document.getElementById('countdownUpdating');
+      if (countdownIdle) countdownIdle.hidden = false;
+      if (countdownUpdating) countdownUpdating.hidden = true;
     }
 
     /**
@@ -2168,7 +2195,9 @@
       stopUpdatingMessage();
 
       let timer = duration;
-      const countdownElement = document.getElementById('countdown');
+      const countdownTimeEl = document.getElementById('countdownTime');
+      const countdownIdle = document.getElementById('countdownIdle');
+      const countdownUpdating = document.getElementById('countdownUpdating');
 
       function updateCountdown() {
         let minutes = Math.floor(timer / 60);
@@ -2177,7 +2206,12 @@
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        countdownElement.textContent = "Prochaine mise à jour dans : " + minutes + ":" + seconds;
+        if (countdownTimeEl) {
+          const nextTime = minutes + ":" + seconds;
+          if (countdownTimeEl.textContent !== nextTime) {
+            countdownTimeEl.textContent = nextTime;
+          }
+        }
 
         if (--timer < 0) {
           clearInterval(countdownInterval);
@@ -2188,6 +2222,8 @@
         }
       }
 
+      if (countdownIdle) countdownIdle.hidden = false;
+      if (countdownUpdating) countdownUpdating.hidden = true;
       updateCountdown();
       countdownInterval = setInterval(updateCountdown, 1000);
     }
