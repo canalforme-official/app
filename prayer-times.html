@@ -626,6 +626,7 @@
     </div>
   </div>
 
+  <script src="./webview-resume.js?v=1"></script>
   <script>
     const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const daysOfWeekShort = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -728,6 +729,10 @@
 
         loadingEl.style.display = 'none';
         tableEl.style.display = 'table';
+
+        if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
+          window.__canalFormeWebViewResume.markHealthy();
+        }
 
         // S'assurer que le thead sticky fonctionne correctement
         // Le problème était que border-collapse: collapse empêchait le sticky de fonctionner

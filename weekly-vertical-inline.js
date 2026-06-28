@@ -800,6 +800,10 @@
         window.addEventListener('resize', handleResize);
         handleResize();
 
+        if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
+          window.__canalFormeWebViewResume.markHealthy();
+        }
+
         document.addEventListener('click', function(e) {
           var a = e.target.closest && e.target.closest('a[href*="prayer-times"]');
           if (!a || !a.getAttribute('href')) return;

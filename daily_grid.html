@@ -1645,6 +1645,7 @@
   </div>
 
   <script src="./planning-embedded.js"></script>
+  <script src="./webview-resume.js?v=1"></script>
   <script src="./planning-resolve.js"></script>
   <script>
     (function() {
@@ -2679,6 +2680,9 @@
         }
         syncDailyGridDateInUrl();
         displayGridSchedule();
+        if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
+          window.__canalFormeWebViewResume.markHealthy();
+        }
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         document.body.setAttribute('data-daily-grid-ready', 'error');

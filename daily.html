@@ -2539,6 +2539,7 @@
   </div>
 
   <script src="./planning-embedded.js"></script>
+  <script src="./webview-resume.js?v=1"></script>
   <script src="./planning-resolve.js"></script>
   <script>
     var NAV_DAYS_LIMIT = 180;
@@ -3120,6 +3121,10 @@
           loadingOverlay.hidden = true;
           loadingOverlay.setAttribute('aria-hidden', 'true');
         }, 300);
+      }
+
+      if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
+        window.__canalFormeWebViewResume.markHealthy();
       }
     }
 
