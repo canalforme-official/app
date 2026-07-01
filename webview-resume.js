@@ -124,6 +124,10 @@
         loadAndDisplayCourses();
         return true;
       }
+      if (file === 'daily_matrix.html' && typeof loadAndDisplay === 'function') {
+        loadAndDisplay();
+        return true;
+      }
       if (file === 'prayer-times.html' && typeof loadPrayerTimes === 'function') {
         loadPrayerTimes();
         return true;
