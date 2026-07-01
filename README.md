@@ -37,7 +37,8 @@ Une réorganisation future du dossier (sous‑dossiers `planning/`, etc.) reste 
 | Fichier | Rôle |
 |--------|------|
 | `daily.html` | Planning **quotidien** (timeline). Thèmes Ramadan / férié / été ; charge `planning-tokens.css` ; données `./planning-v2.json` ou dépôt `app-data`. |
-| `daily_grid.html` | Variante **grille** du jour. Idem tokens + fetch planning / horaires de prière. |
+| `daily_grid.html` | Variante **grille** du jour (studios en colonnes indépendantes). Idem tokens + fetch planning / horaires de prière. |
+| `daily_matrix.html` | Variante **matrice** du jour (heures en lignes, studios en colonnes, fond bordeaux). Même données et thèmes que `daily_grid.html`. |
 | `weekly.html` | Planning **hebdomadaire** (tableau). `planning-tokens.css`, `planning-resolve.js`, `weekly-vertical-inline.js`. |
 | `weekly_vertical.html` | Hebdo **vertical** (scroll jours). Mêmes scripts partagés. |
 | `weekly_vertical_fulldays.html` | Variante vertical **tous les jours** visibles. Mêmes scripts partagés. |

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="fr" data-keep-screenshot-bg="1">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning du jour — vue matrice</title>
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="planning-tokens.css">
+  <link rel="stylesheet" href="planning-embedded.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    :root {
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      --primary-color: #480607;
+      --secondary-color: #FFA630;
+      --red-center: #e42218;
+      --red-middle: #981010;
+      --bordeaux-dark: #4c000a;
+      --bordeaux-deep: #2a0006;
+      --gradient-primary: radial-gradient(circle, var(--red-center) 0%, var(--red-middle) 50%, var(--bordeaux-dark) 100%);
+      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #7a1018 0%, var(--bordeaux-dark) 45%, var(--bordeaux-deep) 100%);
+      --pool-blue: #35767c;
+      --women-light: #ddace7;
+      --women-middle: #9e6187;
+      --text-light: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.55);
+      --grid-line: rgba(255, 255, 255, 0.12);
+      --grid-line-light: rgba(72, 6, 7, 0.1);
+      --grid-bg: #F5F5F5;
+      --background-card: #FFFFFF;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --matrix-hours-width: 40px;
+    }
+
+    body.planning-ramadan {
+      --primary-color: var(--planning-ramadan-primary);
+      --secondary-color: var(--planning-ramadan-secondary);
+      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #3d6b47 0%, #26462d 50%, #1a2e20 100%);
+    }
+    body.planning-ferie {
+      --primary-color: var(--planning-ferie-primary);
+      --secondary-color: var(--planning-ferie-secondary);
+      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #2a7ab8 0%, #1e5a8a 50%, #123d5c 100%);
+    }
+    body.planning-ete {
+      --primary-color: var(--planning-ete-primary, #b8860b);
+      --secondary-color: var(--planning-ete-secondary, #ffc107);
+      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #c49200 0%, #8a6200 50%, #4a3300 100%);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100dvh;
+      max-height: 100dvh;
+      min-height: 100dvh;
+      font-family: var(--font-text);
+      color: var(--text-light);
+      background: var(--gradient-bg);
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 58px;
+      -webkit-user-select: none;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    .dm-bg-pattern {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.04;
+      background-image: var(--planning-pattern-mosaic-url, none);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+    }
+
+    .navigation {
+      position: fixed;
+      top: 50%;
+      left: 4px;
+      right: 4px;
+      transform: translateY(-50%);
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .navigation.loaded { pointer-events: none; }
+    body:not(.puppeteer-view) .navigation { pointer-events: none; }
+
+    .nav-button {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: all;
+    }
+    .nav-button:disabled { visibility: hidden; pointer-events: none; }
+    .nav-segments { position: relative; width: 20px; height: 20px; }
+    .segment { position: absolute; background: var(--primary-color); border-radius: 1px; }
+    .prev-button .segment-1 { width: 14px; height: 3px; top: 8px; right: 2px; transform: rotate(45deg); transform-origin: left center; }
+    .prev-button .segment-2 { width: 14px; height: 3px; top: 10px; right: 2px; transform: rotate(-45deg); transform-origin: left center; }
+    .next-button .segment-1 { width: 14px; height: 3px; top: 8px; left: 2px; transform: rotate(-45deg); transform-origin: right center; }
+    .next-button .segment-2 { width: 14px; height: 3px; top: 10px; left: 2px; transform: rotate(45deg); transform-origin: right center; }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 6px 10px;
+      padding: 10px 14px 8px;
+      border-bottom: none;
+      flex-shrink: 0;
+    }
+
+    .top-bar-left {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .planning-type-label {
+      font-family: var(--font-title);
+      font-size: 0.78em;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.92);
+      line-height: 1.2;
+    }
+
+    .opening-hours-bar {
+      font-family: var(--font-title);
+      font-size: 0.72em;
+      letter-spacing: 0.04em;
+      color: var(--secondary-color);
+      line-height: 1.25;
+      margin-top: 2px;
+    }
+    .opening-hours-bar:empty { display: none; }
+    .opening-hours-bar .oh-inner--compact {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .opening-hours-bar .oh-label {
+      color: rgba(255, 255, 255, 0.65);
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: 0.92em;
+      margin-right: 2px;
+    }
+    .opening-hours-bar .oh-chip-times {
+      display: inline-flex;
+      align-items: baseline;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    .opening-hours-bar .oh-sep { opacity: 0.55; padding: 0 2px; }
+    .opening-hours-bar .oh-sep-slot {
+      display: inline-block;
+      width: 2px;
+      height: 0.95em;
+      margin: 0 6px;
+      background: rgba(255, 255, 255, 0.35);
+      vertical-align: middle;
+    }
+
+    .top-bar-center {
+      text-align: center;
+      min-width: 0;
+    }
+
+    .day-name {
+      font-family: var(--font-title);
+      font-size: clamp(1.25rem, 3.5vw, 2rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .date-str {
+      font-family: var(--font-title);
+      font-size: clamp(0.72rem, 1.8vw, 0.95rem);
+      color: var(--secondary-color);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .top-bar-right {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .tip-line {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-title);
+      font-size: 0.62em;
+      color: rgba(255, 255, 255, 0.82);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.25;
+      text-align: right;
+    }
+    .tip-line svg { flex-shrink: 0; opacity: 0.9; color: var(--secondary-color); }
+
+    .matrix-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      padding: 10px 4px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #matrixContainer {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+
+    table.daily-matrix {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      min-width: 0;
+    }
+
+    .daily-matrix th,
+    .daily-matrix td {
+      border-bottom: 1px solid var(--grid-line-light);
+      border-right: 1px solid var(--grid-line-light);
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 1px;
+    }
+    .daily-matrix tbody td {
+      height: var(--matrix-row-min-h, auto);
+    }
+    .daily-matrix thead th {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .daily-matrix tbody td.cell-studio {
+      background: var(--grid-bg);
+    }
+    .daily-matrix th:last-child,
+    .daily-matrix td:last-child { border-right: none; }
+
+    .daily-matrix thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: rgba(42, 0, 6, 0.92);
+      backdrop-filter: blur(6px);
+      padding: 5px 2px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+      vertical-align: middle;
+    }
+    .daily-matrix thead th.col-hours-corner {
+      background: transparent;
+      backdrop-filter: none;
+      border-bottom-color: transparent;
+      border-right-color: transparent;
+    }
+    body.planning-ramadan .daily-matrix thead th { background: rgba(26, 46, 32, 0.92); }
+    body.planning-ramadan .daily-matrix thead th.col-hours-corner { background: transparent; }
+    body.planning-ferie .daily-matrix thead th { background: rgba(18, 61, 92, 0.92); }
+    body.planning-ferie .daily-matrix thead th.col-hours-corner { background: transparent; }
+    body.planning-ete .daily-matrix thead th { background: rgba(74, 51, 0, 0.92); }
+    body.planning-ete .daily-matrix thead th.col-hours-corner { background: transparent; }
+
+    .col-hours-corner,
+    .cell-time {
+      width: var(--matrix-hours-width);
+      min-width: var(--matrix-hours-width);
+      max-width: var(--matrix-hours-width);
+      font-family: var(--font-title);
+      font-size: 0.72em;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      color: rgba(255, 255, 255, 0.9);
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: rgba(42, 0, 6, 0.85);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    .col-hours-corner {
+      z-index: 4;
+      padding: 0;
+      background: transparent !important;
+      border-color: transparent !important;
+    }
+    .cell-time {
+      vertical-align: middle;
+      font-size: 0.76em;
+    }
+
+    .studio-th-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .studio-th-icon {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: brightness(0) invert(1);
+      opacity: 0.92;
+    }
+
+    .studio-th-name {
+      font-family: var(--font-title);
+      font-size: clamp(0.66em, 1.5vw, 0.84em);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.1;
+      color: rgba(255, 255, 255, 0.95);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    body.planning-ramadan .cell-time { background: rgba(26, 46, 32, 0.85); }
+    body.planning-ferie .cell-time { background: rgba(18, 61, 92, 0.85); }
+    body.planning-ete .cell-time { background: rgba(74, 51, 0, 0.85); }
+
+    .cell-empty {
+      color: rgba(72, 6, 7, 0.22);
+      font-size: 0.8em;
+      line-height: 1;
+    }
+
+    td.cell-studio {
+      vertical-align: middle;
+    }
+
+    .matrix-cell-course {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 1px 2px;
+      width: 100%;
+      line-height: 1.1;
+    }
+
+    .matrix-cell-course + .matrix-cell-course {
+      margin-top: 2px;
+      padding-top: 2px;
+      border-top: 1px dashed rgba(72, 6, 7, 0.1);
+    }
+
+    .matrix-course-logo {
+      width: auto;
+      max-width: 86%;
+      height: auto;
+      max-height: calc(var(--matrix-row-min-h, 34px) * 0.36);
+      object-fit: contain;
+      object-position: center center;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .matrix-course-name {
+      font-family: var(--font-title);
+      font-size: clamp(0.6em, 1.22vw, 0.74em);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-transform: uppercase;
+      word-break: break-word;
+      color: var(--primary-color);
+      padding: 0 2px;
+      text-align: center;
+    }
+
+    .matrix-course-coach {
+      font-family: var(--font-text);
+      font-size: clamp(0.58em, 1.15vw, 0.72em);
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.1;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 2px;
+      text-align: center;
+    }
+
+    .matrix-cell-course.has-logo .matrix-course-name { display: none; }
+    .matrix-cell-course.has-logo.logo-failed .matrix-course-name { display: block; }
+
+    td.cell-studio.cell-current {
+      background: var(--secondary-color);
+    }
+
+    td.cell-studio.cell-starting-soon {
+      box-shadow: inset 0 0 0 2px var(--secondary-color);
+    }
+
+    .matrix-cell-course.current,
+    .matrix-cell-course.starting-soon {
+      background: transparent;
+      border-radius: 0;
+      outline: none;
+      box-shadow: none;
+    }
+    .matrix-cell-course.past { opacity: 0.45; }
+
+    .status-panel {
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 480px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      line-height: 1.5;
+    }
+    .status-panel strong {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 1.2em;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+    .status-panel p { margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 0.95em; }
+
+    .coaches-section {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(42, 0, 6, 0.96);
+      z-index: 100;
+      height: 58px;
+      display: flex;
+      overflow-x: auto;
+      gap: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 6px 16px 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    body.planning-ramadan .coaches-section { background: rgba(26, 46, 32, 0.96); }
+    body.planning-ferie .coaches-section { background: rgba(18, 61, 92, 0.96); }
+    body.planning-ete .coaches-section { background: rgba(74, 51, 0, 0.96); }
+
+    .coach-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-width: fit-content;
+    }
+
+    .coach-image {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: var(--background-card);
+    }
+
+    .coach-image.coach-avatar-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      object-fit: unset;
+      background: linear-gradient(145deg, #c9cbd4 0%, #9698a3 48%, #b0b2bb 100%);
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.97);
+      line-height: 1;
+      user-select: none;
+    }
+
+    .coach-image.coach-avatar-placeholder--double {
+      font-size: 0.76rem;
+    }
+
+    .coach-name {
+      font-family: var(--font-text);
+      font-size: 0.65em;
+      white-space: nowrap;
+      color: var(--text-light);
+      font-style: italic;
+      line-height: 1;
+      text-align: center;
+    }
+
+    body.puppeteer-view .navigation { display: none !important; }
+    body.puppeteer-view .matrix-scroll { overflow: hidden; }
+    body.puppeteer-view table.daily-matrix { min-width: 0; width: 100%; }
+
+    @media (max-width: 640px) {
+      body { padding-bottom: 52px; }
+      .top-bar { padding: 8px 10px 6px; gap: 4px 6px; }
+      .top-bar-right .tip-line { font-size: 0.48em; gap: 3px; }
+      .planning-type-label { font-size: 0.62em; }
+      .opening-hours-bar { font-size: 0.58em; }
+      :root { --matrix-hours-width: 34px; }
+      .studio-th-icon { width: 24px; height: 24px; }
+      .studio-th-name { font-size: 0.58em; }
+      .studio-th-inner { gap: 4px; }
+      .cell-time { font-size: 0.68em; }
+      .matrix-scroll { padding: 8px 2px 10px; }
+      .matrix-course-name { font-size: 0.78em; }
+      .matrix-course-coach { font-size: 0.72em; }
+      .coaches-section { height: 52px; gap: 12px; padding: 5px 10px 6px; }
+      .coach-image { width: 24px; height: 24px; }
+      .coach-name { font-size: 0.58em; }
+      .nav-button { width: 40px; height: 40px; }
+    }
+
+    @media (min-width: 1920px) {
+      .studio-th-name { font-size: 0.92em; }
+      .studio-th-icon { width: 34px; height: 34px; }
+      .matrix-course-name { font-size: 0.78em; }
+      .matrix-course-coach { font-size: 0.76em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dm-bg-pattern" aria-hidden="true"></div>
+
+  <div class="navigation">
+    <button id="prevDay" type="button" onclick="changeDay(-1)" class="nav-button prev-button" aria-label="Jour précédent">
+      <div class="nav-segments"><div class="segment segment-1"></div><div class="segment segment-2"></div></div>
+    </button>
+    <button id="nextDay" type="button" onclick="changeDay(1)" class="nav-button next-button" aria-label="Jour suivant">
+      <div class="nav-segments"><div class="segment segment-1"></div><div class="segment segment-2"></div></div>
+    </button>
+  </div>
+
+  <div class="page-shell">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <span class="planning-type-label" id="planningTypeLabel"></span>
+        <div class="opening-hours-bar" id="openingHoursBar" aria-live="polite" aria-label="Horaires d'ouverture du club"></div>
+      </div>
+      <div class="top-bar-center">
+        <h1 class="day-name" id="dayName"></h1>
+        <div class="date-str" id="dateStr"></div>
+      </div>
+      <div class="top-bar-right">
+        <div class="tip-line">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Arrivez 10 min avant le cours
+        </div>
+        <div class="tip-line">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 14h16M6 18h12M8 6h8l1 8H7l1-8z"/></svg>
+          Serviette obligatoire
+        </div>
+      </div>
+    </header>
+
+    <div class="matrix-scroll" id="matrixScroll">
+      <div id="matrixContainer"></div>
+    </div>
+  </div>
+
+  <div class="coaches-section" id="coachesSection"></div>
+
+  <script src="./planning-embedded.js"></script>
+  <script src="./webview-resume.js?v=1"></script>
+  <script src="./planning-resolve.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    var PR = window.PlanningResolve;
+    var allData = null;
+    var selectedDateYmd = '';
+    var NAV_DAYS_LIMIT = 180;
+
+    function ymdFromDate(d) { return PR.ymdFromDate(d); }
+    function clampNavYmd(ymd) { return PR.clampNavYmd(ymd); }
+    function addDaysToYmd(ymd, d) { return PR.addDaysToYmd(ymd, d); }
+    function escapeHtml(t) { return PR.escapeHtml(t); }
+
+    function formatDateFrShort(ymd) {
+      return PR.parseYmdLocal(ymd).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    }
+
+    function formatDateFrUpper(ymd) {
+      var d = PR.parseYmdLocal(ymd);
+      var months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
+      return d.getDate() + ' ' + months[d.getMonth()];
+    }
+
+    function formatOpeningHoursCompactHtml(h, maghribTime) {
+      if (!h) return '';
+      function range(openT, closeT) {
+        return '<span class="oh-chip-times"><span class="oh-time">' + escapeHtml(openT) + '</span><span class="oh-sep">–</span><span class="oh-time">' + escapeHtml(closeT) + '</span></span>';
+      }
+      var ranges = [];
+      if (h.open1 && h.close1) ranges.push(range(h.open1, h.close1));
+      if (h.open2 && h.close2) ranges.push(range(h.open2, h.close2));
+      if (!ranges.length) return '';
+      var sep = '<span class="oh-sep-slot" aria-hidden="true"></span>';
+      if (maghribTime && String(maghribTime).trim()) {
+        sep = '<span class="oh-sep-slot" aria-hidden="true"></span><span class="oh-chip-times"><span class="oh-time">' + escapeHtml(String(maghribTime).trim()) + '</span></span>';
+      }
+      return '<div class="oh-inner oh-inner--compact"><span class="oh-label">Ouvert</span>' + ranges.join(sep) + '</div>';
+    }
+
+    function renderOpeningHoursBar(rvBase) {
+      var bar = document.getElementById('openingHoursBar');
+      if (!bar) return;
+      if (!rvBase || rvBase.closed || !allData) {
+        bar.innerHTML = '';
+        return;
+      }
+      var slot = PR.pickOpeningHoursForDate(selectedDateYmd, allData, rvBase.planningKey, rvBase.dayName);
+      var maghrib = '';
+      if (rvBase.planningKey === 'ramadan' && window.prayerTimesData && window.prayerTimesData.prayerTimes) {
+        var pt = window.prayerTimesData.prayerTimes[selectedDateYmd];
+        if (pt && pt.maghrib) maghrib = pt.maghrib;
+      }
+      bar.innerHTML = formatOpeningHoursCompactHtml(slot, maghrib);
+    }
+
+    function sortStudios(studios) {
+      return (studios || []).slice().sort(function(a, b) {
+        var rankA = a.rank !== undefined ? a.rank : (a.rang !== undefined ? a.rang : 0);
+        var rankB = b.rank !== undefined ? b.rank : (b.rang !== undefined ? b.rang : 0);
+        return rankA - rankB;
+      });
+    }
+
+    function buildScheduleMap(courses) {
+      var map = {};
+      (courses || []).forEach(function(course) {
+        var t = course.startTime;
+        if (!t) return;
+        if (!map[t]) map[t] = {};
+        var sid = course.studioId || '';
+        if (!map[t][sid]) map[t][sid] = [];
+        map[t][sid].push(course);
+      });
+      return map;
+    }
+
+    function coachNamesForCourse(course, coachList) {
+      var coaches = (course.coachIds || []).map(function(id) {
+        return coachList.find(function(c) { return c && c.id === id; });
+      }).filter(Boolean);
+      if (!coaches.length) return '–';
+      if (coaches.length === 1) return PR.coachDisplayName(coaches[0]) || coaches[0].name || '–';
+      if (coaches.length === 2) {
+        return (PR.coachDisplayName(coaches[0]) || coaches[0].name || '') + ', ' +
+          (PR.coachDisplayName(coaches[1]) || coaches[1].name || '');
+      }
+      return (PR.coachDisplayName(coaches[0]) || coaches[0].name || '') + ', ' +
+        (PR.coachDisplayName(coaches[1]) || coaches[1].name || '') + '…';
+    }
+
+    function computeEndTime(startTimeStr, endTimeStr) {
+      if (endTimeStr) return endTimeStr;
+      if (!startTimeStr) return '';
+      var parts = startTimeStr.split(':');
+      var h = parseInt(parts[0], 10) || 0;
+      var m = (parseInt(parts[1], 10) || 0) + 60;
+      h += Math.floor(m / 60);
+      m = m % 60;
+      return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    }
+
+    function renderCourseCellHtml(course, coachList) {
+      var cd = PR.courseDisplayFromCoursId(course.coursId, allData.cours);
+      var name = ((cd && cd.name) ? cd.name : '').toUpperCase();
+      var logo = cd && cd.logo ? String(cd.logo).trim() : '';
+      var coachText = coachNamesForCourse(course, coachList);
+      var start = course.startTime || '';
+      var end = computeEndTime(start, course.endTime || '');
+      var extraClass = course.isPlanningEventCourse ? ' matrix-cell-course--event' : '';
+      var hasLogo = !!logo;
+      var logoHtml = hasLogo
+        ? '<img class="matrix-course-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(name) + '" loading="lazy" onerror="var c=this.closest(\'.matrix-cell-course\');if(c){c.classList.add(\'logo-failed\');}this.remove();">'
+        : '';
+      var nameHtml = '<div class="matrix-course-name">' + escapeHtml(name) + '</div>';
+      var coachHtml = '<div class="matrix-course-coach">' + escapeHtml(coachText) + '</div>';
+      return '<div class="matrix-cell-course' + (hasLogo ? ' has-logo' : '') + extraClass + '" data-start-time="' + escapeHtml(start) + '" data-end-time="' + escapeHtml(end) + '">' +
+        logoHtml + nameHtml + coachHtml + '</div>';
+    }
+
+    function statusPanelHtml(title, body) {
+      return '<div class="status-panel" role="status"><strong>' + escapeHtml(title) + '</strong><p>' + body + '</p></div>';
+    }
+
+    function displayClosedMessage(rv) {
+      var title = selectedDateYmd === ymdFromDate(new Date()) ? 'Club fermé aujourd\u2019hui' : 'Club fermé';
+      if (rv.periodName) title += ' — ' + rv.periodName;
+      return statusPanelHtml(title, 'Aucun cours prévu pour cette journée.');
+    }
+
+    function displayIndetermineMessage(rv) {
+      var title = rv.planningKey === 'ete' ? 'Planning estival à déterminer' : 'Planning à déterminer';
+      var sub = rv.periodName ? escapeHtml(rv.periodName) + '<br>' : '';
+      return statusPanelHtml(title, sub + 'Un planning sera publié prochainement.');
+    }
+
+    function updatePlanningTypeLabel(rvBase, rvMerged) {
+      var label = document.getElementById('planningTypeLabel');
+      if (!label) return;
+      var hor = allData && allData.metadata && allData.metadata.horaires ? allData.metadata.horaires : null;
+      var rv = rvBase;
+      var text = 'Planning';
+      if (rv.closed) {
+        text = rv.periodName ? ('Fermé — ' + rv.periodName) : 'Club fermé';
+      } else if (rv.planningKey === 'ferie') {
+        text = rv.periodName ? ('Jour férié — ' + rv.periodName) : 'Jour férié';
+      } else if (rv.planningKey === 'ramadan') {
+        var lr = hor && hor.ramadan && hor.ramadan.planningLabel;
+        text = (lr && String(lr).trim()) ? String(lr).trim() : 'Planning Ramadan';
+      } else if (rv.planningKey === 'ete') {
+        var le = hor && hor.ete && hor.ete.planningLabel;
+        text = (le && String(le).trim()) ? String(le).trim() : 'Planning été';
+      } else {
+        var lreg = hor && hor.regulier && hor.regulier.planningLabel;
+        text = (lreg && String(lreg).trim()) ? String(lreg).trim() : 'Planning régulier';
+      }
+      if (rvMerged && rvMerged.planningEventLabels && rvMerged.planningEventLabels.length) {
+        text += ' — ' + rvMerged.planningEventLabels.join(' · ');
+      }
+      label.textContent = text;
+    }
+
+    function dailyMatrixCoachPlaceholderClass(initials) {
+      return 'coach-image coach-avatar-placeholder' + (String(initials).length >= 2 ? ' coach-avatar-placeholder--double' : '');
+    }
+
+    function renderCoachesSection(courses) {
+      var section = document.getElementById('coachesSection');
+      if (!section) return;
+      section.innerHTML = '';
+      var uniqueIds = [];
+      (courses || []).forEach(function(c) {
+        (c.coachIds || []).forEach(function(id) {
+          if (id != null && uniqueIds.indexOf(id) === -1) uniqueIds.push(id);
+        });
+      });
+      var coachList = allData.coachs || [];
+      uniqueIds.forEach(function(coachId) {
+        var coach = coachList.find(function(c) { return c && c.id === coachId; });
+        if (!coach) return;
+        var card = document.createElement('div');
+        card.className = 'coach-card';
+        var disp = PR.coachDisplayName(coach);
+        var initials = PR.coachInitialsFromDisplayName(disp);
+        var url = PR.coachPhotoUrl(coach);
+        if (url) {
+          var img = document.createElement('img');
+          img.className = 'coach-image';
+          img.src = url;
+          img.alt = disp;
+          img.onerror = function() {
+            var ph = document.createElement('div');
+            ph.className = dailyMatrixCoachPlaceholderClass(initials);
+            ph.setAttribute('role', 'img');
+            ph.setAttribute('aria-label', disp);
+            ph.textContent = initials;
+            img.replaceWith(ph);
+          };
+          card.appendChild(img);
+        } else {
+          var ph2 = document.createElement('div');
+          ph2.className = dailyMatrixCoachPlaceholderClass(initials);
+          ph2.setAttribute('role', 'img');
+          ph2.setAttribute('aria-label', disp);
+          ph2.textContent = initials;
+          card.appendChild(ph2);
+        }
+        var nm = document.createElement('div');
+        nm.className = 'coach-name coach-name-bidi';
+        nm.dir = 'auto';
+        nm.textContent = disp;
+        card.appendChild(nm);
+        section.appendChild(card);
+      });
+    }
+
+    function renderMatrixTable(studios, courses) {
+      var schedule = buildScheduleMap(courses);
+      var times = Object.keys(schedule).sort();
+      var coachList = allData.coachs || [];
+      var colCount = studios.length;
+
+      var html = '<table class="daily-matrix"><colgroup>';
+      html += '<col class="col-hours">';
+      for (var c = 0; c < colCount; c++) html += '<col class="col-studio">';
+      html += '</colgroup><thead><tr><th class="col-hours-corner" aria-hidden="true"></th>';
+
+      studios.forEach(function(studio) {
+        html += '<th><div class="studio-th-inner">';
+        if (studio.imageUrl) {
+          html += '<img class="studio-th-icon" src="' + escapeHtml(studio.imageUrl) + '" alt="" onerror="this.style.display=\'none\'">';
+        }
+        html += '<span class="studio-th-name">' + escapeHtml(studio.name || '') + '</span></div></th>';
+      });
+      html += '</tr></thead><tbody>';
+
+      if (!times.length) {
+        html += '<tr><td colspan="' + (colCount + 1) + '" class="status-panel" style="border:none;">Aucun créneau ce jour.</td></tr>';
+      } else {
+        times.forEach(function(time) {
+          html += '<tr><td class="cell-time">' + escapeHtml(time) + '</td>';
+          studios.forEach(function(studio) {
+            var cellCourses = (schedule[time] && schedule[time][studio.id]) ? schedule[time][studio.id] : [];
+            html += '<td class="cell-studio">';
+            if (!cellCourses.length) {
+              html += '<span class="cell-empty" aria-hidden="true">—</span>';
+            } else {
+              cellCourses.forEach(function(course) {
+                html += renderCourseCellHtml(course, coachList);
+              });
+            }
+            html += '</td>';
+          });
+          html += '</tr>';
+        });
+      }
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function fitMatrixLayout() {
+      var container = document.getElementById('matrixContainer');
+      var scroll = document.getElementById('matrixScroll');
+      var table = container && container.querySelector('table.daily-matrix');
+      if (!table || !scroll) return;
+
+      table.style.transform = '';
+      container.style.height = '';
+
+      var rows = table.querySelectorAll('tbody tr');
+      var n = rows.length;
+      if (!n) {
+        document.documentElement.style.removeProperty('--matrix-row-min-h');
+        return;
+      }
+
+      var thead = table.querySelector('thead');
+      var theadH = thead ? thead.offsetHeight : 0;
+      var avail = scroll.clientHeight;
+      if (avail <= 0) return;
+
+      var rowH = Math.max(30, Math.floor((avail - theadH) / n));
+      document.documentElement.style.setProperty('--matrix-row-min-h', rowH + 'px');
+      document.documentElement.style.setProperty('--matrix-row-count', String(n));
+
+      requestAnimationFrame(function() {
+        var totalH = table.offsetHeight;
+        if (totalH > avail + 1) {
+          var scale = avail / totalH;
+          table.style.transform = 'scale(' + scale + ')';
+          table.style.transformOrigin = 'top center';
+          container.style.height = Math.ceil(totalH * scale) + 'px';
+        }
+      });
+    }
+
+    function syncDateInUrl() {
+      try {
+        if (!selectedDateYmd || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDateYmd)) return;
+        var url = new URL(window.location.href);
+        url.searchParams.set('date', selectedDateYmd);
+        history.replaceState({}, '', url);
+      } catch (e) {}
+    }
+
+    function updateNavButtonsState() {
+      var today = ymdFromDate(new Date());
+      var min = addDaysToYmd(today, -NAV_DAYS_LIMIT);
+      var max = addDaysToYmd(today, NAV_DAYS_LIMIT);
+      var prev = document.getElementById('prevDay');
+      var next = document.getElementById('nextDay');
+      if (prev) prev.disabled = selectedDateYmd <= min;
+      if (next) next.disabled = selectedDateYmd >= max;
+    }
+
+    function displayMatrixSchedule() {
+      if (!allData) return;
+      if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
+
+      var dayIndex = PR.parseYmdLocal(selectedDateYmd).getDay();
+      var dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      var dayNameEl = document.getElementById('dayName');
+      var dateStrEl = document.getElementById('dateStr');
+      if (dayNameEl) dayNameEl.textContent = dayNames[dayIndex];
+      if (dateStrEl) dateStrEl.textContent = formatDateFrUpper(selectedDateYmd);
+
+      var rvBase = PR.resolveDailyView(selectedDateYmd, allData);
+      var rv = PR.mergeResolvedViewForDate
+        ? PR.mergeResolvedViewForDate(selectedDateYmd, allData)
+        : PR.applyPlanningEventsToResolvedView(selectedDateYmd, rvBase, allData);
+
+      document.body.classList.toggle('planning-ramadan', rvBase.planningKey === 'ramadan');
+      document.body.classList.toggle('planning-ferie', rvBase.planningKey === 'ferie' || rvBase.planningKey === 'ferme');
+      document.body.classList.toggle('planning-ete', rvBase.planningKey === 'ete');
+
+      updatePlanningTypeLabel(rvBase, rv);
+      renderOpeningHoursBar(rvBase);
+      if (rvBase.planningKey === 'ramadan' && (!window.prayerTimesData || !window.prayerTimesData.prayerTimes)) {
+        loadPrayerTimes().then(function() { renderOpeningHoursBar(rvBase); });
+      }
+      updateNavButtonsState();
+
+      var container = document.getElementById('matrixContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (rvBase.closed) {
+        container.innerHTML = displayClosedMessage(rvBase);
+        renderCoachesSection([]);
+        renderOpeningHoursBar(rvBase);
+        document.body.setAttribute('data-daily-matrix-ready', 'true');
+        return;
+      }
+      if (rv.indetermine) {
+        container.innerHTML = displayIndetermineMessage(rvBase);
+        renderCoachesSection([]);
+        document.body.setAttribute('data-daily-matrix-ready', 'true');
+        return;
+      }
+
+      var courses = rv.courses || [];
+      var studios = sortStudios(allData.studios);
+      if (!studios.length) {
+        container.innerHTML = statusPanelHtml('Configuration', 'Aucun studio configuré.');
+        renderCoachesSection([]);
+        document.body.setAttribute('data-daily-matrix-ready', 'true');
+        return;
+      }
+
+      container.innerHTML = renderMatrixTable(studios, courses);
+      renderCoachesSection(courses);
+      updateCourseCellsState();
+
+      if (PR.fillPlanningEventConfetti) {
+        PR.fillPlanningEventConfetti(container, { variant: 'compact' });
+      }
+
+      fitMatrixLayout();
+      document.body.setAttribute('data-daily-matrix-ready', 'true');
+    }
+
+    function updateCourseCellsState() {
+      var todayStr = ymdFromDate(new Date());
+      var displayedStr = selectedDateYmd || todayStr;
+      var isToday = todayStr === displayedStr;
+      var isPastDay = displayedStr < todayStr;
+      var isFutureDay = displayedStr > todayStr;
+      var now = new Date();
+      var currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+      document.querySelectorAll('td.cell-studio').forEach(function(td) {
+        td.classList.remove('cell-current', 'cell-starting-soon');
+      });
+
+      document.querySelectorAll('.matrix-cell-course').forEach(function(cell) {
+        var startStr = cell.getAttribute('data-start-time');
+        var endStr = cell.getAttribute('data-end-time');
+        var td = cell.closest('td.cell-studio');
+        if (!startStr) return;
+        var sp = startStr.split(':');
+        var startSec = ((parseInt(sp[0], 10) || 0) * 60 + (parseInt(sp[1], 10) || 0)) * 60;
+        var endMin = (parseInt(sp[0], 10) || 0) * 60 + (parseInt(sp[1], 10) || 0) + 60;
+        if (endStr) {
+          var ep = endStr.split(':');
+          endMin = (parseInt(ep[0], 10) || 0) * 60 + (parseInt(ep[1], 10) || 0);
+        }
+        var endSec = endMin * 60;
+        cell.classList.remove('past', 'current', 'starting-soon');
+
+        if (isPastDay) {
+          cell.classList.add('past');
+          return;
+        }
+        if (isFutureDay) return;
+
+        var diff = startSec - currentSeconds;
+        if (isToday && diff > 0 && diff <= 15 * 60) {
+          cell.classList.add('starting-soon');
+          if (td) td.classList.add('cell-starting-soon');
+        } else if (isToday && diff <= 0 && currentSeconds < endSec) {
+          cell.classList.add('current');
+          if (td) td.classList.add('cell-current');
+        } else if (isToday && currentSeconds >= endSec) {
+          cell.classList.add('past');
+        }
+      });
+    }
+
+    function isAutomatedBrowser() {
+      var isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isRealMobile && 'ontouchstart' in window) return false;
+      return navigator.webdriver === true ||
+        (navigator.userAgent.indexOf('HeadlessChrome') !== -1 && !isRealMobile);
+    }
+
+    function updateButtonVisibility() {
+      var isAutomated = isAutomatedBrowser();
+      document.body.classList.toggle('puppeteer-view', isAutomated);
+      var nav = document.querySelector('.navigation');
+      if (nav && !isAutomated) nav.classList.add('loaded');
+    }
+
+    async function loadPrayerTimes() {
+      if (!allData || !allData.metadata) return;
+      var rs = allData.metadata.ramadanStart;
+      var re = allData.metadata.ramadanEnd;
+      if (!rs || !re) return;
+      var today = ymdFromDate(new Date());
+      var sel = selectedDateYmd || today;
+      if ((today < rs || today > re) && (sel < rs || sel > re)) return;
+      if (window.prayerTimesData && window.prayerTimesData.prayerTimes) return;
+      try {
+        var resp = await fetch('./prayer-times.json');
+        if (!resp.ok) throw new Error('local');
+        window.prayerTimesData = await resp.json();
+      } catch (e) {
+        try {
+          var r2 = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+          if (r2.ok) window.prayerTimesData = await r2.json();
+        } catch (e2) {}
+      }
+    }
+
+    async function loadAndDisplay() {
+      try {
+        var data = null;
+        try {
+          var local = await fetch('./planning-v2.json');
+          if (local.ok) data = await local.json();
+          else throw new Error('local');
+        } catch (e) {
+          var remote = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
+          if (!remote.ok) throw new Error('HTTP ' + remote.status);
+          data = await remote.json();
+        }
+        allData = data;
+        if (!selectedDateYmd || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDateYmd)) {
+          selectedDateYmd = ymdFromDate(new Date());
+          try {
+            var dp = new URLSearchParams(window.location.search).get('date');
+            if (dp && /^\d{4}-\d{2}-\d{2}$/.test(dp)) selectedDateYmd = clampNavYmd(dp);
+          } catch (e2) {}
+        }
+        syncDateInUrl();
+        await loadPrayerTimes();
+        displayMatrixSchedule();
+        updateButtonVisibility();
+        if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
+          window.__canalFormeWebViewResume.markHealthy();
+        }
+      } catch (err) {
+        document.body.setAttribute('data-daily-matrix-ready', 'error');
+        var c = document.getElementById('matrixContainer');
+        if (c) c.innerHTML = statusPanelHtml('Erreur', escapeHtml(err.message || String(err)));
+      }
+    }
+
+    window.changeDay = function(direction) {
+      if (!selectedDateYmd) selectedDateYmd = ymdFromDate(new Date());
+      var next = addDaysToYmd(selectedDateYmd, direction);
+      var clamped = clampNavYmd(next);
+      if (clamped !== next) return;
+      selectedDateYmd = clamped;
+      syncDateInUrl();
+      displayMatrixSchedule();
+    };
+
+    (function seedHeader() {
+      var d = new Date();
+      var names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      var dn = document.getElementById('dayName');
+      var ds = document.getElementById('dateStr');
+      if (dn) dn.textContent = names[d.getDay()];
+      if (ds) ds.textContent = formatDateFrUpper(ymdFromDate(d));
+    })();
+
+    function init() {
+      loadAndDisplay();
+      setTimeout(updateButtonVisibility, 100);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    window.addEventListener('load', function() {
+      updateButtonVisibility();
+      fitMatrixLayout();
+    });
+    window.addEventListener('resize', function() {
+      updateButtonVisibility();
+      fitMatrixLayout();
+    });
+    setInterval(loadAndDisplay, 60000);
+    setInterval(updateCourseCellsState, 1000);
+  })();
+  </script>
+</body>
+</html>
