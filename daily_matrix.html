@@ -537,7 +537,12 @@
       text-align: center;
     }
 
-    body.puppeteer-view .navigation { display: none !important; }
+    body.puppeteer-view .navigation,
+    html.puppeteer-view .navigation {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
     body.puppeteer-view .matrix-scroll { overflow: hidden; }
     body.puppeteer-view table.daily-matrix { min-width: 0; width: 100%; }
 
@@ -570,6 +575,26 @@
   </style>
 </head>
 <body>
+  <script>
+  (function () {
+    function isAutomatedBrowserEarly() {
+      try {
+        var q = new URLSearchParams(window.location.search);
+        if (q.get('puppeteer') === '1' || q.get('screenshot') === '1') return true;
+      } catch (e) {}
+      var isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isRealMobile && 'ontouchstart' in window) return false;
+      return navigator.webdriver === true ||
+        window.navigator.webdriver === true ||
+        (navigator.platform === 'Linux x86_64' && navigator.userAgent.indexOf('HeadlessChrome') !== -1) ||
+        (navigator.userAgent.indexOf('HeadlessChrome') !== -1 && !isRealMobile);
+    }
+    if (isAutomatedBrowserEarly()) {
+      document.documentElement.classList.add('puppeteer-view');
+      document.body.classList.add('puppeteer-view');
+    }
+  })();
+  </script>
   <div class="dm-bg-pattern" aria-hidden="true"></div>
 
   <div class="navigation">
@@ -1042,17 +1067,35 @@
     }
 
     function isAutomatedBrowser() {
+      try {
+        var q = new URLSearchParams(window.location.search);
+        if (q.get('puppeteer') === '1' || q.get('screenshot') === '1') return true;
+      } catch (e) {}
       var isRealMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       if (isRealMobile && 'ontouchstart' in window) return false;
       return navigator.webdriver === true ||
+        window.navigator.webdriver === true ||
+        (navigator.platform === 'Linux x86_64' && navigator.userAgent.indexOf('HeadlessChrome') !== -1) ||
         (navigator.userAgent.indexOf('HeadlessChrome') !== -1 && !isRealMobile);
     }
 
     function updateButtonVisibility() {
       var isAutomated = isAutomatedBrowser();
+      document.documentElement.classList.toggle('puppeteer-view', isAutomated);
       document.body.classList.toggle('puppeteer-view', isAutomated);
       var nav = document.querySelector('.navigation');
-      if (nav && !isAutomated) nav.classList.add('loaded');
+      if (!nav) return;
+      if (isAutomated) {
+        nav.style.display = 'none';
+        nav.style.opacity = '0';
+        nav.style.pointerEvents = 'none';
+        nav.classList.remove('loaded');
+      } else {
+        nav.style.display = '';
+        nav.style.opacity = '';
+        nav.style.pointerEvents = '';
+        nav.classList.add('loaded');
+      }
     }
 
     async function loadPrayerTimes() {
