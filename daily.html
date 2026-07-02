@@ -3593,7 +3593,9 @@
         }).join('');
 
         var hasEvLabel = course.eventLabel && String(course.eventLabel).trim();
-        var peClass = course.isPlanningEventCourse ? ' course-block--planning-event' : '';
+        var peClass = window.PlanningResolve && window.PlanningResolve.planningEventThemeClasses
+          ? window.PlanningResolve.planningEventThemeClasses(course, 'block')
+          : (course.isPlanningEventCourse ? ' course-block--planning-event' : '');
         peClass += hasEvLabel ? ' course-block--has-event-label' : '';
         var eventLabelHtml = hasEvLabel
           ? '<div class="course-event-label">' + escapeHtml(String(course.eventLabel).trim()) + '</div>'

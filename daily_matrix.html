@@ -935,7 +935,9 @@
       var coachText = coachNamesForCourse(course, coachList);
       var start = course.startTime || '';
       var end = computeEndTime(start, course.endTime || '');
-      var extraClass = course.isPlanningEventCourse ? ' matrix-cell-course--event' : '';
+      var extraClass = PR.planningEventThemeClasses
+        ? PR.planningEventThemeClasses(course, 'matrix')
+        : (course.isPlanningEventCourse ? ' matrix-cell-course--event' : '');
       var hasLogo = !!logo;
       var logoHtml = hasLogo
         ? '<img class="matrix-course-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(name) + '" loading="lazy" onerror="var c=this.closest(\'.matrix-cell-course\');if(c){c.classList.add(\'logo-failed\');}this.remove();">'

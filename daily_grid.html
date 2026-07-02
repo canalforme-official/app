@@ -2555,8 +2555,9 @@
                 endTimeStr = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
               }
               var courseCard = document.createElement('div');
-              courseCard.className = 'course-card';
-              if (course.isPlanningEventCourse) courseCard.classList.add('course-card--planning-event');
+              courseCard.className = 'course-card' + (window.PlanningResolve && window.PlanningResolve.planningEventThemeClasses
+                ? window.PlanningResolve.planningEventThemeClasses(course, 'card')
+                : (course.isPlanningEventCourse ? ' course-card--planning-event' : ''));
               courseCard.setAttribute('data-start-time', startTimeStr);
               courseCard.setAttribute('data-end-time', endTimeStr);
               var courseType = (course.type || '').toString().toLowerCase();

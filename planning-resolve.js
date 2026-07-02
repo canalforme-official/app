@@ -284,6 +284,7 @@
           if (Object.prototype.hasOwnProperty.call(bc, k)) merged[k] = bc[k];
         }
         merged.isPlanningEventCourse = true;
+        merged.planningEventTheme = block.eventTheme || 'regulier';
         if (block.label && String(block.label).trim()) {
           merged.eventLabel = String(block.label).trim();
         }
@@ -561,7 +562,95 @@
   }
 
   /**
-   * Particules confetti sur les blocs cours événement (daily / grid / weekly).
+   * Thème visuel événement : regulier (confettis) | maroc (étoiles).
+   * @param {*} theme
+   * @returns {'regulier'|'maroc'}
+   */
+  function normalizePlanningEventTheme(theme) {
+    return String(theme || '').trim().toLowerCase() === 'maroc' ? 'maroc' : 'regulier';
+  }
+
+  /**
+   * Classes CSS pour un bloc/carte/cellule cours événement.
+   * @param {Object} course
+   * @param {'block'|'card'|'matrix'} kind
+   * @returns {string}
+   */
+  function planningEventThemeClasses(course, kind) {
+    if (!course || !course.isPlanningEventCourse) return '';
+    var theme = normalizePlanningEventTheme(course.planningEventTheme);
+    if (kind === 'card') {
+      return ' course-card--planning-event course-card--planning-event-' + theme;
+    }
+    if (kind === 'matrix') {
+      return ' matrix-cell-course--event matrix-cell-course--event-' + theme;
+    }
+    return ' course-block--planning-event course-block--planning-event-' + theme;
+  }
+
+  function planningEventThemeFromElement(block) {
+    if (!block || !block.classList) return 'regulier';
+    if (
+      block.classList.contains('course-block--planning-event-maroc') ||
+      block.classList.contains('course-card--planning-event-maroc') ||
+      block.classList.contains('matrix-cell-course--event-maroc')
+    ) {
+      return 'maroc';
+    }
+    return 'regulier';
+  }
+
+  function fillPlanningEventConfettiPieces(fx, variant) {
+    var n = variant === 'daily' ? 32 : 16;
+    var colors = ['#e8b4a0', '#c9a8e8', '#7ec8e3', '#f5d08a', '#9dd5b8', '#f0a8c8', '#c4b5fd', '#fcd34d', '#fb7185', '#a3e635', '#f472b6', '#38bdf8'];
+    var i;
+    for (i = 0; i < n; i++) {
+      var s = document.createElement('span');
+      if (variant === 'daily') {
+        var mod = i % 3;
+        s.className =
+          'planning-event-fx__piece planning-event-fx__piece--daily' +
+          (mod === 0 ? ' planning-event-fx__piece--daily-pop' : mod === 1 ? ' planning-event-fx__piece--daily-fall' : ' planning-event-fx__piece--daily-wobble');
+        s.style.setProperty('--px-drift', (Math.random() * 28 - 14).toFixed(1) + 'px');
+        s.style.left = (2 + Math.random() * 96) + '%';
+        if (mod === 1) {
+          s.style.top = (Math.random() * 22) + '%';
+        } else if (mod === 0) {
+          s.style.top = (35 + Math.random() * 50) + '%';
+        } else {
+          s.style.top = (15 + Math.random() * 65) + '%';
+        }
+        s.style.animationDuration = (3.2 + Math.random() * 1.8).toFixed(2) + 's';
+      } else {
+        s.className = 'planning-event-fx__piece' + (i % 3 === 0 ? ' planning-event-fx__piece--wave' : (i % 3 === 1 ? ' planning-event-fx__piece--drift' : ''));
+        s.style.left = (2 + Math.random() * 96) + '%';
+        s.style.top = (2 + Math.random() * 92) + '%';
+      }
+      s.style.background = colors[i % colors.length];
+      s.style.animationDelay = (i * 0.05 + Math.random() * 0.35) + 's';
+      s.style.setProperty('--pe-rot', (Math.random() * 360 | 0) + 'deg');
+      fx.appendChild(s);
+    }
+  }
+
+  function fillPlanningEventMarocStars(fx, variant) {
+    var n = variant === 'daily' ? 22 : 12;
+    var i;
+    for (i = 0; i < n; i++) {
+      var s = document.createElement('span');
+      s.className = 'planning-event-fx__star' + (variant === 'daily' ? ' planning-event-fx__star--daily' : '');
+      s.textContent = '★';
+      s.style.left = (2 + Math.random() * 92) + '%';
+      s.style.top = (4 + Math.random() * 88) + '%';
+      s.style.fontSize = (variant === 'daily' ? 10 + Math.random() * 8 : 7 + Math.random() * 6).toFixed(1) + 'px';
+      s.style.animationDelay = (i * 0.08 + Math.random() * 0.4) + 's';
+      s.style.setProperty('--pe-star-rot', (Math.random() * 40 - 20 | 0) + 'deg');
+      fx.appendChild(s);
+    }
+  }
+
+  /**
+   * Particules confetti sur les blocs cours événement (daily / grid / weekly / matrix).
    * @param {HTMLElement|Document} root
    * @param {Object} [options]
    * @param {string} [options.variant] 'daily' = particules plus grosses et plus nombreuses (timeline) ; 'compact' = moins nombreuses (grille, hebdo)
@@ -570,41 +659,21 @@
     if (!root || !root.querySelectorAll) return;
     options = options || {};
     var variant = options.variant === 'daily' ? 'daily' : 'compact';
-    var n = variant === 'daily' ? 32 : 16;
-    var sel = '.course-block--planning-event, .course-card--planning-event';
+    var sel =
+      '.course-block--planning-event, .course-card--planning-event, .matrix-cell-course--event';
     root.querySelectorAll(sel).forEach(function(block) {
       if (block.querySelector('.planning-event-fx')) return;
+      var theme = planningEventThemeFromElement(block);
       var fx = document.createElement('div');
-      fx.className = 'planning-event-fx' + (variant === 'daily' ? ' planning-event-fx--daily' : '');
+      fx.className =
+        'planning-event-fx planning-event-fx--' +
+        theme +
+        (variant === 'daily' ? ' planning-event-fx--daily' : '');
       fx.setAttribute('aria-hidden', 'true');
-      var colors = ['#e8b4a0', '#c9a8e8', '#7ec8e3', '#f5d08a', '#9dd5b8', '#f0a8c8', '#c4b5fd', '#fcd34d', '#fb7185', '#a3e635', '#f472b6', '#38bdf8'];
-      var i;
-      for (i = 0; i < n; i++) {
-        var s = document.createElement('span');
-        if (variant === 'daily') {
-          var mod = i % 3;
-          s.className =
-            'planning-event-fx__piece planning-event-fx__piece--daily' +
-            (mod === 0 ? ' planning-event-fx__piece--daily-pop' : mod === 1 ? ' planning-event-fx__piece--daily-fall' : ' planning-event-fx__piece--daily-wobble');
-          s.style.setProperty('--px-drift', (Math.random() * 28 - 14).toFixed(1) + 'px');
-          s.style.left = (2 + Math.random() * 96) + '%';
-          if (mod === 1) {
-            s.style.top = (Math.random() * 22) + '%';
-          } else if (mod === 0) {
-            s.style.top = (35 + Math.random() * 50) + '%';
-          } else {
-            s.style.top = (15 + Math.random() * 65) + '%';
-          }
-          s.style.animationDuration = (3.2 + Math.random() * 1.8).toFixed(2) + 's';
-        } else {
-          s.className = 'planning-event-fx__piece' + (i % 3 === 0 ? ' planning-event-fx__piece--wave' : (i % 3 === 1 ? ' planning-event-fx__piece--drift' : ''));
-          s.style.left = (2 + Math.random() * 96) + '%';
-          s.style.top = (2 + Math.random() * 92) + '%';
-        }
-        s.style.background = colors[i % colors.length];
-        s.style.animationDelay = (i * 0.05 + Math.random() * 0.35) + 's';
-        s.style.setProperty('--pe-rot', (Math.random() * 360 | 0) + 'deg');
-        fx.appendChild(s);
+      if (theme === 'maroc') {
+        fillPlanningEventMarocStars(fx, variant);
+      } else {
+        fillPlanningEventConfettiPieces(fx, variant);
       }
       block.insertBefore(fx, block.firstChild);
     });
@@ -701,6 +770,8 @@
     coachDisplayName: coachDisplayName,
     coachInitialsFromDisplayName: coachInitialsFromDisplayName,
     wirePlanningImgTextFallbacks: wirePlanningImgTextFallbacks,
+    normalizePlanningEventTheme: normalizePlanningEventTheme,
+    planningEventThemeClasses: planningEventThemeClasses,
     fillPlanningEventConfetti: fillPlanningEventConfetti
   };
 

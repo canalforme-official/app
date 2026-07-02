@@ -246,6 +246,7 @@
             duration: course.duration,
             type: course.type,
             isPlanningEventCourse: !!course.isPlanningEventCourse,
+            planningEventTheme: course.planningEventTheme || 'regulier',
             coachs: coachsInfo.map(function(coach) {
               var nm = coach ? coach.name : 'Coach inconnu';
               var disp = coach && PR.coachDisplayName ? PR.coachDisplayName(coach) : nm;
@@ -485,7 +486,11 @@
               if (isPastCourse) courseClasses += ' past';
               else if (isStartingSoon) courseClasses += ' starting-soon';
               else if (isInProgress) courseClasses += ' current';
-              if (course.isPlanningEventCourse) courseClasses += ' course-block--planning-event';
+              if (course.isPlanningEventCourse) {
+                courseClasses += PR.planningEventThemeClasses
+                  ? PR.planningEventThemeClasses(course, 'block')
+                  : ' course-block--planning-event';
+              }
 
               courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
               if (isStartingSoon) {
