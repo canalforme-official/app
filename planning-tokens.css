@@ -234,12 +234,19 @@
 
 .planning-event-fx__star {
   position: absolute;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #006233;
   pointer-events: none;
   will-change: transform, opacity, filter;
   animation: planning-event-star-twinkle 2.8s ease-in-out infinite;
-  text-shadow: 0 0 4px rgba(193, 39, 45, 0.55);
+}
+
+.planning-event-fx__star-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .planning-event-fx__star--daily {

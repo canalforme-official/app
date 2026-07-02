@@ -633,16 +633,27 @@
     }
   }
 
+  /**
+   * Pentagramme marocain (étoile ouverte entrelacée : 5 branches continues qui se croisent).
+   * Sommets d’un pentagone régulier, reliés 0→2→4→1→3→0 — géométrie du drapeau MA.
+   */
+  var MAROC_STAR_SVG =
+    '<svg class="planning-event-fx__star-svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' +
+    '<path fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" ' +
+    'd="M16 3 L23.6 26.5 L3.7 12 L28.4 12 L8.4 26.5 Z"/>' +
+    '</svg>';
+
   function fillPlanningEventMarocStars(fx, variant) {
-    var n = variant === 'daily' ? 22 : 12;
+    var n = Math.round((variant === 'daily' ? 22 : 12) * 0.9);
     var i;
     for (i = 0; i < n; i++) {
       var s = document.createElement('span');
       s.className = 'planning-event-fx__star' + (variant === 'daily' ? ' planning-event-fx__star--daily' : '');
-      s.textContent = '★';
+      s.innerHTML = MAROC_STAR_SVG;
       s.style.left = (2 + Math.random() * 92) + '%';
       s.style.top = (4 + Math.random() * 88) + '%';
-      s.style.fontSize = (variant === 'daily' ? 10 + Math.random() * 8 : 7 + Math.random() * 6).toFixed(1) + 'px';
+      s.style.width = (variant === 'daily' ? 10 + Math.random() * 8 : 7 + Math.random() * 6).toFixed(1) + 'px';
+      s.style.height = s.style.width;
       s.style.animationDelay = (i * 0.08 + Math.random() * 0.4) + 's';
       s.style.setProperty('--pe-star-rot', (Math.random() * 40 - 20 | 0) + 'deg');
       fx.appendChild(s);
