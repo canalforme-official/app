@@ -738,7 +738,15 @@
     @media (max-width: 640px) {
       body { padding-bottom: 52px; }
       .top-bar { padding: 12px 10px 10px; gap: 4px 6px; }
-      .top-bar-right .tip-line { font-size: 0.48em; gap: 3px; }
+      .top-bar-right .tip-line {
+        font-size: 0.48em;
+        gap: 3px;
+        align-items: flex-start;
+      }
+      .top-bar-right .tip-line svg {
+        margin-top: 0.12em;
+        flex-shrink: 0;
+      }
       .planning-type-label { font-size: 0.62em; }
       .opening-hours-bar { font-size: 0.58em; }
       :root { --matrix-hours-width: 34px; }
@@ -750,13 +758,15 @@
       .tagline-bar { font-size: 0.52em; padding: 8px 8px 14px; }
       .matrix-course-name { font-size: 0.78em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-name,
-      .matrix-cell-course.has-logo.logo-failed .matrix-course-name { font-size: 0.72em; }
+      .matrix-cell-course.has-logo.logo-failed .matrix-course-name { font-size: 0.61em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-coach { font-size: 0.68em; }
       .coaches-section { height: 52px; gap: 12px; padding: 5px 10px 6px; }
       .today-view-button { bottom: calc(52px + 8px); width: 48px; height: 48px; }
       .today-view-button::before { width: 48px; height: 48px; }
-      .coach-image { width: 24px; height: 24px; }
-      .coach-name { font-size: 0.58em; }
+      .coach-image { width: 21.6px; height: 21.6px; }
+      .coach-image.coach-avatar-placeholder { font-size: 0.945rem; }
+      .coach-image.coach-avatar-placeholder--double { font-size: 0.684rem; }
+      .coach-name { font-size: 0.52em; }
     }
 
     @media (min-width: 1920px) {
@@ -1123,6 +1133,9 @@
       if (avail <= 0) return;
 
       var rowH = Math.max(30, Math.floor((avail - theadH) / n));
+      if (window.matchMedia('(max-width: 640px)').matches) {
+        rowH = Math.max(28, rowH - 2);
+      }
       document.documentElement.style.setProperty('--matrix-row-min-h', rowH + 'px');
       document.documentElement.style.setProperty('--matrix-row-count', String(n));
 

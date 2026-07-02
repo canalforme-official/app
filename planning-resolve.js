@@ -644,7 +644,7 @@
     '</svg>';
 
   function fillPlanningEventMarocStars(fx, variant) {
-    var n = Math.round((variant === 'daily' ? 22 : 12) * 0.9);
+    var n = Math.round((variant === 'daily' ? 22 : 12) * 0.81);
     var i;
     for (i = 0; i < n; i++) {
       var s = document.createElement('span');
