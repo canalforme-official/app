@@ -30,6 +30,10 @@
       --grid-line: rgba(255, 255, 255, 0.12);
       --grid-line-light: rgba(72, 6, 7, 0.1);
       --grid-bg: #F5F5F5;
+      --matrix-cell-bg: rgba(245, 245, 245, 0.88);
+      --matrix-cell-radius: 8px;
+      --matrix-col-gap: 2px;
+      --matrix-row-gap: 1px;
       --background-card: #FFFFFF;
       --text-primary: #333333;
       --text-secondary: #666666;
@@ -213,7 +217,7 @@
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
       gap: 6px 10px;
-      padding: 10px 14px 8px;
+      padding: 14px 14px 12px;
       border-bottom: none;
       flex-shrink: 0;
     }
@@ -323,7 +327,7 @@
       flex: 1;
       min-height: 0;
       overflow: hidden;
-      padding: 10px 10px 8px;
+      padding: 14px 10px 12px;
       display: flex;
       flex-direction: column;
     }
@@ -339,15 +343,16 @@
 
     table.daily-matrix {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: var(--matrix-col-gap) var(--matrix-row-gap);
       table-layout: fixed;
       min-width: 0;
+      background: transparent;
     }
 
     .daily-matrix th,
     .daily-matrix td {
-      border-bottom: 1px solid var(--grid-line-light);
-      border-right: 1px solid var(--grid-line-light);
+      border: none;
       vertical-align: middle;
       text-align: center;
       padding: 0 1px;
@@ -356,13 +361,12 @@
       height: var(--matrix-row-min-h, auto);
     }
     .daily-matrix thead th {
-      border-color: rgba(255, 255, 255, 0.12);
+      border: none;
     }
     .daily-matrix tbody td.cell-studio {
-      background: var(--grid-bg);
+      background: var(--matrix-cell-bg);
+      border-radius: var(--matrix-cell-radius);
     }
-    .daily-matrix th:last-child,
-    .daily-matrix td:last-child { border-right: none; }
 
     .daily-matrix thead th {
       position: sticky;
@@ -370,9 +374,9 @@
       z-index: 3;
       background: rgba(42, 0, 6, 0.92);
       backdrop-filter: blur(6px);
-      padding: 5px 2px;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 2px;
       vertical-align: middle;
+      border-radius: var(--matrix-cell-radius);
     }
     .daily-matrix thead th.col-hours-corner {
       background: transparent;
@@ -412,6 +416,7 @@
     .cell-time {
       vertical-align: middle;
       font-size: 0.76em;
+      border-radius: 6px;
     }
 
     .studio-th-inner {
@@ -556,7 +561,7 @@
 
     .tagline-bar {
       text-align: center;
-      padding: 6px 10px 14px;
+      padding: 10px 10px 16px;
       font-family: var(--font-title);
       font-size: 0.62em;
       letter-spacing: 0.1em;
@@ -723,7 +728,7 @@
 
     @media (max-width: 640px) {
       body { padding-bottom: 52px; }
-      .top-bar { padding: 8px 10px 6px; gap: 4px 6px; }
+      .top-bar { padding: 12px 10px 10px; gap: 4px 6px; }
       .top-bar-right .tip-line { font-size: 0.48em; gap: 3px; }
       .planning-type-label { font-size: 0.62em; }
       .opening-hours-bar { font-size: 0.58em; }
@@ -732,8 +737,8 @@
       .studio-th-name { font-size: 0.58em; }
       .studio-th-inner { gap: 4px; }
       .cell-time { font-size: 0.68em; }
-      .matrix-scroll { padding: 8px 8px 6px; }
-      .tagline-bar { font-size: 0.52em; padding: 4px 8px 12px; }
+      .matrix-scroll { padding: 12px 8px 10px; }
+      .tagline-bar { font-size: 0.52em; padding: 8px 8px 14px; }
       .matrix-course-name { font-size: 0.78em; }
       .matrix-course-coach { font-size: 0.72em; }
       .coaches-section { height: 52px; gap: 12px; padding: 5px 10px 6px; }
