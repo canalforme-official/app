@@ -1083,7 +1083,9 @@
       background: var(--primary-color);
     }
 
-    .filters-bar-unit.open .filter-button:hover .filter-bar {
+    .filters-bar-unit.open .filter-button:hover .filter-icon::before,
+    .filters-bar-unit.open .filter-button:hover .filter-icon::after,
+    .filters-bar-unit.open .filter-button:hover .filter-icon span {
       background: white;
     }
 
@@ -1095,34 +1097,68 @@
       background: var(--primary-light);
     }
 
-    /* Icône filtre — 3 barres égales, toujours centrées (même rendu fermé / ouvert) */
+    /* Icône filtre — 3 barres qui se rétrécissent (comme weekly.html) */
     .filter-icon {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
       width: 24px;
       height: 24px;
+      position: relative;
+      display: block;
       flex-shrink: 0;
       pointer-events: none;
     }
 
-    .filter-bar {
-      display: block;
-      width: 16px;
+    .filter-icon::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
       height: 2.5px;
-      border-radius: 2px;
       background: var(--primary-color);
-      transition: background 0.2s ease;
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
     }
 
-    .filter-button:hover .filter-bar {
+    .filter-icon::after {
+      content: '';
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+
+    .filter-icon span {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 2.5px;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: block;
+      z-index: 1;
+    }
+
+    .filter-button:hover .filter-icon::before,
+    .filter-button:hover .filter-icon::after,
+    .filter-button:hover .filter-icon span {
       background: white;
     }
 
     /* Panneau fermé : annule le :hover collant sur mobile au 2e clic */
-    .filters-bar-unit:not(.open) .filter-bar {
+    .filters-bar-unit:not(.open) .filter-icon::before,
+    .filters-bar-unit:not(.open) .filter-icon::after,
+    .filters-bar-unit:not(.open) .filter-icon span {
       background: var(--primary-color) !important;
     }
 
@@ -2206,11 +2242,7 @@
       </div>
     </div>
     <button type="button" class="filter-button" id="filterToggleButton" aria-label="Filtres" aria-expanded="false" aria-controls="filtersSidebar" onclick="toggleFiltersSidebar(event)">
-      <span class="filter-icon" aria-hidden="true">
-        <span class="filter-bar"></span>
-        <span class="filter-bar"></span>
-        <span class="filter-bar"></span>
-      </span>
+      <div class="filter-icon" aria-hidden="true"><span></span></div>
     </button>
   </div>
 
