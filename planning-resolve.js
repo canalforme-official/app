@@ -169,6 +169,17 @@
     return np || nr || ne;
   }
 
+  /** True si la map jour→cours contient au moins un cours (ex. planningEte renseigné). */
+  function planningMapHasAnyCourses(dayMap) {
+    if (!dayMap || typeof dayMap !== 'object') return false;
+    var k;
+    for (k in dayMap) {
+      if (!Object.prototype.hasOwnProperty.call(dayMap, k)) continue;
+      if (Array.isArray(dayMap[k]) && dayMap[k].length > 0) return true;
+    }
+    return false;
+  }
+
   function resolveDailyView(dateStr, data) {
     var periodes = data.metadata && data.metadata.periods ? data.metadata.periods : [];
     var eff = getEffectivePeriodForDate(dateStr, periodes);
@@ -198,7 +209,8 @@
     }
     if (key === 'ete') {
       var arrE = planningEte[dayName] || [];
-      if (!arrE.length) {
+      // Jour sans cours (ex. dimanche) ≠ « à déterminer » si le planning été existe déjà.
+      if (!arrE.length && !planningMapHasAnyCourses(planningEte)) {
         return { courses: [], planningKey: 'ete', periodName: periodName, closed: false, indetermine: true, dayName: dayName };
       }
       return { courses: arrE, planningKey: 'ete', periodName: periodName, closed: false, indetermine: false, dayName: dayName };

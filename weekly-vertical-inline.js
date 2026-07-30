@@ -198,8 +198,9 @@
         rv = PR.resolveDailyView(ymd, data);
         listed = PR.isWeekdayListedInBasePlannings(data, dayLower);
         var hasEv = PR.hasPlanningEventsForDate && PR.hasPlanningEventsForDate(ymd, data);
-        /* Jour sans aucun cours en base mais période été : afficher quand même la colonne « à déterminer ». */
-        if (!listed && rv.planningKey !== 'ete' && !hasEv) continue;
+        var hasCourses = rv.courses && rv.courses.length > 0;
+        /* Même logique partout : jour sans cours / events / statut → ne pas afficher la colonne (ex. dimanche été vide). */
+        if (!listed && !hasEv && !hasCourses && !rv.closed && !rv.indetermine) continue;
         var rvMerged = PR.mergeResolvedViewForDate
           ? PR.mergeResolvedViewForDate(ymd, data)
           : (PR.applyPlanningEventsToResolvedView

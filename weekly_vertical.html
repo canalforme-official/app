@@ -109,7 +109,7 @@
       position: relative;
     }
     body.planning-ferie .course-block { border-left-color: var(--primary-color); }
-    body.planning-ferie .weekly-schedule th { background: var(--primary-light); color: #fff; }
+    /* En-têtes colonnes : uniquement via data-planning-key (pas tout le thead en bleu le jour J férié) */
     body.planning-ferie::before {
       content: '';
       position: fixed;
@@ -138,7 +138,6 @@
       position: relative;
     }
     body.planning-ete .course-block { border-left-color: var(--primary-color); }
-    body.planning-ete .weekly-schedule th { background: var(--primary-light); color: #fff; }
     body.planning-ete::before {
       content: '';
       position: fixed;
@@ -2034,6 +2033,23 @@
 
     .weekly-day-title { font-weight: 700; font-size: 0.95em; }
     .weekly-day-date { font-size: 0.78em; font-weight: 500; opacity: 0.9; margin-top: 2px; }
+    /* Régulier : couleur club fixe — ne pas suivre --primary-color du body (férié/été jour J) */
+    .weekly-schedule thead th[data-planning-key="regulier"] {
+      background: #480607 !important;
+      color: #fff !important;
+    }
+    .weekly-schedule thead th.today[data-planning-key="regulier"] {
+      background-color: #981010 !important;
+      color: #fff !important;
+    }
+    .sticky-days-bar .weekly-schedule-header th[data-planning-key="regulier"] {
+      background: #480607 !important;
+      color: #fff !important;
+    }
+    .sticky-days-bar .weekly-schedule-header th.today[data-planning-key="regulier"] {
+      background-color: #981010 !important;
+      color: #fff !important;
+    }
     .weekly-schedule thead th[data-planning-key="ramadan"] { background: var(--planning-weekly-header-ramadan-bg) !important; color: #fff !important; }
     .weekly-schedule thead th[data-planning-key="ete"],
     .weekly-schedule thead th.today[data-planning-key="ete"] {
