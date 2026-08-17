@@ -2212,9 +2212,17 @@
       color: #fff !important;
     }
     .weekly-schedule thead th[data-planning-key="ramadan"] { background: var(--planning-weekly-header-ramadan-bg) !important; color: #fff !important; }
-    .weekly-schedule thead th[data-planning-key="ete"],
-    .weekly-schedule thead th.today[data-planning-key="ete"] {
+    .weekly-schedule thead th.today[data-planning-key="ramadan"] {
+      background: var(--planning-weekly-header-ramadan-today-bg) !important;
+      color: #fff !important;
+    }
+    .weekly-schedule thead th[data-planning-key="ete"] {
       background: var(--planning-weekly-header-ete-gradient) !important;
+      color: #fff !important;
+      border-bottom-color: rgba(255, 255, 255, 0.25);
+    }
+    .weekly-schedule thead th.today[data-planning-key="ete"] {
+      background: var(--planning-weekly-header-ete-today-gradient) !important;
       color: #fff !important;
       border-bottom-color: rgba(255, 255, 255, 0.25);
     }

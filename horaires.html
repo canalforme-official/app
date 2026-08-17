@@ -356,6 +356,47 @@
       box-shadow: 0 0 0 1px color-mix(in srgb, var(--today-ring) 35%, transparent), var(--shadow-soft);
       background: rgba(255, 255, 255, 0.9);
     }
+    /* CF-37 : couleur du jour selon la période (indépendant du thème de la page) */
+    .week-row[data-planning-key="regulier"] {
+      --primary: #6e0c0c;
+      --horaires-primary-rgb: 110, 12, 12;
+      --accent: #e42218;
+      --today-ring: #c41e1e;
+      --border: rgba(110, 12, 12, 0.14);
+      background: rgba(110, 12, 12, 0.06);
+    }
+    .week-row[data-planning-key="ete"] {
+      --primary: var(--planning-ete-primary);
+      --horaires-primary-rgb: 184, 134, 11;
+      --accent: var(--planning-ete-secondary);
+      --today-ring: var(--planning-ete-secondary);
+      --border: rgba(184, 134, 11, 0.22);
+      background: rgba(184, 134, 11, 0.10);
+    }
+    .week-row[data-planning-key="ramadan"] {
+      --primary: var(--planning-ramadan-primary);
+      --horaires-primary-rgb: 38, 70, 45;
+      --accent: var(--planning-ramadan-secondary);
+      --today-ring: var(--planning-ramadan-secondary);
+      --border: rgba(38, 70, 45, 0.22);
+      background: rgba(38, 70, 45, 0.10);
+    }
+    .week-row[data-planning-key="ferie"],
+    .week-row[data-planning-key="ferme"] {
+      --primary: var(--planning-ferie-primary);
+      --horaires-primary-rgb: 30, 90, 138;
+      --accent: var(--planning-ferie-secondary);
+      --today-ring: var(--planning-ferie-secondary);
+      --border: rgba(30, 90, 138, 0.22);
+      background: rgba(30, 90, 138, 0.10);
+    }
+    .week-row.is-today[data-planning-key="regulier"],
+    .week-row.is-today[data-planning-key="ete"],
+    .week-row.is-today[data-planning-key="ramadan"],
+    .week-row.is-today[data-planning-key="ferie"],
+    .week-row.is-today[data-planning-key="ferme"] {
+      background: rgba(255, 255, 255, 0.9);
+    }
     .week-hours {
       font-family: var(--font-title);
       font-weight: 500;
@@ -639,9 +680,10 @@
 
   /** Identifiant stable pour fusionner des jours consécutifs à horaires identiques. */
   function hoursSignature(rv, p) {
-    if (rv.closed) return 'x:closed';
-    if (!p.lines.length) return 'x:empty';
-    return 'o:' + p.plain;
+    var pk = String(rv.planningKey || 'regulier');
+    if (rv.closed) return pk + ':x:closed';
+    if (!p.lines.length) return pk + ':x:empty';
+    return pk + ':o:' + p.plain;
   }
 
   /** JJ mois ou « JJ – JJ mois » / « JJ mois – JJ mois » (noms de mois complets). */
@@ -897,8 +939,10 @@
       });
       var nameLine = dayNamesRangeFr(first.rv, last.rv);
       var dateLine = formatDateRangeFr(first.ymd, last.ymd);
+      var rowKey = String(first.rv.planningKey || 'regulier');
       weekHtml +=
-        '<div class="week-row' + (inSel ? ' is-today' : '') + '">' +
+        '<div class="week-row' + (inSel ? ' is-today' : '') +
+        '" data-planning-key="' + PR.escapeHtml(rowKey) + '">' +
         '<div class="horaires-daily-pattern horaires-daily-pattern--compact">' +
         '<div class="day-title-row">' +
         '<p class="day-heading-compact">' +

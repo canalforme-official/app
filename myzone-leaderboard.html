@@ -1672,8 +1672,64 @@
   <script>
 
     const DEFAULT_COACH_PHOTO_LEADERBOARD = 'default-coach-photo.png';
+    let avatarsByGuid = {};
 
-    /** Photo coach leaderboard : caricature du 1er au 7 avril (date locale), aligné sur PlanningResolve.coachPhotoUrl. */
+    function normalizeLeaderboardGuid(value) {
+      return String(value || '').trim().toUpperCase();
+    }
+
+    function loadAvatarsMap(doc) {
+      var map = {};
+      var byGuid = doc && doc.byGuid ? doc.byGuid : {};
+      Object.keys(byGuid).forEach(function (key) {
+        var entry = byGuid[key];
+        if (typeof entry === 'string') {
+          map[normalizeLeaderboardGuid(key)] = { photoUrl: entry, nickname: '' };
+          return;
+        }
+        if (!entry || typeof entry !== 'object') return;
+        map[normalizeLeaderboardGuid(key)] = {
+          photoUrl: entry.photoUrl ? String(entry.photoUrl) : '',
+          nickname: entry.nickname ? String(entry.nickname).trim() : '',
+        };
+      });
+      avatarsByGuid = map;
+    }
+
+    async function fetchAvatarsJson() {
+      try {
+        const localResp = await fetch('./leaderboard-avatars.json?timestamp=' + Date.now());
+        if (localResp.ok) {
+          loadAvatarsMap(await localResp.json());
+          return;
+        }
+      } catch (e) { /* fallback GitHub */ }
+      try {
+        const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard-avatars.json?timestamp=' + Date.now());
+        if (remoteResp.ok) loadAvatarsMap(await remoteResp.json());
+      } catch (e) {
+        avatarsByGuid = {};
+      }
+    }
+
+    function leaderboardAppEntry(user) {
+      return avatarsByGuid[normalizeLeaderboardGuid(user && user.usrGUID)] || {};
+    }
+
+    function leaderboardMemberDisplayName(user) {
+      var appName = leaderboardAppEntry(user).nickname;
+      if (appName) return appName;
+      return String((user && user.nickname) || '');
+    }
+
+    /** Photo membre : avatar app prioritaire ; sinon photo coach (feuille). */
+    function leaderboardMemberPhotoSrc(user) {
+      var appPhoto = leaderboardAppEntry(user).photoUrl;
+      if (appPhoto) return appPhoto;
+      if (user && user.type === 'Coach') return leaderboardCoachPhotoSrc(user);
+      return '';
+    }
+
     function leaderboardCoachPhotoSrc(user) {
       if (!user || user.type !== 'Coach') return '';
       var coachObj = {
@@ -1866,6 +1922,9 @@
 
       fetchLeaderboardJson()
         .then(data => {
+          return fetchAvatarsJson().then(function () { return data; });
+        })
+        .then(data => {
           console.log('Données chargées:', data);
           stopUpdatingMessage();
           updateLeaderboard(data);
@@ -1901,6 +1960,9 @@
 
     function refreshLeaderboard() {
       fetchLeaderboardJson()
+        .then(data => {
+          return fetchAvatarsJson().then(function () { return data; });
+        })
         .then(data => {
           console.log('Données rafraîchies:', data);
           updateLeaderboard(data);
@@ -2508,7 +2570,7 @@
         const nameDiv = document.createElement('div');
         nameDiv.classList.add('name', 'coach-name-bidi');
         nameDiv.dir = 'auto';
-        nameDiv.textContent = user.nickname;
+        nameDiv.textContent = leaderboardMemberDisplayName(user);
         profileDiv.appendChild(nameDiv);
 
         const rankChange = rankChangeMap[user.usrGUID];
@@ -2556,12 +2618,12 @@
           stepDiv.appendChild(statusIconDiv);
         }
 
-        // Ajoute la photo du coach si l'utilisateur est un coach
-        if (user.type === 'Coach') {
+        const memberPhotoUrl = leaderboardMemberPhotoSrc(user);
+        if (memberPhotoUrl) {
           const coachPhoto = document.createElement('img');
           coachPhoto.classList.add('coach-podium-photo');
-          coachPhoto.src = leaderboardCoachPhotoSrc(user);
-          coachPhoto.alt = `Photo du coach ${user.nickname}`;
+          coachPhoto.src = memberPhotoUrl;
+          coachPhoto.alt = `Photo de ${leaderboardMemberDisplayName(user)}`;
           stepDiv.appendChild(coachPhoto);
         }
 
@@ -2665,7 +2727,8 @@
         const rankChangeSvg = getRankChangeSvg(rankChange);
         const zoneBarHtml = getZoneBarHtml(user);
 
-        var coachPhotoUrlRow = user.type === 'Coach' ? leaderboardCoachPhotoSrc(user) : '';
+        var memberPhotoUrl = leaderboardMemberPhotoSrc(user);
+        var displayName = leaderboardMemberDisplayName(user);
         tableHtml += `
             <div class="leaderboard-row">
                 <span class="rank-cell">
@@ -2673,10 +2736,9 @@
                     ${rankChangeSvg}
                 </span>
 
-                <!-- Photo du coach si le type est Coach -->
-                ${user.type === 'Coach' ? `<img class="coach-photo" src="${coachPhotoUrlRow}" alt="Photo de ${user.nickname}" />` : ''}
+                ${memberPhotoUrl ? `<img class="coach-photo" src="${memberPhotoUrl}" alt="Photo de ${displayName}" />` : ''}
                 
-                <span class="nickname coach-name-bidi" dir="auto">${user.nickname}</span>
+                <span class="nickname coach-name-bidi" dir="auto">${displayName}</span>
                 <span class="leaderboard-meps">
                     <div class="zone-bar-wrap">${zoneBarHtml}</div>
                     <div class="leaderboard-meps-row">
@@ -2686,9 +2748,8 @@
                     </div>
                 </span>
 
-                <!-- Ajout de la photo du coach sur le podium -->
-                ${isPodium && user.type === 'Coach' ? `
-                    <img class="coach-podium-photo" src="${coachPhotoUrlRow}" alt="Photo podium de ${user.nickname}" />
+                ${isPodium && memberPhotoUrl ? `
+                    <img class="coach-podium-photo" src="${memberPhotoUrl}" alt="Photo podium de ${displayName}" />
                 ` : ''}
             </div>`;
       });

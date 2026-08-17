@@ -8,7 +8,7 @@ Les pages `daily.html`, `daily_grid.html`, `weekly.html`, `weekly_vertical.html`
 
 | Fichier | Rôle |
 |---------|------|
-| `planning-tokens.css` | Variables `:root` préfixées `--planning-*` : couleurs par thème, URLs des images de fond en mosaïque, dégradé d’en-tête « été » pour le tableau hebdo, voile `::after` férié (daily / grid). |
+| `planning-tokens.css` | Variables `:root` préfixées `--planning-*` : couleurs par thème, URLs des images de fond en mosaïque, dégradé d’en-tête « été » (+ today plus foncé), voile `::after` férié (daily / grid). Compte à rebours été = bordeaux / blanc (CF-04). |
 
 ## Chargement
 
@@ -24,7 +24,7 @@ Le chemin est relatif au dossier `frontend/` (même répertoire que les HTML).
 
 Les règles `body.planning-ramadan`, `body.planning-ferie` et `body.planning-ete` **recopient** les jetons vers les variables déjà utilisées par le reste du CSS (`--primary-color`, `--primary-overlay`, etc.) via `var(--planning-…)`. Ainsi le layout existant ne change pas ; seule la source des valeurs est unique.
 
-Les cellules d’en-tête hebdomadaires (`data-planning-key="ramadan"`, `ete`, `ferie` / `ferme`) utilisent `var(--planning-weekly-header-…)` pour rester alignées avec le corps de page.
+Les cellules d’en-tête hebdomadaires (`data-planning-key="ramadan"`, `ete`, `ferie` / `ferme`) utilisent `var(--planning-weekly-header-…)` pour rester alignées avec le corps de page. La colonne **aujourd’hui** a une variante plus foncée pour `regulier`, `ete` et `ramadan` (`--planning-weekly-header-*-today`).
 
 ## Modifier un thème
 

@@ -1772,9 +1772,17 @@
     .weekly-day-title { font-weight: 700; font-size: 0.95em; }
     .weekly-day-date { font-size: 0.78em; font-weight: 500; opacity: 0.9; margin-top: 2px; }
     .weekly-schedule thead th[data-planning-key="ramadan"] { background: var(--planning-weekly-header-ramadan-bg) !important; color: #fff !important; }
-    .weekly-schedule thead th[data-planning-key="ete"],
-    .weekly-schedule thead th.today[data-planning-key="ete"] {
+    .weekly-schedule thead th.today[data-planning-key="ramadan"] {
+      background: var(--planning-weekly-header-ramadan-today-bg) !important;
+      color: #fff !important;
+    }
+    .weekly-schedule thead th[data-planning-key="ete"] {
       background: var(--planning-weekly-header-ete-gradient) !important;
+      color: #fff !important;
+      border-bottom-color: rgba(255, 255, 255, 0.25);
+    }
+    .weekly-schedule thead th.today[data-planning-key="ete"] {
+      background: var(--planning-weekly-header-ete-today-gradient) !important;
       color: #fff !important;
       border-bottom-color: rgba(255, 255, 255, 0.25);
     }

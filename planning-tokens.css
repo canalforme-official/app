@@ -22,6 +22,7 @@
   --planning-ramadan-secondary-light: rgba(201, 162, 39, 0.75);
   --planning-ramadan-time: rgba(38, 70, 45, 0.7);
   --planning-weekly-header-ramadan-bg: rgba(38, 70, 45, 0.92);
+  --planning-weekly-header-ramadan-today-bg: #1a3220;
 
   --planning-ferie-primary: #1e5a8a;
   --planning-ferie-overlay: rgba(30, 90, 138, 0.92);
@@ -39,6 +40,19 @@
   --planning-ete-secondary-light: rgba(245, 158, 11, 0.75);
   --planning-ete-time: rgba(184, 134, 11, 0.75);
   --planning-weekly-header-ete-gradient: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%);
+  --planning-weekly-header-ete-today-gradient: linear-gradient(180deg, #a67c1a 0%, #8b6508 100%);
+  --planning-club-bordeaux: #480607;
+}
+
+/* CF-04 : compte à rebours lisible en été (pas jaune sur jaune).
+   Ramadan = or sur vert ; férié = or sur bleu — contrastes déjà OK. */
+body.planning-ete .countdown-pill,
+body.planning-ete .course-time .countdown-pill {
+  background-color: var(--planning-club-bordeaux);
+  color: #fff;
+}
+body.planning-ete .countdown {
+  color: var(--planning-club-bordeaux);
 }
 
 /* Confettis cours événement (planningEventsByDate) — libellé texte uniquement dans daily.html */
