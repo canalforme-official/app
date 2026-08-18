@@ -12,15 +12,19 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #000;
+            background: #480607;
             color: #fff;
+            min-height: 100vh;
+        }
+
+        body.loaded {
+            background: linear-gradient(145deg, #480607, #822026);
         }
 
         .header {
             text-align: center;
             padding: 20px;
-            background-color: #000;
-
+            background: transparent;
         }
 
         .header img {
@@ -45,13 +49,16 @@
 
         #year-selector label {
             margin-right: 10px;
+            color: #fff;
         }
 
         #year-selector select {
             font-size: 1rem;
             padding: 5px;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: #fff;
+            color: #480607;
         }
 
         .container {
@@ -244,25 +251,41 @@
     </div>
 
     <script src="./planning-embedded.js"></script>
+    <script src="./webview-resume.js?v=2"></script>
     <script>
-        async function fetchLeaderboardData() {
-            try {
-                const localResp = await fetch('./alltime-leaderboard.json?timestamp=' + Date.now());
-                if (localResp.ok) {
-                    const data = await localResp.json();
-                    console.log('✅ Données palmarès chargées depuis le fichier local');
+        let cachedPalmaresData = null;
+        let palmaresDataPromise = null;
+
+        async function fetchLeaderboardData(forceRefresh) {
+            if (!forceRefresh && cachedPalmaresData) return cachedPalmaresData;
+            if (!forceRefresh && palmaresDataPromise) return palmaresDataPromise;
+
+            palmaresDataPromise = (async function () {
+                try {
+                    const localResp = await fetch('./alltime-leaderboard.json?timestamp=' + Date.now());
+                    if (localResp.ok) {
+                        const data = await localResp.json();
+                        console.log('✅ Données palmarès chargées depuis le fichier local');
+                        return data;
+                    }
+                    throw new Error('Fichier local non disponible');
+                } catch (localError) {
+                    console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+                    const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/alltime-leaderboard.json?timestamp=' + Date.now());
+                    if (!remoteResp.ok) {
+                        throw new Error('Impossible de charger le palmarès depuis GitHub');
+                    }
+                    const data = await remoteResp.json();
+                    console.log('✅ Données palmarès chargées depuis GitHub');
                     return data;
                 }
-                throw new Error('Fichier local non disponible');
-            } catch (localError) {
-                console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
-                const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/alltime-leaderboard.json?timestamp=' + Date.now());
-                if (!remoteResp.ok) {
-                    throw new Error('Impossible de charger le palmarès depuis GitHub');
-                }
-                const data = await remoteResp.json();
-                console.log('✅ Données palmarès chargées depuis GitHub');
-                return data;
+            })();
+
+            try {
+                cachedPalmaresData = await palmaresDataPromise;
+                return cachedPalmaresData;
+            } finally {
+                palmaresDataPromise = null;
             }
         }
 
@@ -331,6 +354,8 @@
                 await updateLeaderboard();
             } catch (error) {
                 console.error('Erreur palmarès:', error);
+            } finally {
+                document.body.classList.add('loaded');
             }
         }
 

@@ -1405,6 +1405,12 @@
       displayMatrixSchedule();
     };
 
+    window.__canalFormeGoToday = function () {
+      selectedDateYmd = ymdFromDate(new Date());
+      syncDateInUrl();
+      displayMatrixSchedule();
+    };
+
     (function seedHeader() {
       var d = new Date();
       var names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];

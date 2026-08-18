@@ -454,8 +454,8 @@
         @media (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
-                padding: 10px;
-                gap: 45px;
+                padding: 8px;
+                gap: 10px;
             }
 
             .header {
@@ -464,8 +464,8 @@
 
             .table {
                 max-height: none;
-                margin: 25px 5px;
-                padding: 15px;
+                margin: 0;
+                padding: 12px;
                 border-radius: 12px;
                 touch-action: manipulation;
             }
@@ -942,6 +942,7 @@
 
     <script src="./planning-embedded.js"></script>
     <script src="./planning-resolve.js"></script>
+    <script src="./webview-resume.js?v=2"></script>
     <script>
         const DEFAULT_COACH_PHOTO_STATUS = '';
         const STATUS_PREVIEW_COUNT = 10;
@@ -973,30 +974,44 @@
 
         let medalAnimationInterval = null;
         let medalUrls = [];
+        let cachedLeaderboardData = null;
+        let leaderboardDataPromise = null;
 
-        async function fetchLeaderboardData() {
-            try {
-                const localResp = await fetch(`./leaderboard.json?timestamp=${Date.now()}`);
-                if (localResp.ok) {
-                    const data = await localResp.json();
-                    console.log('✅ Données leaderboard chargées depuis le fichier local');
+        async function fetchLeaderboardData(forceRefresh) {
+            if (!forceRefresh && cachedLeaderboardData) return cachedLeaderboardData;
+            if (!forceRefresh && leaderboardDataPromise) return leaderboardDataPromise;
+
+            leaderboardDataPromise = (async function () {
+                try {
+                    const localResp = await fetch(`./leaderboard.json?timestamp=${Date.now()}`);
+                    if (localResp.ok) {
+                        const data = await localResp.json();
+                        console.log('✅ Données leaderboard chargées depuis le fichier local');
+                        return data;
+                    }
+                    throw new Error('Fichier local non disponible');
+                } catch (localError) {
+                    console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
+                    const remoteResp = await fetch(`https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=${Date.now()}`);
+                    if (!remoteResp.ok) {
+                        throw new Error('Impossible de charger le leaderboard depuis GitHub');
+                    }
+                    const data = await remoteResp.json();
+                    console.log('✅ Données leaderboard chargées depuis GitHub');
                     return data;
                 }
-                throw new Error('Fichier local non disponible');
-            } catch (localError) {
-                console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
-                const remoteResp = await fetch(`https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=${Date.now()}`);
-                if (!remoteResp.ok) {
-                    throw new Error('Impossible de charger le leaderboard depuis GitHub');
-                }
-                const data = await remoteResp.json();
-                console.log('✅ Données leaderboard chargées depuis GitHub');
-                return data;
+            })();
+
+            try {
+                cachedLeaderboardData = await leaderboardDataPromise;
+                return cachedLeaderboardData;
+            } finally {
+                leaderboardDataPromise = null;
             }
         }
 
-        async function fetchLeaderboard() {
-            const data = await fetchLeaderboardData();
+        async function fetchLeaderboard(forceRefresh) {
+            const data = await fetchLeaderboardData(forceRefresh);
             console.log('Données reçues:', data.current.data[0]);
             return data.current.data;
         }
@@ -1048,17 +1063,10 @@
                 existingTable = tableContainer;
             }
 
-            // Ajouter une classe de chargement pendant la mise à jour
             const tableContainer = existingTable;
             const countEl = tableContainer.querySelector('.status-count');
             if (countEl) countEl.textContent = `${users.length} membres`;
-            tableContainer.classList.add('loading');
-            
-            // Simuler un délai de chargement pour une meilleure expérience utilisateur
-            setTimeout(() => {
-                tableContainer.classList.remove('loading');
-                // Met à jour le contenu du tableau
-                const tbody = existingTable.querySelector('tbody');
+            const tbody = existingTable.querySelector('tbody');
                 const oldRows = Array.from(tbody.querySelectorAll('tr'));
                 tbody.innerHTML = '';
                 
@@ -1217,7 +1225,6 @@
                         }, 500);
                     });
                 }
-            }, 300);
         }
 
         function formatNumber(num) {
@@ -1279,9 +1286,9 @@
             medalAnimationInterval = setInterval(createMedalAnimation, interval);
         }
 
-        async function init() {
+        async function init(forceRefresh) {
             try {
-                const data = await fetchLeaderboard();
+                const data = await fetchLeaderboard(!!forceRefresh);
                 
                 if (!data || data.length === 0) {
                     console.error('Aucune donnée disponible');
@@ -1339,7 +1346,7 @@
 
                 if (--timer < 0) {
                     timer = duration;
-                    await init();
+                    await init(true);
                 }
             }
 
@@ -1400,8 +1407,8 @@
 
         // Mettre à jour les interactions mobiles après chaque mise à jour des données
         const originalInit = init;
-        init = async function() {
-            await originalInit();
+        init = async function(forceRefresh) {
+            await originalInit(forceRefresh);
             initMobileInteractions();
         };
     </script>

@@ -76,6 +76,22 @@
     watchPrayerButton();
   }
 
+  window.__canalFormeGoToday = function () {
+    var file = pageFileName();
+    try {
+      if (file === 'daily.html' && typeof returnToToday === 'function') {
+        returnToToday();
+        return;
+      }
+      if (file === 'daily_grid.html' && typeof selectedDateYmd === 'string' && typeof ymdFromDate === 'function') {
+        selectedDateYmd = ymdFromDate(new Date());
+        if (typeof currentDayIndex !== 'undefined') currentDayIndex = new Date().getDay();
+        if (typeof syncDailyGridDateInUrl === 'function') syncDailyGridDateInUrl();
+        if (typeof displayGridSchedule === 'function') displayGridSchedule();
+      }
+    } catch (e) {}
+  };
+
   function initEmbeddedShell() {
     document.documentElement.classList.add('embedded');
     document.body.classList.add('embedded');

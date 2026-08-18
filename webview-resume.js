@@ -116,6 +116,14 @@
         loadLeaderboard();
         return true;
       }
+      if (file === 'palmares-myzone.html' && typeof updateLeaderboard === 'function') {
+        updateLeaderboard();
+        return true;
+      }
+      if (file === 'status-leaderboard.html' && typeof init === 'function') {
+        init(true);
+        return true;
+      }
       if (file === 'daily.html' && typeof fetchAllData === 'function') {
         fetchAllData();
         return true;
@@ -126,6 +134,10 @@
       }
       if (file === 'daily_matrix.html' && typeof loadAndDisplay === 'function') {
         loadAndDisplay();
+        return true;
+      }
+      if ((file === 'weekly.html' || file.indexOf('weekly_vertical') !== -1) && typeof refreshPlanningDisplay === 'function') {
+        refreshPlanningDisplay();
         return true;
       }
       if (file === 'prayer-times.html' && typeof loadPrayerTimes === 'function') {

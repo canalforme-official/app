@@ -1485,6 +1485,14 @@
       window.location.href = './daily.html';
     }
 
+    window.__canalFormeGoToday = function () {
+      var PR = getPR();
+      if (!PR) return;
+      weekMondayYmd = PR.clampWeekMonday(PR.mondayOfWeekContaining(PR.ymdFromDate(new Date())));
+      updateUrlWeekParam();
+      refreshPlanningDisplay();
+    };
+
     function goToWeekly() {
       window.location.href = './weekly.html' + buildPlanningViewQuery();
     }
