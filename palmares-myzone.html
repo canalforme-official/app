@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>Palmarès Myzone</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="planning-tokens.css">
@@ -193,25 +194,27 @@
             table td, table th {
                 font-size: 0.8rem;
             }
-        
+
             .header {
                 display: none;
             }
-    
+        }
+
+        body.embedded .header {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Logo">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/fb3dca97-3220-08af-99bd-f8b5043a309f.png" alt="Logo" referrerpolicy="no-referrer">
     </div>
 
-    <h2 class="title" id="page-title">Palmarès Myzone 2024</h2>
+    <h2 class="title" id="page-title">Palmarès Myzone</h2>
 
     <div id="year-selector">
-        <label for="year">Sélectionnez l'année :</label>
+        <label for="year">Année</label>
         <select id="year" onchange="updateLeaderboard()">
-            <option value="2024" selected>2024</option>
         </select>
     </div>
 
@@ -221,11 +224,11 @@
                 <tr>
                     <th style="width: 30px;">Rang</th>
                     <th></th>
-                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/5eb2294d-4d88-587d-12fe-b6f2ef6b64d6.png" alt="Or"></th>
-                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/721a5a8c-7411-63f4-437f-b64f61153d32.png" alt="Argent"></th>
-                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b8f46427-82e4-7bdb-cb95-74cc34e7e31b.png" alt="Bronze"></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/5eb2294d-4d88-587d-12fe-b6f2ef6b64d6.png" alt="Or" referrerpolicy="no-referrer"></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/721a5a8c-7411-63f4-437f-b64f61153d32.png" alt="Argent" referrerpolicy="no-referrer"></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b8f46427-82e4-7bdb-cb95-74cc34e7e31b.png" alt="Bronze" referrerpolicy="no-referrer"></th>
                     <th>Points</th>
-                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/d315c5ca-2944-43c2-0ebb-3e34c70b586d.png" alt="MEPS"></th>
+                    <th><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/d315c5ca-2944-43c2-0ebb-3e34c70b586d.png" alt="MEPS" referrerpolicy="no-referrer"></th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body">
@@ -234,12 +237,13 @@
         </table>
 
         <div class="legend">
-            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/5eb2294d-4d88-587d-12fe-b6f2ef6b64d6.png" alt="Or"> Or : <span>12 pts</span></p>
-            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/721a5a8c-7411-63f4-437f-b64f61153d32.png" alt="Argent"> Argent : <span>6 pts</span></p>
-            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b8f46427-82e4-7bdb-cb95-74cc34e7e31b.png" alt="Bronze"> Bronze : <span>3 pts</span></p>
+            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/5eb2294d-4d88-587d-12fe-b6f2ef6b64d6.png" alt="Or" referrerpolicy="no-referrer"> Or : <span>12 pts</span></p>
+            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/721a5a8c-7411-63f4-437f-b64f61153d32.png" alt="Argent" referrerpolicy="no-referrer"> Argent : <span>6 pts</span></p>
+            <p><img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/b8f46427-82e4-7bdb-cb95-74cc34e7e31b.png" alt="Bronze" referrerpolicy="no-referrer"> Bronze : <span>3 pts</span></p>
         </div>
     </div>
 
+    <script src="./planning-embedded.js"></script>
     <script>
         async function fetchLeaderboardData() {
             try {
@@ -262,9 +266,20 @@
             }
         }
 
+        function getAvailableYears(data) {
+            return Object.keys(data?.years || {}).sort((a, b) => Number(b) - Number(a));
+        }
+
+        function populateYearSelector(years, selectedYear) {
+            const select = document.getElementById('year');
+            select.innerHTML = years.map((year) => (
+                `<option value="${year}"${year === selectedYear ? ' selected' : ''}>${year}</option>`
+            )).join('');
+        }
+
         async function fetchLeaderboard(year) {
             const data = await fetchLeaderboardData();
-            return data.years[year] ? data.years[year].user_medal_rankings : [];
+            return data.years?.[year]?.user_medal_rankings || [];
         }
 
         async function updateLeaderboard() {
@@ -284,6 +299,13 @@
             const tbody = document.getElementById('leaderboard-body');
             tbody.innerHTML = '';
 
+            if (!data.length) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7">Aucun palmarès pour cette année.</td>';
+                tbody.appendChild(row);
+                return;
+            }
+
             data.forEach((user, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -301,7 +323,15 @@
         }
 
         async function init() {
-            await updateLeaderboard();
+            try {
+                const data = await fetchLeaderboardData();
+                const years = getAvailableYears(data);
+                const selectedYear = years[0] || String(new Date().getFullYear());
+                populateYearSelector(years, selectedYear);
+                await updateLeaderboard();
+            } catch (error) {
+                console.error('Erreur palmarès:', error);
+            }
         }
 
         init();

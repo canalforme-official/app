@@ -1576,13 +1576,6 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <!-- Overlay de chargement (display: none par défaut dans le CSS pour éviter le flash au 1er rendu) -->
-  <div id="loadingOverlay" hidden aria-hidden="true">
-    <div class="modal-center-container">
-      <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Logo du Club">
-    </div>
-  </div>
-
   <!-- Logo principal -->
   <div class="logo-container">
     <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/6dd4e171-247a-454f-1d79-8a84922e5e25.png"
@@ -1744,7 +1737,7 @@
       return url || DEFAULT_COACH_PHOTO_LEADERBOARD;
     }
 
-    /* Overlay de chargement au démarrage : true = activé, false = désactivé (par défaut) */
+    /* Overlay de chargement au démarrage : retiré (contenu visible tout de suite) */
     const SHOW_LOADING_OVERLAY = false;
 
     /* Détection d'exécution automatisée (ex: Puppeteer) ou paramètre URL ?puppeteer=1 pour tester */
@@ -1773,8 +1766,6 @@
     let previousPodiumConfettiInterval = null;
     let previousPodiumConfettiTimeout = null;
     let previousTrophyLayoutTimer = null;
-
-    const loadingOverlay = document.getElementById('loadingOverlay');
 
     function setCountdownVisible(visible) {
       const el = document.getElementById('countdown');
@@ -1848,43 +1839,13 @@
       troEl.style.transform = 'translateX(0)';
     }
 
-    /**
-     * Affiche l'overlay de chargement (uniquement si SHOW_LOADING_OVERLAY est true)
-     */
-    function showLoadingOverlay() {
-      if (SHOW_LOADING_OVERLAY && isFirstLoad) {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-      }
-    }
+    function showLoadingOverlay() {}
 
-    /**
-     * Cache l'overlay de chargement et affiche le contenu principal
-     */
     function hideLoadingOverlay() {
-      const overlay = document.getElementById('loadingOverlay');
-
-      function revealContent() {
-        overlay.style.display = 'none';
-        overlay.hidden = true;
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('loading');
-        if (SHOW_LOADING_OVERLAY) {
-          document.querySelectorAll('.container').forEach(el => el.style.display = 'flex');
-          document.querySelectorAll('.month-block').forEach(el => el.style.display = 'block');
-        }
-        /* Podiums et challenge homme/femme sont gérés par updateLeaderboard (hasRanking) */
-        isFirstLoad = false;
-        if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
-          window.__canalFormeWebViewResume.markHealthy();
-        }
-      }
-
-      if (SHOW_LOADING_OVERLAY) {
-        overlay.style.pointerEvents = 'none';
-        overlay.classList.add('fade-out');
-        setTimeout(revealContent, 500);
-      } else {
-        revealContent();
+      document.body.classList.remove('loading');
+      isFirstLoad = false;
+      if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
+        window.__canalFormeWebViewResume.markHealthy();
       }
     }
 
@@ -2824,32 +2785,8 @@
         });
       }
 
-      const loadingOverlay = document.getElementById('loadingOverlay');
-
-      if (SHOW_LOADING_OVERLAY) {
-        document.body.classList.add('loading');
-        document.querySelectorAll('.container').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.month-block').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.podium-wrapper').forEach(el => el.style.display = 'none');
-        document.querySelector('.competition-container').style.display = 'none';
-        if (loadingOverlay) {
-          loadingOverlay.hidden = false;
-          loadingOverlay.removeAttribute('aria-hidden');
-          loadingOverlay.style.display = 'flex';
-          loadingOverlay.classList.remove('fade-out');
-        }
-        setTimeout(function () {
-          loadLeaderboard();
-        }, 500);
-      } else {
-        document.body.classList.remove('loading');
-        if (loadingOverlay) {
-          loadingOverlay.style.display = 'none';
-          loadingOverlay.hidden = true;
-          loadingOverlay.setAttribute('aria-hidden', 'true');
-        }
-        loadLeaderboard();
-      }
+      document.body.classList.remove('loading');
+      loadLeaderboard();
 
       // Vérifier si on est sur mobile
       const isMobile = window.innerWidth <= 600;

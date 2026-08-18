@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/57464fd1-2801-45f5-cb10-2b6b52aecf16.png">
     <title>Status Leaderboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -90,16 +91,13 @@
             background: white;
             border-radius: 15px;
             padding: 12px;
-            margin: 15px 0;
+            margin: 20px 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            max-height: 400px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            position: relative;
+            max-height: none;
             overflow: visible;
+            position: relative;
         }
 
         .table::-webkit-scrollbar {
@@ -122,44 +120,53 @@
             z-index: 1;
         }
 
-        .table h3 {
+        .table-banner {
             display: flex;
             align-items: center;
-            font-size: 1.2em;
-            margin-bottom: 8px;
-            position: absolute;
-            top: -30px;
-            left: 15px;
+            gap: 10px;
+            background: rgba(72, 6, 7, 0.92);
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 0 0 12px;
+            min-height: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .table-banner img.status-badge {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+        }
+
+        .table h3,
+        .table-banner h3 {
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+            margin: 0;
+            position: static;
             color: #ffffff;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            background: rgba(72, 6, 7, 0.9);
+            background: transparent;
             border: none;
-            height: 50px;
-            width: calc(100% - 30px);
-            padding: 0 12px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            z-index: 2;
+            height: auto;
+            width: auto;
+            flex: 1;
+            padding: 0;
+            box-shadow: none;
         }
 
-        .table h3 img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-        }
-
-        .table:hover h3 img {
-            transform: scale(1.1);
-        }
-
-        .table h3 span {
-            margin-top: 10px;
+        .table-banner .status-count {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.16);
+            margin: 0;
+            top: 0;
+            flex-shrink: 0;
         }
 
         table {
@@ -291,24 +298,27 @@
             100% { transform: scale(1); }
         }
 
-        /* Amélioration du compte à rebours */
-        .countdown {
-            background: #ffffff;
-            border: 1px solid rgba(72, 6, 7, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin: 15px auto;
-            max-width: 300px;
+        /* Countdown — même gabarit discret que myzone-leaderboard.html */
+        .countdown-in-block {
             text-align: center;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 0.72rem;
             font-weight: 500;
-            transition: all 0.3s ease;
-            color: #480607;
+            padding: 0 0 8px;
+            margin: 0 auto 8px;
+            min-height: 1.2em;
+            line-height: 1.2;
         }
 
-        .countdown:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 6, 7, 0.15);
+        .countdown-label,
+        .countdown-time {
+            display: inline;
+        }
+
+        .countdown-time {
+            font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.02em;
         }
 
         /* Animation pour les nouvelles données */
@@ -331,14 +341,14 @@
             text-align: center;
             background-color: transparent;
             color: #ffffff;
-            padding: 15px 0;
-            margin-bottom: 15px;
+            padding: 10px 0 4px;
+            margin-bottom: 4px;
             z-index: 10;
             position: relative;
         }
 
         .page-title h1 {
-            font-size: 1.6em;
+            font-size: 1.25em;
             font-weight: 700;
             margin: 0;
             letter-spacing: 1px;
@@ -394,14 +404,13 @@
         .description {
             font-size: 0.85em;
             color: #666;
-            margin: 8px 0 25px 0;
+            margin: 0 0 12px 0;
             font-weight: 500;
             text-align: center;
             padding: 0 8px;
             white-space: normal;
             word-wrap: break-word;
             position: relative;
-            top: 5px;
         }
 
         .status-count {
@@ -918,25 +927,31 @@
     </style>
 </head>
 <body>
-    <div id="loadingOverlay">
-        <div class="modal-center-container">
-            <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/8fd797c9-5e06-60a8-1720-128bcf9390cf.png" alt="Myzone Logo">
-        </div>
-    </div>
     <div class="medal-background"></div>
     <div class="page-title">
         <h1>Statuts Myzone</h1>
     </div>
 
-    <div class="countdown" id="countdown">Prochaine mise à jour dans : 05:00</div>
+    <div id="countdown" class="countdown-in-block" aria-live="off">
+        <span class="countdown-label">Mise à jour </span><span id="countdownTime" class="countdown-time">05:00</span>
+    </div>
 
     <div class="container" id="status-tables">
         <!-- Les tableaux seront générés dynamiquement ici -->
     </div>
 
+    <script src="./planning-embedded.js"></script>
     <script src="./planning-resolve.js"></script>
     <script>
         const DEFAULT_COACH_PHOTO_STATUS = '';
+        const STATUS_PREVIEW_COUNT = 10;
+        const STATUS_MIN_HIDDEN = 8;
+
+        function statusHint(status, rank) {
+            if (rank > 0) return `${rank} mois à 1300 MEPs`;
+            if (status === 'Copper') return 'Premier entraînement ≥ 10 min';
+            return '';
+        }
 
         /** Avatar coach / membre avec photo : caricature 1er–7 avril si pngCaricature (JSON leaderboard). */
         function leaderboardCoachPhotoSrc(user) {
@@ -991,45 +1006,37 @@
             let existingTable = Array.from(container.children).find(table => table.dataset.status === status);
 
             if (!existingTable) {
-                // Crée le conteneur pour le tableau
                 const tableContainer = document.createElement('div');
                 tableContainer.classList.add('table');
                 tableContainer.dataset.status = status;
 
-                // Crée un conteneur pour aligner les éléments
-                const headerContainer = document.createElement('div');
-                headerContainer.style.display = 'flex';
-                headerContainer.style.alignItems = 'center';
-                headerContainer.style.justifyContent = 'space-between';
-                headerContainer.style.gap = '10px';
+                const banner = document.createElement('div');
+                banner.className = 'table-banner';
 
-                // Ajoute le titre avec l'icône
-                const title = document.createElement('h3');
                 if (iconLink) {
-                    title.innerHTML = `<img src="${iconLink}" alt="${status}"> ${status}`;
-                } else {
-                    title.textContent = status;
+                    const badge = document.createElement('img');
+                    badge.className = 'status-badge';
+                    badge.src = iconLink;
+                    badge.alt = status;
+                    badge.referrerPolicy = 'no-referrer';
+                    banner.appendChild(badge);
                 }
-                title.style.margin = '0';
-                headerContainer.appendChild(title);
 
-                // Ajoute la description
-                const description = document.createElement('p');
-                description.classList.add('description');
-                description.style.margin = '0';
-                description.textContent = rank > 0 
-                    ? `${rank} mois à 1300 MEPs`
-                    : ``;
-                headerContainer.appendChild(description);
+                const title = document.createElement('h3');
+                title.textContent = status;
+                banner.appendChild(title);
 
-                // Ajoute le nombre de personnes
                 const count = document.createElement('p');
                 count.classList.add('status-count');
-                count.style.margin = '0';
-                count.textContent = `${users.length} users`;
-                headerContainer.appendChild(count);
+                count.textContent = `${users.length} membres`;
+                banner.appendChild(count);
 
-                tableContainer.appendChild(headerContainer);
+                tableContainer.appendChild(banner);
+
+                const description = document.createElement('p');
+                description.classList.add('description');
+                description.textContent = statusHint(status, rank);
+                tableContainer.appendChild(description);
 
                 // Crée le tableau
                 const table = document.createElement('table');
@@ -1043,6 +1050,8 @@
 
             // Ajouter une classe de chargement pendant la mise à jour
             const tableContainer = existingTable;
+            const countEl = tableContainer.querySelector('.status-count');
+            if (countEl) countEl.textContent = `${users.length} membres`;
             tableContainer.classList.add('loading');
             
             // Simuler un délai de chargement pour une meilleure expérience utilisateur
@@ -1053,8 +1062,10 @@
                 const oldRows = Array.from(tbody.querySelectorAll('tr'));
                 tbody.innerHTML = '';
                 
-                // Limite le nombre d'utilisateurs affichés à 5
-                const displayUsers = users.slice(0, 5);
+                const hiddenCount = users.length - STATUS_PREVIEW_COUNT;
+                const collapseList = hiddenCount >= STATUS_MIN_HIDDEN;
+                const previewCount = collapseList ? STATUS_PREVIEW_COUNT : users.length;
+                const displayUsers = users.slice(0, previewCount);
                 displayUsers.forEach((user, index) => {
                     const row = document.createElement('tr');
                     row.setAttribute('data-position', user.position);
@@ -1069,7 +1080,7 @@
                         <td style="font-weight: bold;">${user.position}</td>
                         <td style="padding-left: 15px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
+                                ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" referrerpolicy="no-referrer" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
                                 <span class="coach-name-bidi" dir="auto">${user.nickname}</span>
                             </div>
                         </td>
@@ -1087,13 +1098,12 @@
                     tbody.appendChild(row);
                 });
 
-                // Dans la partie où on ajoute la ligne "autres"
-                if (users.length > 5) {
+                if (collapseList) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td colspan="3" style="text-align: center;">
                             <button class="expand-button">
-                                Voir les ${users.length - 5} autres membres
+                                Voir les ${hiddenCount} autres
                             </button>
                             <button class="collapse-button">
                                 Voir moins
@@ -1112,7 +1122,7 @@
                         const tbody = table.querySelector('tbody');
                         
                         // Ajouter les lignes supplémentaires avec animation
-                        const additionalUsers = users.slice(5);
+                        const additionalUsers = users.slice(previewCount);
                         const fragment = document.createDocumentFragment();
                         
                         additionalUsers.forEach((user, index) => {
@@ -1126,7 +1136,7 @@
                                 <td style="font-weight: bold;">${user.position}</td>
                                 <td style="padding-left: 15px;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                        ${coachImgSrcMore ? `<img src="${coachImgSrcMore}" alt="${user.nickname}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
+                                        ${coachImgSrcMore ? `<img src="${coachImgSrcMore}" alt="${user.nickname}" referrerpolicy="no-referrer" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(72, 6, 7, 0.2);">` : ''}
                                         <span class="coach-name-bidi" dir="auto">${user.nickname}</span>
                                     </div>
                                 </td>
@@ -1162,8 +1172,7 @@
                         
                         // Supprimer toutes les lignes sauf les 5 premières et la ligne des boutons
                         rows.forEach((row, index) => {
-                            if (index > 5 && row !== buttonRow) {
-                                console.log('Suppression de la ligne:', index, row.innerHTML);
+                            if (index >= previewCount && row !== buttonRow) {
                                 row.remove();
                             }
                         });
@@ -1218,7 +1227,7 @@
         async function fetchMedals() {
             try {
                 const data = await fetchLeaderboardData();
-                medalUrls = [...new Set(data.current.data.map(user => user.iconLink))];
+                medalUrls = [...new Set(data.current.data.map(user => user.iconLink).filter(Boolean))];
                 return medalUrls;
             } catch (error) {
                 console.error('Erreur lors du chargement des médailles:', error);
@@ -1240,6 +1249,7 @@
 
             const medal = document.createElement('img');
             medal.classList.add('medal');
+            medal.referrerPolicy = 'no-referrer';
             medal.src = medalUrls[Math.floor(Math.random() * medalUrls.length)];
             
             const leftPosition = 20 + (Math.random() * 60);
@@ -1279,17 +1289,18 @@
                 }
 
                 const groupedByStatus = data.reduce((acc, user) => {
-                    if (!acc[user.status]) {
-                        acc[user.status] = [];
-                    }
-                    acc[user.status].push(user);
+                    const key = String(user.status || '').trim() || 'No Status';
+                    if (!acc[key]) acc[key] = [];
+                    acc[key].push(user);
                     return acc;
                 }, {});
 
                 const statuses = Object.keys(groupedByStatus).sort((a, b) => {
-                    const maxRankA = Math.max(...groupedByStatus[a].map(u => u.rank));
-                    const maxRankB = Math.max(...groupedByStatus[b].map(u => u.rank));
-                    return maxRankB - maxRankA;
+                    const rankOf = (status) => {
+                        if (status === 'No Status') return -1;
+                        return Math.max(0, ...groupedByStatus[status].map((u) => Number(u.rank) || 0));
+                    };
+                    return rankOf(b) - rankOf(a);
                 });
 
                 // Créer les tableaux
@@ -1298,8 +1309,8 @@
                         const users = groupedByStatus[status]
                             .sort((a, b) => b.rank - a.rank);
 
-                        const iconLink = users[0]?.iconLink || '';
-                        const rank = users[0]?.rank || 0;
+                        const rank = Math.max(0, ...users.map((u) => Number(u.rank) || 0));
+                        const iconLink = users.find((u) => u.iconLink)?.iconLink || '';
                         generateTable(status, rank, iconLink, users);
                     }, index * 50);
                 });
@@ -1316,13 +1327,15 @@
         }
 
         function startCountdown(duration) {
-            const countdownElement = document.getElementById('countdown');
+            const timeEl = document.getElementById('countdownTime');
             let timer = duration;
 
             async function updateCountdown() {
                 const minutes = Math.floor(timer / 60);
                 const seconds = timer % 60;
-                countdownElement.textContent = `Prochaine mise à jour dans : ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                if (timeEl) {
+                    timeEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
 
                 if (--timer < 0) {
                     timer = duration;
@@ -1427,22 +1440,6 @@
         });
     </script>
 
-    <script>
-        // Gestion de l'overlay de chargement
-        document.addEventListener('DOMContentLoaded', function() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            // Afficher l'overlay au chargement
-            loadingOverlay.style.display = 'flex';
-            
-            // Masquer l'overlay après 2 secondes
-            setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 500);
-            }, 2000);
-        });
     </script>
 </body>
 </html>
