@@ -2481,15 +2481,39 @@
         return;
       }
 
+      var usedStudioIds = {};
+      function addGridCourses(list) {
+        (list || []).forEach(function(course) {
+          if (course && course.studioId) usedStudioIds[course.studioId] = true;
+        });
+      }
+      function addGridDayMap(map) {
+        if (!map) return;
+        Object.keys(map).forEach(function(day) { addGridCourses(map[day]); });
+      }
+      addGridDayMap(allData.planning);
+      addGridDayMap(allData.planningRamadan);
+      addGridDayMap(allData.planningEte);
+      var ferieMap = allData.planningFerieByDate || {};
+      Object.keys(ferieMap).forEach(function(ymd) { addGridCourses(ferieMap[ymd]); });
+      addGridCourses(todaysCourses);
       var sortedStudios = allData.studios.slice().sort(function(a, b) {
         var rankA = a.rank !== undefined ? a.rank : (a.rang !== undefined ? a.rang : 0);
         var rankB = b.rank !== undefined ? b.rank : (b.rang !== undefined ? b.rang : 0);
         return rankA - rankB;
+      }).filter(function(studio) {
+        return studio && usedStudioIds[studio.id];
       });
 
-      for (var i = 0; i < sortedStudios.length; i += 3) {
-        for (var j = 0; j < 3 && i + j < sortedStudios.length; j++) {
-          var studio = sortedStudios[i + j];
+      if (!sortedStudios.length) {
+        studiosContainer.innerHTML = displayNoCourseMessageHtml();
+        document.getElementById('coachesSection').innerHTML = '';
+        updateNavButtonsState();
+        document.body.setAttribute('data-daily-grid-ready', 'true');
+        return;
+      }
+
+      sortedStudios.forEach(function(studio) {
           var studioCourses = (todaysCourses || [])
             .filter(function(course) { return (course.studioId || '') === (studio.id || ''); })
             .sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
@@ -2521,7 +2545,7 @@
             emptyMessage.textContent = 'Pas de cours';
             coursesContainer.appendChild(emptyMessage);
           } else {
-            studioCourses.forEach(function(course) {
+          studioCourses.forEach(function(course) {
               var coursIdStr = (course.coursId || '').toString();
               var courseName;
               if (window.PlanningResolve && window.PlanningResolve.courseDisplayFromCoursId) {
@@ -2572,8 +2596,7 @@
           studioColumn.appendChild(studioTitle);
           studioColumn.appendChild(coursesContainer);
           studiosContainer.appendChild(studioColumn);
-        }
-      }
+      });
 
       updateCourseCardsState();
 

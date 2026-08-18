@@ -15,7 +15,6 @@
       --primary: #6e0c0c;
       --primary-light: #8a1212;
       --primary-rgb: 110, 12, 12;
-      --pattern-url: url(https://mcusercontent.com/74abea872abd45d46efed5d41/images/2d4c73b7-fe42-6a75-9542-d52da9dcc082.png);
       /* Dégradé rouge → bordeaux */
       --leaderboard-red: #e42218;
       --leaderboard-bordeaux: #6e0c0c;
@@ -43,6 +42,7 @@
       overflow-x: hidden;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      background-color: #480607;
     }
 
     html::-webkit-scrollbar {
@@ -51,7 +51,7 @@
       height: 0 !important;
     }
 
-    /* Fond de page : motif séparation matin/après-midi en 128×128 + overlay bordeaux ~8% */
+    /* Fond uni : page claire, bordeaux au swipe (même teinte que l’app) */
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: #f8f9fa;
@@ -64,32 +64,6 @@
       -ms-overflow-style: none;
       -webkit-overflow-scrolling: touch;
       position: relative;
-    }
-
-    /*
-     * Couches d'arrière-plan (z-index négatifs) :
-     * Le pattern et l'overlay teinte sont TOUJOURS en dessous de tout le contenu.
-     * Tout élément visible du DOM a naturellement un z-index supérieur (≥ auto).
-     * Ne JAMAIS donner un z-index positif au pattern/overlay.
-     */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: var(--pattern-url);
-      background-size: 128px 128px;
-      background-repeat: repeat;
-      z-index: -2;
-      pointer-events: none;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-color: rgba(var(--primary-rgb), 0.08);
-      z-index: -1;
-      pointer-events: none;
     }
 
     /* Masque la barre de défilement pour le body (doublon avec *::-webkit-scrollbar pour insister) */

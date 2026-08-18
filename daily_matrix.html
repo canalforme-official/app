@@ -19,9 +19,7 @@
       --red-center: #e42218;
       --red-middle: #981010;
       --bordeaux-dark: #4c000a;
-      --bordeaux-deep: #2a0006;
       --gradient-primary: radial-gradient(circle, var(--red-center) 0%, var(--red-middle) 50%, var(--bordeaux-dark) 100%);
-      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #7a1018 0%, var(--bordeaux-dark) 45%, var(--bordeaux-deep) 100%);
       --pool-blue: #35767c;
       --women-light: #ddace7;
       --women-middle: #9e6187;
@@ -30,30 +28,87 @@
       --grid-line: rgba(255, 255, 255, 0.12);
       --grid-line-light: rgba(72, 6, 7, 0.1);
       --grid-bg: #F5F5F5;
-      --matrix-cell-bg: rgba(245, 245, 245, 0.88);
+      --background-main: #F5F5F5;
+      --matrix-cell-bg: rgba(255, 255, 255, 0.72);
       --matrix-cell-radius: 8px;
       --matrix-col-gap: 2px;
       --matrix-row-gap: 1px;
       --background-card: #FFFFFF;
       --text-primary: #333333;
       --text-secondary: #666666;
+      --primary-overlay: rgba(72, 6, 7, 0.95);
+      --primary-light: rgba(72, 6, 7, 0.8);
       --matrix-hours-width: 40px;
+    }
+
+    .dm-bg-tiles,
+    .dm-bg-veil {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body:not(.planning-ramadan):not(.planning-ferie):not(.planning-ete) .dm-bg-tiles {
+      background-color: var(--background-main);
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+    }
+    body:not(.planning-ramadan):not(.planning-ferie):not(.planning-ete) .dm-bg-veil {
+      background-color: rgba(72, 6, 7, 0.08);
     }
 
     body.planning-ramadan {
       --primary-color: var(--planning-ramadan-primary);
+      --primary-overlay: var(--planning-ramadan-overlay);
+      --primary-light: var(--planning-ramadan-light);
       --secondary-color: var(--planning-ramadan-secondary);
-      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #3d6b47 0%, #26462d 50%, #1a2e20 100%);
     }
+    body.planning-ramadan .dm-bg-tiles {
+      background-color: var(--background-main);
+      background-image: var(--planning-pattern-ramadan-url);
+      background-repeat: repeat;
+      background-size: 40px 40px;
+      background-position: 0 0;
+      opacity: 0.04;
+      filter: sepia(1) hue-rotate(335deg) saturate(2.5);
+    }
+    body.planning-ramadan .dm-bg-veil { display: none; }
+
     body.planning-ferie {
       --primary-color: var(--planning-ferie-primary);
+      --primary-overlay: var(--planning-ferie-overlay);
+      --primary-light: var(--planning-ferie-light);
       --secondary-color: var(--planning-ferie-secondary);
-      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #2a7ab8 0%, #1e5a8a 50%, #123d5c 100%);
     }
+    body.planning-ferie .dm-bg-tiles {
+      background-color: var(--background-main);
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      filter: sepia(0.35) saturate(1.2) hue-rotate(175deg);
+      opacity: 0.85;
+    }
+    body.planning-ferie .dm-bg-veil {
+      background: var(--planning-daily-ferie-sheen);
+    }
+
     body.planning-ete {
       --primary-color: var(--planning-ete-primary, #b8860b);
+      --primary-overlay: var(--planning-ete-overlay);
+      --primary-light: var(--planning-ete-light);
       --secondary-color: var(--planning-ete-secondary, #ffc107);
-      --gradient-bg: radial-gradient(ellipse 120% 80% at 50% 0%, #c49200 0%, #8a6200 50%, #4a3300 100%);
+    }
+    body.planning-ete .dm-bg-tiles {
+      background-color: var(--background-main);
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+    }
+    body.planning-ete .dm-bg-veil {
+      background-color: rgba(72, 6, 7, 0.08);
     }
 
     body.planning-ramadan .today-view-button::before {
@@ -74,25 +129,15 @@
       max-height: 100dvh;
       min-height: 100dvh;
       font-family: var(--font-text);
-      color: var(--text-light);
-      background: var(--gradient-bg);
+      color: var(--text-primary);
+      background-color: var(--background-main);
       display: flex;
       flex-direction: column;
       padding-bottom: 58px;
       -webkit-user-select: none;
       user-select: none;
       overflow: hidden;
-    }
-
-    .dm-bg-pattern {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.04;
-      background-image: var(--planning-pattern-mosaic-url, none);
-      background-size: 128px 128px;
-      background-repeat: repeat;
+      position: relative;
     }
 
     .navigation {
@@ -116,8 +161,8 @@
     }
 
     .nav-button {
-      background: rgba(255, 255, 255, 0.35);
-      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.65);
       border-radius: 50%;
       width: 50px;
       height: 50px;
@@ -130,7 +175,7 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
 
     .nav-segments {
@@ -217,9 +262,12 @@
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
       gap: 6px 10px;
-      padding: 14px 14px 12px;
+      padding: 8px 14px;
       border-bottom: none;
       flex-shrink: 0;
+      background: var(--gradient-primary);
+      color: var(--text-light);
+      position: relative;
     }
 
     .top-bar-left {
@@ -290,6 +338,7 @@
       line-height: 1;
       margin: 0;
       text-transform: uppercase;
+      color: var(--text-light);
     }
 
     .date-str {
@@ -372,24 +421,16 @@
       position: sticky;
       top: 0;
       z-index: 3;
-      background: rgba(42, 0, 6, 0.92);
-      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.72);
       padding: 6px 2px;
       vertical-align: middle;
       border-radius: var(--matrix-cell-radius);
     }
     .daily-matrix thead th.col-hours-corner {
       background: transparent;
-      backdrop-filter: none;
       border-bottom-color: transparent;
       border-right-color: transparent;
     }
-    body.planning-ramadan .daily-matrix thead th { background: rgba(26, 46, 32, 0.92); }
-    body.planning-ramadan .daily-matrix thead th.col-hours-corner { background: transparent; }
-    body.planning-ferie .daily-matrix thead th { background: rgba(18, 61, 92, 0.92); }
-    body.planning-ferie .daily-matrix thead th.col-hours-corner { background: transparent; }
-    body.planning-ete .daily-matrix thead th { background: rgba(74, 51, 0, 0.92); }
-    body.planning-ete .daily-matrix thead th.col-hours-corner { background: transparent; }
 
     .col-hours-corner,
     .cell-time {
@@ -400,12 +441,12 @@
       font-size: 0.72em;
       font-weight: 500;
       letter-spacing: 0.03em;
-      color: rgba(255, 255, 255, 0.9);
+      color: var(--text-light);
       position: sticky;
       left: 0;
       z-index: 2;
-      background: rgba(42, 0, 6, 0.85);
-      border-color: rgba(255, 255, 255, 0.1);
+      background: var(--gradient-primary);
+      border-color: transparent;
     }
     .col-hours-corner {
       z-index: 4;
@@ -433,8 +474,6 @@
       height: 30px;
       object-fit: contain;
       flex-shrink: 0;
-      filter: brightness(0) invert(1);
-      opacity: 0.92;
     }
 
     .studio-th-name {
@@ -444,16 +483,22 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
       line-height: 1.1;
-      color: rgba(255, 255, 255, 0.95);
+      color: var(--primary-color);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
     }
 
-    body.planning-ramadan .cell-time { background: rgba(26, 46, 32, 0.85); }
-    body.planning-ferie .cell-time { background: rgba(18, 61, 92, 0.85); }
-    body.planning-ete .cell-time { background: rgba(74, 51, 0, 0.85); }
+    body.planning-ramadan .studio-th-icon {
+      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%);
+    }
+    body.planning-ferie .studio-th-icon {
+      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%);
+    }
+    body.planning-ete .studio-th-icon {
+      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%);
+    }
 
     .cell-empty {
       color: rgba(72, 6, 7, 0.22);
@@ -554,10 +599,12 @@
       padding: 40px 20px;
       max-width: 480px;
       margin: 40px auto;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.72);
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: none;
       line-height: 1.5;
+      color: var(--text-primary);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
     }
     .status-panel strong {
       display: block;
@@ -565,8 +612,9 @@
       font-size: 1.2em;
       margin-bottom: 8px;
       letter-spacing: 0.04em;
+      color: var(--primary-color);
     }
-    .status-panel p { margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 0.95em; }
+    .status-panel p { margin: 0; color: var(--text-secondary); font-size: 0.95em; }
 
     .tagline-bar {
       text-align: center;
@@ -575,7 +623,7 @@
       font-size: 0.62em;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(72, 6, 7, 0.45);
       flex-shrink: 0;
     }
     .tagline-bar em { color: var(--secondary-color); font-style: normal; }
@@ -586,20 +634,17 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(42, 0, 6, 0.96);
+      background: var(--gradient-primary);
       z-index: 100;
       height: 58px;
       display: flex;
       overflow-x: auto;
       gap: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
       padding: 6px 16px 8px;
       align-items: center;
       justify-content: center;
     }
-    body.planning-ramadan .coaches-section { background: rgba(26, 46, 32, 0.96); }
-    body.planning-ferie .coaches-section { background: rgba(18, 61, 92, 0.96); }
-    body.planning-ete .coaches-section { background: rgba(74, 51, 0, 0.96); }
 
     .coach-card {
       display: flex;
@@ -800,7 +845,8 @@
     }
   })();
   </script>
-  <div class="dm-bg-pattern" aria-hidden="true"></div>
+  <div class="dm-bg-tiles" aria-hidden="true"></div>
+  <div class="dm-bg-veil" aria-hidden="true"></div>
 
   <div class="navigation">
     <button id="prevDay" type="button" onclick="changeDay(-1)" class="nav-button prev-button" aria-label="Jour précédent">
@@ -910,6 +956,33 @@
         var rankA = a.rank !== undefined ? a.rank : (a.rang !== undefined ? a.rang : 0);
         var rankB = b.rank !== undefined ? b.rank : (b.rang !== undefined ? b.rang : 0);
         return rankA - rankB;
+      });
+    }
+
+    function collectPlanningStudioIds(data, extraCourses) {
+      var used = {};
+      function addCourses(list) {
+        (list || []).forEach(function(course) {
+          if (course && course.studioId) used[course.studioId] = true;
+        });
+      }
+      function addDayMap(map) {
+        if (!map) return;
+        Object.keys(map).forEach(function(day) { addCourses(map[day]); });
+      }
+      addDayMap(data && data.planning);
+      addDayMap(data && data.planningRamadan);
+      addDayMap(data && data.planningEte);
+      var ferie = (data && data.planningFerieByDate) || {};
+      Object.keys(ferie).forEach(function(ymd) { addCourses(ferie[ymd]); });
+      addCourses(extraCourses);
+      return used;
+    }
+
+    function studiosForMatrix(studios, data, extraCourses) {
+      var used = collectPlanningStudioIds(data, extraCourses);
+      return sortStudios(studios).filter(function(studio) {
+        return studio && used[studio.id];
       });
     }
 
@@ -1239,13 +1312,13 @@
       }
 
       var courses = rv.courses || [];
-      var studios = sortStudios(allData.studios);
-      if (!studios.length) {
+      if (!allData.studios || !allData.studios.length) {
         container.innerHTML = statusPanelHtml('Configuration', 'Aucun studio configuré.');
         renderCoachesSection([]);
         document.body.setAttribute('data-daily-matrix-ready', 'true');
         return;
       }
+      var studios = studiosForMatrix(allData.studios, allData, courses);
 
       container.innerHTML = renderMatrixTable(studios, courses);
       renderCoachesSection(courses);
