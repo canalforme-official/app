@@ -31,104 +31,19 @@ body.embedded.embedded-weekly-vertical .filters-bar-unit.open .filters-sidebar {
   left: auto !important;
 }
 
-/* daily_grid / daily_matrix — en-tête frost glass iOS (app, pas Puppeteer / TV) */
-body.embedded.embedded-daily-grid:not(.puppeteer-view) .header,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  overflow: visible !important;
-  background: transparent !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-  isolation: isolate;
+/* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer), pas de barre coachs */
+body.embedded.embedded-daily-grid .coaches-section,
+body.embedded.embedded-daily-matrix .coaches-section {
+  display: none !important;
 }
 
-body.embedded.embedded-daily-grid:not(.puppeteer-view) .header::before,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .top-bar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: rgba(255, 255, 255, 0.58);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    0 4px 24px rgba(72, 6, 7, 0.08);
-  pointer-events: none;
+body.embedded.embedded-daily-grid,
+body.embedded.embedded-daily-matrix {
+  padding-bottom: 0 !important;
 }
 
-body.embedded.embedded-daily-grid:not(.puppeteer-view) .header-center .day-name,
-body.embedded.embedded-daily-grid:not(.puppeteer-view) .header-right .date-str,
-body.embedded.embedded-daily-grid:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-grid:not(.puppeteer-view) .maghrib-badge,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .day-name,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .date-str,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .tip-line,
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .opening-hours-bar .oh-label {
-  color: var(--primary-color) !important;
-}
-
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .opening-hours-bar {
-  color: var(--secondary-color);
-}
-body.embedded.embedded-daily-matrix:not(.puppeteer-view) .opening-hours-bar .oh-sep-slot {
-  background: rgba(72, 6, 7, 0.25);
-}
-
-body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header::before,
-body.embedded.embedded-daily-matrix.planning-ramadan:not(.puppeteer-view) .top-bar::before {
-  background: rgba(255, 255, 255, 0.52);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 4px 24px rgba(38, 70, 45, 0.1);
-}
-
-body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header-center .day-name,
-body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .header-right .date-str,
-body.embedded.embedded-daily-grid.planning-ramadan:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix.planning-ramadan:not(.puppeteer-view) .day-name,
-body.embedded.embedded-daily-matrix.planning-ramadan:not(.puppeteer-view) .date-str,
-body.embedded.embedded-daily-matrix.planning-ramadan:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix.planning-ramadan:not(.puppeteer-view) .tip-line {
-  color: #26462d !important;
-}
-
-body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header::before,
-body.embedded.embedded-daily-matrix.planning-ferie:not(.puppeteer-view) .top-bar::before {
-  background: rgba(255, 255, 255, 0.54);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    0 4px 24px rgba(30, 90, 138, 0.1);
-}
-
-body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header-center .day-name,
-body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .header-right .date-str,
-body.embedded.embedded-daily-grid.planning-ferie:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix.planning-ferie:not(.puppeteer-view) .day-name,
-body.embedded.embedded-daily-matrix.planning-ferie:not(.puppeteer-view) .date-str,
-body.embedded.embedded-daily-matrix.planning-ferie:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix.planning-ferie:not(.puppeteer-view) .tip-line {
-  color: #1e5a8a !important;
-}
-
-body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header::before,
-body.embedded.embedded-daily-matrix.planning-ete:not(.puppeteer-view) .top-bar::before {
-  background: rgba(255, 255, 255, 0.56);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.74),
-    0 4px 24px rgba(184, 134, 11, 0.12);
-}
-
-body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header-center .day-name,
-body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .header-right .date-str,
-body.embedded.embedded-daily-grid.planning-ete:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix.planning-ete:not(.puppeteer-view) .day-name,
-body.embedded.embedded-daily-matrix.planning-ete:not(.puppeteer-view) .date-str,
-body.embedded.embedded-daily-matrix.planning-ete:not(.puppeteer-view) .planning-type-label,
-body.embedded.embedded-daily-matrix.planning-ete:not(.puppeteer-view) .tip-line {
-  color: #b8860b !important;
+body.embedded.embedded-daily-grid .content-wrapper {
+  margin-bottom: 0 !important;
+  height: calc(100vh - 52px) !important;
+  min-height: 0 !important;
 }

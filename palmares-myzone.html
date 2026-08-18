@@ -175,6 +175,22 @@
             width: auto;
         }
 
+        .name-with-photo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .member-photo {
+            width: 28px;
+            height: 28px;
+            max-height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid rgba(var(--primary-rgb), 0.2);
+        }
+
         table th:nth-child(7), /* Cacher l'en-tête MEPS */
         table td:nth-child(7) { /* Cacher les données MEPS */
             display: none;
@@ -280,6 +296,7 @@
     </div>
 
     <script src="./planning-embedded.js"></script>
+    <script src="./leaderboard-avatars.js?v=13"></script>
     <script src="./webview-resume.js?v=2"></script>
     <script>
         let cachedPalmaresData = null;
@@ -357,9 +374,19 @@
 
             data.forEach((user, index) => {
                 const row = document.createElement('tr');
+                const displayName = LeaderboardAvatars.memberDisplayName(user);
+                const photoUrl = LeaderboardAvatars.memberPhotoSrc(user);
+                const photoHtml = photoUrl
+                    ? `<img class="member-photo" src="${photoUrl}" alt="${displayName}" referrerpolicy="no-referrer">`
+                    : '';
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td><span class="coach-name-bidi" dir="auto">${user.nickname}</span></td>
+                    <td>
+                        <div class="name-with-photo">
+                            ${photoHtml}
+                            <span class="coach-name-bidi" dir="auto">${displayName}</span>
+                        </div>
+                    </td>
                     <td>${user.gold}</td>
                     <td>${user.silver}</td>
                     <td>${user.bronze}</td>
@@ -373,7 +400,10 @@
 
         async function init() {
             try {
-                const data = await fetchLeaderboardData();
+                const [data] = await Promise.all([
+                    fetchLeaderboardData(),
+                    LeaderboardAvatars.fetchAvatarsJson()
+                ]);
                 const years = getAvailableYears(data);
                 const selectedYear = years[0] || String(new Date().getFullYear());
                 populateYearSelector(years, selectedYear);

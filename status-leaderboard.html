@@ -944,9 +944,9 @@
 
     <script src="./planning-embedded.js"></script>
     <script src="./planning-resolve.js"></script>
+    <script src="./leaderboard-avatars.js?v=13"></script>
     <script src="./webview-resume.js?v=2"></script>
     <script>
-        const DEFAULT_COACH_PHOTO_STATUS = '';
         const STATUS_PREVIEW_COUNT = 10;
         const STATUS_MIN_HIDDEN = 8;
 
@@ -956,22 +956,13 @@
             return '';
         }
 
-        /** Avatar coach / membre avec photo : caricature 1er–7 avril si pngCaricature (JSON leaderboard). */
-        function leaderboardCoachPhotoSrc(user) {
-            if (!user) return '';
-            var hasImg = user.coachLink && String(user.coachLink).trim();
-            var hasCaricature = user.pngCaricature && String(user.pngCaricature).trim();
-            if (!hasImg && !hasCaricature) return '';
-            var coachObj = {
-                imageUrl: user.coachLink || '',
-                pngCaricature: hasCaricature || ''
-            };
-            var url = '';
-            if (typeof PlanningResolve !== 'undefined' && PlanningResolve.coachPhotoUrl) {
-                url = PlanningResolve.coachPhotoUrl(coachObj) || '';
-            }
-            if (!url) url = user.coachLink || '';
-            return url || DEFAULT_COACH_PHOTO_STATUS;
+        function statusMemberIdentityHtml(user) {
+            var photo = LeaderboardAvatars.memberPhotoSrc(user);
+            var name = LeaderboardAvatars.memberDisplayName(user);
+            var img = photo
+                ? `<img src="${photo}" alt="${name}" referrerpolicy="no-referrer" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(var(--primary-rgb), 0.2);">`
+                : '';
+            return `<div style="display: flex; align-items: center; gap: 10px;">${img}<span class="coach-name-bidi" dir="auto">${name}</span></div>`;
         }
 
         let medalAnimationInterval = null;
@@ -1089,10 +1080,7 @@
                     row.innerHTML = `
                         <td style="font-weight: 700;">${user.position}</td>
                         <td style="padding-left: 15px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                ${user.coachLink ? `<img src="${user.coachLink}" alt="${user.nickname}" referrerpolicy="no-referrer" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(var(--primary-rgb), 0.2);">` : ''}
-                                <span class="coach-name-bidi" dir="auto">${user.nickname}</span>
-                            </div>
+                            ${statusMemberIdentityHtml(user)}
                         </td>
                         <td>
                             <span class="meps">
@@ -1141,14 +1129,10 @@
                             newRow.style.animationDelay = `${index * 0.05}s`;
                             newRow.setAttribute('data-position', user.position);
                             
-                            var coachImgSrcMore = leaderboardCoachPhotoSrc(user);
                             newRow.innerHTML = `
                                 <td style="font-weight: 700;">${user.position}</td>
                                 <td style="padding-left: 15px;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        ${coachImgSrcMore ? `<img src="${coachImgSrcMore}" alt="${user.nickname}" referrerpolicy="no-referrer" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(var(--primary-rgb), 0.2);">` : ''}
-                                        <span class="coach-name-bidi" dir="auto">${user.nickname}</span>
-                                    </div>
+                                    ${statusMemberIdentityHtml(user)}
                                 </td>
                                 <td>
                                     <span class="meps">
@@ -1290,7 +1274,10 @@
 
         async function init(forceRefresh) {
             try {
-                const data = await fetchLeaderboard(!!forceRefresh);
+                const [data] = await Promise.all([
+                    fetchLeaderboard(!!forceRefresh),
+                    LeaderboardAvatars.fetchAvatarsJson()
+                ]);
                 
                 if (!data || data.length === 0) {
                     console.error('Aucune donnée disponible');

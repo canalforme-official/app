@@ -1635,80 +1635,20 @@
   </div>
 
   <script src="./planning-resolve.js"></script>
+  <script src="./leaderboard-avatars.js?v=13"></script>
   <script src="./webview-resume.js?v=2"></script>
   <script>
 
-    const DEFAULT_COACH_PHOTO_LEADERBOARD = 'default-coach-photo.png';
-    let avatarsByGuid = {};
-
-    function normalizeLeaderboardGuid(value) {
-      return String(value || '').trim().toUpperCase();
-    }
-
-    function loadAvatarsMap(doc) {
-      var map = {};
-      var byGuid = doc && doc.byGuid ? doc.byGuid : {};
-      Object.keys(byGuid).forEach(function (key) {
-        var entry = byGuid[key];
-        if (typeof entry === 'string') {
-          map[normalizeLeaderboardGuid(key)] = { photoUrl: entry, nickname: '' };
-          return;
-        }
-        if (!entry || typeof entry !== 'object') return;
-        map[normalizeLeaderboardGuid(key)] = {
-          photoUrl: entry.photoUrl ? String(entry.photoUrl) : '',
-          nickname: entry.nickname ? String(entry.nickname).trim() : '',
-        };
-      });
-      avatarsByGuid = map;
-    }
-
-    async function fetchAvatarsJson() {
-      try {
-        const localResp = await fetch('./leaderboard-avatars.json?timestamp=' + Date.now());
-        if (localResp.ok) {
-          loadAvatarsMap(await localResp.json());
-          return;
-        }
-      } catch (e) { /* fallback GitHub */ }
-      try {
-        const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard-avatars.json?timestamp=' + Date.now());
-        if (remoteResp.ok) loadAvatarsMap(await remoteResp.json());
-      } catch (e) {
-        avatarsByGuid = {};
-      }
-    }
-
-    function leaderboardAppEntry(user) {
-      return avatarsByGuid[normalizeLeaderboardGuid(user && user.usrGUID)] || {};
+    function fetchAvatarsJson() {
+      return LeaderboardAvatars.fetchAvatarsJson();
     }
 
     function leaderboardMemberDisplayName(user) {
-      var appName = leaderboardAppEntry(user).nickname;
-      if (appName) return appName;
-      return String((user && user.nickname) || '');
+      return LeaderboardAvatars.memberDisplayName(user);
     }
 
-    /** Photo membre : avatar app prioritaire ; sinon photo coach (feuille). */
     function leaderboardMemberPhotoSrc(user) {
-      var appPhoto = leaderboardAppEntry(user).photoUrl;
-      if (appPhoto) return appPhoto;
-      if (user && user.type === 'Coach') return leaderboardCoachPhotoSrc(user);
-      return '';
-    }
-
-    function leaderboardCoachPhotoSrc(user) {
-      if (!user || user.type !== 'Coach') return '';
-      var coachObj = {
-        imageUrl: user.coachLink || '',
-        pngCaricature: (user.pngCaricature && String(user.pngCaricature).trim()) || ''
-      };
-      var url = '';
-      if (typeof PlanningResolve !== 'undefined' && PlanningResolve.coachPhotoUrl) {
-        url = PlanningResolve.coachPhotoUrl(coachObj) || '';
-      }
-      if (!url) url = user.coachLink || '';
-      return url || DEFAULT_COACH_PHOTO_LEADERBOARD;
+      return LeaderboardAvatars.memberPhotoSrc(user);
     }
 
     /* Overlay de chargement au démarrage : retiré (contenu visible tout de suite) */
