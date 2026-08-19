@@ -397,15 +397,16 @@
       -webkit-overflow-scrolling: touch;
       position: relative;
       overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
+    /* Masque l'ascenseur (dont l'indicateur overlay iOS) — le scroll et les ombres restent */
     .schedule-scroll-wrapper::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .schedule-scroll-wrapper::-webkit-scrollbar-thumb {
-      background: var(--primary-color);
-      border-radius: 3px;
+      display: none;
+      width: 0;
+      height: 0;
+      -webkit-appearance: none;
     }
 
     /* Ombre à droite tant qu'il y a du contenu à défiler — pleine hauteur de la page */
