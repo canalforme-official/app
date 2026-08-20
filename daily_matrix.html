@@ -257,120 +257,128 @@
       overflow: hidden;
     }
 
-    .top-bar {
+    .header {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      margin: 0;
+      flex-shrink: 0;
+      width: 100%;
+      background: var(--gradient-primary);
+      z-index: 100;
+      padding: 4px 12px;
+      box-sizing: border-box;
+      height: 52px;
+      min-height: 52px;
+      max-height: 52px;
+      overflow: hidden;
+    }
+
+    .header-inner {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
-      gap: 6px 10px;
-      padding: 8px 14px;
-      border-bottom: none;
-      flex-shrink: 0;
-      background: var(--gradient-primary);
-      color: var(--text-light);
-      position: relative;
+      width: 100%;
+      gap: 4px 10px;
+      min-width: 0;
+      min-height: 0;
     }
 
-    .top-bar-left {
+    .header-left {
+      grid-column: 1;
+      justify-self: start;
       min-width: 0;
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
       gap: 2px;
     }
 
-    .planning-type-label {
-      font-family: var(--font-title);
-      font-size: 0.78em;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.92);
-      line-height: 1.2;
-    }
-
-    .opening-hours-bar {
-      font-family: var(--font-title);
-      font-size: 0.72em;
-      letter-spacing: 0.04em;
-      color: var(--secondary-color);
-      line-height: 1.25;
-      margin-top: 2px;
-    }
-    .opening-hours-bar:empty { display: none; }
-    .opening-hours-bar .oh-inner--compact {
-      display: inline-flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-    }
-    .opening-hours-bar .oh-label {
-      color: rgba(255, 255, 255, 0.65);
-      font-weight: 400;
-      text-transform: uppercase;
-      font-size: 0.92em;
-      margin-right: 2px;
-    }
-    .opening-hours-bar .oh-chip-times {
-      display: inline-flex;
-      align-items: baseline;
-      font-variant-numeric: tabular-nums;
-      font-weight: 600;
-    }
-    .opening-hours-bar .oh-sep { opacity: 0.55; padding: 0 2px; }
-    .opening-hours-bar .oh-sep-slot {
-      display: inline-block;
-      width: 2px;
-      height: 0.95em;
-      margin: 0 6px;
-      background: rgba(255, 255, 255, 0.35);
-      vertical-align: middle;
-    }
-
-    .top-bar-center {
+    .header-center {
+      grid-column: 2;
+      justify-self: center;
+      min-width: 0;
+      max-width: 42vw;
       text-align: center;
-      min-width: 0;
     }
 
-    .day-name {
+    .header-center .day-name {
       font-family: var(--font-title);
-      font-size: clamp(1.25rem, 3.5vw, 2rem);
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      line-height: 1;
-      margin: 0;
-      text-transform: uppercase;
       color: var(--text-light);
-    }
-
-    .date-str {
-      font-family: var(--font-title);
-      font-size: clamp(0.72rem, 1.8vw, 0.95rem);
-      color: var(--secondary-color);
-      letter-spacing: 0.12em;
+      font-size: 1.52em;
+      font-weight: 600;
       text-transform: uppercase;
-      margin-top: 2px;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      display: block;
+      margin: 0;
+      padding: 0;
     }
 
-    .top-bar-right {
+    .header-right {
+      grid-column: 3;
+      justify-self: end;
+      align-self: center;
       min-width: 0;
+      max-width: 48%;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 4px;
-    }
-
-    .tip-line {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-family: var(--font-title);
-      font-size: 0.62em;
-      color: rgba(255, 255, 255, 0.82);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      line-height: 1.25;
+      justify-content: center;
+      gap: 2px;
       text-align: right;
     }
-    .tip-line svg { flex-shrink: 0; opacity: 0.9; color: var(--secondary-color); }
+
+    .header-right .date-str {
+      font-family: var(--font-text);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 1.05em;
+      font-weight: 500;
+      text-transform: none;
+      line-height: 1.15;
+      display: block;
+      margin: 0;
+    }
+
+    .planning-type-label {
+      font-family: var(--font-text);
+      font-size: 0.72em;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.88);
+      text-transform: none;
+      font-style: italic;
+      line-height: 1.15;
+      max-width: 100%;
+    }
+
+    body.planning-ramadan .planning-type-label { color: rgba(255, 255, 255, 0.92); }
+    body.planning-ferie .planning-type-label { color: rgba(255, 255, 255, 0.94); }
+    body.planning-ete .planning-type-label { color: rgba(255, 255, 255, 0.95); }
+
+    .maghrib-badge {
+      font-family: var(--font-text);
+      font-size: 0.72em;
+      color: var(--secondary-color);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-transform: none;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .maghrib-badge .maghrib-badge-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1em;
+      height: 1em;
+      flex-shrink: 0;
+      color: inherit;
+    }
+    .maghrib-badge .maghrib-badge-icon svg { width: 100%; height: 100%; }
+    .maghrib-badge.hidden { display: none !important; }
 
     .matrix-scroll {
       flex: 1;
@@ -421,7 +429,7 @@
       position: sticky;
       top: 0;
       z-index: 3;
-      background: rgba(255, 255, 255, 0.72);
+      background: var(--gradient-primary);
       padding: 6px 2px;
       vertical-align: middle;
       border-radius: var(--matrix-cell-radius);
@@ -474,6 +482,7 @@
       height: 30px;
       object-fit: contain;
       flex-shrink: 0;
+      filter: brightness(0) invert(1);
     }
 
     .studio-th-name {
@@ -483,21 +492,11 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
       line-height: 1.1;
-      color: var(--primary-color);
+      color: var(--text-light);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
-    }
-
-    body.planning-ramadan .studio-th-icon {
-      filter: brightness(0) saturate(0%) invert(27%) sepia(8%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%);
-    }
-    body.planning-ferie .studio-th-icon {
-      filter: brightness(0) saturate(0%) invert(30%) sepia(85%) saturate(900%) hue-rotate(175deg) brightness(90%) contrast(92%);
-    }
-    body.planning-ete .studio-th-icon {
-      filter: brightness(0) saturate(0%) invert(55%) sepia(45%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(95%);
     }
 
     .cell-empty {
@@ -616,19 +615,7 @@
     }
     .status-panel p { margin: 0; color: var(--text-secondary); font-size: 0.95em; }
 
-    .tagline-bar {
-      text-align: center;
-      padding: 10px 10px 16px;
-      font-family: var(--font-title);
-      font-size: 0.62em;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(72, 6, 7, 0.45);
-      flex-shrink: 0;
-    }
-    .tagline-bar em { color: var(--secondary-color); font-style: normal; }
-    body.embedded .coaches-section,
-    body.embedded .tagline-bar {
+    body.embedded .coaches-section {
       display: none !important;
     }
     body.embedded {
@@ -662,8 +649,8 @@
     }
 
     .coach-image {
-      width: 28px;
-      height: 28px;
+      width: 31px;
+      height: 31px;
       border-radius: 50%;
       object-fit: cover;
       background-color: var(--background-card);
@@ -676,14 +663,14 @@
       object-fit: unset;
       background: linear-gradient(145deg, #c9cbd4 0%, #9698a3 48%, #b0b2bb 100%);
       font-weight: 600;
-      font-size: 1.05rem;
+      font-size: 1.16rem;
       color: rgba(255, 255, 255, 0.97);
       line-height: 1;
       user-select: none;
     }
 
     .coach-image.coach-avatar-placeholder--double {
-      font-size: 0.76rem;
+      font-size: 0.84rem;
     }
 
     .coach-name {
@@ -790,25 +777,16 @@
       body { padding-bottom: 58px; }
       body:not(.puppeteer-view) { padding-bottom: 0; }
       body:not(.puppeteer-view) .coaches-section { display: none !important; }
-      .top-bar { padding: 12px 10px 10px; gap: 4px 6px; }
-      .top-bar-right .tip-line {
-        font-size: 0.48em;
-        gap: 3px;
-        align-items: flex-start;
-      }
-      .top-bar-right .tip-line svg {
-        margin-top: 0.12em;
-        flex-shrink: 0;
-      }
-      .planning-type-label { font-size: 0.62em; }
-      .opening-hours-bar { font-size: 0.58em; }
+      .header { padding: 5px 8px; }
+      .header-center .day-name { font-size: 1.28em; }
+      .header-right .date-str { font-size: 0.88em; }
+      .planning-type-label { font-size: 0.65em; }
       :root { --matrix-hours-width: 34px; }
       .studio-th-icon { width: 24px; height: 24px; }
       .studio-th-name { font-size: 0.58em; }
       .studio-th-inner { gap: 4px; }
       .cell-time { font-size: 0.68em; }
       .matrix-scroll { padding: 12px 8px 10px; }
-      .tagline-bar { font-size: 0.52em; padding: 8px 8px 14px; }
       .matrix-course-name { font-size: 0.78em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-name,
       .matrix-cell-course.has-logo.logo-failed .matrix-course-name { font-size: 0.61em; }
@@ -816,9 +794,9 @@
       .coaches-section { height: 52px; gap: 12px; padding: 5px 10px 6px; }
       .today-view-button { bottom: calc(52px + 8px); width: 48px; height: 48px; }
       .today-view-button::before { width: 48px; height: 48px; }
-      .coach-image { width: 21.6px; height: 21.6px; }
-      .coach-image.coach-avatar-placeholder { font-size: 0.945rem; }
-      .coach-image.coach-avatar-placeholder--double { font-size: 0.684rem; }
+      .coach-image { width: 24px; height: 24px; }
+      .coach-image.coach-avatar-placeholder { font-size: 1.04rem; }
+      .coach-image.coach-avatar-placeholder--double { font-size: 0.75rem; }
       .coach-name { font-size: 0.52em; }
     }
 
@@ -866,23 +844,24 @@
   </div>
 
   <div class="page-shell">
-    <header class="top-bar">
-      <div class="top-bar-left">
-        <span class="planning-type-label" id="planningTypeLabel"></span>
-        <div class="opening-hours-bar" id="openingHoursBar" aria-live="polite" aria-label="Horaires d'ouverture du club"></div>
-      </div>
-      <div class="top-bar-center">
-        <h1 class="day-name" id="dayName"></h1>
-        <div class="date-str" id="dateStr"></div>
-      </div>
-      <div class="top-bar-right">
-        <div class="tip-line">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          Arrivez 10 min avant le cours
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-left">
+          <span class="planning-type-label" id="planningTypeLabel"></span>
+          <a href="./prayer-times.html" class="maghrib-badge hidden" id="maghribBadge" title="Voir les horaires de prière" aria-label="Horaires de prière Maghrib">
+            <span class="maghrib-badge-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                <path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+              </svg>
+            </span>
+            <span class="maghrib-badge-time"></span>
+          </a>
         </div>
-        <div class="tip-line">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 14h16M6 18h12M8 6h8l1 8H7l1-8z"/></svg>
-          Serviette obligatoire
+        <div class="header-center">
+          <h1 class="day-name" id="dayName"></h1>
+        </div>
+        <div class="header-right">
+          <span class="date-str" id="dateStr"></span>
         </div>
       </div>
     </header>
@@ -891,7 +870,6 @@
       <div id="matrixContainer"></div>
     </div>
 
-    <div class="tagline-bar">Bougez plus · <em>Vivez mieux</em> · #StrongerTogether</div>
   </div>
 
   <div class="coaches-section" id="coachesSection"></div>
@@ -921,42 +899,30 @@
       return PR.parseYmdLocal(ymd).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
     }
 
-    function formatDateFrUpper(ymd) {
-      var d = PR.parseYmdLocal(ymd);
-      var months = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-      return d.getDate() + ' ' + months[d.getMonth()];
-    }
-
-    function formatOpeningHoursCompactHtml(h, maghribTime) {
-      if (!h) return '';
-      function range(openT, closeT) {
-        return '<span class="oh-chip-times"><span class="oh-time">' + escapeHtml(openT) + '</span><span class="oh-sep">–</span><span class="oh-time">' + escapeHtml(closeT) + '</span></span>';
-      }
-      var ranges = [];
-      if (h.open1 && h.close1) ranges.push(range(h.open1, h.close1));
-      if (h.open2 && h.close2) ranges.push(range(h.open2, h.close2));
-      if (!ranges.length) return '';
-      var sep = '<span class="oh-sep-slot" aria-hidden="true"></span>';
-      if (maghribTime && String(maghribTime).trim()) {
-        sep = '<span class="oh-sep-slot" aria-hidden="true"></span><span class="oh-chip-times"><span class="oh-time">' + escapeHtml(String(maghribTime).trim()) + '</span></span>';
-      }
-      return '<div class="oh-inner oh-inner--compact"><span class="oh-label">Ouvert</span>' + ranges.join(sep) + '</div>';
-    }
-
-    function renderOpeningHoursBar(rvBase) {
-      var bar = document.getElementById('openingHoursBar');
-      if (!bar) return;
-      if (!rvBase || rvBase.closed || !allData) {
-        bar.innerHTML = '';
+    function updateMaghribBadge() {
+      var badge = document.getElementById('maghribBadge');
+      if (!badge || !allData || !allData.metadata) {
+        if (badge) badge.classList.add('hidden');
         return;
       }
-      var slot = PR.pickOpeningHoursForDate(selectedDateYmd, allData, rvBase.planningKey, rvBase.dayName);
-      var maghrib = '';
-      if (rvBase.planningKey === 'ramadan' && window.prayerTimesData && window.prayerTimesData.prayerTimes) {
-        var pt = window.prayerTimesData.prayerTimes[selectedDateYmd];
-        if (pt && pt.maghrib) maghrib = pt.maghrib;
+      var ymd = selectedDateYmd || ymdFromDate(new Date());
+      var rv = PR.resolveDailyView(ymd, allData);
+      if (!rv || rv.planningKey !== 'ramadan') {
+        badge.classList.add('hidden');
+        return;
       }
-      bar.innerHTML = formatOpeningHoursCompactHtml(slot, maghrib);
+      if (!window.prayerTimesData || !window.prayerTimesData.prayerTimes) {
+        badge.classList.add('hidden');
+        return;
+      }
+      var dayPrayer = window.prayerTimesData.prayerTimes[ymd];
+      if (dayPrayer && dayPrayer.maghrib) {
+        var timeEl = badge.querySelector('.maghrib-badge-time');
+        if (timeEl) timeEl.textContent = dayPrayer.maghrib;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
     }
 
     function sortStudios(studios) {
@@ -1283,7 +1249,7 @@
       var dayNameEl = document.getElementById('dayName');
       var dateStrEl = document.getElementById('dateStr');
       if (dayNameEl) dayNameEl.textContent = dayNames[dayIndex];
-      if (dateStrEl) dateStrEl.textContent = formatDateFrUpper(selectedDateYmd);
+      if (dateStrEl) dateStrEl.textContent = formatDateFrShort(selectedDateYmd);
 
       var rvBase = PR.resolveDailyView(selectedDateYmd, allData);
       var rv = PR.mergeResolvedViewForDate
@@ -1295,9 +1261,9 @@
       document.body.classList.toggle('planning-ete', rvBase.planningKey === 'ete');
 
       updatePlanningTypeLabel(rvBase, rv);
-      renderOpeningHoursBar(rvBase);
+      updateMaghribBadge();
       if (rvBase.planningKey === 'ramadan' && (!window.prayerTimesData || !window.prayerTimesData.prayerTimes)) {
-        loadPrayerTimes().then(function() { renderOpeningHoursBar(rvBase); });
+        loadPrayerTimes().then(function() { updateMaghribBadge(); });
       }
       updateNavButtonsState();
 
@@ -1308,7 +1274,7 @@
       if (rvBase.closed) {
         container.innerHTML = displayClosedMessage(rvBase);
         renderCoachesSection([]);
-        renderOpeningHoursBar(rvBase);
+        updateMaghribBadge();
         document.body.setAttribute('data-daily-matrix-ready', 'true');
         return;
       }
@@ -1498,7 +1464,7 @@
       var dn = document.getElementById('dayName');
       var ds = document.getElementById('dateStr');
       if (dn) dn.textContent = names[d.getDay()];
-      if (ds) ds.textContent = formatDateFrUpper(ymdFromDate(d));
+      if (ds) ds.textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
     })();
 
     function init() {
