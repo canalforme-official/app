@@ -369,6 +369,15 @@
       min-height: 52px;
       max-height: 52px;
       overflow: hidden;
+      box-shadow: 0 3px 14px rgba(72, 6, 7, 0.22);
+      border-bottom: 2px solid rgba(255, 166, 48, 0.62);
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 42%, rgba(0, 0, 0, 0.07) 100%);
+      pointer-events: none;
     }
 
     .nav-button {
@@ -383,6 +392,8 @@
       gap: 4px 10px;
       min-width: 0;
       min-height: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .header-left {
@@ -415,6 +426,17 @@
       display: block;
       margin: 0;
       padding: 0;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+    }
+    .header-center .day-name::after {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 2px;
+      margin: 4px auto 0;
+      background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+      border-radius: 2px;
+      opacity: 0.92;
     }
 
     .header-right {
@@ -686,7 +708,8 @@
     }
 
     .studios-container:has(.timeline-message--closed),
-    .studios-container:has(.timeline-message--indetermine) {
+    .studios-container:has(.timeline-message--indetermine),
+    .studios-container:has(.no-courses-container) {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -711,9 +734,17 @@
       overflow: visible;
       box-sizing: border-box;
       width: 100%;
-      max-width: min(66.67vw, 100%);
+      max-width: min(66.67vw, 520px);
       margin-left: auto;
       margin-right: auto;
+      text-align: center;
+      padding: 20px;
+    }
+    .no-courses-container img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 10px;
     }
 
     .studio-column {
@@ -2246,9 +2277,9 @@
 
     function displayNoCourseMessageHtml() {
       var r = getNoCourseMessage();
-      return '<div class="no-courses-container" style="text-align:center;padding:20px;">' +
-        '<img src="' + escapeHtml(r.image) + '" alt="" style="max-width:100%;height:auto;margin-bottom:20px;border-radius:10px;" />' +
-        '<p class="no-courses-message" style="font-style:italic;font-size:1.2em;color:var(--text-secondary);">' + escapeHtml(r.message) + '</p></div>';
+      return '<div class="no-courses-container">' +
+        '<img src="' + r.image + '" alt="Image de repos" style="max-width:100%;height:auto;margin-bottom:20px;border-radius:10px;display:block;margin-left:auto;margin-right:auto;">' +
+        '<p class="no-courses-message">' + escapeHtml(r.message) + '</p></div>';
     }
 
     function syncDailyGridDateInUrl() {

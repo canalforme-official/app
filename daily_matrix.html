@@ -272,6 +272,16 @@
       min-height: 52px;
       max-height: 52px;
       overflow: hidden;
+      position: relative;
+      box-shadow: 0 3px 14px rgba(72, 6, 7, 0.22);
+      border-bottom: 2px solid rgba(255, 166, 48, 0.62);
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 42%, rgba(0, 0, 0, 0.07) 100%);
+      pointer-events: none;
     }
 
     .header-inner {
@@ -282,6 +292,8 @@
       gap: 4px 10px;
       min-width: 0;
       min-height: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .header-left {
@@ -314,6 +326,17 @@
       display: block;
       margin: 0;
       padding: 0;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+    }
+    .header-center .day-name::after {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 2px;
+      margin: 4px auto 0;
+      background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+      border-radius: 2px;
+      opacity: 0.92;
     }
 
     .header-right {
@@ -397,6 +420,19 @@
       align-items: stretch;
       justify-content: flex-start;
     }
+    #matrixContainer.matrix-empty-day {
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px 32px;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+    .matrix-scroll.matrix-scroll--empty,
+    .matrix-scroll:has(.matrix-empty-day) {
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
     table.daily-matrix {
       width: 100%;
@@ -429,10 +465,11 @@
       position: sticky;
       top: 0;
       z-index: 3;
-      background: var(--gradient-primary);
-      padding: 6px 2px;
+      background: linear-gradient(180deg, rgba(107, 18, 24, 0.94) 0%, rgba(72, 6, 7, 0.9) 100%);
+      padding: 5px 2px;
       vertical-align: middle;
       border-radius: var(--matrix-cell-radius);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
     }
     .daily-matrix thead th.col-hours-corner {
       background: transparent;
@@ -466,6 +503,7 @@
       vertical-align: middle;
       font-size: 0.76em;
       border-radius: 6px;
+      background: linear-gradient(180deg, rgba(107, 18, 24, 0.9) 0%, rgba(72, 6, 7, 0.86) 100%);
     }
 
     .studio-th-inner {
@@ -614,6 +652,116 @@
       color: var(--primary-color);
     }
     .status-panel p { margin: 0; color: var(--text-secondary); font-size: 0.95em; }
+
+    .timeline-message--closed,
+    .timeline-message--indetermine {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: min(66.67vw, 520px);
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+    .closed-card,
+    .indetermine-card {
+      box-sizing: border-box;
+      width: 100%;
+      text-align: center;
+      background: var(--background-card);
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px var(--shadow-light, rgba(0, 0, 0, 0.08)), 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(72, 6, 7, 0.12);
+    }
+    body.planning-ramadan .closed-card,
+    body.planning-ramadan .indetermine-card {
+      border-color: rgba(38, 70, 45, 0.2);
+    }
+    body.planning-ferie .closed-card,
+    body.planning-ferie .indetermine-card {
+      border-color: rgba(30, 90, 138, 0.2);
+    }
+    body.planning-ete .closed-card,
+    body.planning-ete .indetermine-card {
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .closed-title,
+    .indetermine-title {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 1.25em;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--primary-color);
+      line-height: 1.25;
+    }
+    .closed-text,
+    .indetermine-text {
+      margin: 0;
+      font-size: 0.98em;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    .indetermine-holiday {
+      margin: 0 0 12px 0;
+      font-size: 1.08em;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+    .no-courses-container {
+      overflow: visible;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: min(66.67vw, 520px);
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      padding: 20px;
+    }
+    .no-courses-message {
+      color: var(--text-secondary);
+      font-size: 1.2em;
+      font-style: italic;
+      text-align: center;
+      line-height: 1.5;
+      position: relative;
+      padding: 20px 30px;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0;
+    }
+    .no-courses-message::before,
+    .no-courses-message::after {
+      position: absolute;
+      font-size: 2.5em;
+      color: var(--secondary-color);
+      font-weight: bold;
+      line-height: 1;
+      opacity: 0.8;
+      z-index: 1;
+    }
+    .no-courses-message::before {
+      content: '«';
+      left: -10px;
+      top: -10px;
+    }
+    .no-courses-message::after {
+      content: '»';
+      right: -10px;
+      bottom: -10px;
+      top: auto;
+      line-height: 0;
+    }
+    .no-courses-container img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
 
     body.embedded .coaches-section {
       display: none !important;
@@ -1023,15 +1171,79 @@
     }
 
     function displayClosedMessage(rv) {
-      var title = selectedDateYmd === ymdFromDate(new Date()) ? 'Club fermé aujourd\u2019hui' : 'Club fermé';
-      if (rv.periodName) title += ' — ' + rv.periodName;
-      return statusPanelHtml(title, 'Aucun cours prévu pour cette journée.');
+      var name = rv.periodName ? escapeHtml(rv.periodName) : '';
+      var isTodayView = selectedDateYmd === ymdFromDate(new Date());
+      var title = isTodayView ? 'Club fermé aujourd\u2019hui' : 'Club fermé';
+      if (name) title += ' — ' + name;
+      return '<div class="timeline-message timeline-message--closed" role="status">' +
+        '<div class="closed-card">' +
+        '<strong class="closed-title">' + title + '</strong>' +
+        '<p class="closed-text">Aucun cours prévu pour cette journée.</p>' +
+        '</div></div>';
     }
 
     function displayIndetermineMessage(rv) {
-      var title = rv.planningKey === 'ete' ? 'Planning estival à déterminer' : 'Planning à déterminer';
-      var sub = rv.periodName ? escapeHtml(rv.periodName) + '<br>' : '';
-      return statusPanelHtml(title, sub + 'Un planning sera publié prochainement.');
+      var name = rv && rv.periodName ? escapeHtml(rv.periodName) : '';
+      var holidayLine = name ? '<p class="indetermine-holiday">' + name + '</p>' : '';
+      var title =
+        rv && rv.planningKey === 'ete'
+          ? 'Planning estival à déterminer'
+          : 'Planning à déterminer';
+      return '<div class="timeline-message timeline-message--indetermine" role="status">' +
+        '<div class="indetermine-card">' +
+        '<strong class="indetermine-title">' + title + '</strong>' +
+        holidayLine +
+        '<p class="indetermine-text">Un planning sera publié prochainement. Vous serez averti par notification ; il s\u2019affichera ici dès la mise à jour.</p>' +
+        '</div></div>';
+    }
+
+    var noCourseMessages = [
+      'Profitez de cette journée pour vous reposer et recharger vos batteries ! 💪',
+      'Prenez soin de vous aujourd\u2019hui, et retrouvez-nous dès demain pour continuer vos objectifs !',
+      'Conseil du jour : Hydratez-vous bien et pensez à inclure des protéines et des légumes dans vos repas ! 🌱🥤',
+      'Le saviez-vous ? Dormir au moins 7 heures améliore la récupération et les performances sportives ! 😴',
+      'Suggestions pour aujourd\u2019hui : ✨ Méditation guidée, 🚶 Promenade en plein air, 🧘 Étirements et relaxation'
+    ];
+    var noCourseImages = [
+      'https://mcusercontent.com/74abea872abd45d46efed5d41/images/70a8506a-23ce-3fc3-0e6d-2bc78a5b13d6.png',
+      'https://mcusercontent.com/74abea872abd45d46efed5d41/images/fc0db061-f08d-2db2-ab2e-341f4d9a067d.png',
+      'https://mcusercontent.com/74abea872abd45d46efed5d41/images/54cf9bc8-ad8e-2aef-1c5a-ae060b1f6d9b.png',
+      'https://mcusercontent.com/74abea872abd45d46efed5d41/images/2e02ff47-a45e-f793-0166-8a61a5c3cb1d.png',
+      'https://mcusercontent.com/74abea872abd45d46efed5d41/images/5a6492bf-169c-0807-fa9b-fbc2cc5bfaa8.png'
+    ];
+
+    function getNoCourseMessage() {
+      var today = new Date().toLocaleDateString('fr-FR');
+      var cachedDate = localStorage.getItem('noCourseMessageDate');
+      var cachedMessage = localStorage.getItem('noCourseMessage');
+      var cachedImage = localStorage.getItem('noCourseImage');
+      var message, image;
+      if (cachedDate === today && cachedMessage && cachedImage) {
+        message = cachedMessage;
+        image = cachedImage;
+      } else {
+        var randomIndex = Math.floor(Math.random() * noCourseMessages.length);
+        message = noCourseMessages[randomIndex];
+        image = noCourseImages[randomIndex];
+        localStorage.setItem('noCourseMessageDate', today);
+        localStorage.setItem('noCourseMessage', message);
+        localStorage.setItem('noCourseImage', image);
+      }
+      return { message: message, image: image };
+    }
+
+    function setMatrixEmptyLayout(isEmpty) {
+      var scroll = document.getElementById('matrixScroll');
+      var container = document.getElementById('matrixContainer');
+      if (scroll) scroll.classList.toggle('matrix-scroll--empty', !!isEmpty);
+      if (container) container.classList.toggle('matrix-empty-day', !!isEmpty);
+    }
+
+    function displayNoCourseMessageHtml() {
+      var r = getNoCourseMessage();
+      return '<div class="no-courses-container">' +
+        '<img src="' + r.image + '" alt="Image de repos" style="max-width:100%;height:auto;margin-bottom:20px;border-radius:10px;display:block;margin-left:auto;margin-right:auto;">' +
+        '<p class="no-courses-message">' + escapeHtml(r.message) + '</p></div>';
     }
 
     function updatePlanningTypeLabel(rvBase, rvMerged) {
@@ -1270,8 +1482,10 @@
       var container = document.getElementById('matrixContainer');
       if (!container) return;
       container.innerHTML = '';
+      setMatrixEmptyLayout(false);
 
       if (rvBase.closed) {
+        setMatrixEmptyLayout(true);
         container.innerHTML = displayClosedMessage(rvBase);
         renderCoachesSection([]);
         updateMaghribBadge();
@@ -1279,6 +1493,7 @@
         return;
       }
       if (rv.indetermine) {
+        setMatrixEmptyLayout(true);
         container.innerHTML = displayIndetermineMessage(rvBase);
         renderCoachesSection([]);
         document.body.setAttribute('data-daily-matrix-ready', 'true');
@@ -1286,6 +1501,15 @@
       }
 
       var courses = rv.courses || [];
+      if (!courses.length) {
+        setMatrixEmptyLayout(true);
+        container.innerHTML = displayNoCourseMessageHtml();
+        renderCoachesSection([]);
+        updateNavButtonsState();
+        toggleTodayButton();
+        document.body.setAttribute('data-daily-matrix-ready', 'true');
+        return;
+      }
       if (!allData.studios || !allData.studios.length) {
         container.innerHTML = statusPanelHtml('Configuration', 'Aucun studio configuré.');
         renderCoachesSection([]);
