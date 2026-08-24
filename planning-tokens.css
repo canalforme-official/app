@@ -312,10 +312,99 @@ body.planning-ete .countdown {
   z-index: 2;
 }
 
-/* CF-19 — favoris cours / coach (contour doré) */
-.course-block.is-favorite,
-.course-card.is-favorite,
-.matrix-cell-course.is-favorite {
-  box-shadow: 0 0 0 2.5px #c9a227, 0 2px 10px rgba(201, 162, 39, 0.38);
-  border-color: #c9a227;
+/* CF-19 — favoris */
+/* Jour / Semaine : bloc plein doré */
+.course-block.is-favorite {
+  background: #c9a227 !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.28) !important;
+  color: #fff !important;
+  overflow: hidden;
+}
+
+.course-block.is-favorite::before,
+.course-block.is-favorite::after {
+  display: none !important;
+  content: none !important;
+}
+
+.course-block.is-favorite .course-name-text,
+.course-block.is-favorite .single-coach span,
+.course-block.is-favorite .coach-name-bidi,
+.course-block.is-favorite .course-type,
+.course-block.is-favorite .course-studio,
+.course-block.is-favorite .course-studio-fallback,
+.course-block.is-favorite .course-title h3,
+.course-block.is-favorite .course-event-label,
+.course-block.is-favorite .countdown,
+.course-block.is-favorite .coach-avatar-placeholder {
+  color: #fff !important;
+}
+
+.course-block.is-favorite .course-type,
+.course-block.is-favorite .course-studio {
+  color: #fff !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.course-block.is-favorite .countdown-pill {
+  background-color: #fff !important;
+  color: #a8861f !important;
+}
+
+/* Matrice : cellule heure×studio entière */
+td.cell-studio.is-favorite {
+  background: #c9a227 !important;
+  background-image: none !important;
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.28) !important;
+  border-radius: var(--matrix-cell-radius, 8px);
+}
+
+td.cell-studio.is-favorite .matrix-course-name,
+td.cell-studio.is-favorite .matrix-course-coach,
+td.cell-studio.is-favorite .cell-empty {
+  color: #fff !important;
+}
+
+td.cell-studio.is-favorite .matrix-cell-course {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-top-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Grille : pastille heure + textes or (pas le fond carte) */
+.course-card.is-favorite {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.course-card.is-favorite .course-time {
+  background: #c9a227 !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+
+.course-card.is-favorite .course-name,
+.course-card.is-favorite .course-coach {
+  color: #c9a227 !important;
+  background: transparent !important;
+}
+
+.course-card.is-favorite .countdown-pill,
+.course-card.is-favorite .course-time .countdown-pill {
+  background-color: #fff !important;
+  color: #a8861f !important;
+}
+
+/* Filtre créneaux favoris */
+.course-block.cf-slot-hidden,
+.course-card.cf-slot-hidden,
+.matrix-cell-course.cf-slot-hidden,
+td.cell-studio.cf-slot-hidden,
+.timeline-block.cf-slot-hidden {
+  display: none !important;
 }

@@ -755,20 +755,42 @@
   }
 
   /**
-   * Contour doré favoris (CF-19). Config : window.__CF_FAVORITES__ = { courseIds, coachIds, matchMode }.
-   * Blocs : data-cours-id + data-coach-ids (ids séparés par virgule).
+   * Favoris CF-19. Config : window.__CF_FAVORITES__ = { courseIds, coachIds, slotTimes, matchMode }.
+   * Matrice : classe is-favorite sur td.cell-studio. Créneaux : filtre cf-slot-hidden.
    */
   function applyFavoriteHighlights(config) {
     var cfg = config || global.__CF_FAVORITES__ || {};
     var courseIds = Array.isArray(cfg.courseIds) ? cfg.courseIds : [];
     var coachIds = Array.isArray(cfg.coachIds) ? cfg.coachIds : [];
+    var slotTimes = Array.isArray(cfg.slotTimes) ? cfg.slotTimes : [];
     var mode = cfg.matchMode || 'any';
-    if (!courseIds.length && !coachIds.length) {
-      document.querySelectorAll('.course-block.is-favorite, .course-card.is-favorite, .matrix-cell-course.is-favorite')
-        .forEach(function(el) { el.classList.remove('is-favorite'); });
-      return;
+
+    function normTime(raw) {
+      var m = String(raw || '').trim().match(/^(\d{1,2}):(\d{2})/);
+      if (!m) return '';
+      var h = Number(m[1]);
+      var min = Number(m[2]);
+      if (!isFinite(h) || !isFinite(min) || h > 23 || min > 59) return '';
+      return (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
     }
-    document.querySelectorAll('.course-block, .course-card, .matrix-cell-course').forEach(function(el) {
+
+    function startOf(el) {
+      return normTime(
+        el.getAttribute('data-start-time') ||
+        (el.querySelector && el.querySelector('.course-time') && el.querySelector('.course-time').textContent) ||
+        (el.closest && el.closest('.timeline-block') && el.closest('.timeline-block').getAttribute('data-start-time')) ||
+        ''
+      );
+    }
+
+    function slotAllowed(el) {
+      if (!slotTimes.length) return true;
+      var t = startOf(el);
+      return t && slotTimes.indexOf(t) !== -1;
+    }
+
+    function matchHighlight(el) {
+      if (!courseIds.length && !coachIds.length) return false;
       var cid = (el.getAttribute('data-cours-id') || '').trim();
       var coachAttr = (el.getAttribute('data-coach-ids') || '').trim();
       var cids = coachAttr
@@ -776,12 +798,46 @@
         : [];
       var courseHit = cid && courseIds.indexOf(cid) !== -1;
       var coachHit = cids.some(function(id) { return coachIds.indexOf(id) !== -1; });
-      var hit = false;
-      if (mode === 'course') hit = !!courseHit;
-      else if (mode === 'coach') hit = !!coachHit;
-      else if (mode === 'both') hit = !!(courseHit && coachHit);
-      else hit = !!(courseHit || coachHit);
+      if (mode === 'course') return !!courseHit;
+      if (mode === 'coach') return !!coachHit;
+      if (mode === 'both') return !!(courseHit && coachHit);
+      return !!(courseHit || coachHit);
+    }
+
+    document.querySelectorAll('td.cell-studio.is-favorite, td.cell-studio.cf-slot-hidden').forEach(function(td) {
+      td.classList.remove('is-favorite');
+      td.classList.remove('cf-slot-hidden');
+    });
+    document.querySelectorAll('.timeline-block.cf-slot-hidden').forEach(function(el) {
+      el.classList.remove('cf-slot-hidden');
+    });
+
+    document.querySelectorAll('.course-block, .course-card, .matrix-cell-course').forEach(function(el) {
+      var allowed = slotAllowed(el);
+      el.classList.toggle('cf-slot-hidden', !allowed);
+      var hit = allowed && matchHighlight(el);
       el.classList.toggle('is-favorite', hit);
+
+      if (el.classList.contains('matrix-cell-course')) {
+        var td = el.closest && el.closest('td.cell-studio');
+        if (td) {
+          if (!allowed) td.classList.add('cf-slot-hidden');
+          else if (hit) td.classList.add('is-favorite');
+        }
+      }
+      if (el.classList.contains('course-block')) {
+        var tb = el.closest && el.closest('.timeline-block');
+        if (tb && !allowed) tb.classList.add('cf-slot-hidden');
+      }
+    });
+
+    document.querySelectorAll('table.daily-matrix tbody tr').forEach(function(tr) {
+      if (!slotTimes.length) {
+        tr.style.display = '';
+        return;
+      }
+      var rowTime = normTime((tr.querySelector('.cell-time') || {}).textContent || '');
+      tr.style.display = rowTime && slotTimes.indexOf(rowTime) !== -1 ? '' : 'none';
     });
   }
 
