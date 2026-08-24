@@ -1162,7 +1162,7 @@
         : '';
       var nameHtml = '<div class="matrix-course-name">' + escapeHtml(name) + '</div>';
       var coachHtml = '<div class="matrix-course-coach">' + escapeHtml(coachText) + '</div>';
-      return '<div class="matrix-cell-course' + (hasLogo ? ' has-logo' : '') + extraClass + '" data-start-time="' + escapeHtml(start) + '" data-end-time="' + escapeHtml(end) + '">' +
+      return '<div class="matrix-cell-course' + (hasLogo ? ' has-logo' : '') + extraClass + '" data-cours-id="' + escapeHtml(course.coursId || '') + '" data-coach-ids="' + escapeHtml((course.coachIds || []).join(',')) + '" data-start-time="' + escapeHtml(start) + '" data-end-time="' + escapeHtml(end) + '">' +
         logoHtml + nameHtml + coachHtml + '</div>';
     }
 
@@ -1521,6 +1521,12 @@
       container.innerHTML = renderMatrixTable(studios, courses);
       renderCoachesSection(courses);
       updateCourseCellsState();
+
+      if (PR.applyFavoriteHighlights) {
+        PR.applyFavoriteHighlights();
+      } else if (typeof window.__canalFormeApplyFavorites === 'function') {
+        window.__canalFormeApplyFavorites();
+      }
 
       if (PR.fillPlanningEventConfetti) {
         PR.fillPlanningEventConfetti(container, { variant: 'compact' });

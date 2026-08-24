@@ -239,6 +239,7 @@
             return coachs.find(function(c) { return c.id === coachId; });
           });
           scheduleByTimeAndDay[startTime][col.ymd].push({
+            coursId: course.coursId || '',
             courseName: courseInfo ? courseInfo.name : (PR.formatCourseNameFromCoursId ? PR.formatCourseNameFromCoursId(course.coursId) : 'Cours'),
             logo: courseInfo ? courseInfo.logo : '',
             studio: studioInfo ? studioInfo.name : 'Studio inconnu',
@@ -248,10 +249,12 @@
             type: course.type,
             isPlanningEventCourse: !!course.isPlanningEventCourse,
             planningEventTheme: course.planningEventTheme || 'regulier',
+            coachIds: (course.coachIds || []).slice(),
             coachs: coachsInfo.map(function(coach) {
               var nm = coach ? coach.name : 'Coach inconnu';
               var disp = coach && PR.coachDisplayName ? PR.coachDisplayName(coach) : nm;
               return {
+                id: coach && coach.id ? coach.id : '',
                 name: nm,
                 displayName: disp,
                 imageUrl: PR.coachPhotoUrl(coach) || (coach && coach.imageUrl) || ''
@@ -493,7 +496,7 @@
                   : ' course-block--planning-event';
               }
 
-              courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
+              courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-cours-id="' + PR.escapeHtml(course.coursId || '') + '" data-coach-ids="' + PR.escapeHtml((course.coachIds || []).join(',')) + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
               if (isStartingSoon) {
                 courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
               }
@@ -597,6 +600,11 @@
       if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
         window.PlanningResolve.fillPlanningEventConfetti(el, { variant: 'compact' });
       }
+      if (window.PlanningResolve && window.PlanningResolve.applyFavoriteHighlights) {
+        window.PlanningResolve.applyFavoriteHighlights();
+      } else if (typeof window.__canalFormeApplyFavorites === 'function') {
+        window.__canalFormeApplyFavorites();
+      }
       applyWeeklyBodyPlanningTheme();
       updateNavButtonsStateWeek();
       if (scheduleData) renderPlanningViewSwitcher(scheduleData);
@@ -683,6 +691,11 @@
         wireWeeklyCoachPhotoFallbacks();
         if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
           window.PlanningResolve.fillPlanningEventConfetti(document.getElementById('weeklySchedule'), { variant: 'compact' });
+        }
+        if (window.PlanningResolve && window.PlanningResolve.applyFavoriteHighlights) {
+          window.PlanningResolve.applyFavoriteHighlights();
+        } else if (typeof window.__canalFormeApplyFavorites === 'function') {
+          window.__canalFormeApplyFavorites();
         }
 
         (function setupStickyDaysBar() {
@@ -1052,10 +1065,12 @@
       for (const badge of badges) {
         const timeDiff = parseInt(badge.getAttribute('data-time-diff'), 10);
         if (timeDiff >= 0) {
-          const minutes = Math.floor(timeDiff / 60);
-          const seconds = timeDiff % 60;
-          const timeString = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-          badge.textContent = timeString;
+          // Aligné grille Jour : ≥ 1 min → 12' ; < 1 min → 45" (plus compact que mm:ss)
+          if (timeDiff < 60) {
+            badge.textContent = timeDiff + '"';
+          } else {
+            badge.textContent = Math.ceil(timeDiff / 60) + "'";
+          }
           badge.setAttribute('data-time-diff', timeDiff - 1);
         } else {
           badge.parentElement.classList.remove('starting-soon');

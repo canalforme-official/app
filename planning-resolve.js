@@ -754,6 +754,37 @@
     });
   }
 
+  /**
+   * Contour doré favoris (CF-19). Config : window.__CF_FAVORITES__ = { courseIds, coachIds, matchMode }.
+   * Blocs : data-cours-id + data-coach-ids (ids séparés par virgule).
+   */
+  function applyFavoriteHighlights(config) {
+    var cfg = config || global.__CF_FAVORITES__ || {};
+    var courseIds = Array.isArray(cfg.courseIds) ? cfg.courseIds : [];
+    var coachIds = Array.isArray(cfg.coachIds) ? cfg.coachIds : [];
+    var mode = cfg.matchMode || 'any';
+    if (!courseIds.length && !coachIds.length) {
+      document.querySelectorAll('.course-block.is-favorite, .course-card.is-favorite, .matrix-cell-course.is-favorite')
+        .forEach(function(el) { el.classList.remove('is-favorite'); });
+      return;
+    }
+    document.querySelectorAll('.course-block, .course-card, .matrix-cell-course').forEach(function(el) {
+      var cid = (el.getAttribute('data-cours-id') || '').trim();
+      var coachAttr = (el.getAttribute('data-coach-ids') || '').trim();
+      var cids = coachAttr
+        ? coachAttr.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
+        : [];
+      var courseHit = cid && courseIds.indexOf(cid) !== -1;
+      var coachHit = cids.some(function(id) { return coachIds.indexOf(id) !== -1; });
+      var hit = false;
+      if (mode === 'course') hit = !!courseHit;
+      else if (mode === 'coach') hit = !!coachHit;
+      else if (mode === 'both') hit = !!(courseHit && coachHit);
+      else hit = !!(courseHit || coachHit);
+      el.classList.toggle('is-favorite', hit);
+    });
+  }
+
   var api = {
     NAV_DAYS_LIMIT: NAV_DAYS_LIMIT,
     ymdFromDate: ymdFromDate,
@@ -795,7 +826,8 @@
     wirePlanningImgTextFallbacks: wirePlanningImgTextFallbacks,
     normalizePlanningEventTheme: normalizePlanningEventTheme,
     planningEventThemeClasses: planningEventThemeClasses,
-    fillPlanningEventConfetti: fillPlanningEventConfetti
+    fillPlanningEventConfetti: fillPlanningEventConfetti,
+    applyFavoriteHighlights: applyFavoriteHighlights
   };
 
   global.PlanningResolve = api;

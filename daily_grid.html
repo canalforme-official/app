@@ -2582,6 +2582,8 @@
                 : (course.isPlanningEventCourse ? ' course-card--planning-event' : ''));
               courseCard.setAttribute('data-start-time', startTimeStr);
               courseCard.setAttribute('data-end-time', endTimeStr);
+              courseCard.setAttribute('data-cours-id', coursIdStr);
+              courseCard.setAttribute('data-coach-ids', coachIds.join(','));
               var courseType = (course.type || '').toString().toLowerCase();
               var studioName = (studio.name || '').toString().toLowerCase();
               if (courseType.indexOf('femme') !== -1) courseCard.classList.add('women-only');
@@ -2598,6 +2600,12 @@
       });
 
       updateCourseCardsState();
+
+      if (window.PlanningResolve && window.PlanningResolve.applyFavoriteHighlights) {
+        window.PlanningResolve.applyFavoriteHighlights();
+      } else if (typeof window.__canalFormeApplyFavorites === 'function') {
+        window.__canalFormeApplyFavorites();
+      }
 
       if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
         var sc = document.getElementById('studiosContainer');

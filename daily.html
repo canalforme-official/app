@@ -219,7 +219,9 @@
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
-      overflow-x: visible;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       width: 100%;
       max-width: 100vw;
       box-sizing: border-box;
@@ -3604,7 +3606,7 @@
         scheduleHTML +=
           '<div class="timeline-block ' + (courseStatusClass.indexOf('past') !== -1 ? 'past' : '') + ' ' + (courseStatusClass.indexOf('current') !== -1 ? 'current' : '') + '" data-start-time="' + course.startTime + '" data-end-time="' + course.endTime + '">' +
             '<div class="time">' + course.startTime + ' - ' + course.endTime + '</div>' +
-            '<div class="course-block ' + courseTypeClass + ' ' + courseStatusClass + peClass + '" id="' + (courseStatusClass.indexOf('focus') !== -1 ? 'focus-course' : '') + '">' +
+            '<div class="course-block ' + courseTypeClass + ' ' + courseStatusClass + peClass + '" id="' + (courseStatusClass.indexOf('focus') !== -1 ? 'focus-course' : '') + '" data-cours-id="' + escapeHtml(course.coursId || '') + '" data-coach-ids="' + escapeHtml((course.coachIds || []).join(',')) + '">' +
               '<div class="course-studio">' +
                 (studio.imageUrl
                   ? '<img class="course-studio-icon" src="' +
@@ -3638,6 +3640,11 @@
       scheduleContainer.innerHTML = scheduleHTML;
       if (window.PlanningResolve && window.PlanningResolve.fillPlanningEventConfetti) {
         window.PlanningResolve.fillPlanningEventConfetti(scheduleContainer, { variant: 'daily' });
+      }
+      if (window.PlanningResolve && window.PlanningResolve.applyFavoriteHighlights) {
+        window.PlanningResolve.applyFavoriteHighlights();
+      } else if (typeof window.__canalFormeApplyFavorites === 'function') {
+        window.__canalFormeApplyFavorites();
       }
       if (window.PlanningResolve && window.PlanningResolve.wirePlanningImgTextFallbacks) {
         window.PlanningResolve.wirePlanningImgTextFallbacks(scheduleContainer);

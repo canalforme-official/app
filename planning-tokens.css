@@ -311,3 +311,11 @@ body.planning-ete .countdown {
   position: relative;
   z-index: 2;
 }
+
+/* CF-19 — favoris cours / coach (contour doré) */
+.course-block.is-favorite,
+.course-card.is-favorite,
+.matrix-cell-course.is-favorite {
+  box-shadow: 0 0 0 2.5px #c9a227, 0 2px 10px rgba(201, 162, 39, 0.38);
+  border-color: #c9a227;
+}
