@@ -475,13 +475,14 @@ td.cell-studio.is-favorite.is-favorite--star::after {
 td.cell-studio.is-favorite.is-favorite--outline {
   position: relative;
   outline: none !important;
+  overflow: visible !important;
 }
 
 .course-block.is-favorite.is-favorite--outline::after {
   content: '';
   position: absolute;
-  inset: -3px;
-  border-radius: 18px;
+  inset: -4px;
+  border-radius: 19px;
   padding: 2.5px;
   box-sizing: border-box;
   background: conic-gradient(
@@ -497,17 +498,23 @@ td.cell-studio.is-favorite.is-favorite--outline {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.4s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: 12;
+}
+
+.weekly-schedule .course-block.is-favorite.is-favorite--outline::after {
+  inset: -2px;
+  border-radius: 12px;
+  padding: 1.5px;
 }
 
 .course-card.is-favorite.is-favorite--outline .course-time::after {
   content: '';
   position: absolute;
-  inset: -3px;
-  border-radius: 10px;
-  padding: 2px;
+  inset: -2px;
+  border-radius: 5px;
+  padding: 1.5px;
   box-sizing: border-box;
   background: conic-gradient(
     from var(--cf-fav-angle),
@@ -522,7 +529,7 @@ td.cell-studio.is-favorite.is-favorite--outline {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.4s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: 12;
 }
@@ -552,7 +559,8 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.4s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: 12;
 }
+
