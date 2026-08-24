@@ -458,9 +458,15 @@ td.cell-studio.is-favorite.is-favorite--star::after {
   display: none !important;
 }
 
-@keyframes cf-fav-outline-spin {
+@property --cf-fav-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes cf-fav-outline-gleam {
   to {
-    transform: rotate(360deg);
+    --cf-fav-angle: 360deg;
   }
 }
 
@@ -479,20 +485,19 @@ td.cell-studio.is-favorite.is-favorite--outline {
   padding: 2.5px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
-    rgba(201, 162, 39, 0.5) 0deg,
-    rgba(201, 162, 39, 0.22) 55deg,
-    rgba(201, 162, 39, 0.22) 210deg,
-    #ffe9a0 250deg,
+    from var(--cf-fav-angle),
+    rgba(201, 162, 39, 0.4) 0deg,
+    rgba(201, 162, 39, 0.4) 230deg,
+    #ffe9a0 255deg,
     #fffef8 275deg,
-    #c9a227 300deg,
-    rgba(201, 162, 39, 0.22) 330deg,
-    rgba(201, 162, 39, 0.5) 360deg
+    #c9a227 295deg,
+    rgba(201, 162, 39, 0.4) 320deg,
+    rgba(201, 162, 39, 0.4) 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.4s linear infinite;
+  animation: cf-fav-outline-gleam 2.4s linear infinite;
   pointer-events: none;
   z-index: 12;
 }
@@ -505,20 +510,19 @@ td.cell-studio.is-favorite.is-favorite--outline {
   padding: 2px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
-    rgba(201, 162, 39, 0.5) 0deg,
-    rgba(201, 162, 39, 0.22) 55deg,
-    rgba(201, 162, 39, 0.22) 210deg,
-    #ffe9a0 250deg,
+    from var(--cf-fav-angle),
+    rgba(201, 162, 39, 0.4) 0deg,
+    rgba(201, 162, 39, 0.4) 230deg,
+    #ffe9a0 255deg,
     #fffef8 275deg,
-    #c9a227 300deg,
-    rgba(201, 162, 39, 0.22) 330deg,
-    rgba(201, 162, 39, 0.5) 360deg
+    #c9a227 295deg,
+    rgba(201, 162, 39, 0.4) 320deg,
+    rgba(201, 162, 39, 0.4) 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.4s linear infinite;
+  animation: cf-fav-outline-gleam 2.4s linear infinite;
   pointer-events: none;
   z-index: 12;
 }
@@ -536,20 +540,19 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   padding: 2px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
-    rgba(201, 162, 39, 0.5) 0deg,
-    rgba(201, 162, 39, 0.22) 55deg,
-    rgba(201, 162, 39, 0.22) 210deg,
-    #ffe9a0 250deg,
+    from var(--cf-fav-angle),
+    rgba(201, 162, 39, 0.4) 0deg,
+    rgba(201, 162, 39, 0.4) 230deg,
+    #ffe9a0 255deg,
     #fffef8 275deg,
-    #c9a227 300deg,
-    rgba(201, 162, 39, 0.22) 330deg,
-    rgba(201, 162, 39, 0.5) 360deg
+    #c9a227 295deg,
+    rgba(201, 162, 39, 0.4) 320deg,
+    rgba(201, 162, 39, 0.4) 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.4s linear infinite;
+  animation: cf-fav-outline-gleam 2.4s linear infinite;
   pointer-events: none;
   z-index: 12;
 }
