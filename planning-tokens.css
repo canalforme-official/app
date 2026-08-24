@@ -401,13 +401,26 @@ td.cell-studio.is-favorite.is-favorite--gold .matrix-cell-course {
 
 .course-block.is-favorite.is-favorite--star,
 .course-card.is-favorite.is-favorite--star,
-.matrix-cell-course.is-favorite.is-favorite--star {
+.matrix-cell-course.is-favorite.is-favorite--star,
+td.cell-studio.is-favorite.is-favorite--star {
   position: relative;
 }
 
-.course-block.is-favorite.is-favorite--star::after,
-.course-card.is-favorite.is-favorite--star::after,
-.matrix-cell-course.is-favorite.is-favorite--star::after {
+/* Jour : étoile ~2,3× (14 → 32), coin haut droit */
+.course-block.is-favorite.is-favorite--star::after {
+  content: '★';
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  z-index: 20;
+  font-size: 32px;
+  line-height: 1;
+  color: #c9a227;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+.course-card.is-favorite.is-favorite--star::after {
   content: '★';
   position: absolute;
   top: 2px;
@@ -420,26 +433,123 @@ td.cell-studio.is-favorite.is-favorite--gold .matrix-cell-course {
   pointer-events: none;
 }
 
+/* Matrice : fond blanc conservé + étoile coin cellule */
 td.cell-studio.is-favorite.is-favorite--star {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.course-block.is-favorite.is-favorite--outline {
-  background: transparent !important;
+  background: var(--matrix-cell-bg, rgba(255, 255, 255, 0.72)) !important;
   background-image: none !important;
   box-shadow: none !important;
-  outline: 2px solid #c9a227;
-  outline-offset: -2px;
-  border-radius: 6px;
 }
 
-.course-card.is-favorite.is-favorite--outline .course-time {
-  outline: 2px solid #c9a227;
-  outline-offset: 0;
+td.cell-studio.is-favorite.is-favorite--star::after {
+  content: '★';
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  z-index: 20;
+  font-size: 13px;
+  line-height: 1;
+  color: #c9a227;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.matrix-cell-course.is-favorite.is-favorite--star::after {
+  content: none !important;
+  display: none !important;
+}
+
+@keyframes cf-fav-outline-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.course-block.is-favorite.is-favorite--outline,
+.course-card.is-favorite.is-favorite--outline .course-time,
+td.cell-studio.is-favorite.is-favorite--outline {
+  position: relative;
+  outline: none !important;
+}
+
+.course-block.is-favorite.is-favorite--outline::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  padding: 2.5px;
+  box-sizing: border-box;
+  background: conic-gradient(
+    from 0deg,
+    rgba(201, 162, 39, 0.5) 0deg,
+    rgba(201, 162, 39, 0.22) 55deg,
+    rgba(201, 162, 39, 0.22) 210deg,
+    #ffe9a0 250deg,
+    #fffef8 275deg,
+    #c9a227 300deg,
+    rgba(201, 162, 39, 0.22) 330deg,
+    rgba(201, 162, 39, 0.5) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-fav-outline-spin 2.4s linear infinite;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.course-card.is-favorite.is-favorite--outline .course-time::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 10px;
+  padding: 2px;
+  box-sizing: border-box;
+  background: conic-gradient(
+    from 0deg,
+    rgba(201, 162, 39, 0.5) 0deg,
+    rgba(201, 162, 39, 0.22) 55deg,
+    rgba(201, 162, 39, 0.22) 210deg,
+    #ffe9a0 250deg,
+    #fffef8 275deg,
+    #c9a227 300deg,
+    rgba(201, 162, 39, 0.22) 330deg,
+    rgba(201, 162, 39, 0.5) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-fav-outline-spin 2.4s linear infinite;
+  pointer-events: none;
+  z-index: 12;
 }
 
 td.cell-studio.is-favorite.is-favorite--outline {
   background: var(--matrix-cell-bg, rgba(255, 255, 255, 0.72)) !important;
-  box-shadow: inset 0 0 0 2px #c9a227 !important;
+  overflow: visible;
+}
+
+td.cell-studio.is-favorite.is-favorite--outline::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  padding: 2px;
+  box-sizing: border-box;
+  background: conic-gradient(
+    from 0deg,
+    rgba(201, 162, 39, 0.5) 0deg,
+    rgba(201, 162, 39, 0.22) 55deg,
+    rgba(201, 162, 39, 0.22) 210deg,
+    #ffe9a0 250deg,
+    #fffef8 275deg,
+    #c9a227 300deg,
+    rgba(201, 162, 39, 0.22) 330deg,
+    rgba(201, 162, 39, 0.5) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-fav-outline-spin 2.4s linear infinite;
+  pointer-events: none;
+  z-index: 12;
 }
