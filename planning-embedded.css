@@ -73,3 +73,13 @@ body.embedded.embedded-daily-grid .content-wrapper {
   height: calc(100vh - 52px) !important;
   min-height: 0 !important;
 }
+
+/* Matrice app : scroll vertical libre (pousser le pouce) — sans marge basse artificielle */
+body.embedded.embedded-daily-matrix .matrix-scroll {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: auto !important;
+}
