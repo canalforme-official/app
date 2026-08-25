@@ -43,13 +43,13 @@ body.embedded.embedded-weekly-vertical .content-wrapper {
 /* weekly.html (Tableau) — droite, bas d’origine, léger décalage vers l’intérieur */
 body.embedded.embedded-weekly-horizontal .filters-sidebar {
   bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
-  right: 56px !important;
+  right: 72px !important;
   left: auto !important;
   z-index: 10050 !important;
 }
 
 body.embedded.embedded-weekly-horizontal .filters-sidebar.open {
-  width: calc(100% - 72px) !important;
+  width: calc(100% - 88px) !important;
 }
 
 body.embedded.embedded-weekly-horizontal .content-wrapper {
