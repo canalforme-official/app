@@ -295,6 +295,8 @@
       -ms-overflow-style: none;
       /* Vertical uniquement ici : le horizontal est géré par les wrappers enfants */
       touch-action: pan-y;
+      /* Évite le blocage iOS en bas de page (rubber-band / scroll imbriqué) */
+      overscroll-behavior-y: none;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
@@ -397,6 +399,7 @@
       -webkit-overflow-scrolling: touch;
       position: relative;
       overscroll-behavior-x: contain;
+      overscroll-behavior-y: none;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
@@ -1681,10 +1684,13 @@
       100% { transform: scale(1) translateZ(0); }
     }
 
-    /* Mobile : filtre un peu plus bas ; fermé = pastille 50×50, ouvert = 2 lignes fluides */
+    /* Mobile public : filtre bas ; en app (?embedded) planning-embedded.css prime */
     @media screen and (max-width: 768px) {
       .filters-bar-unit {
         --filter-bar-bottom: max(6px, env(safe-area-inset-bottom, 0px));
+      }
+      body.embedded.embedded-weekly-vertical .filters-bar-unit {
+        --filter-bar-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
       }
     }
 

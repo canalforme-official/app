@@ -770,6 +770,7 @@
       highlightStyle = 'gold';
     }
     var STYLE_CLASSES = ['is-favorite--gold', 'is-favorite--star', 'is-favorite--outline'];
+    var enabled = cfg.enabled !== false;
 
     function normTime(raw) {
       var m = String(raw || '').trim().match(/^(\d{1,2}):(\d{2})/);
@@ -827,7 +828,7 @@
     });
 
     document.querySelectorAll('.course-block, .course-card, .matrix-cell-course').forEach(function(el) {
-      var hit = matchCourseCoach(el) && slotOk(el);
+      var hit = enabled && matchCourseCoach(el) && slotOk(el);
       setFav(el, hit);
       if (el.classList.contains('matrix-cell-course')) {
         var td = el.closest && el.closest('td.cell-studio');

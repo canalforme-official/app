@@ -13,9 +13,12 @@ body.embedded #ramadanSwitchButton {
   opacity: 0 !important;
 }
 
-/* weekly_vertical (app) : filtre au-dessus de la tab bar glass, pas sous elle */
+/*
+ * Tab bar glass app ≈ 58 px + marge bas.
+ * Filtre au-dessus de la barre (pas confondu avec elle).
+ */
 body.embedded.embedded-weekly-vertical .filters-bar-unit {
-  --filter-bar-bottom: calc(38px + env(safe-area-inset-bottom, 0px));
+  --filter-bar-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
   --filter-bar-right: 16px;
 }
 
@@ -29,6 +32,28 @@ body.embedded.embedded-weekly-vertical .filters-bar-unit .filter-button {
 body.embedded.embedded-weekly-vertical .filters-bar-unit.open .filters-sidebar {
   width: calc(100% - 32px) !important;
   left: auto !important;
+}
+
+/* Air en bas du scroll : filtre + tab bar, évite le blocage en fin de page */
+body.embedded.embedded-weekly-vertical .content-wrapper {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+  overscroll-behavior-y: none !important;
+}
+
+/* weekly.html (Tableau) — même dégagement filtre / tab bar */
+body.embedded.embedded-weekly-horizontal .filters-sidebar {
+  bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+  right: 16px !important;
+  z-index: 10050 !important;
+}
+
+body.embedded.embedded-weekly-horizontal .filters-sidebar.open {
+  width: calc(100% - 32px) !important;
+}
+
+body.embedded.embedded-weekly-horizontal .content-wrapper {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+  overscroll-behavior-y: none !important;
 }
 
 /* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer), pas de barre coachs */
