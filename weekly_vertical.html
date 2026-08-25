@@ -400,6 +400,8 @@
       position: relative;
       overscroll-behavior-x: contain;
       overscroll-behavior-y: none;
+      /* Horizontal ici ; le vertical remonte au .content-wrapper (évite le freeze iOS) */
+      touch-action: pan-x;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }

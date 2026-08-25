@@ -14,8 +14,8 @@ body.embedded #ramadanSwitchButton {
 }
 
 /*
- * Tab bar glass app ≈ 58 px + marge bas.
- * Filtre au-dessus de la barre (pas confondu avec elle).
+ * Semaine verticale app : filtre à droite, au-dessus de la tab bar.
+ * Tableau (weekly) : même logique de hauteur, ancré à gauche.
  */
 body.embedded.embedded-weekly-vertical .filters-bar-unit {
   --filter-bar-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
@@ -40,10 +40,11 @@ body.embedded.embedded-weekly-vertical .content-wrapper {
   overscroll-behavior-y: none !important;
 }
 
-/* weekly.html (Tableau) — même dégagement filtre / tab bar */
+/* weekly.html (Tableau) — gauche, plus bas que la version « remontée » (~−58 px) */
 body.embedded.embedded-weekly-horizontal .filters-sidebar {
   bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
-  right: 16px !important;
+  left: 16px !important;
+  right: auto !important;
   z-index: 10050 !important;
 }
 
