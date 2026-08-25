@@ -15,7 +15,7 @@ body.embedded #ramadanSwitchButton {
 
 /*
  * Semaine verticale app : filtre à droite, au-dessus de la tab bar.
- * Tableau (weekly) : même logique de hauteur, ancré à gauche.
+ * Tableau (weekly) : reste à droite, un peu rentré vers la gauche, bas comme le site.
  */
 body.embedded.embedded-weekly-vertical .filters-bar-unit {
   --filter-bar-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
@@ -40,20 +40,20 @@ body.embedded.embedded-weekly-vertical .content-wrapper {
   overscroll-behavior-y: none !important;
 }
 
-/* weekly.html (Tableau) — gauche, plus bas que la version « remontée » (~−58 px) */
+/* weekly.html (Tableau) — droite, bas d’origine, léger décalage vers l’intérieur */
 body.embedded.embedded-weekly-horizontal .filters-sidebar {
-  bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
-  left: 16px !important;
-  right: auto !important;
+  bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
+  right: 56px !important;
+  left: auto !important;
   z-index: 10050 !important;
 }
 
 body.embedded.embedded-weekly-horizontal .filters-sidebar.open {
-  width: calc(100% - 32px) !important;
+  width: calc(100% - 72px) !important;
 }
 
 body.embedded.embedded-weekly-horizontal .content-wrapper {
-  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
   overscroll-behavior-y: none !important;
 }
 
