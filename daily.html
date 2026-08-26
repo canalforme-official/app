@@ -827,7 +827,7 @@
       font-family: var(--font-title);
       font-size: 1.5em;
       font-weight: 500;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
       display: flex;
       align-items: center;
       min-height: 40px; /* Hauteur minimale pour le titre sans logo */
@@ -844,7 +844,7 @@
       max-width: 150px;
       max-height: 55px;
       object-fit: contain;
-      margin-bottom: 12px;
+      margin-bottom: 2px;
     }
 
     /* Libellé événement : bas du bloc, aligné à gauche, bordeaux, discret */
@@ -876,19 +876,21 @@
       text-shadow: none;
     }
 
-    /* Styles pour le type de cours */
+    /* Mixte / 100% femmes : légende sous le nom (ou logo) */
     .course-type {
       font-family: var(--font-title);
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 0.9em;
+      position: relative;
+      display: block;
+      font-size: 0.72em;
       font-weight: 500;
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 0;
+      margin: 0 0 10px 0;
+      border-radius: 0;
       color: var(--primary-color);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      opacity: 0.88;
     }
 
     /* Type de cours pour "100% Femmes" */
@@ -913,6 +915,7 @@
     }
 
     .course-block.women-only .course-title,
+    .course-block.women-only .course-type,
     .course-block.women-only .course-coach,
     .course-block.women-only .countdown {
       position: relative;
@@ -955,6 +958,7 @@
     }
 
     .course-block.piscine .course-title,
+    .course-block.piscine .course-type,
     .course-block.piscine .course-coach,
     .course-block.piscine .countdown {
       position: relative;
@@ -3618,7 +3622,6 @@
                     '" data-planning-fallback-tag="span" data-planning-fallback-class="course-studio-fallback" data-planning-fallback-dir="auto">'
                   : '<span class="course-studio-fallback" dir="auto">' + escapeHtml(studio.name) + '</span>') +
               '</div>' +
-              '<div class="course-type">' + escapeHtml(courseTypeText) + '</div>' +
               '<div class="course-title">' +
                 (SHOW_COURSE_IMAGES && cours.logo
                   ? '<img src="' +
@@ -3630,6 +3633,7 @@
                     '" data-planning-fallback-tag="h3" data-planning-fallback-dir="auto" />'
                   : '<h3 dir="auto">' + escapeHtml(cours.name) + '</h3>') +
               '</div>' +
+              '<div class="course-type">' + escapeHtml(courseTypeText) + '</div>' +
               '<div class="course-coach"><div class="coach-images">' + coachImagesHTML + '</div></div>' +
               (courseStatusClass.indexOf('starting-soon') !== -1 ? '<div class="countdown" data-start-time="' + course.startTime + '"></div>' : '') +
               eventLabelHtml +

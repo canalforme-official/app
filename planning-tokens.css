@@ -283,15 +283,12 @@ body.planning-ete .countdown {
 
 /* Ne pas toucher à .course-studio (position absolute bas-droite dans daily) */
 .course-block--planning-event .course-title,
+.course-block--planning-event .course-type,
 .course-block--planning-event .course-coach,
 .course-block--planning-event .course-event-label,
 .course-block--planning-event .countdown {
   position: relative;
   z-index: 2;
-}
-
-.course-block--planning-event .course-type {
-  z-index: 3;
 }
 
 .weekly-schedule .course-block--planning-event .course-info,
@@ -406,18 +403,33 @@ td.cell-studio.is-favorite.is-favorite--star {
   position: relative;
 }
 
-/* Jour : étoile ~2,3× (14 → 32), coin haut droit */
+/* Jour (daily) : ★ coin haut-droite, bordure = fond du bloc */
 .course-block.is-favorite.is-favorite--star::after {
   content: '★';
   position: absolute;
-  top: 4px;
-  right: 6px;
+  top: 12px;
+  right: 14px;
   z-index: 20;
-  font-size: 32px;
+  font-size: 18px;
   line-height: 1;
   color: #c9a227;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  -webkit-text-stroke: 1.6px var(--fav-star-edge, #ffffff);
+  paint-order: stroke fill;
+  text-shadow: none;
   pointer-events: none;
+}
+
+.course-block.is-favorite.is-favorite--star .course-title,
+.course-block.is-favorite.is-favorite--star .course-type {
+  padding-right: 28px;
+}
+
+/* Semaine / semaine verticale : ★ petite (comme matrice) */
+.weekly-schedule .course-block.is-favorite.is-favorite--star::after {
+  top: 2px;
+  right: 4px;
+  font-size: 12px;
+  -webkit-text-stroke: 1.4px var(--fav-star-edge, #ffffff);
 }
 
 .course-card.is-favorite.is-favorite--star::after {
@@ -426,7 +438,7 @@ td.cell-studio.is-favorite.is-favorite--star {
   top: 2px;
   right: 3px;
   z-index: 20;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
   color: #c9a227;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);

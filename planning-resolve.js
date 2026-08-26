@@ -814,6 +814,7 @@
     function clearFav(el) {
       el.classList.remove('is-favorite');
       for (var i = 0; i < STYLE_CLASSES.length; i++) el.classList.remove(STYLE_CLASSES[i]);
+      if (el.style) el.style.removeProperty('--fav-star-edge');
     }
 
     function setFav(el, hit) {
@@ -821,6 +822,14 @@
       if (!hit) return;
       el.classList.add('is-favorite');
       el.classList.add('is-favorite--' + highlightStyle);
+      if (highlightStyle === 'star' && el.classList.contains('course-block') && global.getComputedStyle) {
+        try {
+          var bg = global.getComputedStyle(el).backgroundColor;
+          if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+            el.style.setProperty('--fav-star-edge', bg);
+          }
+        } catch (e) {}
+      }
     }
 
     document.querySelectorAll('td.cell-studio.is-favorite').forEach(function(td) {

@@ -57,7 +57,7 @@ body.embedded.embedded-weekly-horizontal .content-wrapper {
   overscroll-behavior-y: none !important;
 }
 
-/* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer), pas de barre coachs */
+/* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer) */
 body.embedded.embedded-daily-grid .coaches-section,
 body.embedded.embedded-daily-matrix .coaches-section {
   display: none !important;

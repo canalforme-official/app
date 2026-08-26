@@ -133,7 +133,7 @@
       background-color: var(--background-main);
       display: flex;
       flex-direction: column;
-      padding-bottom: 58px;
+      padding-bottom: 0;
       -webkit-user-select: none;
       user-select: none;
       overflow: hidden;
@@ -544,13 +544,17 @@
       vertical-align: middle;
     }
 
+    td.cell-studio:has(> .matrix-cell-course:only-of-type) .matrix-cell-course {
+      min-height: calc(var(--matrix-row-min-h, 34px) - 2px);
+    }
+
     .matrix-cell-course {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1px;
-      padding: 1px 2px;
+      gap: 2px;
+      padding: 2px 2px;
       width: 100%;
       line-height: 1.1;
     }
@@ -565,7 +569,7 @@
       width: auto;
       max-width: 86%;
       height: auto;
-      max-height: calc(var(--matrix-row-min-h, 34px) * 0.36);
+      max-height: calc(var(--matrix-row-min-h, 34px) * 0.28);
       object-fit: contain;
       object-position: center center;
       display: block;
@@ -610,6 +614,65 @@
 
     .matrix-cell-course.has-logo .matrix-course-name { display: none; }
     .matrix-cell-course.has-logo.logo-failed .matrix-course-name { display: block; }
+
+    .matrix-course-avatars {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      line-height: 0;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    .matrix-course-avatars.is-stacked {
+      gap: 0;
+    }
+
+    .matrix-coach-avatar {
+      width: calc(var(--matrix-row-min-h, 34px) * 0.34);
+      height: calc(var(--matrix-row-min-h, 34px) * 0.34);
+      max-width: 22px;
+      max-height: 22px;
+      min-width: 14px;
+      min-height: 14px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: var(--background-card);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .matrix-course-avatars.is-multiple .matrix-coach-avatar {
+      max-width: 18px;
+      max-height: 18px;
+    }
+
+    .matrix-course-avatars.is-stacked .matrix-coach-avatar {
+      box-shadow: 0 0 0 1.5px var(--matrix-cell-bg);
+    }
+
+    td.cell-studio.cell-current .matrix-course-avatars.is-stacked .matrix-coach-avatar {
+      box-shadow: 0 0 0 1.5px var(--secondary-color);
+    }
+
+    .matrix-coach-avatar.coach-avatar-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      object-fit: unset;
+      background: linear-gradient(145deg, #c9cbd4 0%, #9698a3 48%, #b0b2bb 100%);
+      font-weight: 600;
+      font-size: 0.62em;
+      color: rgba(255, 255, 255, 0.97);
+      line-height: 1;
+      user-select: none;
+    }
+
+    .matrix-coach-avatar.coach-avatar-placeholder--double {
+      font-size: 0.48em;
+    }
 
     td.cell-studio.cell-current {
       background: var(--secondary-color);
@@ -760,77 +823,13 @@
       border-radius: 10px;
     }
 
-    body.embedded .coaches-section {
-      display: none !important;
-    }
     body.embedded {
       padding-bottom: 0;
     }
 
-    .coaches-section {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--gradient-primary);
-      z-index: 100;
-      height: 58px;
-      display: flex;
-      overflow-x: auto;
-      gap: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 6px 16px 8px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .coach-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      min-width: fit-content;
-    }
-
-    .coach-image {
-      width: 31px;
-      height: 31px;
-      border-radius: 50%;
-      object-fit: cover;
-      background-color: var(--background-card);
-    }
-
-    .coach-image.coach-avatar-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      object-fit: unset;
-      background: linear-gradient(145deg, #c9cbd4 0%, #9698a3 48%, #b0b2bb 100%);
-      font-weight: 600;
-      font-size: 1.16rem;
-      color: rgba(255, 255, 255, 0.97);
-      line-height: 1;
-      user-select: none;
-    }
-
-    .coach-image.coach-avatar-placeholder--double {
-      font-size: 0.84rem;
-    }
-
-    .coach-name {
-      font-family: var(--font-text);
-      font-size: 0.65em;
-      white-space: nowrap;
-      color: var(--text-light);
-      font-style: italic;
-      line-height: 1;
-      text-align: center;
-    }
-
     .today-view-button {
       position: fixed;
-      bottom: calc(58px + 10px);
+      bottom: 10px;
       right: 10px;
       z-index: 1000;
       background: none;
@@ -919,9 +918,6 @@
     body.puppeteer-view table.daily-matrix { min-width: 0; width: 100%; }
 
     @media (max-width: 640px) {
-      body { padding-bottom: 58px; }
-      body:not(.puppeteer-view) { padding-bottom: 0; }
-      body:not(.puppeteer-view) .coaches-section { display: none !important; }
       .header { padding: 5px 8px; }
       .header-center .day-name { font-size: 1.28em; }
       .header-right .date-str { font-size: 0.88em; }
@@ -936,13 +932,10 @@
       .matrix-cell-course:not(.has-logo) .matrix-course-name,
       .matrix-cell-course.has-logo.logo-failed .matrix-course-name { font-size: 0.61em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-coach { font-size: 0.68em; }
-      .coaches-section { height: 52px; gap: 12px; padding: 5px 10px 6px; }
-      .today-view-button { bottom: calc(52px + 8px); width: 48px; height: 48px; }
+      .today-view-button { bottom: 8px; width: 48px; height: 48px; }
       .today-view-button::before { width: 48px; height: 48px; }
-      .coach-image { width: 24px; height: 24px; }
-      .coach-image.coach-avatar-placeholder { font-size: 1.04rem; }
-      .coach-image.coach-avatar-placeholder--double { font-size: 0.75rem; }
-      .coach-name { font-size: 0.52em; }
+      .matrix-coach-avatar { max-width: 18px; max-height: 18px; }
+      .matrix-course-avatars.is-multiple .matrix-coach-avatar { max-width: 15px; max-height: 15px; }
     }
 
     @media (min-width: 1920px) {
@@ -1016,8 +1009,6 @@
     </div>
 
   </div>
-
-  <div class="coaches-section" id="coachesSection"></div>
 
   <div class="today-view-button" id="todayViewButton" aria-hidden="true">
     <button type="button" onclick="returnToDaily()" aria-label="Retour au planning jour"></button>
@@ -1118,10 +1109,13 @@
       return map;
     }
 
-    function coachNamesForCourse(course, coachList) {
-      var coaches = (course.coachIds || []).map(function(id) {
+    function coachesForCourse(course, coachList) {
+      return (course.coachIds || []).map(function(id) {
         return coachList.find(function(c) { return c && c.id === id; });
       }).filter(Boolean);
+    }
+
+    function coachNamesForCourse(coaches) {
       if (!coaches.length) return '–';
       if (coaches.length === 1) return PR.coachDisplayName(coaches[0]) || coaches[0].name || '–';
       if (coaches.length === 2) {
@@ -1131,6 +1125,55 @@
       return (PR.coachDisplayName(coaches[0]) || coaches[0].name || '') + ', ' +
         (PR.coachDisplayName(coaches[1]) || coaches[1].name || '') + '…';
     }
+
+    function matrixCoachAvatarClass(initials) {
+      return 'matrix-coach-avatar coach-avatar-placeholder' +
+        (String(initials).length >= 2 ? ' coach-avatar-placeholder--double' : '');
+    }
+
+    function matrixCoachAvatarHtml(coach) {
+      var disp = PR.coachDisplayName(coach) || coach.name || '';
+      var initials = PR.coachInitialsFromDisplayName(disp);
+      var url = PR.coachPhotoUrl(coach);
+      if (url) {
+        return '<img class="matrix-coach-avatar" src="' + escapeHtml(url) + '" alt="' + escapeHtml(disp) +
+          '" loading="lazy" onerror="window.__cfMatrixCoachAvatarError&&window.__cfMatrixCoachAvatarError(this)">';
+      }
+      return '<div class="' + matrixCoachAvatarClass(initials) + '" role="img" aria-label="' + escapeHtml(disp) + '">' +
+        escapeHtml(initials) + '</div>';
+    }
+
+    function wireMatrixCoachAvatarFallbacks(root) {
+      if (!root) return;
+      var imgs = root.querySelectorAll('img.matrix-coach-avatar[src]');
+      for (var i = 0; i < imgs.length; i++) {
+        var img = imgs[i];
+        if (img.getAttribute('data-fallback-wired')) continue;
+        img.setAttribute('data-fallback-wired', '1');
+        img.addEventListener('error', function onCoachImgErr() {
+          this.removeEventListener('error', onCoachImgErr);
+          var alt = this.getAttribute('alt') || '';
+          var initials = PR.coachInitialsFromDisplayName(alt);
+          var div = document.createElement('div');
+          div.className = matrixCoachAvatarClass(initials);
+          div.setAttribute('role', 'img');
+          div.setAttribute('aria-label', alt);
+          div.textContent = initials;
+          this.replaceWith(div);
+        });
+      }
+    }
+    window.__cfMatrixCoachAvatarError = function(img) {
+      if (!img || !img.parentNode) return;
+      var alt = img.getAttribute('alt') || '';
+      var initials = PR.coachInitialsFromDisplayName(alt);
+      var div = document.createElement('div');
+      div.className = matrixCoachAvatarClass(initials);
+      div.setAttribute('role', 'img');
+      div.setAttribute('aria-label', alt);
+      div.textContent = initials;
+      img.replaceWith(div);
+    };
 
     function computeEndTime(startTimeStr, endTimeStr) {
       if (endTimeStr) return endTimeStr;
@@ -1147,7 +1190,8 @@
       var cd = PR.courseDisplayFromCoursId(course.coursId, allData.cours);
       var name = ((cd && cd.name) ? cd.name : '').toUpperCase();
       var logo = cd && cd.logo ? String(cd.logo).trim() : '';
-      var coachText = coachNamesForCourse(course, coachList);
+      var coaches = coachesForCourse(course, coachList);
+      var coachText = coachNamesForCourse(coaches);
       var start = course.startTime || '';
       var end = computeEndTime(start, course.endTime || '');
       var extraClass = PR.planningEventThemeClasses
@@ -1159,8 +1203,13 @@
         : '';
       var nameHtml = '<div class="matrix-course-name">' + escapeHtml(name) + '</div>';
       var coachHtml = '<div class="matrix-course-coach">' + escapeHtml(coachText) + '</div>';
+      var avatarsHtml = coaches.length
+        ? '<div class="matrix-course-avatars' + (coaches.length > 1 ? ' is-multiple' : '') +
+          '" data-count="' + coaches.length + '">' +
+          coaches.map(matrixCoachAvatarHtml).join('') + '</div>'
+        : '';
       return '<div class="matrix-cell-course' + (hasLogo ? ' has-logo' : '') + extraClass + '" data-cours-id="' + escapeHtml(course.coursId || '') + '" data-coach-ids="' + escapeHtml((course.coachIds || []).join(',')) + '" data-start-time="' + escapeHtml(start) + '" data-end-time="' + escapeHtml(end) + '">' +
-        logoHtml + nameHtml + coachHtml + '</div>';
+        logoHtml + nameHtml + coachHtml + avatarsHtml + '</div>';
     }
 
     function statusPanelHtml(title, body) {
@@ -1269,60 +1318,6 @@
       label.textContent = text;
     }
 
-    function dailyMatrixCoachPlaceholderClass(initials) {
-      return 'coach-image coach-avatar-placeholder' + (String(initials).length >= 2 ? ' coach-avatar-placeholder--double' : '');
-    }
-
-    function renderCoachesSection(courses) {
-      var section = document.getElementById('coachesSection');
-      if (!section) return;
-      section.innerHTML = '';
-      var uniqueIds = [];
-      (courses || []).forEach(function(c) {
-        (c.coachIds || []).forEach(function(id) {
-          if (id != null && uniqueIds.indexOf(id) === -1) uniqueIds.push(id);
-        });
-      });
-      var coachList = allData.coachs || [];
-      uniqueIds.forEach(function(coachId) {
-        var coach = coachList.find(function(c) { return c && c.id === coachId; });
-        if (!coach) return;
-        var card = document.createElement('div');
-        card.className = 'coach-card';
-        var disp = PR.coachDisplayName(coach);
-        var initials = PR.coachInitialsFromDisplayName(disp);
-        var url = PR.coachPhotoUrl(coach);
-        if (url) {
-          var img = document.createElement('img');
-          img.className = 'coach-image';
-          img.src = url;
-          img.alt = disp;
-          img.onerror = function() {
-            var ph = document.createElement('div');
-            ph.className = dailyMatrixCoachPlaceholderClass(initials);
-            ph.setAttribute('role', 'img');
-            ph.setAttribute('aria-label', disp);
-            ph.textContent = initials;
-            img.replaceWith(ph);
-          };
-          card.appendChild(img);
-        } else {
-          var ph2 = document.createElement('div');
-          ph2.className = dailyMatrixCoachPlaceholderClass(initials);
-          ph2.setAttribute('role', 'img');
-          ph2.setAttribute('aria-label', disp);
-          ph2.textContent = initials;
-          card.appendChild(ph2);
-        }
-        var nm = document.createElement('div');
-        nm.className = 'coach-name coach-name-bidi';
-        nm.dir = 'auto';
-        nm.textContent = disp;
-        card.appendChild(nm);
-        section.appendChild(card);
-      });
-    }
-
     function renderMatrixTable(studios, courses) {
       var schedule = buildScheduleMap(courses);
       var times = Object.keys(schedule).sort();
@@ -1403,7 +1398,45 @@
           table.style.transformOrigin = 'top center';
           container.style.height = Math.ceil(totalH * scale) + 'px';
         }
+        nestMatrixCoachAvatars(container);
       });
+    }
+
+    /** Si plusieurs icônes dépassent la cellule : les imbriquer (chevauchement). */
+    function nestMatrixCoachAvatars(root) {
+      var groups = (root || document).querySelectorAll('.matrix-course-avatars.is-multiple');
+      for (var i = 0; i < groups.length; i++) {
+        var group = groups[i];
+        var avatars = group.querySelectorAll('.matrix-coach-avatar');
+        var count = avatars.length;
+        if (count < 2) continue;
+
+        group.classList.remove('is-stacked');
+        for (var a = 0; a < count; a++) {
+          avatars[a].style.marginLeft = '';
+          avatars[a].style.zIndex = '';
+        }
+
+        var course = group.closest('.matrix-cell-course');
+        var avail = Math.floor((course ? course.clientWidth : group.clientWidth) - 4);
+        if (avail <= 0) continue;
+
+        var size = avatars[0].offsetWidth || 16;
+        var gap = 3;
+        var natural = count * size + (count - 1) * gap;
+        if (natural <= avail) continue;
+
+        group.classList.add('is-stacked');
+        var overlap = Math.ceil((natural - avail) / (count - 1) + gap);
+        var maxOverlap = Math.floor(size * 0.55);
+        if (overlap < 4) overlap = 4;
+        if (overlap > maxOverlap) overlap = maxOverlap;
+
+        for (var b = 0; b < count; b++) {
+          avatars[b].style.zIndex = String(count - b);
+          if (b > 0) avatars[b].style.marginLeft = '-' + overlap + 'px';
+        }
+      }
     }
 
     function isEmbeddedView() {
@@ -1484,7 +1517,6 @@
       if (rvBase.closed) {
         setMatrixEmptyLayout(true);
         container.innerHTML = displayClosedMessage(rvBase);
-        renderCoachesSection([]);
         updateMaghribBadge();
         document.body.setAttribute('data-daily-matrix-ready', 'true');
         return;
@@ -1492,7 +1524,6 @@
       if (rv.indetermine) {
         setMatrixEmptyLayout(true);
         container.innerHTML = displayIndetermineMessage(rvBase);
-        renderCoachesSection([]);
         document.body.setAttribute('data-daily-matrix-ready', 'true');
         return;
       }
@@ -1501,7 +1532,6 @@
       if (!courses.length) {
         setMatrixEmptyLayout(true);
         container.innerHTML = displayNoCourseMessageHtml();
-        renderCoachesSection([]);
         updateNavButtonsState();
         toggleTodayButton();
         document.body.setAttribute('data-daily-matrix-ready', 'true');
@@ -1509,14 +1539,13 @@
       }
       if (!allData.studios || !allData.studios.length) {
         container.innerHTML = statusPanelHtml('Configuration', 'Aucun studio configuré.');
-        renderCoachesSection([]);
         document.body.setAttribute('data-daily-matrix-ready', 'true');
         return;
       }
       var studios = studiosForMatrix(allData.studios, allData, courses);
 
       container.innerHTML = renderMatrixTable(studios, courses);
-      renderCoachesSection(courses);
+      wireMatrixCoachAvatarFallbacks(container);
       updateCourseCellsState();
 
       if (PR.applyFavoriteHighlights) {

@@ -325,7 +325,7 @@
       overflow-x: hidden;
       box-sizing: border-box;
       position: relative;
-      padding-bottom: 52px;
+      padding-bottom: 0;
       width: 100%;
       max-width: 100vw;
       -webkit-user-select: none;
@@ -956,20 +956,7 @@
     }
 
     .coaches-section {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--gradient-primary);
-      z-index: 100;
-      height: 52px;
-      display: flex;
-      overflow-x: auto;
-      gap: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 0 16px;
-      align-items: center;
-      justify-content: center;
+      display: none !important;
     }
 
     .coach-card {
@@ -1163,7 +1150,7 @@
     /* Style pour le bouton today-view */
     .today-view-button {
       position: fixed;
-      bottom: 70px;
+      bottom: 10px;
       right: 10px;
       z-index: 1000;
       background: none;
@@ -2071,17 +2058,10 @@
         }
       }
       
-      // Masquer la barre en bas uniquement sur mobile réel (pas Puppeteer, pas grand écran)
+      // Barre coachs en pied : retirée (icônes dans les cellules / matrice).
       if (coachesSection) {
-        if (isMobile && !isAutomated && !isLargeScreen) {
-          // Mobile réel : masquer la barre
-          coachesSection.style.display = 'none';
-          document.body.style.paddingBottom = '0';
-        } else {
-          // Puppeteer ou grand écran : afficher la barre
-          coachesSection.style.display = 'flex';
-          document.body.style.paddingBottom = '52px';
-        }
+        coachesSection.style.display = 'none';
+        document.body.style.paddingBottom = '0';
       }
       
       // Si c'est un grand écran en portrait (32 pouces, rotation 90°) ou en paysage (format téléviseur inversé), masquer les boutons
