@@ -403,17 +403,17 @@ td.cell-studio.is-favorite.is-favorite--star {
   position: relative;
 }
 
-/* Jour (daily) : ★ coin haut-droite (+80 %), bordure = fond du bloc */
+/* Jour (daily) : ★ coin haut-droite (+60 %), bordure = fond du bloc */
 .course-block.is-favorite.is-favorite--star::after {
   content: '★';
   position: absolute;
   top: 10px;
   right: 12px;
   z-index: 20;
-  font-size: 32.4px;
+  font-size: 28.8px;
   line-height: 1;
   color: #c9a227;
-  -webkit-text-stroke: 2.2px var(--fav-star-edge, #ffffff);
+  -webkit-text-stroke: 2.1px var(--fav-star-edge, #ffffff);
   paint-order: stroke fill;
   text-shadow: none;
   pointer-events: none;
@@ -421,7 +421,7 @@ td.cell-studio.is-favorite.is-favorite--star {
 
 .course-block.is-favorite.is-favorite--star .course-title,
 .course-block.is-favorite.is-favorite--star .course-type {
-  padding-right: 44px;
+  padding-right: 42px;
 }
 
 /* Semaine / semaine verticale : ★ petite (comme matrice) */
