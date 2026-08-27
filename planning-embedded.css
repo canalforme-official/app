@@ -34,9 +34,9 @@ body.embedded.embedded-weekly-vertical .filters-bar-unit.open .filters-sidebar {
   left: auto !important;
 }
 
-/* Air en bas du scroll : filtre + tab bar, évite le blocage en fin de page */
+/* Air en bas du scroll : filtre + tab bar (−15 px vs avant), évite le blocage en fin de page */
 body.embedded.embedded-weekly-vertical .content-wrapper {
-  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px)) !important;
   overscroll-behavior-y: none !important;
 }
 
@@ -74,7 +74,7 @@ body.embedded.embedded-daily-grid .content-wrapper {
   min-height: 0 !important;
 }
 
-/* Matrice app : scroll vertical libre (pousser le pouce) — sans marge basse artificielle */
+/* Matrice app : scroll vertical libre (pousser le pouce) — marge bas = nav bar sur téléphone */
 body.embedded.embedded-daily-matrix .matrix-scroll {
   flex: 1 !important;
   min-height: 0 !important;
@@ -82,4 +82,10 @@ body.embedded.embedded-daily-matrix .matrix-scroll {
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior-y: auto !important;
+}
+
+@media (max-width: 640px) {
+  body.embedded.embedded-daily-matrix .matrix-scroll {
+    padding-bottom: calc(10px + 58px) !important;
+  }
 }

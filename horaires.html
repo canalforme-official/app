@@ -299,6 +299,27 @@
       margin: 0.25rem 0 0;
       line-height: 1.35;
     }
+    .hero-body-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem 0.85rem;
+      margin-top: 0.15rem;
+    }
+    .hero-day-col {
+      flex: 1 1 10.5rem;
+      min-width: 0;
+    }
+    .hero-day-col .warn-msg {
+      margin-top: 0.35rem;
+    }
+    .hero-hours-col {
+      flex: 1 1 auto;
+      min-width: 8.5rem;
+      text-align: right;
+      align-self: center;
+    }
     .today-hours {
       font-family: var(--font-title);
       font-size: 1.42rem;
@@ -307,11 +328,22 @@
       color: var(--text);
       line-height: 1.32;
       margin: 0;
-      padding: 0.5rem 0 0.08rem;
-      border-top: 1px solid var(--border);
+      padding: 0;
+    }
+    .hero-hours-col .today-hours {
+      font-size: clamp(1.55rem, 5.2vw, 1.92rem);
+      font-weight: 600;
+      line-height: 1.22;
     }
     .today-hours .oh-slot { display: block; margin-top: 0.32rem; }
     .today-hours .oh-slot:first-child { margin-top: 0; }
+    .hero-hours-col .today-hours .oh-slot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 0.28rem 0.45rem;
+    }
     .today-hours .oh-lbl {
       font-size: 0.88rem;
       font-family: var(--font-text);
@@ -320,6 +352,10 @@
       letter-spacing: 0.07em;
       color: var(--muted);
       margin-right: 0.35rem;
+    }
+    .hero-hours-col .today-hours .oh-lbl {
+      font-size: 0.78rem;
+      margin-right: 0;
     }
     .warn-msg {
       font-size: 0.82rem;
@@ -396,6 +432,23 @@
     .week-row.is-today[data-planning-key="ferie"],
     .week-row.is-today[data-planning-key="ferme"] {
       background: rgba(255, 255, 255, 0.9);
+    }
+    .week-row.is-past {
+      opacity: 0.52;
+      filter: grayscale(0.35);
+    }
+    .week-row.is-past .day-heading-compact,
+    .week-row.is-past .date,
+    .week-row.is-past .week-hours,
+    .week-row.is-past .week-ferie-note {
+      color: #8a8480;
+    }
+    .week-row.is-past[data-planning-key="regulier"],
+    .week-row.is-past[data-planning-key="ete"],
+    .week-row.is-past[data-planning-key="ramadan"],
+    .week-row.is-past[data-planning-key="ferie"],
+    .week-row.is-past[data-planning-key="ferme"] {
+      background: rgba(var(--horaires-primary-rgb), 0.04);
     }
     .week-hours {
       font-family: var(--font-title);
@@ -937,11 +990,14 @@
       var inSel = g.some(function (x) {
         return x.ymd === ymd;
       });
+      var isPast = last.ymd < realToday;
       var nameLine = dayNamesRangeFr(first.rv, last.rv);
       var dateLine = formatDateRangeFr(first.ymd, last.ymd);
       var rowKey = String(first.rv.planningKey || 'regulier');
       weekHtml +=
-        '<div class="week-row' + (inSel ? ' is-today' : '') +
+        '<div class="week-row' +
+        (inSel ? ' is-today' : '') +
+        (isPast ? ' is-past' : '') +
         '" data-planning-key="' + PR.escapeHtml(rowKey) + '">' +
         '<div class="horaires-daily-pattern horaires-daily-pattern--compact">' +
         '<div class="day-title-row">' +
@@ -967,9 +1023,15 @@
       '</div>' +
       '<h2 class="section-kicker">' + todayHeadline + '</h2>' +
       (pl ? '<div class="period-pill">' + PR.escapeHtml(pl) + '</div>' : '') +
+      '<div class="hero-body-row">' +
+      '<div class="hero-day-col">' +
       heroDayHead +
       todayBlock +
-      todayHoursBlock +
+      '</div>' +
+      (todayHoursBlock
+        ? '<div class="hero-hours-col">' + todayHoursBlock + '</div>'
+        : '') +
+      '</div>' +
       '</div>' +
       '<header class="page-head">' +
       '<h1 class="page-title">Horaires d’ouverture</h1>' +

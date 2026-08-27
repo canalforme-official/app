@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="planning-tokens.css">
-  <link rel="stylesheet" href="planning-embedded.css?v=12">
+  <link rel="stylesheet" href="planning-tokens.css?v=30">
+  <link rel="stylesheet" href="planning-embedded.css?v=13">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     :root {
@@ -916,6 +916,19 @@
     }
     body.puppeteer-view .matrix-scroll { overflow: hidden; }
     body.puppeteer-view table.daily-matrix { min-width: 0; width: 100%; }
+    /* Screenshots / Stories : icônes coach +10 % dans les cellules */
+    body.puppeteer-view .matrix-coach-avatar {
+      width: calc(var(--matrix-row-min-h, 34px) * 0.374);
+      height: calc(var(--matrix-row-min-h, 34px) * 0.374);
+      max-width: 24.2px;
+      max-height: 24.2px;
+      min-width: 15.4px;
+      min-height: 15.4px;
+    }
+    body.puppeteer-view .matrix-course-avatars.is-multiple .matrix-coach-avatar {
+      max-width: 19.8px;
+      max-height: 19.8px;
+    }
 
     @media (max-width: 640px) {
       .header { padding: 5px 8px; }
@@ -927,7 +940,8 @@
       .studio-th-name { font-size: 0.58em; }
       .studio-th-inner { gap: 4px; }
       .cell-time { font-size: 0.68em; }
-      .matrix-scroll { padding: 12px 8px 10px; }
+      /* Téléphone : marge bas += hauteur nav bar app (58 px) pour dégager la pilule */
+      .matrix-scroll { padding: 12px 8px calc(10px + 58px); }
       .matrix-course-name { font-size: 0.78em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-name,
       .matrix-cell-course.has-logo.logo-failed .matrix-course-name { font-size: 0.61em; }
@@ -1381,6 +1395,10 @@
       var thead = table.querySelector('thead');
       var theadH = thead ? thead.offsetHeight : 0;
       var avail = scroll.clientHeight;
+      try {
+        var cs = window.getComputedStyle(scroll);
+        avail -= (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      } catch (e) {}
       if (avail <= 0) return;
 
       var rowH = Math.max(30, Math.floor((avail - theadH) / n));
