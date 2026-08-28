@@ -914,20 +914,38 @@
       opacity: 0 !important;
       pointer-events: none !important;
     }
-    body.puppeteer-view .matrix-scroll { overflow: hidden; }
-    body.puppeteer-view table.daily-matrix { min-width: 0; width: 100%; }
-    /* Screenshots / Stories : icônes coach +10 % dans les cellules */
+    /* Stories : pas de barre coachs ni réserve nav (58 px) — le tableau descend jusqu’en bas */
+    body.puppeteer-view .matrix-scroll {
+      overflow: hidden;
+      padding: 12px 10px 10px;
+    }
+    body.puppeteer-view #matrixContainer {
+      flex: 1;
+      height: 100%;
+      min-height: 0;
+    }
+    body.puppeteer-view table.daily-matrix {
+      min-width: 0;
+      width: 100%;
+    }
+    /* Stories : nom + icône coach un peu plus grands */
+    body.puppeteer-view .matrix-course-coach {
+      font-size: clamp(0.64em, 1.26vw, 0.8em);
+    }
+    body.puppeteer-view .matrix-cell-course:not(.has-logo) .matrix-course-coach {
+      font-size: clamp(0.6em, 1.2vw, 0.76em);
+    }
     body.puppeteer-view .matrix-coach-avatar {
-      width: calc(var(--matrix-row-min-h, 34px) * 0.374);
-      height: calc(var(--matrix-row-min-h, 34px) * 0.374);
-      max-width: 24.2px;
-      max-height: 24.2px;
-      min-width: 15.4px;
-      min-height: 15.4px;
+      width: calc(var(--matrix-row-min-h, 34px) * 0.39);
+      height: calc(var(--matrix-row-min-h, 34px) * 0.39);
+      max-width: 26px;
+      max-height: 26px;
+      min-width: 16px;
+      min-height: 16px;
     }
     body.puppeteer-view .matrix-course-avatars.is-multiple .matrix-coach-avatar {
-      max-width: 19.8px;
-      max-height: 19.8px;
+      max-width: 21px;
+      max-height: 21px;
     }
 
     @media (max-width: 640px) {
@@ -942,6 +960,7 @@
       .cell-time { font-size: 0.68em; }
       /* Téléphone : marge bas += hauteur nav bar app (58 px) pour dégager la pilule */
       .matrix-scroll { padding: 12px 8px calc(10px + 58px); }
+      body.puppeteer-view .matrix-scroll { padding: 12px 8px 10px; }
       .matrix-course-name { font-size: 0.78em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-name,
       .matrix-cell-course.has-logo.logo-failed .matrix-course-name { font-size: 0.61em; }
@@ -1401,23 +1420,52 @@
       } catch (e) {}
       if (avail <= 0) return;
 
-      var rowH = Math.max(30, Math.floor((avail - theadH) / n));
-      if (window.matchMedia('(max-width: 640px)').matches) {
-        rowH = Math.max(28, rowH - 2);
+      var isPuppeteer = document.body.classList.contains('puppeteer-view');
+      var minRow = 30;
+      if (!isPuppeteer && window.matchMedia('(max-width: 640px)').matches) {
+        minRow = 28;
+      }
+      var rowH = Math.max(minRow, Math.floor((avail - theadH) / n));
+      if (!isPuppeteer && window.matchMedia('(max-width: 640px)').matches) {
+        rowH = Math.max(minRow, rowH - 2);
       }
       document.documentElement.style.setProperty('--matrix-row-min-h', rowH + 'px');
       document.documentElement.style.setProperty('--matrix-row-count', String(n));
 
-      requestAnimationFrame(function() {
+      var fitPasses = 0;
+      function applyFit() {
         var totalH = table.offsetHeight;
+        if (!totalH) {
+          nestMatrixCoachAvatars(container);
+          return;
+        }
         if (totalH > avail + 1) {
+          var shrink = Math.ceil((totalH - avail) / n);
+          var next = Math.max(minRow, rowH - shrink);
+          if (next < rowH && fitPasses < 6) {
+            rowH = next;
+            fitPasses += 1;
+            document.documentElement.style.setProperty('--matrix-row-min-h', rowH + 'px');
+            requestAnimationFrame(applyFit);
+            return;
+          }
           var scale = avail / totalH;
           table.style.transform = 'scale(' + scale + ')';
           table.style.transformOrigin = 'top center';
           container.style.height = Math.ceil(totalH * scale) + 'px';
+        } else if (isPuppeteer && totalH < avail - 2 && fitPasses < 6) {
+          var bump = Math.floor((avail - totalH) / n);
+          if (bump > 0) {
+            rowH += bump;
+            fitPasses += 1;
+            document.documentElement.style.setProperty('--matrix-row-min-h', rowH + 'px');
+            requestAnimationFrame(applyFit);
+            return;
+          }
         }
         nestMatrixCoachAvatars(container);
-      });
+      }
+      requestAnimationFrame(applyFit);
     }
 
     /** Si plusieurs icônes dépassent la cellule : les imbriquer (chevauchement). */

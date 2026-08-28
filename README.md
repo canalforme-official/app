@@ -144,3 +144,7 @@ frontend/
 2. Si vous touchez aux thèmes couleur : privilégier `planning-tokens.css` et lire [PLANNING-CSS.md](./PLANNING-CSS.md).  
 3. Mettre à jour ce README si vous ajoutez une page à la racine ou une ressource partagée.  
 4. Avant tout renommage de `.html` : recenser les **liens publiés** et les redirections nécessaires.
+
+### Minification + historique GitHub (plus tard)
+
+**Pas avant validation store 7.2.0.** Plan complet : [FUTURE_PLANNING_MINIFY_AND_HISTORY.md](./FUTURE_PLANNING_MINIFY_AND_HISTORY.md) — build `dist/` minifié pour github.io, purge historique du dépôt public `canalforme-official/app`, lot JSON via API.
