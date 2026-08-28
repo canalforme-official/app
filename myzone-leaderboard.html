@@ -1324,6 +1324,105 @@
       }
     }
 
+    /* Surbrillance membre connecté (app, ?me=GUID) */
+    .leaderboard-row--me {
+      position: relative;
+    }
+
+    .leaderboard-me-marker {
+      flex-shrink: 0;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 999px;
+      padding: 1px 6px;
+      margin-right: 4px;
+    }
+
+    .leaderboard-row--me-highlight {
+      animation: me-row-highlight 0.85s ease-out forwards;
+      z-index: 2;
+    }
+
+    .step--me .coach-podium-photo,
+    .step--me .status-icon-podium {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.95), 0 0 14px rgba(255, 215, 0, 0.45);
+    }
+
+    .step--me-highlight {
+      animation: me-podium-highlight 0.9s ease-out forwards;
+    }
+
+    @keyframes me-row-highlight {
+      0% {
+        box-shadow: inset 0 0 0 3px #fff, 0 0 18px rgba(255, 215, 0, 0.55);
+      }
+      100% {
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.45), 0 0 0 transparent;
+      }
+    }
+
+    @keyframes me-podium-highlight {
+      0% {
+        filter: brightness(1.12);
+        transform: translateY(0) scale(1.03);
+      }
+      100% {
+        filter: brightness(1);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .leaderboard-me-outside-card {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      text-align: center;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .leaderboard-me-outside-card.is-visible {
+      display: block;
+    }
+
+    .leaderboard-me-outside-card--highlight {
+      animation: me-row-highlight 0.85s ease-out forwards;
+    }
+
+    .leaderboard-me-outside-card .me-outside-rank {
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .leaderboard-me-outside-card .me-outside-meps {
+      font-weight: 600;
+      opacity: 0.92;
+    }
+
+    .leaderboard-me-outside-card .me-outside-hint {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.72rem;
+      opacity: 0.78;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .leaderboard-row--me-highlight,
+      .step--me-highlight,
+      .leaderboard-me-outside-card--highlight {
+        animation: none;
+      }
+    }
+
     /* Suppression des styles de tooltip et hover */
     .men-label::before,
     .women-label::before {
@@ -1593,6 +1692,7 @@
       </div>
       <div id="currentMonthEmptyState" class="leaderboard-empty-state" style="display: none;" aria-live="polite">En attente du premier entraînement Myzone du mois</div>
       <div id="currentMonthLeaderboard"></div>
+      <div id="leaderboardMeOutsideCard" class="leaderboard-me-outside-card" aria-live="polite"></div>
     </div>
   </div>
 
@@ -1682,6 +1782,132 @@
     let previousPodiumConfettiInterval = null;
     let previousPodiumConfettiTimeout = null;
     let previousTrophyLayoutTimer = null;
+
+    /** GUID membre (app embed : ?me=…) — surbrillance 1× par session WebView */
+    const ME_GUID_PARAM = normalizeLeaderboardMeGuid(
+      new URLSearchParams(window.location.search).get('me')
+    );
+    const ME_HIGHLIGHT_SESSION_KEY = 'cf_lb_me_highlight_v1';
+
+    function normalizeLeaderboardMeGuid(value) {
+      return String(value || '').trim().toUpperCase();
+    }
+
+    function leaderboardUserMatchesMe(user) {
+      if (!ME_GUID_PARAM || !user) return false;
+      return normalizeLeaderboardMeGuid(user.usrGUID) === ME_GUID_PARAM;
+    }
+
+    function shouldRunMeHighlightAnimation() {
+      if (!ME_GUID_PARAM) return false;
+      try {
+        return !sessionStorage.getItem(ME_HIGHLIGHT_SESSION_KEY);
+      } catch (e) {
+        return true;
+      }
+    }
+
+    function markMeHighlightAnimationDone() {
+      if (!ME_GUID_PARAM) return;
+      try {
+        sessionStorage.setItem(ME_HIGHLIGHT_SESSION_KEY, '1');
+      } catch (e) { /* sessionStorage indisponible */ }
+    }
+
+    function prefersReducedMeMotion() {
+      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    function clearMeOutsideCard() {
+      const card = document.getElementById('leaderboardMeOutsideCard');
+      if (!card) return;
+      card.classList.remove('is-visible', 'leaderboard-me-outside-card--highlight');
+      card.innerHTML = '';
+      card.style.display = 'none';
+    }
+
+    function showMeOutsideCard(user, topEntries) {
+      const card = document.getElementById('leaderboardMeOutsideCard');
+      if (!card || !user) return;
+      const rank = Number(user.position) || 0;
+      const name = leaderboardMemberDisplayName(user);
+      card.innerHTML =
+        '<span class="me-outside-rank">' + rank + '<sup>e</sup> · Toi</span><br>' +
+        '<span class="me-outside-meps">' + formatNumber(user.meps) + ' MEPs</span>' +
+        '<span class="me-outside-hint">Hors top ' + topEntries + ' affiché</span>';
+      card.style.display = 'block';
+      card.classList.add('is-visible');
+      if (shouldRunMeHighlightAnimation()) {
+        if (!prefersReducedMeMotion()) card.classList.add('leaderboard-me-outside-card--highlight');
+        scrollMeIntoView(card);
+        markMeHighlightAnimationDone();
+      }
+    }
+
+    function scrollMeIntoView(el) {
+      if (!el || typeof el.scrollIntoView !== 'function') return;
+      el.scrollIntoView({
+        behavior: prefersReducedMeMotion() ? 'auto' : 'smooth',
+        block: 'center',
+      });
+    }
+
+    function runMeHighlightFocus(user, topEntries) {
+      if (!ME_GUID_PARAM || !user) return;
+
+      const position = Number(user.position) || 0;
+      const reduced = prefersReducedMeMotion();
+
+      if (position >= 1 && position <= 3) {
+        const step = document.querySelector('#podiumWrapper .step[data-usguid="' + ME_GUID_PARAM + '"]');
+        if (step) {
+          if (shouldRunMeHighlightAnimation()) {
+            scrollMeIntoView(step);
+            if (!reduced) step.classList.add('step--me-highlight');
+            markMeHighlightAnimationDone();
+          }
+        }
+        clearMeOutsideCard();
+        return;
+      }
+
+      if (position >= 4 && position <= topEntries) {
+        clearMeOutsideCard();
+        const row = document.querySelector(
+          '#currentMonthLeaderboard .leaderboard-row[data-usguid="' + ME_GUID_PARAM + '"]'
+        );
+        if (!row) return;
+        if (shouldRunMeHighlightAnimation()) {
+          scrollMeIntoView(row);
+          if (!reduced) row.classList.add('leaderboard-row--me-highlight');
+          markMeHighlightAnimationDone();
+        }
+        return;
+      }
+
+      if (position > topEntries) {
+        showMeOutsideCard(user, topEntries);
+      }
+    }
+
+    function scheduleMeHighlightFocus(user, topEntries) {
+      if (!ME_GUID_PARAM || !user) {
+        clearMeOutsideCard();
+        return;
+      }
+      const delay = isFirstLoad ? 1800 : 350;
+      setTimeout(function () {
+        runMeHighlightFocus(user, topEntries);
+      }, delay);
+    }
+
+    function findMeInCurrentData(data) {
+      if (!ME_GUID_PARAM || !data || !Array.isArray(data)) return null;
+      for (let i = 0; i < data.length; i++) {
+        if (leaderboardUserMatchesMe(data[i])) return data[i];
+      }
+      return null;
+    }
 
     function setCountdownVisible(visible) {
       const el = document.getElementById('countdown');
@@ -2260,6 +2486,10 @@
           displayPodium(data.current.data.slice(0, 3), 'podiumWrapper', 'current', rankChangeMap);
           displayLeaderboard(data.current.data, 'currentMonthLeaderboard', 'current', rankChangeMap);
 
+          const topEntries = dayOfMonth <= 7 ? 10 : 20;
+          const meUser = findMeInCurrentData(data.current.data);
+          scheduleMeHighlightFocus(meUser, topEntries);
+
           lastCurrentMonthRankByGuid = {};
           data.current.data.forEach(function (u) {
             lastCurrentMonthRankByGuid[u.usrGUID] = u.position;
@@ -2277,6 +2507,7 @@
           document.getElementById('currentMonthLeaderboard').innerHTML = '';
           document.getElementById('podiumWrapper').style.display = 'none';
           document.getElementById('podiumWrapper').innerHTML = '';
+          clearMeOutsideCard();
           if (SHOW_COUNTDOWN) {
             setCountdownVisible(true);
           } else {
@@ -2413,6 +2644,10 @@
         const positionClass = positions[index];
         const stepDiv = document.createElement('div');
         stepDiv.classList.add('step', positionClass);
+        stepDiv.setAttribute('data-usguid', normalizeLeaderboardMeGuid(user.usrGUID));
+        if (leaderboardUserMatchesMe(user)) {
+          stepDiv.classList.add('step--me');
+        }
 
         // Gestion différente des animations selon le contexte
         if (isFirstLoad) {
@@ -2603,11 +2838,15 @@
         const rankChange = rankChangeMap[user.usrGUID];
         const rankChangeSvg = getRankChangeSvg(rankChange);
         const zoneBarHtml = getZoneBarHtml(user);
+        const isMe = leaderboardUserMatchesMe(user);
+        const meMarkerHtml = isMe ? '<span class="leaderboard-me-marker">Toi</span>' : '';
+        const meRowClass = isMe ? ' leaderboard-row--me' : '';
+        const meGuidAttr = normalizeLeaderboardMeGuid(user.usrGUID);
 
         var memberPhotoUrl = leaderboardMemberPhotoSrc(user);
         var displayName = leaderboardMemberDisplayName(user);
         tableHtml += `
-            <div class="leaderboard-row">
+            <div class="leaderboard-row${meRowClass}" data-usguid="${meGuidAttr}">
                 <span class="rank-cell">
                     <span class="rank">${user.position}</span>
                     ${rankChangeSvg}
@@ -2615,7 +2854,7 @@
 
                 ${memberPhotoUrl ? `<img class="coach-photo" src="${memberPhotoUrl}" alt="Photo de ${displayName}" />` : ''}
                 
-                <span class="nickname coach-name-bidi" dir="auto">${displayName}</span>
+                ${meMarkerHtml}<span class="nickname coach-name-bidi" dir="auto">${displayName}</span>
                 <span class="leaderboard-meps">
                     <div class="zone-bar-wrap">${zoneBarHtml}</div>
                     <div class="leaderboard-meps-row">

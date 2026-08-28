@@ -844,6 +844,10 @@
         if (td) setFav(td, hit);
       }
     });
+
+    if (typeof global.__cfNestMatrixCoachAvatars === 'function') {
+      global.__cfNestMatrixCoachAvatars(document);
+    }
   }
 
   var api = {

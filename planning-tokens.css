@@ -576,3 +576,23 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   z-index: 12;
 }
 
+/* Matrice : favoris = taille coach inchangée */
+td.cell-studio.is-favorite .matrix-coach-avatar {
+  width: calc(var(--matrix-row-min-h, 34px) * 0.34) !important;
+  height: calc(var(--matrix-row-min-h, 34px) * 0.34) !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  min-width: 14px !important;
+  min-height: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+td.cell-studio.is-favorite .matrix-course-avatars.is-multiple .matrix-coach-avatar {
+  max-width: 18px !important;
+  max-height: 18px !important;
+}
+
+td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avatar {
+  margin-left: 0 !important;
+}
+

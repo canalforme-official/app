@@ -674,6 +674,26 @@
       font-size: 0.48em;
     }
 
+    /* Favoris : conserver la taille des avatars coach (pas de réduction / empilement) */
+    td.cell-studio.is-favorite .matrix-coach-avatar {
+      width: calc(var(--matrix-row-min-h, 34px) * 0.34) !important;
+      height: calc(var(--matrix-row-min-h, 34px) * 0.34) !important;
+      max-width: 22px !important;
+      max-height: 22px !important;
+      min-width: 14px !important;
+      min-height: 14px !important;
+      flex-shrink: 0 !important;
+    }
+
+    td.cell-studio.is-favorite .matrix-course-avatars.is-multiple .matrix-coach-avatar {
+      max-width: 18px !important;
+      max-height: 18px !important;
+    }
+
+    td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avatar {
+      margin-left: 0 !important;
+    }
+
     td.cell-studio.cell-current {
       background: var(--secondary-color);
     }
@@ -1484,6 +1504,16 @@
         }
 
         var course = group.closest('.matrix-cell-course');
+        var tdFav = course && course.closest('td.cell-studio');
+        if (tdFav && tdFav.classList.contains('is-favorite')) {
+          group.classList.remove('is-stacked');
+          for (var s = 0; s < count; s++) {
+            avatars[s].style.marginLeft = '';
+            avatars[s].style.zIndex = '';
+          }
+          continue;
+        }
+
         var avail = Math.floor((course ? course.clientWidth : group.clientWidth) - 4);
         if (avail <= 0) continue;
 
@@ -1504,6 +1534,8 @@
         }
       }
     }
+
+    window.__cfNestMatrixCoachAvatars = nestMatrixCoachAvatars;
 
     function isEmbeddedView() {
       if (document.body.classList.contains('embedded')) return true;
