@@ -213,6 +213,37 @@
       min-height: 0;
     }
 
+    .dc-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .dc-section-title {
+      align-self: flex-start;
+      font-family: var(--font-title);
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.62);
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+      position: relative;
+      padding: 0 14px 0 0;
+    }
+
+    .dc-section-title::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      margin-left: 10px;
+      width: 36px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 166, 48, 0.5), transparent);
+    }
+
     .dc-board {
       display: grid;
       grid-template-columns: repeat(var(--dc-cols), minmax(0, 1fr));
@@ -797,6 +828,22 @@
     return board;
   }
 
+  function buildSection(title, times, byTime) {
+    var section = document.createElement('section');
+    section.className = 'dc-section';
+    var h = document.createElement('h2');
+    h.className = 'dc-section-title';
+    h.textContent = title;
+    section.appendChild(h);
+    section.appendChild(buildBoardRow(times, byTime));
+    return section;
+  }
+
+  function sectionTitles(isRamadan) {
+    if (isRamadan) return { first: 'Avant ftour', second: 'Après ftour' };
+    return { first: 'Matinée', second: 'Après-midi' };
+  }
+
   function setColCount(n) {
     var count = Math.max(1, Math.min(6, n || 1));
     document.documentElement.style.setProperty('--dc-cols', String(count));
@@ -921,8 +968,9 @@
     /* Toujours 2 rangées s’il y a matin ET aprem (même si ≤ 6 créneaux au total — ex. lundi). */
     if (first.length && second.length) {
       setColCount(Math.max(first.length, second.length, 1));
-      stack.appendChild(buildBoardRow(first, byTime));
-      stack.appendChild(buildBoardRow(second, byTime));
+      var titles = sectionTitles(rvBase.planningKey === 'ramadan');
+      stack.appendChild(buildSection(titles.first, first, byTime));
+      stack.appendChild(buildSection(titles.second, second, byTime));
     } else {
       setColCount(times.length);
       stack.appendChild(buildBoardRow(times, byTime));
