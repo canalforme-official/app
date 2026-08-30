@@ -25,6 +25,8 @@
       document.body.classList.add('embedded-daily-grid');
     } else if (file === 'daily_matrix.html') {
       document.body.classList.add('embedded-daily-matrix');
+    } else if (file === 'daily_columns.html') {
+      document.body.classList.add('embedded-daily-columns');
     } else if (file.indexOf('weekly_vertical') !== -1) {
       document.body.classList.add('embedded-weekly-vertical');
     } else if (file === 'weekly.html') {
@@ -88,6 +90,11 @@
         if (typeof currentDayIndex !== 'undefined') currentDayIndex = new Date().getDay();
         if (typeof syncDailyGridDateInUrl === 'function') syncDailyGridDateInUrl();
         if (typeof displayGridSchedule === 'function') displayGridSchedule();
+        return;
+      }
+      if (file === 'daily_columns.html' && typeof goToday === 'function') {
+        goToday();
+        return;
       }
     } catch (e) {}
   };

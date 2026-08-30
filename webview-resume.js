@@ -136,6 +136,10 @@
         loadAndDisplay();
         return true;
       }
+      if (file === 'daily_columns.html' && typeof renderBoard === 'function') {
+        renderBoard();
+        return true;
+      }
       if ((file === 'weekly.html' || file.indexOf('weekly_vertical') !== -1) && typeof refreshPlanningDisplay === 'function') {
         refreshPlanningDisplay();
         return true;

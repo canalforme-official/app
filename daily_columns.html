@@ -553,7 +553,9 @@
     <div class="dc-board-stack" id="dcBoardStack"></div>
   </div>
 
-  <script src="planning-resolve.js?v=31"></script>
+  <script src="planning-resolve.js?v=32"></script>
+  <script src="planning-embedded.js?v=32"></script>
+  <script src="webview-resume.js?v=1"></script>
   <script>
 (function () {
   'use strict';
@@ -1007,6 +1009,16 @@
     syncUrl();
     renderBoard();
   }
+
+  function goToday() {
+    selectedDateYmd = ymdFromDate(new Date());
+    syncUrl();
+    renderBoard();
+  }
+
+  window.goToday = goToday;
+  window.renderBoard = renderBoard;
+  window.changeDay = changeDay;
 
   async function loadData() {
     var data = null;
