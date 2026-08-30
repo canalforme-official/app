@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="fr" data-keep-screenshot-bg="1">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning du jour · colonnes</title>
+  <link rel="icon" type="image/png" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="planning-tokens.css?v=31">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    :root {
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      --primary-color: #480607;
+      --accent: #FFA630;
+      --accent-soft: #F6D5A2;
+      --women: #9e6187;
+      --men: #2f5d8a;
+      --pool: #35767c;
+      --card: #ffffff;
+      --ink: #1a1a1a;
+      --muted: rgba(255, 255, 255, 0.82);
+      --col-gap: 5px;
+      --shell-pad-x: 8px;
+      --shell-pad-y: 28px;
+      --dc-cols: 6;
+      --card-h: 50px;
+      --coach-size: 22px;
+      --board-row-gap: 48px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: var(--font-text);
+      color: #fff;
+      background: #0a0a0a;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .dc-bg,
+    .dc-bg-veil,
+    .dc-bg-scrim {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .dc-bg {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: grayscale(0.35) contrast(1.08) brightness(0.72);
+      transform: scale(1.02);
+    }
+
+    .dc-bg-veil {
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      background-repeat: repeat;
+      opacity: 0.05;
+    }
+
+    .dc-bg-scrim {
+      background:
+        linear-gradient(180deg, rgba(10, 6, 6, 0.55) 0%, rgba(10, 6, 6, 0.25) 28%, rgba(10, 6, 6, 0.2) 62%, rgba(10, 6, 6, 0.72) 100%),
+        radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(72, 6, 7, 0.35) 100%);
+    }
+
+    .navigation {
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .navigation.loaded {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .nav-button {
+      background: rgba(255, 255, 255, 0.35);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      pointer-events: all;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-segments { position: relative; width: 20px; height: 20px; }
+
+    .segment {
+      position: absolute;
+      background: var(--primary-color);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .prev-button .segment-1 {
+      width: 16px; height: 3px; top: 8px; right: 1px;
+      transform: rotate(45deg); transform-origin: left center;
+    }
+    .prev-button .segment-2 {
+      width: 16px; height: 3px; top: 10px; right: 1px;
+      transform: rotate(-45deg); transform-origin: left center;
+    }
+    .next-button .segment-1 {
+      width: 16px; height: 3px; top: 8px; left: 1px;
+      transform: rotate(-45deg); transform-origin: right center;
+    }
+    .next-button .segment-2 {
+      width: 16px; height: 3px; top: 10px; left: 1px;
+      transform: rotate(45deg); transform-origin: right center;
+    }
+
+    @media (hover: hover) {
+      .nav-button:hover {
+        background: var(--primary-color);
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .nav-button:hover .segment { background: white; }
+    }
+
+    .nav-button:active { transform: scale(0.95); }
+    .nav-button:disabled { visibility: hidden; }
+
+    .dc-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding:
+        max(var(--shell-pad-y), env(safe-area-inset-top))
+        var(--shell-pad-x)
+        max(var(--shell-pad-y), env(safe-area-inset-bottom))
+        var(--shell-pad-x);
+    }
+
+    .dc-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+
+    .dc-day { text-align: right; }
+
+    .dc-day-name {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: clamp(28px, 8vw, 44px);
+      line-height: 0.95;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .dc-day-date {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dc-period {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-family: var(--font-title);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(255, 166, 48, 0.22);
+      color: #fff;
+      border: 1px solid rgba(255, 166, 48, 0.45);
+    }
+
+    .dc-period:empty { display: none; }
+
+    .dc-board-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--board-row-gap);
+      min-height: 0;
+    }
+
+    .dc-board {
+      display: grid;
+      grid-template-columns: repeat(var(--dc-cols), minmax(0, 1fr));
+      gap: var(--col-gap);
+      width: 100%;
+      align-items: start;
+    }
+
+    .dc-col {
+      width: 100%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .dc-time {
+      width: 100%;
+      padding: 3px 2px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: var(--primary-color);
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: clamp(11.5px, 3vw, 13.8px);
+      letter-spacing: 0.02em;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+      white-space: nowrap;
+      line-height: 1.15;
+    }
+
+    .dc-slot {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .course-card {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-bottom: calc(var(--coach-size) / 2 + 14px);
+    }
+
+    .dc-card-face {
+      position: relative;
+      width: 100%;
+      height: var(--card-h);
+      padding: 4px 4px 8px;
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+      overflow: visible;
+    }
+
+    .dc-card-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .dc-studio-watermark {
+      position: absolute;
+      right: 2px;
+      bottom: 1px;
+      height: 50%;
+      width: auto;
+      max-width: 55%;
+      object-fit: contain;
+      object-position: bottom right;
+      opacity: 0.08;
+      filter: grayscale(0.25);
+    }
+
+    .dc-card-face > .dc-logo,
+    .dc-card-face > .dc-name {
+      position: relative;
+      z-index: 1;
+    }
+
+    .course-card.women-only .dc-card-face {
+      background: linear-gradient(180deg, #fbf4ff 0%, #fff 60%);
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.28),
+        inset 0 0 0 1.5px rgba(158, 97, 135, 0.5);
+    }
+
+    .course-card.men-only .dc-card-face {
+      background: linear-gradient(180deg, #eef4fa 0%, #fff 60%);
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.28),
+        inset 0 0 0 1.5px rgba(47, 93, 138, 0.45);
+    }
+
+    .course-card.pool .dc-card-face {
+      background: linear-gradient(180deg, #eef8f7 0%, #fff 60%);
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.28),
+        inset 0 0 0 1.5px rgba(53, 118, 124, 0.4);
+    }
+
+    .dc-logo {
+      max-width: 82%;
+      max-height: 26px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .dc-name {
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: clamp(9px, 2.5vw, 12px);
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--ink);
+      word-break: break-word;
+      max-width: 100%;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .dc-type {
+      position: absolute;
+      right: 4px;
+      bottom: 3px;
+      z-index: 1;
+      font-family: var(--font-title);
+      font-size: 6.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #777;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .course-card.women-only .dc-type { color: var(--women); font-weight: 700; }
+    .course-card.men-only .dc-type { color: var(--men); font-weight: 700; }
+    .course-card.pool .dc-type { color: var(--pool); font-weight: 700; }
+
+    .dc-coach-avatars {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .dc-coach-avatars .dc-coach-photo,
+    .dc-coach-avatars .dc-coach-ph {
+      width: var(--coach-size);
+      height: var(--coach-size);
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      object-fit: cover;
+      background: rgba(72, 6, 7, 0.9);
+    }
+
+    .dc-coach-avatars .dc-coach-photo + .dc-coach-photo,
+    .dc-coach-avatars .dc-coach-photo + .dc-coach-ph,
+    .dc-coach-avatars .dc-coach-ph + .dc-coach-photo,
+    .dc-coach-avatars .dc-coach-ph + .dc-coach-ph {
+      margin-left: -8px;
+    }
+
+    .dc-coach-ph {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-title);
+      font-size: 8px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .dc-coach-name {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      font-family: var(--font-text);
+      font-size: clamp(8.8px, 2.42vw, 11px);
+      font-weight: 700;
+      font-style: normal;
+      color: var(--accent-soft);
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+      line-height: 1.1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 1px;
+    }
+
+    .course-card.is-favorite.is-favorite--gold .dc-card-face,
+    .course-card.is-favorite.is-favorite--outline .dc-card-face {
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.28),
+        0 0 0 2px #d4a017;
+    }
+
+    .course-card.is-favorite.is-favorite--star::after {
+      content: '★';
+      position: absolute;
+      top: -2px;
+      right: 0;
+      z-index: 3;
+      font-size: 12px;
+      color: #FFA630;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .dc-status {
+      width: min(420px, 92vw);
+      margin: 40px auto;
+      padding: 22px 18px;
+      text-align: center;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .dc-status h2 {
+      font-family: var(--font-title);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .dc-status p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    body.puppeteer-view .navigation {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+
+    @media screen and (min-width: 769px) {
+      .navigation {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dc-bg" aria-hidden="true"></div>
+  <div class="dc-bg-veil" aria-hidden="true"></div>
+  <div class="dc-bg-scrim" aria-hidden="true"></div>
+
+  <div class="navigation" id="dcNavigation">
+    <button type="button" id="prevDay" class="nav-button prev-button" aria-label="Jour précédent">
+      <div class="nav-segments">
+        <div class="segment segment-1"></div>
+        <div class="segment segment-2"></div>
+      </div>
+    </button>
+    <button type="button" id="nextDay" class="nav-button next-button" aria-label="Jour suivant">
+      <div class="nav-segments">
+        <div class="segment segment-1"></div>
+        <div class="segment segment-2"></div>
+      </div>
+    </button>
+  </div>
+
+  <div class="dc-shell">
+    <header class="dc-header">
+      <div class="dc-day">
+        <div class="dc-day-name" id="dcDayName">—</div>
+        <div class="dc-day-date" id="dcDayDate"></div>
+        <div class="dc-period" id="dcPeriod"></div>
+      </div>
+    </header>
+
+    <div class="dc-board-stack" id="dcBoardStack"></div>
+  </div>
+
+  <script src="planning-resolve.js?v=31"></script>
+  <script>
+(function () {
+  'use strict';
+
+  var PR = window.PlanningResolve;
+  var allData = null;
+  var selectedDateYmd = '';
+  var NAV_DAYS_LIMIT = (PR && PR.NAV_DAYS_LIMIT) || 180;
+  var DEFAULT_SPLIT = '14:00';
+  var splitTime = DEFAULT_SPLIT;
+
+  var BACKGROUND_IMAGES = [
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/f08922e6-dc5e-c477-8dc8-9965ee8eeb15.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/36accb69-741b-b430-c473-3857221e0b5d.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/337cb80e-3d2b-1659-af7b-a3f2b298ab54.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/33541086-ca70-2933-4ca6-a4ab1c023895.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/8ae46cc9-0689-18c3-e61b-72c25230f77f.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/d8b09d3a-30ec-ea94-f32c-7bb975b84626.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/29928305-f166-be9e-6969-abf5567515bd.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/7df851b0-1635-05f0-2d6a-c1a14344df68.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/c254157d-070b-bd75-f553-1f85b65f68b6.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/5121735b-ffb5-3c2e-677b-80cf13aed99e.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/94927341-292a-3239-f87f-e32dfe600903.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/9c6706b6-eb18-38a2-1c3f-73101dd5a639.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/932311f1-d701-e177-7efc-4c14b070d364.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/416be599-02d1-6315-7b1f-89b0dfba281e.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/5adf5246-a067-f5e3-9e90-86bc0ae2412e.jpg',
+    'https://mcusercontent.com/74abea872abd45d46efed5d41/images/55c5a528-6d06-6655-75d9-24408454e623.jpg'
+  ];
+
+  function ymdFromDate(d) {
+    return PR ? PR.ymdFromDate(d) : [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, '0'),
+      String(d.getDate()).padStart(2, '0')
+    ].join('-');
+  }
+
+  function clampNavYmd(ymd) { return PR ? PR.clampNavYmd(ymd) : ymd; }
+  function addDaysToYmd(ymd, delta) { return PR ? PR.addDaysToYmd(ymd, delta) : ymd; }
+
+  function capitalizeDayFr(ymd) {
+    if (PR && PR.capitalizeDayFr) return PR.capitalizeDayFr(PR.getDayNameFrFromYmd(ymd));
+    var names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    var p = String(ymd).split('-');
+    return names[new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
+  }
+
+  function formatDateFr(ymd) {
+    if (PR && PR.formatDateJjMmmm) return PR.formatDateJjMmmm(ymd);
+    var p = String(ymd).split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+  }
+
+  function escapeHtml(s) {
+    if (PR && PR.escapeHtml) return PR.escapeHtml(s);
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function pickDailyBackgroundUrl(ymd) {
+    if (!BACKGROUND_IMAGES.length) return '';
+    var seed = String(ymd || '').replace(/-/g, '');
+    var n = Number(seed);
+    if (!Number.isFinite(n)) n = Date.now();
+    return BACKGROUND_IMAGES[Math.abs(n) % BACKGROUND_IMAGES.length];
+  }
+
+  function applyDailyBackground(ymd) {
+    var bg = document.querySelector('.dc-bg');
+    if (!bg) return;
+    var url = pickDailyBackgroundUrl(ymd);
+    if (url) bg.style.backgroundImage = 'url("' + url + '")';
+  }
+
+  function studioRank(studioId) {
+    var studios = (allData && allData.studios) || [];
+    var s = studios.find(function (x) { return x && x.id === studioId; });
+    if (!s) return 999;
+    return s.rank != null ? s.rank : (s.rang != null ? s.rang : 999);
+  }
+
+  function resolveCoaches(course) {
+    var ids = course.coachIds || [];
+    var list = (allData && allData.coachs) || [];
+    return ids.map(function (id) {
+      return list.find(function (x) { return x && x.id === id; });
+    }).filter(Boolean);
+  }
+
+  function coachNamesText(coaches) {
+    var names = coaches.map(function (c) {
+      return (PR && PR.coachDisplayName) ? PR.coachDisplayName(c) : (c.name || '');
+    }).filter(Boolean);
+    if (!names.length) return '–';
+    if (names.length === 1) return names[0];
+    if (names.length === 2) return names[0] + ', ' + names[1];
+    return names[0] + ', ' + names[1] + '…';
+  }
+
+  function coachInitials(displayName) {
+    if (PR && PR.coachInitialsFromDisplayName) return PR.coachInitialsFromDisplayName(displayName);
+    var parts = String(displayName || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+  }
+
+  function coachPhotoHtml(coach) {
+    var disp = (PR && PR.coachDisplayName) ? PR.coachDisplayName(coach) : (coach.name || '');
+    var url = (PR && PR.coachPhotoUrl) ? PR.coachPhotoUrl(coach) : (coach.imageUrl || '');
+    var initials = coachInitials(disp);
+    if (url) {
+      return '<img class="dc-coach-photo" src="' + escapeHtml(url) + '" alt="' + escapeHtml(disp) + '" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;dc-coach-ph&quot;>' + escapeHtml(initials) + '</span>\'">';
+    }
+    return '<span class="dc-coach-ph">' + escapeHtml(initials) + '</span>';
+  }
+
+  function resolveView(ymd) {
+    if (PR && PR.mergeResolvedViewForDate) return PR.mergeResolvedViewForDate(ymd, allData);
+    if (PR && PR.resolveDailyView) return PR.resolveDailyView(ymd, allData);
+    return { courses: [], planningKey: 'regulier', closed: false, indetermine: false };
+  }
+
+  function resolveBaseView(ymd) {
+    if (PR && PR.resolveDailyView) return PR.resolveDailyView(ymd, allData);
+    return resolveView(ymd);
+  }
+
+  function planningLabelFromView(rvBase, rvMerged) {
+    var hor = allData && allData.metadata && allData.metadata.horaires ? allData.metadata.horaires : null;
+    var rv = rvBase || {};
+    var labelText = '';
+    if (rv.closed) {
+      labelText = rv.periodName ? ('Fermé — ' + rv.periodName) : 'Club fermé';
+    } else if (rv.planningKey === 'ferie') {
+      labelText = rv.periodName ? ('Jour férié — ' + rv.periodName) : 'Jour férié';
+    } else if (rv.planningKey === 'ramadan') {
+      var lr = hor && hor.ramadan && hor.ramadan.planningLabel;
+      labelText = (lr && String(lr).trim()) ? String(lr).trim() : 'Planning Ramadan';
+      if (labelText.toLowerCase().indexOf('planning') === -1) labelText = 'Planning ' + labelText;
+    } else if (rv.planningKey === 'ete') {
+      var le = hor && hor.ete && hor.ete.planningLabel;
+      labelText = (le && String(le).trim()) ? String(le).trim() : 'Planning été';
+      if (labelText.toLowerCase().indexOf('planning') === -1) labelText = 'Planning ' + labelText;
+    } else {
+      var lreg = hor && hor.regulier && hor.regulier.planningLabel;
+      labelText = (lreg && String(lreg).trim()) ? String(lreg).trim() : 'Planning régulier';
+      if (/^planning$/i.test(labelText)) labelText = 'Planning régulier';
+    }
+    if (rvMerged && rvMerged.planningEventLabels && rvMerged.planningEventLabels.length) {
+      labelText = labelText + ' — ' + rvMerged.planningEventLabels.join(' · ');
+    }
+    if (rvMerged && rvMerged.exceptionnelName) {
+      labelText = labelText + ' — ' + rvMerged.exceptionnelName;
+    }
+    return labelText;
+  }
+
+  function typeShortLabel(typeRaw) {
+    var t = String(typeRaw || 'Mixte');
+    var low = t.toLowerCase();
+    if (low.indexOf('femme') !== -1) return 'Femmes';
+    if (low.indexOf('homme') !== -1) return 'Hommes';
+    return 'Mixte';
+  }
+
+  /** Mixte → Femmes → Hommes (alignement des rangées entre colonnes). */
+  function typeSortRank(typeRaw) {
+    var low = String(typeRaw || '').toLowerCase();
+    if (low.indexOf('femme') !== -1) return 1;
+    if (low.indexOf('homme') !== -1) return 2;
+    if (low.indexOf('mixte') !== -1 || !low) return 0;
+    return 3;
+  }
+
+  function sortCoursesInSlot(list) {
+    return (list || []).slice().sort(function (a, b) {
+      var tr = typeSortRank(a.type) - typeSortRank(b.type);
+      if (tr !== 0) return tr;
+      return studioRank(a.studioId) - studioRank(b.studioId);
+    });
+  }
+
+  function buildCard(course) {
+    var cours = (PR && PR.courseDisplayFromCoursId)
+      ? PR.courseDisplayFromCoursId(course.coursId, allData.cours)
+      : ((allData.cours || []).find(function (c) { return c.id === course.coursId; }) || { name: 'Cours' });
+    var studio = (allData.studios || []).find(function (s) { return s && s.id === course.studioId; });
+    var typeRaw = (course.type || 'Mixte').toString();
+    var typeLow = typeRaw.toLowerCase();
+    var studioName = studio ? (studio.name || '') : '';
+    var studioLow = studioName.toLowerCase();
+    var isWomen = typeLow.indexOf('femme') !== -1;
+    var isMen = typeLow.indexOf('homme') !== -1;
+    var isPool = studioLow.indexOf('piscine') !== -1 || studioLow.indexOf('aqua') !== -1;
+    var coaches = resolveCoaches(course);
+
+    var classes = ['course-card'];
+    if (isWomen) classes.push('women-only');
+    if (isMen) classes.push('men-only');
+    if (isPool) classes.push('pool');
+    if (PR && PR.planningEventThemeClasses) {
+      classes.push(PR.planningEventThemeClasses(course, 'card').replace(/^\s+/, ''));
+    }
+
+    var watermark = (studio && studio.imageUrl)
+      ? '<div class="dc-card-bg"><img class="dc-studio-watermark" src="' + escapeHtml(studio.imageUrl) + '" alt=""></div>'
+      : '';
+
+    var hasLogo = !!(cours.logo && String(cours.logo).trim());
+    var titleHtml = hasLogo
+      ? '<img class="dc-logo" src="' + escapeHtml(cours.logo) + '" alt="" loading="lazy" data-fallback-name="' + escapeHtml((cours.name || 'Cours').toUpperCase()) + '">'
+      : '<div class="dc-name">' + escapeHtml((cours.name || 'Cours').toUpperCase()) + '</div>';
+
+    var avatars = coaches.slice(0, 2).map(coachPhotoHtml).join('');
+
+    var el = document.createElement('div');
+    el.className = classes.join(' ').replace(/\s+/g, ' ').trim();
+    el.setAttribute('data-start-time', course.startTime || '');
+    el.setAttribute('data-end-time', course.endTime || '');
+    el.setAttribute('data-cours-id', course.coursId || '');
+    el.setAttribute('data-coach-ids', (course.coachIds || []).join(','));
+
+    el.innerHTML =
+      '<div class="dc-card-face">' +
+        watermark +
+        titleHtml +
+        '<span class="dc-type">' + escapeHtml(typeShortLabel(typeRaw)) + '</span>' +
+        (avatars ? '<div class="dc-coach-avatars">' + avatars + '</div>' : '') +
+      '</div>' +
+      '<div class="dc-coach-name">' + escapeHtml(coachNamesText(coaches)) + '</div>';
+
+    var logoImg = el.querySelector('.dc-logo');
+    if (logoImg) {
+      logoImg.addEventListener('error', function onLogoErr() {
+        logoImg.removeEventListener('error', onLogoErr);
+        var name = document.createElement('div');
+        name.className = 'dc-name';
+        name.textContent = logoImg.getAttribute('data-fallback-name') || 'Cours';
+        logoImg.replaceWith(name);
+      });
+    }
+
+    return el;
+  }
+
+  function buildColumn(time, coursesAtTime) {
+    var col = document.createElement('div');
+    col.className = 'dc-col';
+
+    var timeEl = document.createElement('div');
+    timeEl.className = 'dc-time';
+    timeEl.textContent = time;
+    col.appendChild(timeEl);
+
+    var slot = document.createElement('div');
+    slot.className = 'dc-slot';
+    sortCoursesInSlot(coursesAtTime).forEach(function (course) {
+      slot.appendChild(buildCard(course));
+    });
+    col.appendChild(slot);
+    return col;
+  }
+
+  function buildBoardRow(times, byTime) {
+    var board = document.createElement('div');
+    board.className = 'dc-board';
+    times.forEach(function (time) {
+      board.appendChild(buildColumn(time, byTime[time] || []));
+    });
+    return board;
+  }
+
+  function setColCount(n) {
+    var count = Math.max(1, Math.min(6, n || 1));
+    document.documentElement.style.setProperty('--dc-cols', String(count));
+  }
+
+  function maghribForYmd(ymd) {
+    var data = window.prayerTimesData;
+    if (!data || !data.prayerTimes || !ymd) return '';
+    var day = data.prayerTimes[ymd] || data.prayerTimes[String(ymd)];
+    if (!day && Array.isArray(data.prayerTimes)) {
+      for (var i = 0; i < data.prayerTimes.length; i++) {
+        var row = data.prayerTimes[i];
+        if (row && (row.date === ymd || row.ymd === ymd)) {
+          day = row;
+          break;
+        }
+      }
+    }
+    var m = day && (day.maghrib || day.Maghrib || day.MAGHRIB);
+    if (!m) return '';
+    var match = String(m).trim().match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return '';
+    var h = Number(match[1]);
+    var min = Number(match[2]);
+    return (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
+  }
+
+  async function loadPrayerTimesIfNeeded(ymd, planningKey) {
+    splitTime = DEFAULT_SPLIT;
+    if (planningKey !== 'ramadan') return;
+    var mag = maghribForYmd(ymd);
+    if (mag) {
+      splitTime = mag;
+      return;
+    }
+    try {
+      var prayerData = null;
+      try {
+        var localResp = await fetch('./prayer-times.json');
+        if (localResp.ok) prayerData = await localResp.json();
+      } catch (e) {}
+      if (!prayerData) {
+        var remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/prayer-times.json');
+        if (remoteResp.ok) prayerData = await remoteResp.json();
+      }
+      if (prayerData) {
+        window.prayerTimesData = prayerData;
+        mag = maghribForYmd(ymd);
+        if (mag) splitTime = mag;
+      }
+    } catch (err) {
+      console.warn('prayer times', err);
+    }
+  }
+
+  function renderStatus(title, message) {
+    var stack = document.getElementById('dcBoardStack');
+    stack.innerHTML =
+      '<div class="dc-status">' +
+        '<h2>' + escapeHtml(title) + '</h2>' +
+        '<p>' + escapeHtml(message) + '</p>' +
+      '</div>';
+  }
+
+  async function renderBoard() {
+    var ymd = selectedDateYmd || ymdFromDate(new Date());
+    applyDailyBackground(ymd);
+
+    document.getElementById('dcDayName').textContent = capitalizeDayFr(ymd);
+    document.getElementById('dcDayDate').textContent = formatDateFr(ymd);
+
+    var rvBase = resolveBaseView(ymd);
+    var rv = resolveView(ymd);
+    var periodEl = document.getElementById('dcPeriod');
+    periodEl.textContent = planningLabelFromView(rvBase, rv);
+
+    document.body.classList.toggle('planning-ramadan', rvBase.planningKey === 'ramadan');
+    document.body.classList.toggle('planning-ete', rvBase.planningKey === 'ete');
+    document.body.classList.toggle('planning-ferie', rvBase.planningKey === 'ferie' || rvBase.planningKey === 'ferme');
+
+    await loadPrayerTimesIfNeeded(ymd, rvBase.planningKey);
+
+    var stack = document.getElementById('dcBoardStack');
+    stack.innerHTML = '';
+
+    if (rvBase.closed) {
+      renderStatus('Club fermé', 'Pas de cours ce jour-là.');
+      updateNav();
+      return;
+    }
+    if (rv.indetermine) {
+      renderStatus('À déterminer', 'Le planning de ce jour n’est pas encore fixé.');
+      updateNav();
+      return;
+    }
+
+    var courses = (rv.courses || []).slice().sort(function (a, b) {
+      var t = String(a.startTime || '').localeCompare(String(b.startTime || ''));
+      if (t !== 0) return t;
+      return studioRank(a.studioId) - studioRank(b.studioId);
+    });
+
+    if (!courses.length) {
+      renderStatus('Pas de cours', 'Aucun cours programmé pour cette journée.');
+      updateNav();
+      return;
+    }
+
+    var byTime = {};
+    var times = [];
+    courses.forEach(function (course) {
+      var t = course.startTime || '';
+      if (!byTime[t]) {
+        byTime[t] = [];
+        times.push(t);
+      }
+      byTime[t].push(course);
+    });
+
+    var first = times.filter(function (t) { return t < splitTime; });
+    var second = times.filter(function (t) { return t >= splitTime; });
+    /* Toujours 2 rangées s’il y a matin ET aprem (même si ≤ 6 créneaux au total — ex. lundi). */
+    if (first.length && second.length) {
+      setColCount(Math.max(first.length, second.length, 1));
+      stack.appendChild(buildBoardRow(first, byTime));
+      stack.appendChild(buildBoardRow(second, byTime));
+    } else {
+      setColCount(times.length);
+      stack.appendChild(buildBoardRow(times, byTime));
+    }
+
+    if (PR && PR.applyFavoriteHighlights) PR.applyFavoriteHighlights();
+    else if (typeof window.__canalFormeApplyFavorites === 'function') window.__canalFormeApplyFavorites();
+    if (PR && PR.fillPlanningEventConfetti) PR.fillPlanningEventConfetti(stack, { variant: 'compact' });
+    if (PR && PR.wirePlanningImgTextFallbacks) PR.wirePlanningImgTextFallbacks(stack);
+
+    updateNav();
+  }
+
+  function updateNav() {
+    var today = ymdFromDate(new Date());
+    var min = addDaysToYmd(today, -NAV_DAYS_LIMIT);
+    var max = addDaysToYmd(today, NAV_DAYS_LIMIT);
+    var prev = document.getElementById('prevDay');
+    var next = document.getElementById('nextDay');
+    if (prev) prev.disabled = selectedDateYmd <= min;
+    if (next) next.disabled = selectedDateYmd >= max;
+  }
+
+  function syncUrl() {
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set('date', selectedDateYmd);
+      history.replaceState({}, '', url);
+    } catch (e) {}
+  }
+
+  function changeDay(delta) {
+    selectedDateYmd = clampNavYmd(addDaysToYmd(selectedDateYmd, delta));
+    syncUrl();
+    renderBoard();
+  }
+
+  async function loadData() {
+    var data = null;
+    try {
+      var local = await fetch('./planning-v2.json');
+      if (local.ok) data = await local.json();
+    } catch (e) {}
+    if (!data) {
+      try {
+        var localAlt = await fetch('./Planning-v2.json');
+        if (localAlt.ok) data = await localAlt.json();
+      } catch (e2) {}
+    }
+    if (!data) {
+      var remote = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json');
+      if (!remote.ok) throw new Error('HTTP ' + remote.status);
+      data = await remote.json();
+    }
+    return data;
+  }
+
+  function initPuppeteerMode() {
+    try {
+      var q = new URLSearchParams(window.location.search);
+      if (q.get('puppeteer') === '1' || q.get('screenshot') === '1') {
+        document.body.classList.add('puppeteer-view');
+      }
+    } catch (e) {}
+  }
+
+  async function boot() {
+    initPuppeteerMode();
+    selectedDateYmd = ymdFromDate(new Date());
+    try {
+      var q = new URLSearchParams(window.location.search).get('date');
+      if (q && /^\d{4}-\d{2}-\d{2}$/.test(q)) selectedDateYmd = clampNavYmd(q);
+    } catch (e) {}
+
+    document.getElementById('prevDay').addEventListener('click', function () { changeDay(-1); });
+    document.getElementById('nextDay').addEventListener('click', function () { changeDay(1); });
+
+    try {
+      allData = await loadData();
+      await renderBoard();
+      var nav = document.getElementById('dcNavigation');
+      if (nav && !document.body.classList.contains('puppeteer-view')) {
+        nav.classList.add('loaded');
+      }
+      document.body.setAttribute('data-daily-columns-ready', 'true');
+    } catch (err) {
+      console.error(err);
+      renderStatus('Erreur', 'Impossible de charger le planning.');
+    }
+  }
+
+  boot();
+})();
+  </script>
+</body>
+</html>

@@ -1901,6 +1901,22 @@
       }, delay);
     }
 
+    /** App Mes MEPs → « Voir dans le classement » : rejoue scroll + surbrillance 1× */
+    window.__canalFormeReplayMeHighlight = function () {
+      if (!ME_GUID_PARAM) return;
+      try {
+        sessionStorage.removeItem(ME_HIGHLIGHT_SESSION_KEY);
+      } catch (e) { /* ignore */ }
+      if (!previousData || !previousData.current || !Array.isArray(previousData.current.data)) return;
+      const dayOfMonth = new Date().getDate();
+      const topEntries = dayOfMonth <= 7 ? 10 : 20;
+      const meUser = findMeInCurrentData(previousData.current.data);
+      if (!meUser) return;
+      setTimeout(function () {
+        runMeHighlightFocus(meUser, topEntries);
+      }, 280);
+    };
+
     function findMeInCurrentData(data) {
       if (!ME_GUID_PARAM || !data || !Array.isArray(data)) return null;
       for (let i = 0; i < data.length; i++) {

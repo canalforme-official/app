@@ -40,7 +40,7 @@ body.embedded.embedded-weekly-vertical .content-wrapper {
   overscroll-behavior-y: none !important;
 }
 
-/* weekly.html (Tableau) — droite, bas d’origine, léger décalage vers l’intérieur */
+/* weekly.html (Tableau) — iOS : inset ~88 px (barre glass). Android : inject app → 16 px. */
 body.embedded.embedded-weekly-horizontal .filters-sidebar {
   bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
   right: 88px !important;
