@@ -609,10 +609,6 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   color: #fff !important;
 }
 
-.course-card.is-favorite.is-favorite--gold .dc-logo {
-  filter: brightness(0) invert(1);
-}
-
 .course-card.is-favorite.is-favorite--outline .dc-card-face {
   position: relative;
   overflow: visible !important;
@@ -640,6 +636,6 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   mask-composite: exclude;
   animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
-  z-index: 12;
+  z-index: 1;
 }
 
