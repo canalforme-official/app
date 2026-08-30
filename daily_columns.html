@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="planning-tokens.css?v=31">
+  <link rel="stylesheet" href="planning-tokens.css?v=33">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     :root {
@@ -462,22 +462,82 @@
       padding: 0 1px;
     }
 
-    .course-card.is-favorite.is-favorite--gold .dc-card-face,
+    /* Favoris Colonnes — même logique que daily (bloc), pas la grille (.course-time) */
+    .course-card.is-favorite {
+      position: relative;
+    }
+
+    .course-card.is-favorite.is-favorite--gold .dc-card-face {
+      background: #c9a227 !important;
+      background-image: none !important;
+      box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35) !important;
+      color: #fff !important;
+    }
+
+    .course-card.is-favorite.is-favorite--gold .dc-name,
+    .course-card.is-favorite.is-favorite--gold .dc-type {
+      color: #fff !important;
+    }
+
+    .course-card.is-favorite.is-favorite--gold .dc-logo {
+      filter: brightness(0) invert(1);
+    }
+
+    .course-card.is-favorite.is-favorite--gold .dc-studio-watermark {
+      opacity: 0.18;
+      filter: brightness(0) invert(1);
+    }
+
+    .course-card.is-favorite.is-favorite--gold .dc-coach-name {
+      color: #ffe9a0;
+    }
+
     .course-card.is-favorite.is-favorite--outline .dc-card-face {
-      box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.28),
-        0 0 0 2px #d4a017;
+      position: relative;
+      overflow: visible !important;
+      outline: none !important;
+    }
+
+    .course-card.is-favorite.is-favorite--outline .dc-card-face::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 11px;
+      padding: 2px;
+      box-sizing: border-box;
+      background: conic-gradient(
+        from var(--cf-fav-angle, 0deg),
+        rgba(201, 162, 39, 0.4) 0deg,
+        rgba(201, 162, 39, 0.4) 230deg,
+        #ffe9a0 255deg,
+        #fffef8 275deg,
+        #c9a227 295deg,
+        rgba(201, 162, 39, 0.4) 320deg,
+        rgba(201, 162, 39, 0.4) 360deg
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: cf-fav-outline-gleam 2.8s linear infinite;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    .course-card.is-favorite.is-favorite--star .dc-card-face {
+      position: relative;
     }
 
     .course-card.is-favorite.is-favorite--star::after {
       content: '★';
       position: absolute;
       top: -2px;
-      right: 0;
-      z-index: 3;
-      font-size: 12px;
-      color: #FFA630;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+      right: -1px;
+      z-index: 20;
+      font-size: 14px;
+      line-height: 1;
+      color: #c9a227;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+      pointer-events: none;
     }
 
     .dc-status {

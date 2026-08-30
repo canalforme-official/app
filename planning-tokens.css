@@ -596,3 +596,50 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   margin-left: 0 !important;
 }
 
+/* Daily colonnes — favoris sur .dc-card-face (pas .course-time de la grille) */
+.course-card.is-favorite.is-favorite--gold .dc-card-face {
+  background: #c9a227 !important;
+  background-image: none !important;
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35) !important;
+  color: #fff !important;
+}
+
+.course-card.is-favorite.is-favorite--gold .dc-name,
+.course-card.is-favorite.is-favorite--gold .dc-type {
+  color: #fff !important;
+}
+
+.course-card.is-favorite.is-favorite--gold .dc-logo {
+  filter: brightness(0) invert(1);
+}
+
+.course-card.is-favorite.is-favorite--outline .dc-card-face {
+  position: relative;
+  overflow: visible !important;
+}
+
+.course-card.is-favorite.is-favorite--outline .dc-card-face::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 11px;
+  padding: 2px;
+  box-sizing: border-box;
+  background: conic-gradient(
+    from var(--cf-fav-angle),
+    rgba(201, 162, 39, 0.4) 0deg,
+    rgba(201, 162, 39, 0.4) 230deg,
+    #ffe9a0 255deg,
+    #fffef8 275deg,
+    #c9a227 295deg,
+    rgba(201, 162, 39, 0.4) 320deg,
+    rgba(201, 162, 39, 0.4) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
+  pointer-events: none;
+  z-index: 12;
+}
+
