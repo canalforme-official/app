@@ -562,12 +562,24 @@
       line-height: 1.45;
     }
 
+    /* Puppeteer / screenshot — masquer flèches (aligné daily_grid / daily_matrix) */
     html.puppeteer-view .navigation,
     body.puppeteer-view .navigation {
       display: none !important;
       opacity: 0 !important;
       pointer-events: none !important;
       visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    html.puppeteer-view .nav-button,
+    body.puppeteer-view .nav-button {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
     }
 
     @media screen and (min-width: 769px) {
@@ -1012,11 +1024,13 @@
     if (rvBase.closed) {
       renderStatus('Club fermé', 'Pas de cours ce jour-là.');
       updateNav();
+      updateButtonVisibility();
       return;
     }
     if (rv.indetermine) {
       renderStatus('À déterminer', 'Le planning de ce jour n’est pas encore fixé.');
       updateNav();
+      updateButtonVisibility();
       return;
     }
 
@@ -1029,6 +1043,7 @@
     if (!courses.length) {
       renderStatus('Pas de cours', 'Aucun cours programmé pour cette journée.');
       updateNav();
+      updateButtonVisibility();
       return;
     }
 
@@ -1062,6 +1077,7 @@
     if (PR && PR.wirePlanningImgTextFallbacks) PR.wirePlanningImgTextFallbacks(stack);
 
     updateNav();
+    updateButtonVisibility();
   }
 
   function updateNav() {
@@ -1131,15 +1147,39 @@
       (navigator.userAgent.indexOf('HeadlessChrome') !== -1 && !isRealMobile);
   }
 
-  function initPuppeteerMode() {
+  function updateButtonVisibility() {
     var isAutomated = isAutomatedBrowser();
     document.documentElement.classList.toggle('puppeteer-view', isAutomated);
     document.body.classList.toggle('puppeteer-view', isAutomated);
-    return isAutomated;
+    var nav = document.getElementById('dcNavigation');
+    if (!nav) return;
+    if (isAutomated) {
+      nav.style.display = 'none';
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+      nav.style.visibility = 'hidden';
+      nav.classList.remove('loaded');
+      return;
+    }
+    var isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      nav.style.display = 'flex';
+      nav.style.opacity = '1';
+      nav.style.transform = 'translateY(0)';
+      nav.style.pointerEvents = 'all';
+      nav.style.visibility = '';
+      nav.classList.add('loaded');
+    } else {
+      nav.style.display = '';
+      nav.style.opacity = '';
+      nav.style.pointerEvents = '';
+      nav.style.visibility = '';
+      nav.classList.remove('loaded');
+    }
   }
 
   async function boot() {
-    var isPuppeteer = initPuppeteerMode();
+    updateButtonVisibility();
     selectedDateYmd = ymdFromDate(new Date());
     try {
       var q = new URLSearchParams(window.location.search).get('date');
@@ -1152,17 +1192,7 @@
     try {
       allData = await loadData();
       await renderBoard();
-      var nav = document.getElementById('dcNavigation');
-      if (nav) {
-        if (isPuppeteer) {
-          nav.style.display = 'none';
-          nav.style.opacity = '0';
-          nav.style.pointerEvents = 'none';
-          nav.classList.remove('loaded');
-        } else {
-          nav.classList.add('loaded');
-        }
-      }
+      updateButtonVisibility();
       document.body.setAttribute('data-daily-columns-ready', 'true');
     } catch (err) {
       console.error(err);
@@ -1170,7 +1200,19 @@
     }
   }
 
-  boot();
+  function initPage() {
+    boot();
+    setTimeout(updateButtonVisibility, 100);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPage);
+  } else {
+    initPage();
+  }
+
+  window.addEventListener('load', updateButtonVisibility);
+  window.addEventListener('resize', updateButtonVisibility);
 })();
   </script>
 </body>
