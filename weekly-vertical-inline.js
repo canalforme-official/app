@@ -1209,7 +1209,7 @@
           top = tr.bottom - hr.top + host.scrollTop;
           colW = Math.max(8, tr.width);
         } else {
-          /* weekly.html (paysage natif mobile ; archive CSS rotate = weekly_archived_css_rotate.html). */
+          /* weekly_landscape.html (app paysage natif) ; weekly.html = prod github rotate CSS. */
           var off = cumulativeOffsetToAncestor(th, host);
           if (off) {
             left = off.x;
@@ -1509,7 +1509,13 @@
     };
 
     function goToWeekly() {
-      window.location.href = './weekly.html' + buildPlanningViewQuery();
+      var target = './weekly.html';
+      try {
+        if (document.body && document.body.classList.contains('embedded')) {
+          target = './weekly_landscape.html';
+        }
+      } catch (e) {}
+      window.location.href = target + buildPlanningViewQuery();
     }
 
     function goToWeeklyVertical() {

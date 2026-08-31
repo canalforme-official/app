@@ -140,7 +140,7 @@
         renderBoard();
         return true;
       }
-      if ((file === 'weekly.html' || file.indexOf('weekly_vertical') !== -1) && typeof refreshPlanningDisplay === 'function') {
+      if ((file === 'weekly.html' || file === 'weekly_landscape.html' || file.indexOf('weekly_vertical') !== -1) && typeof refreshPlanningDisplay === 'function') {
         refreshPlanningDisplay();
         return true;
       }

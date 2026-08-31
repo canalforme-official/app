@@ -40,7 +40,8 @@ Une réorganisation future du dossier (sous‑dossiers `planning/`, etc.) reste 
 | `daily_grid.html` | Variante **grille** du jour (studios en colonnes indépendantes). Idem tokens + fetch planning / horaires de prière. |
 | `daily_matrix.html` | Variante **matrice** du jour (heures en lignes, studios en colonnes, fond bordeaux). Même données et thèmes que `daily_grid.html`. |
 | `daily_columns.html` | Daily style Story : **heures en colonnes**, matin/aprem (ftour en Ramadan). Vue app **Colonnes**. Fond photo (même logique qu’`horaires`). |
-| `weekly.html` | Planning **hebdomadaire** (tableau paysage natif). `planning-tokens.css`, `planning-resolve.js`, `weekly-vertical-inline.js`. Archives : `weekly_archived_css_rotate.html`, `weekly_rotate_content_archived.html`. |
+| `weekly.html` | Planning hebdo **prod github.io** (rotate CSS mobile). |
+| `weekly_landscape.html` | Tableau **paysage natif** — app Canal Forme (build avec orientation). |
 | `weekly_vertical.html` | Hebdo **vertical** (scroll jours). Mêmes scripts partagés. |
 | `weekly_vertical_fulldays.html` | Variante vertical **tous les jours** visibles. Mêmes scripts partagés. |
 | `prayer-times.html` | Page horaires de prière (si utilisée seule). |
@@ -49,7 +50,7 @@ Une réorganisation future du dossier (sous‑dossiers `planning/`, etc.) reste 
 | `palmares-myzone.html` | Palmarès performances. |
 | `planning-tokens.css` | Variables CSS des **thèmes** planning (Ramadan, férié, été). Détails : [PLANNING-CSS.md](./PLANNING-CSS.md). |
 | `planning-resolve.js` | Résolution des périodes / clés planning (partagé par plusieurs pages). |
-| `weekly-vertical-inline.js` | Logique hebdo (vertical + chargé aussi par `weekly.html`). |
+| `weekly-vertical-inline.js` | Logique hebdo (vertical + `weekly.html` + `weekly_landscape.html`). |
 | `Planning-v2.json` | Copie / fallback **local** du JSON planning (le déploiement peut s’appuyer sur `app-data` en priorité). Les pages font souvent `fetch('./planning-v2.json')` : le nom exact du fichier déployé doit rester aligné avec le code (sensible à la casse selon l’hébergeur). |
 | `PLANNING-CSS.md` | Documentation des jetons CSS planning. |
 | `images_to_import.txt` | Note interne (imports d’images), non servi comme page. |
@@ -71,7 +72,7 @@ Chemins indiqués **depuis la racine `frontend/`** (même dossier que les `.html
 |-----------|--------------------------------|
 | `planning-tokens.css` | `daily.html`, `daily_grid.html`, `weekly.html`, `weekly_vertical.html`, `weekly_vertical_fulldays.html` |
 | `planning-resolve.js` | `weekly.html`, `weekly_vertical.html`, `weekly_vertical_fulldays.html`, `myzone-leaderboard.html`, `status-leaderboard.html` |
-| `weekly-vertical-inline.js` | `weekly.html`, `weekly_vertical.html`, `weekly_vertical_fulldays.html` |
+| `weekly-vertical-inline.js` | `weekly.html`, `weekly_landscape.html`, `weekly_vertical.html`, `weekly_vertical_fulldays.html` |
 | `svg/planning-icons.svg` | Au moins `daily.html` (badges / icônes) |
 
 ---

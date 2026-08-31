@@ -29,7 +29,7 @@
       document.body.classList.add('embedded-daily-columns');
     } else if (file.indexOf('weekly_vertical') !== -1) {
       document.body.classList.add('embedded-weekly-vertical');
-    } else if (file === 'weekly.html') {
+    } else if (file === 'weekly.html' || file === 'weekly_landscape.html') {
       document.body.classList.add('embedded-weekly-horizontal');
     }
   }
