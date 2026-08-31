@@ -6,7 +6,7 @@
 
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <link rel="stylesheet" href="planning-tokens.css?v=35">
   <link rel="stylesheet" href="planning-embedded.css">
 
@@ -1594,8 +1594,12 @@
     will-change: transform, opacity;
   }
 
-  /* Mobile paysage natif (TEST B) — pas de rotation CSS */
-  @media screen and (max-width: 767px) and (orientation: landscape) {
+  /*
+   * Mobile paysage natif (TEST B) — pas de rotation CSS.
+   * Important : en paysage, un iPhone récent a souvent une LARGEUR > 767px.
+   * Donc max-width:767px rate le cas. On cible plutôt max-height (écran peu haut).
+   */
+  @media screen and (orientation: landscape) and (max-height: 560px) {
     html, body {
       width: 100%;
       height: 100%;
@@ -1603,17 +1607,47 @@
       padding: 0;
       overflow: hidden;
       position: fixed;
+      inset: 0;
     }
 
     .content-wrapper {
+      position: fixed;
+      inset: 0;
       width: 100%;
-      height: 100vh;
+      height: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 10px;
+      /* Peu de marge : pas d’espace « fantôme » pour une barre inexistante */
+      padding: 4px;
+      padding-left: max(4px, env(safe-area-inset-left, 0px));
+      padding-right: max(4px, env(safe-area-inset-right, 0px));
+      padding-top: max(2px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(2px, env(safe-area-inset-bottom, 0px));
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
-      position: relative;
+    }
+
+    /* Ne pas traiter le téléphone paysage comme une tablette */
+    .today-view-button {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: all !important;
+      top: max(8px, env(safe-area-inset-top, 0px)) !important;
+      right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    }
+    .rotation-view-button {
+      bottom: max(70px, calc(env(safe-area-inset-bottom, 0px) + 60px));
+      right: max(12px, env(safe-area-inset-right, 0px));
+    }
+    .filters-sidebar {
+      bottom: max(12px, env(safe-area-inset-bottom, 0px));
+      right: max(12px, env(safe-area-inset-right, 0px));
+    }
+    .portrait-hint {
+      display: none !important;
     }
 
     #weeklySchedule {
@@ -2347,7 +2381,8 @@
       line-height: 1.35;
     }
 
-    @media screen and (max-width: 767px) and (orientation: portrait) {
+    /* Portrait téléphone : invite à pivoter (hauteur > largeur, pas trop large) */
+    @media screen and (orientation: portrait) and (max-width: 1024px) {
       .portrait-hint { display: flex; }
       .content-wrapper,
       .rotation-view-button,
