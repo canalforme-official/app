@@ -7,7 +7,7 @@
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <link rel="stylesheet" href="planning-tokens.css?v=35">
+  <link rel="stylesheet" href="planning-tokens.css?v=38">
   <link rel="stylesheet" href="planning-embedded.css">
 
   <style>
@@ -1619,14 +1619,21 @@
       max-height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
-      /* Peu de marge : pas d’espace « fantôme » pour une barre inexistante */
+      /* Comme weekly.html : petit padding, pas de bande réservée aux flèches (elles sont en overlay) */
       padding: 4px;
-      padding-left: max(4px, env(safe-area-inset-left, 0px));
-      padding-right: max(4px, env(safe-area-inset-right, 0px));
-      padding-top: max(2px, env(safe-area-inset-top, 0px));
-      padding-bottom: max(2px, env(safe-area-inset-bottom, 0px));
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
+    }
+
+    .navigation {
+      display: flex !important;
+      left: max(6px, env(safe-area-inset-left, 0px));
+      right: max(6px, env(safe-area-inset-right, 0px));
+      pointer-events: none;
+      z-index: 10060;
+    }
+    .navigation .nav-button {
+      pointer-events: all;
     }
 
     /* Ne pas traiter le téléphone paysage comme une tablette */
@@ -2066,105 +2073,7 @@
     }
   }
 
-  /* Styles pour l'ascenseur personnalisé */
-  .custom-scrollbar {
-    position: fixed;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    height: calc(100% - 200px);
-    width: 50px;
-    z-index: 1000;
-    pointer-events: auto;
-    opacity: 1;
-  }
-
-  .scrollbar-track {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 60%;
-    background-color: var(--primary-lighter);
-    box-shadow: 0 0 8px var(--primary-lighter);
-    border-radius: 2px;
-    opacity: 0.3;
-  }
-
-  /* Masquer le track sur les résolutions non mobiles */
-  @media screen and (min-width: 768px) {
-    .scrollbar-track {
-      display: none;
-    }
-  }
-
-  .scrollbar-thumb {
-    position: absolute;
-    right: 0;
-    width: 4px;
-    background-color: transparent;
-    border-radius: 2px;
-    transition: all 0.2s ease;
-    box-shadow: none;
-    opacity: 0;
-  }
-
-  .scrollbar-thumb:hover,
-  .scrollbar-thumb:active {
-    background-color: transparent;
-    box-shadow: none;
-    width: 4px;
-    right: 0;
-    opacity: 0;
-  }
-
-  .scrollbar-touch-area {
-    position: absolute;
-    right: -20px;
-    width: 50px;
-    height: 100%;
-    cursor: pointer;
-    background-color: transparent;
-    border-radius: 25px;
-  }
-
-  /* Ajustement pour la rotation mobile */
-  @media screen and (max-width: 767px) {
-    .custom-scrollbar {
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      height: calc(100% - 200px);
-      width: 50px;
-    }
-
-    .scrollbar-track {
-      width: 4px;
-      opacity: 0.3;
-      display: block;
-      height: 60%;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .scrollbar-thumb {
-      width: 4px;
-      opacity: 0;
-    }
-
-    .scrollbar-thumb:hover,
-    .scrollbar-thumb:active {
-      width: 4px;
-      right: 0;
-      opacity: 0;
-    }
-
-    .scrollbar-touch-area {
-      right: -20px;
-      width: 50px;
-    }
-  }
+  /* Styles pour l'ascenseur personnalisé — retiré (inutile) */
 
     .navigation {
       position: fixed;
@@ -2343,7 +2252,7 @@
       line-height: 1.35;
     }
 
-    /* --- TEST B : paysage natif (pas de rotation CSS) --- */
+    /* --- TEST B : paysage forcé — message seulement si le pivot auto échoue --- */
     .portrait-hint {
       display: none;
       position: fixed;
@@ -2355,43 +2264,81 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 28px 20px;
-      gap: 16px;
+      padding: 28px 24px;
+      gap: 18px;
+    }
+    .portrait-hint.is-visible {
+      display: flex;
+    }
+    .portrait-hint-icon {
+      width: 72px;
+      height: 72px;
+      border: 3px solid rgba(255, 255, 255, 0.85);
+      border-radius: 12px;
+      position: relative;
+      animation: portrait-hint-tilt 1.6s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(255, 166, 48, 0.35);
+    }
+    .portrait-hint-icon::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+    @keyframes portrait-hint-tilt {
+      0%, 100% { transform: rotate(0deg); }
+      35% { transform: rotate(90deg); }
+      65% { transform: rotate(90deg); }
     }
     .portrait-hint p {
       margin: 0;
-      font-size: 1.05em;
+      font-size: 1.15em;
       line-height: 1.45;
       max-width: 280px;
+      font-weight: 600;
+    }
+    .portrait-hint small {
+      opacity: 0.8;
+      font-size: 0.88em;
+      max-width: 300px;
+      line-height: 1.4;
+      font-weight: 400;
     }
     .portrait-hint button {
       background: rgba(255, 166, 48, 0.95);
       color: #480607;
       border: none;
       border-radius: 999px;
-      padding: 10px 18px;
-      font-size: 0.9em;
-      font-weight: 600;
+      padding: 12px 22px;
+      font-size: 0.95em;
+      font-weight: 700;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
-    .portrait-hint small {
-      opacity: 0.75;
-      font-size: 0.78em;
-      max-width: 300px;
-      line-height: 1.35;
+    .portrait-hint button:active {
+      transform: scale(0.97);
     }
 
-    /* Portrait téléphone : invite à pivoter (hauteur > largeur, pas trop large) */
+    /* En portrait : planning masqué tant que le message n’est pas encore décidé par le JS */
     @media screen and (orientation: portrait) and (max-width: 1024px) {
-      .portrait-hint { display: flex; }
-      .content-wrapper,
-      .rotation-view-button,
-      .today-view-button,
-      .navigation,
-      .filters-sidebar,
-      .ramadan-switch-button {
+      body.portrait-blocked .content-wrapper,
+      body.portrait-blocked .rotation-view-button,
+      body.portrait-blocked .today-view-button,
+      body.portrait-blocked .navigation,
+      body.portrait-blocked .filters-sidebar,
+      body.portrait-blocked .ramadan-switch-button {
         visibility: hidden;
         pointer-events: none;
+      }
+    }
+    @media screen and (orientation: landscape) {
+      .portrait-hint.is-visible {
+        display: none !important;
       }
     }
 
@@ -2399,10 +2346,11 @@
   <script src="./planning-resolve.js"></script>
 </head>
 <body onload="initializeWeeklyPage();">
-  <div class="portrait-hint" id="portraitHint" role="dialog" aria-live="polite">
-    <p>Tournez le téléphone en <strong>paysage</strong> pour afficher le planning hebdo.</p>
-    <button type="button" id="tryLandscapeLock">Verrouiller en paysage</button>
-    <small>Si le bouton ne marche pas : normal sur Safari / WebView app. Pivotez manuellement.</small>
+  <div class="portrait-hint" id="portraitHint" role="dialog" aria-live="polite" aria-hidden="true">
+    <div class="portrait-hint-icon" aria-hidden="true"></div>
+    <p>Tournez votre téléphone</p>
+    <small>Le planning hebdomadaire s’affiche en mode paysage.</small>
+    <button type="button" id="tryLandscapeLock">C’est fait</button>
   </div>
 
   <!-- Nouveau système de modal -->
@@ -2515,13 +2463,77 @@
   <script src="./weekly-vertical-inline.js"></script>
   <script>
     (function () {
+      var hint = document.getElementById('portraitHint');
       var btn = document.getElementById('tryLandscapeLock');
-      if (!btn || !window.screen || !screen.orientation || !screen.orientation.lock) return;
-      btn.addEventListener('click', function () {
-        screen.orientation.lock('landscape').catch(function (err) {
-          alert('Verrouillage paysage impossible ici : ' + (err && err.message ? err.message : 'non supporté'));
+
+      function isPortrait() {
+        if (window.matchMedia) {
+          return window.matchMedia('(orientation: portrait)').matches;
+        }
+        return window.innerHeight > window.innerWidth;
+      }
+
+      function isPhoneLike() {
+        return Math.min(window.innerWidth, window.innerHeight) <= 1024;
+      }
+
+      function hideHint() {
+        if (hint) {
+          hint.classList.remove('is-visible');
+          hint.setAttribute('aria-hidden', 'true');
+        }
+        document.body.classList.remove('portrait-blocked');
+      }
+
+      function showHint() {
+        if (!hint || !isPortrait() || !isPhoneLike()) return;
+        hint.classList.add('is-visible');
+        hint.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('portrait-blocked');
+      }
+
+      function tryLockLandscape() {
+        if (!window.screen || !screen.orientation || typeof screen.orientation.lock !== 'function') {
+          return Promise.reject(new Error('unsupported'));
+        }
+        return screen.orientation.lock('landscape');
+      }
+
+      function syncForOrientation() {
+        if (!isPortrait() || !isPhoneLike()) {
+          hideHint();
+          return;
+        }
+        /* Tentative silencieuse ; le message n’apparaît que si on reste en portrait */
+        tryLockLandscape().then(function () {
+          hideHint();
+        }).catch(function () {
+          showHint();
         });
+      }
+
+      /* Au chargement : tenter sans afficher tout de suite */
+      document.body.classList.add('portrait-blocked');
+      setTimeout(syncForOrientation, 120);
+
+      window.addEventListener('orientationchange', function () {
+        setTimeout(syncForOrientation, 200);
       });
+      window.addEventListener('resize', function () {
+        if (!isPortrait()) hideHint();
+      });
+
+      if (btn) {
+        btn.addEventListener('click', function () {
+          tryLockLandscape().then(function () {
+            hideHint();
+          }).catch(function () {
+            /* Toujours en portrait → rappeler de pivoter physiquement */
+            if (!isPortrait()) hideHint();
+            else showHint();
+          });
+        });
+      }
     })();
   </script>
 
