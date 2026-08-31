@@ -42,6 +42,13 @@
   --planning-weekly-header-ete-gradient: linear-gradient(180deg, #c99a3a 0%, #b8860b 100%);
   --planning-weekly-header-ete-today-gradient: linear-gradient(180deg, #a67c1a 0%, #8b6508 100%);
   --planning-club-bordeaux: #480607;
+
+  /* Favoris / sticky planning — empilement (éviter débordement sur en-têtes sticky) */
+  --cf-z-fav-deco: 0;
+  --cf-z-fav-star: 1;
+  --cf-z-fav-content: 2;
+  --cf-z-sticky-planning: 50;
+  --cf-z-sticky-corner: 60;
 }
 
 /* CF-04 : compte à rebours lisible en été (pas jaune sur jaune).
@@ -409,7 +416,7 @@ td.cell-studio.is-favorite.is-favorite--star {
   position: absolute;
   top: 10px;
   right: 12px;
-  z-index: 20;
+  z-index: var(--cf-z-fav-star, 1);
   font-size: 28.8px;
   line-height: 1;
   color: #c9a227;
@@ -437,7 +444,7 @@ td.cell-studio.is-favorite.is-favorite--star {
   position: absolute;
   top: 2px;
   right: 3px;
-  z-index: 20;
+  z-index: var(--cf-z-fav-star, 1);
   font-size: 13px;
   line-height: 1;
   color: #c9a227;
@@ -457,7 +464,7 @@ td.cell-studio.is-favorite.is-favorite--star::after {
   position: absolute;
   top: 2px;
   right: 3px;
-  z-index: 20;
+  z-index: var(--cf-z-fav-star, 1);
   font-size: 13px;
   line-height: 1;
   color: #c9a227;
@@ -470,15 +477,12 @@ td.cell-studio.is-favorite.is-favorite--star::after {
   display: none !important;
 }
 
-@property --cf-fav-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes cf-fav-outline-gleam {
+@keyframes cf-fav-outline-spin {
+  from {
+    transform: translateZ(0) rotate(0deg);
+  }
   to {
-    --cf-fav-angle: 360deg;
+    transform: translateZ(0) rotate(360deg);
   }
 }
 
@@ -498,7 +502,7 @@ td.cell-studio.is-favorite.is-favorite--outline {
   padding: 2.5px;
   box-sizing: border-box;
   background: conic-gradient(
-    from var(--cf-fav-angle),
+    from 0deg,
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -510,15 +514,36 @@ td.cell-studio.is-favorite.is-favorite--outline {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.8s linear infinite;
+  animation: cf-fav-outline-spin 2.8s linear infinite;
   pointer-events: none;
-  z-index: 12;
+  z-index: var(--cf-z-fav-deco, 0);
+  will-change: transform;
+}
+
+/* Semaine : anim conservée via rotation GPU · contour contenu (pas de débordement sticky/scroll) */
+.weekly-schedule .course-block.is-favorite.is-favorite--outline,
+.weekly-schedule .course-block.is-favorite.is-favorite--star {
+  isolation: isolate;
+  contain: paint;
+  overflow: hidden !important;
 }
 
 .weekly-schedule .course-block.is-favorite.is-favorite--outline::after {
-  inset: -2px;
-  border-radius: 12px;
+  inset: 0;
+  border-radius: 10px;
   padding: 1.5px;
+  animation: cf-fav-outline-spin 3.2s linear infinite;
+}
+
+.weekly-schedule .course-block.is-favorite.is-favorite--outline .course-info,
+.weekly-schedule .course-block.is-favorite.is-favorite--outline .single-coach,
+.weekly-schedule .course-block.is-favorite.is-favorite--outline .multiple-coaches,
+.weekly-schedule .course-block.is-favorite.is-favorite--outline .countdown-pill,
+.weekly-schedule .course-block.is-favorite.is-favorite--star .course-info,
+.weekly-schedule .course-block.is-favorite.is-favorite--star .single-coach,
+.weekly-schedule .course-block.is-favorite.is-favorite--star .multiple-coaches {
+  position: relative;
+  z-index: var(--cf-z-fav-content, 2);
 }
 
 .course-card.is-favorite.is-favorite--outline .course-time::after {
@@ -529,7 +554,7 @@ td.cell-studio.is-favorite.is-favorite--outline {
   padding: 1.5px;
   box-sizing: border-box;
   background: conic-gradient(
-    from var(--cf-fav-angle),
+    from 0deg,
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -541,9 +566,10 @@ td.cell-studio.is-favorite.is-favorite--outline {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.8s linear infinite;
+  animation: cf-fav-outline-spin 2.8s linear infinite;
   pointer-events: none;
-  z-index: 12;
+  z-index: var(--cf-z-fav-deco, 0);
+  will-change: transform;
 }
 
 td.cell-studio.is-favorite.is-favorite--outline {
@@ -559,7 +585,7 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   padding: 2px;
   box-sizing: border-box;
   background: conic-gradient(
-    from var(--cf-fav-angle),
+    from 0deg,
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -571,9 +597,20 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.8s linear infinite;
+  animation: cf-fav-outline-spin 2.8s linear infinite;
   pointer-events: none;
-  z-index: 12;
+  z-index: var(--cf-z-fav-deco, 0);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-block.is-favorite.is-favorite--outline::after,
+  .course-card.is-favorite.is-favorite--outline .course-time::after,
+  .course-card.is-favorite.is-favorite--outline .dc-card-face::after,
+  td.cell-studio.is-favorite.is-favorite--outline::after {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* Matrice : favoris = taille coach inchangée */
@@ -604,9 +641,20 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   color: #fff !important;
 }
 
-.course-card.is-favorite.is-favorite--gold .dc-name,
-.course-card.is-favorite.is-favorite--gold .dc-type {
+.course-card.is-favorite.is-favorite--gold .dc-name {
   color: #fff !important;
+}
+
+.course-card.is-favorite.is-favorite--gold .dc-studio-watermark {
+  opacity: 0.22;
+  filter: brightness(0) invert(1);
+}
+
+.course-card.is-favorite.is-favorite--gold .dc-type {
+  z-index: 2;
+  color: #fff !important;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(72, 6, 7, 0.55);
 }
 
 .course-card.is-favorite.is-favorite--outline .dc-card-face {
@@ -622,7 +670,7 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   padding: 2px;
   box-sizing: border-box;
   background: conic-gradient(
-    from var(--cf-fav-angle),
+    from 0deg,
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -634,8 +682,9 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-gleam 2.8s linear infinite;
+  animation: cf-fav-outline-spin 2.8s linear infinite;
   pointer-events: none;
-  z-index: 1;
+  z-index: var(--cf-z-fav-deco, 0);
+  will-change: transform;
 }
 

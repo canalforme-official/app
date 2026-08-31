@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Planning Hebdomadaire</title>
+  <title>Planning Hebdo — TEST rotation contenu</title>
 
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="planning-tokens.css?v=36">
+  <link rel="stylesheet" href="planning-tokens.css?v=35">
   <link rel="stylesheet" href="planning-embedded.css">
 
   <style>
@@ -1594,7 +1594,26 @@
     will-change: transform, opacity;
   }
 
-  /* Styles spécifiques pour les appareils mobiles avec rotation */
+  @media screen and (min-width: 768px) {
+    .landscape-viewport {
+      display: block;
+      position: static;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .landscape-rotator {
+      transform: none;
+      position: static;
+      width: auto;
+      height: auto;
+      top: auto;
+      left: auto;
+    }
+  }
+
+  /* Styles spécifiques pour les appareils mobiles avec rotation contenu (TEST A) */
   @media screen and (max-width: 767px) {
     html, body {
       width: 100%;
@@ -1605,14 +1624,24 @@
       position: fixed;
     }
 
-    body {
+    .landscape-viewport {
+      display: block;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .landscape-rotator {
       transform: rotate(90deg);
       transform-origin: bottom left;
-      position: fixed;
+      position: absolute;
       top: -100vw;
       left: 0;
       width: 100vh;
       height: 100vw;
+      /* Conteneur des position:fixed (boutons, filtres, nav) dans le repère tourné */
+      transform-style: preserve-3d;
     }
 
     .content-wrapper {
@@ -1831,12 +1860,17 @@
   }
 
   /* Masquer tous les éléments pendant le chargement */
+  body.loading .landscape-viewport,
   body.loading .content-wrapper,
   body.loading .header-wrapper,
   body.loading .today-view-button,
   body.loading .filters,
+  body.loading .filters-sidebar,
   body.loading h1,
-  body.loading #weeklySchedule {
+  body.loading #weeklySchedule,
+  body.loading .rotation-view-button,
+  body.loading .navigation,
+  body.loading .ramadan-switch-button {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
@@ -1926,24 +1960,14 @@
     margin-top: -15px !important;
   }
 
-  /* Ajustement du modal pour la rotation */
+  /* Modal : body non tourné (TEST A) — dimensions viewport standard */
   @media screen and (max-width: 767px) {
-    body {
-      transform: rotate(90deg);
-      transform-origin: bottom left;
-      position: fixed;
-      top: -100vw;
-      left: 0;
-      width: 100vh;
-      height: 100vw;
-    }
-
     .modal-backdrop {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100vh !important;
-      height: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
       background-color: rgba(72,6,7, 0.95) !important;
       z-index: 999999 !important;
       display: none;
@@ -1957,8 +1981,8 @@
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100vh !important;
-      height: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
       z-index: 1000000 !important;
       display: none;
       overflow: hidden !important;
@@ -1983,9 +2007,8 @@
       background-color: transparent !important;
     }
 
-    /* Ajout de l'animation de rotation pour mobile */
     .modal-center-container img {
-      animation: rotateAndPulse 1.5s ease-in-out forwards !important;
+      animation: zoom-logo 2s ease-in-out infinite !important;
     }
   }
 
@@ -2330,11 +2353,15 @@
       line-height: 1.35;
     }
 
+    .content-wrapper--inside-rotator {
+      height: 100vh;
+    }
+
 </style>
   <script src="./planning-resolve.js"></script>
 </head>
 <body onload="initializeWeeklyPage();">
-  <!-- Nouveau système de modal -->
+  <!-- Modal hors rotation (chargement lisible en portrait) -->
   <div class="modal-backdrop" style="background-color: rgba(72,6,7, 1) !important;"></div>
   <div class="modal-content">
     <div class="modal-center-container">
@@ -2343,99 +2370,102 @@
     </div>
   </div>
 
-  <div class="content-wrapper">
+  <!-- Zone tournée à 90° sur mobile : planning + boutons -->
+  <div class="landscape-viewport">
+    <div class="landscape-rotator">
 
-    <!-- Bouton de rotation vers weekly_vertical.html -->
-    <div class="rotation-view-button" id="rotationViewButton" role="button" tabindex="0" aria-label="Vue verticale du planning" onclick="goToWeeklyVertical()">
-      <button type="button" aria-label="Vue verticale du planning"></button>
-    </div>
-
-    <!-- Bouton pour revenir à aujourd'hui -->
-    <div class="today-view-button" id="todayViewButton">
-      <button onclick="returnToToday()">
-      </button>
-    </div>
-
-    <div class="navigation" id="weekNavigation">
-      <button type="button" id="prevWeek" onclick="changeWeek(-1)" class="nav-button prev-button" aria-label="Semaine précédente">
-        <div class="nav-segments">
-          <div class="segment segment-1"></div>
-          <div class="segment segment-2"></div>
-        </div>
-      </button>
-      <button type="button" id="nextWeek" onclick="changeWeek(1)" class="nav-button next-button" aria-label="Semaine suivante">
-        <div class="nav-segments">
-          <div class="segment segment-1"></div>
-          <div class="segment segment-2"></div>
-        </div>
-      </button>
-    </div>
-
-    <!-- En-tête avec le titre et les filtres -->
-    <div class="header-wrapper">
-      <h1>Planning Hebdomadaire</h1>
-      <div class="filters">
-        <label>
-          <input type="checkbox" id="filter-mixte" checked>
-          Mixte
-        </label>
-        <label>
-          <input type="checkbox" id="filter-women-only" checked>
-          100% Femmes
-        </label>
-        <label>
-          <input type="checkbox" id="filter-piscine" checked>
-          Piscine
-        </label>
-        <label>
-          <input type="checkbox" id="filter-coach" checked>
-          Coach
-        </label>
+      <div class="rotation-view-button" id="rotationViewButton" role="button" tabindex="0" aria-label="Vue verticale du planning" onclick="goToWeeklyVertical()">
+        <button type="button" aria-label="Vue verticale du planning"></button>
       </div>
-    </div>
 
-    <!-- Le planning hebdomadaire sera inséré ici -->
-    <div id="weeklySchedule"></div>
+      <div class="today-view-button" id="todayViewButton">
+        <button onclick="returnToToday()">
+        </button>
+      </div>
 
-  </div>
+      <div class="navigation" id="weekNavigation">
+        <button type="button" id="prevWeek" onclick="changeWeek(-1)" class="nav-button prev-button" aria-label="Semaine précédente">
+          <div class="nav-segments">
+            <div class="segment segment-1"></div>
+            <div class="segment segment-2"></div>
+          </div>
+        </button>
+        <button type="button" id="nextWeek" onclick="changeWeek(1)" class="nav-button next-button" aria-label="Semaine suivante">
+          <div class="nav-segments">
+            <div class="segment segment-1"></div>
+            <div class="segment segment-2"></div>
+          </div>
+        </button>
+      </div>
 
-  <a href="./prayer-times.html" id="ramadanSwitchButton" class="ramadan-switch-button" title="Horaires de prière" aria-label="Horaires de prière">
-    <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Horaires de prière" class="ramadan-icon">
-  </a>
+      <div class="content-wrapper content-wrapper--inside-rotator">
 
-  <!-- Barre de filtres en bas avec le bouton intégré -->
-  <div class="filters-sidebar" id="filtersSidebar">
-    <button class="filter-button" onclick="toggleFiltersSidebar(event)">
-      <div class="filter-icon"><span></span></div>
-    </button>
-    <div class="filters-sidebar-content">
-      <div class="filters">
-        <label>
-          <input type="checkbox" id="filter-mixte-sidebar" checked>
-          Mixte
-        </label>
-        <label>
-          <input type="checkbox" id="filter-women-only-sidebar" checked>
-          Femmes
-        </label>
-        <label>
-          <input type="checkbox" id="filter-piscine-sidebar" checked>
-          Piscine
-        </label>
-        <label>
-          <input type="checkbox" id="filter-coach-sidebar" checked>
-          Coach
-        </label>
-        <div class="coach-dropdown">
-          <button class="coach-dropdown-button" id="coachDropdownButton">
-            <span id="coachDropdownText">Sélection coach</span>
-            <span class="coach-dropdown-arrow">▼</span>
-          </button>
-          <div class="coach-dropdown-content" id="coachDropdownContent">
-            <!-- Les options seront ajoutées ici dynamiquement -->
+        <!-- En-tête avec le titre et les filtres -->
+        <div class="header-wrapper">
+          <h1>Planning Hebdomadaire</h1>
+          <div class="filters">
+            <label>
+              <input type="checkbox" id="filter-mixte" checked>
+              Mixte
+            </label>
+            <label>
+              <input type="checkbox" id="filter-women-only" checked>
+              100% Femmes
+            </label>
+            <label>
+              <input type="checkbox" id="filter-piscine" checked>
+              Piscine
+            </label>
+            <label>
+              <input type="checkbox" id="filter-coach" checked>
+              Coach
+            </label>
+          </div>
+        </div>
+
+        <div id="weeklySchedule"></div>
+
+      </div>
+
+      <a href="./prayer-times.html" id="ramadanSwitchButton" class="ramadan-switch-button" title="Horaires de prière" aria-label="Horaires de prière">
+        <img src="https://mcusercontent.com/74abea872abd45d46efed5d41/images/4ec582c4-20c6-2c4a-8bc6-9121f0913a3c.png" alt="Horaires de prière" class="ramadan-icon">
+      </a>
+
+      <div class="filters-sidebar" id="filtersSidebar">
+        <button class="filter-button" onclick="toggleFiltersSidebar(event)">
+          <div class="filter-icon"><span></span></div>
+        </button>
+        <div class="filters-sidebar-content">
+          <div class="filters">
+            <label>
+              <input type="checkbox" id="filter-mixte-sidebar" checked>
+              Mixte
+            </label>
+            <label>
+              <input type="checkbox" id="filter-women-only-sidebar" checked>
+              Femmes
+            </label>
+            <label>
+              <input type="checkbox" id="filter-piscine-sidebar" checked>
+              Piscine
+            </label>
+            <label>
+              <input type="checkbox" id="filter-coach-sidebar" checked>
+              Coach
+            </label>
+            <div class="coach-dropdown">
+              <button class="coach-dropdown-button" id="coachDropdownButton">
+                <span id="coachDropdownText">Sélection coach</span>
+                <span class="coach-dropdown-arrow">▼</span>
+              </button>
+              <div class="coach-dropdown-content" id="coachDropdownContent">
+                <!-- Les options seront ajoutées ici dynamiquement -->
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 

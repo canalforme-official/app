@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Planning Hebdomadaire</title>
+  <title>Planning Hebdo — TEST paysage natif</title>
 
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="planning-tokens.css?v=36">
+  <link rel="stylesheet" href="planning-tokens.css?v=35">
   <link rel="stylesheet" href="planning-embedded.css">
 
   <style>
@@ -1594,8 +1594,8 @@
     will-change: transform, opacity;
   }
 
-  /* Styles spécifiques pour les appareils mobiles avec rotation */
-  @media screen and (max-width: 767px) {
+  /* Mobile paysage natif (TEST B) — pas de rotation CSS */
+  @media screen and (max-width: 767px) and (orientation: landscape) {
     html, body {
       width: 100%;
       height: 100%;
@@ -1603,16 +1603,6 @@
       padding: 0;
       overflow: hidden;
       position: fixed;
-    }
-
-    body {
-      transform: rotate(90deg);
-      transform-origin: bottom left;
-      position: fixed;
-      top: -100vw;
-      left: 0;
-      width: 100vh;
-      height: 100vw;
     }
 
     .content-wrapper {
@@ -1642,7 +1632,7 @@
       touch-action: pan-y;
     }
 
-    /* En rotation 90° : colonne heures légèrement élargie pour voir toute l'heure */
+    /* Paysage natif : colonne heures un peu plus large */
     .weekly-schedule col.col-hours {
       width: 36px !important;
     }
@@ -1658,28 +1648,28 @@
       touch-action: pan-y;
     }
 
-      /* Colonne des heures au strict minimum en rotation 90° (weekly.html) */
+      /* Colonne heures compacte en paysage natif */
     .weekly-schedule th:first-child {
-      width: 22px !important;
-      min-width: 22px !important;
-      max-width: 26px !important;
+      width: 36px !important;
+      min-width: 36px !important;
+      max-width: 42px !important;
       text-align: center;
-      writing-mode: vertical-rl;
+      writing-mode: unset;
       white-space: nowrap;
-      padding: 1px;
+      padding: 2px;
       transform: none;
-      font-size: 1em;
+      font-size: 0.95em;
     }
 
       .weekly-schedule th:not(:first-child) {
-      width: calc((100% - 22px) / 7) !important;
+      width: calc((100% - 36px) / 7) !important;
       padding: 2px;
     }
 
     .weekly-schedule .time-cell {
-      width: 22px !important;
-      min-width: 22px !important;
-      max-width: 26px !important;
+      width: 36px !important;
+      min-width: 36px !important;
+      max-width: 42px !important;
       writing-mode: unset;
       font-size: 1em;
       white-space: nowrap;
@@ -1689,7 +1679,7 @@
     }
 
     .weekly-schedule .course-cell {
-      width: calc((100% - 22px) / 7) !important;
+      width: calc((100% - 36px) / 7) !important;
       padding: 2px;
     }
 
@@ -1926,24 +1916,14 @@
     margin-top: -15px !important;
   }
 
-  /* Ajustement du modal pour la rotation */
+  /* Modal TEST B — viewport standard (pas de rotation) */
   @media screen and (max-width: 767px) {
-    body {
-      transform: rotate(90deg);
-      transform-origin: bottom left;
-      position: fixed;
-      top: -100vw;
-      left: 0;
-      width: 100vh;
-      height: 100vw;
-    }
-
     .modal-backdrop {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100vh !important;
-      height: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
       background-color: rgba(72,6,7, 0.95) !important;
       z-index: 999999 !important;
       display: none;
@@ -1957,8 +1937,8 @@
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100vh !important;
-      height: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
       z-index: 1000000 !important;
       display: none;
       overflow: hidden !important;
@@ -1983,9 +1963,8 @@
       background-color: transparent !important;
     }
 
-    /* Ajout de l'animation de rotation pour mobile */
     .modal-center-container img {
-      animation: rotateAndPulse 1.5s ease-in-out forwards !important;
+      animation: zoom-logo 2s ease-in-out infinite !important;
     }
   }
 
@@ -2330,10 +2309,67 @@
       line-height: 1.35;
     }
 
+    /* --- TEST B : paysage natif (pas de rotation CSS) --- */
+    .portrait-hint {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100400;
+      background: rgba(72, 6, 7, 0.97);
+      color: #fff;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 28px 20px;
+      gap: 16px;
+    }
+    .portrait-hint p {
+      margin: 0;
+      font-size: 1.05em;
+      line-height: 1.45;
+      max-width: 280px;
+    }
+    .portrait-hint button {
+      background: rgba(255, 166, 48, 0.95);
+      color: #480607;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .portrait-hint small {
+      opacity: 0.75;
+      font-size: 0.78em;
+      max-width: 300px;
+      line-height: 1.35;
+    }
+
+    @media screen and (max-width: 767px) and (orientation: portrait) {
+      .portrait-hint { display: flex; }
+      .content-wrapper,
+      .rotation-view-button,
+      .today-view-button,
+      .navigation,
+      .filters-sidebar,
+      .ramadan-switch-button {
+        visibility: hidden;
+        pointer-events: none;
+      }
+    }
+
 </style>
   <script src="./planning-resolve.js"></script>
 </head>
 <body onload="initializeWeeklyPage();">
+  <div class="portrait-hint" id="portraitHint" role="dialog" aria-live="polite">
+    <p>Tournez le téléphone en <strong>paysage</strong> pour afficher le planning hebdo.</p>
+    <button type="button" id="tryLandscapeLock">Verrouiller en paysage</button>
+    <small>Si le bouton ne marche pas : normal sur Safari / WebView app. Pivotez manuellement.</small>
+  </div>
+
   <!-- Nouveau système de modal -->
   <div class="modal-backdrop" style="background-color: rgba(72,6,7, 1) !important;"></div>
   <div class="modal-content">
@@ -2442,6 +2478,17 @@
   <script src="./planning-embedded.js"></script>
   <script src="./webview-resume.js?v=1"></script>
   <script src="./weekly-vertical-inline.js"></script>
+  <script>
+    (function () {
+      var btn = document.getElementById('tryLandscapeLock');
+      if (!btn || !window.screen || !screen.orientation || !screen.orientation.lock) return;
+      btn.addEventListener('click', function () {
+        screen.orientation.lock('landscape').catch(function (err) {
+          alert('Verrouillage paysage impossible ici : ' + (err && err.message ? err.message : 'non supporté'));
+        });
+      });
+    })();
+  </script>
 
 </body>
 </html>

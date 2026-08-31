@@ -7,7 +7,7 @@
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="planning-tokens.css">
+  <link rel="stylesheet" href="planning-tokens.css?v=36">
   <link rel="stylesheet" href="planning-embedded.css">
 
   <style>
@@ -308,7 +308,7 @@
     .sticky-days-bar {
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--cf-z-sticky-planning, 50);
       background-color: var(--background-main);
       flex-shrink: 0;
     }
@@ -394,7 +394,7 @@
     /* Wrapper scroll horizontal : inertie préservée (pas d'écriture scrollLeft depuis la barre sticky) */
     .schedule-scroll-wrapper {
       overflow-x: auto;
-      overflow-y: visible;
+      overflow-y: hidden;
       width: 100%;
       -webkit-overflow-scrolling: touch;
       position: relative;
@@ -589,7 +589,7 @@
       border-bottom: 2px solid var(--shadow-light);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--cf-z-sticky-planning, 50);
       pointer-events: none;
       border-radius: 0;
       margin: 0;
@@ -605,7 +605,7 @@
       position: sticky;
       left: 0;
       top: 0;
-      z-index: 20;
+      z-index: var(--cf-z-sticky-corner, 60);
     }
 
     /* Arrondir uniquement les extrémités de la barre de titres */
@@ -624,7 +624,7 @@
       background-color: #981010;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--cf-z-sticky-planning, 50);
       color: var(--text-light);
       overflow: hidden;
       pointer-events: none;
@@ -659,14 +659,14 @@
     .weekly-schedule td.time-cell {
       position: sticky;
       left: 0;
-      z-index: 40;
+      z-index: var(--cf-z-sticky-planning, 45);
     }
 
     /* La colonne des heures doit toujours rester au-dessus des blocs cours */
     .sticky-days-bar .weekly-schedule-header th:first-child {
       position: sticky;
       left: 0;
-      z-index: 46;
+      z-index: var(--cf-z-sticky-corner, 60);
       background-color: var(--background-main);
     }
 
