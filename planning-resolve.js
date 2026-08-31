@@ -813,6 +813,7 @@
 
     function clearFav(el) {
       el.classList.remove('is-favorite');
+      el.classList.remove('is-fav-outline-paused');
       for (var i = 0; i < STYLE_CLASSES.length; i++) el.classList.remove(STYLE_CLASSES[i]);
       if (el.style) el.style.removeProperty('--fav-star-edge');
     }
@@ -847,6 +848,29 @@
 
     if (typeof global.__cfNestMatrixCoachAvatars === 'function') {
       global.__cfNestMatrixCoachAvatars(document);
+    }
+
+    if (highlightStyle === 'outline' && global.IntersectionObserver) {
+      if (global.__CF_FAV_OUTLINE_IO__) {
+        global.__CF_FAV_OUTLINE_IO__.disconnect();
+        global.__CF_FAV_OUTLINE_IO__ = null;
+      }
+      var io = new global.IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.remove('is-fav-outline-paused');
+          } else {
+            entry.target.classList.add('is-fav-outline-paused');
+          }
+        });
+      }, { root: null, rootMargin: '48px 0px', threshold: 0 });
+      global.__CF_FAV_OUTLINE_IO__ = io;
+      document.querySelectorAll('.is-favorite.is-favorite--outline').forEach(function(el) {
+        io.observe(el);
+      });
+    } else if (global.__CF_FAV_OUTLINE_IO__) {
+      global.__CF_FAV_OUTLINE_IO__.disconnect();
+      global.__CF_FAV_OUTLINE_IO__ = null;
     }
   }
 

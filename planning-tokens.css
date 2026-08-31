@@ -477,12 +477,15 @@ td.cell-studio.is-favorite.is-favorite--star::after {
   display: none !important;
 }
 
-@keyframes cf-fav-outline-spin {
-  from {
-    transform: translateZ(0) rotate(0deg);
-  }
+@property --cf-fav-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes cf-fav-outline-gleam {
   to {
-    transform: translateZ(0) rotate(360deg);
+    --cf-fav-angle: 360deg;
   }
 }
 
@@ -502,7 +505,7 @@ td.cell-studio.is-favorite.is-favorite--outline {
   padding: 2.5px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
+    from var(--cf-fav-angle),
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -514,13 +517,12 @@ td.cell-studio.is-favorite.is-favorite--outline {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.8s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: var(--cf-z-fav-deco, 0);
-  will-change: transform;
 }
 
-/* Semaine : anim conservée via rotation GPU · contour contenu (pas de débordement sticky/scroll) */
+/* Semaine : flash inchangé · contour contenu (sticky / scroll) · pause hors écran via JS */
 .weekly-schedule .course-block.is-favorite.is-favorite--outline,
 .weekly-schedule .course-block.is-favorite.is-favorite--star {
   isolation: isolate;
@@ -532,7 +534,6 @@ td.cell-studio.is-favorite.is-favorite--outline {
   inset: 0;
   border-radius: 10px;
   padding: 1.5px;
-  animation: cf-fav-outline-spin 3.2s linear infinite;
 }
 
 .weekly-schedule .course-block.is-favorite.is-favorite--outline .course-info,
@@ -546,6 +547,13 @@ td.cell-studio.is-favorite.is-favorite--outline {
   z-index: var(--cf-z-fav-content, 2);
 }
 
+.course-block.is-favorite.is-favorite--outline.is-fav-outline-paused::after,
+.course-card.is-favorite.is-favorite--outline.is-fav-outline-paused .course-time::after,
+.course-card.is-favorite.is-favorite--outline.is-fav-outline-paused .dc-card-face::after,
+td.cell-studio.is-favorite.is-favorite--outline.is-fav-outline-paused::after {
+  animation-play-state: paused !important;
+}
+
 .course-card.is-favorite.is-favorite--outline .course-time::after {
   content: '';
   position: absolute;
@@ -554,7 +562,7 @@ td.cell-studio.is-favorite.is-favorite--outline {
   padding: 1.5px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
+    from var(--cf-fav-angle),
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -566,10 +574,9 @@ td.cell-studio.is-favorite.is-favorite--outline {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.8s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: var(--cf-z-fav-deco, 0);
-  will-change: transform;
 }
 
 td.cell-studio.is-favorite.is-favorite--outline {
@@ -585,7 +592,7 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   padding: 2px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
+    from var(--cf-fav-angle),
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -597,10 +604,9 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.8s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: var(--cf-z-fav-deco, 0);
-  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -609,7 +615,6 @@ td.cell-studio.is-favorite.is-favorite--outline::after {
   .course-card.is-favorite.is-favorite--outline .dc-card-face::after,
   td.cell-studio.is-favorite.is-favorite--outline::after {
     animation: none !important;
-    transform: none !important;
   }
 }
 
@@ -670,7 +675,7 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   padding: 2px;
   box-sizing: border-box;
   background: conic-gradient(
-    from 0deg,
+    from var(--cf-fav-angle),
     rgba(201, 162, 39, 0.4) 0deg,
     rgba(201, 162, 39, 0.4) 230deg,
     #ffe9a0 255deg,
@@ -682,9 +687,8 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: cf-fav-outline-spin 2.8s linear infinite;
+  animation: cf-fav-outline-gleam 2.8s linear infinite;
   pointer-events: none;
   z-index: var(--cf-z-fav-deco, 0);
-  will-change: transform;
 }
 
