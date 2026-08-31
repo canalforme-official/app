@@ -1209,7 +1209,7 @@
           top = tr.bottom - hr.top + host.scrollTop;
           colW = Math.max(8, tr.width);
         } else {
-          /* weekly.html (souvent body en rotate(90deg) sur mobile) : repère viewport ≠ repère CSS local. */
+          /* weekly.html (paysage natif mobile ; archive CSS rotate = weekly_archived_css_rotate.html). */
           var off = cumulativeOffsetToAncestor(th, host);
           if (off) {
             left = off.x;

@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Planning Hebdo — TEST paysage natif</title>
+  <title>ARCHIVE — weekly CSS rotate (ancien)</title>
 
   <!-- Favicon -->
   <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="planning-tokens.css?v=38">
   <link rel="stylesheet" href="planning-embedded.css">
 
@@ -1594,12 +1594,8 @@
     will-change: transform, opacity;
   }
 
-  /*
-   * Mobile paysage natif (TEST B) — pas de rotation CSS.
-   * Important : en paysage, un iPhone récent a souvent une LARGEUR > 767px.
-   * Donc max-width:767px rate le cas. On cible plutôt max-height (écran peu haut).
-   */
-  @media screen and (orientation: landscape) and (max-height: 560px) {
+  /* Styles spécifiques pour les appareils mobiles avec rotation */
+  @media screen and (max-width: 767px) {
     html, body {
       width: 100%;
       height: 100%;
@@ -1607,54 +1603,27 @@
       padding: 0;
       overflow: hidden;
       position: fixed;
-      inset: 0;
+    }
+
+    body {
+      transform: rotate(90deg);
+      transform-origin: bottom left;
+      position: fixed;
+      top: -100vw;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
     }
 
     .content-wrapper {
-      position: fixed;
-      inset: 0;
       width: 100%;
-      height: 100%;
-      height: 100dvh;
-      max-height: 100dvh;
+      height: 100vh;
       overflow-y: auto;
       overflow-x: hidden;
-      /* Comme weekly.html : petit padding, pas de bande réservée aux flèches (elles sont en overlay) */
-      padding: 4px;
+      padding: 10px;
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
-    }
-
-    .navigation {
-      display: flex !important;
-      left: max(6px, env(safe-area-inset-left, 0px));
-      right: max(6px, env(safe-area-inset-right, 0px));
-      pointer-events: none;
-      z-index: 10060;
-    }
-    .navigation .nav-button {
-      pointer-events: all;
-    }
-
-    /* Ne pas traiter le téléphone paysage comme une tablette */
-    .today-view-button {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: all !important;
-      top: max(8px, env(safe-area-inset-top, 0px)) !important;
-      right: max(8px, env(safe-area-inset-right, 0px)) !important;
-    }
-    .rotation-view-button {
-      bottom: max(70px, calc(env(safe-area-inset-bottom, 0px) + 60px));
-      right: max(12px, env(safe-area-inset-right, 0px));
-    }
-    .filters-sidebar {
-      bottom: max(12px, env(safe-area-inset-bottom, 0px));
-      right: max(12px, env(safe-area-inset-right, 0px));
-    }
-    .portrait-hint {
-      display: none !important;
+      position: relative;
     }
 
     #weeklySchedule {
@@ -1673,7 +1642,7 @@
       touch-action: pan-y;
     }
 
-    /* Paysage natif : colonne heures un peu plus large */
+    /* En rotation 90° : colonne heures légèrement élargie pour voir toute l'heure */
     .weekly-schedule col.col-hours {
       width: 36px !important;
     }
@@ -1689,28 +1658,28 @@
       touch-action: pan-y;
     }
 
-      /* Colonne heures compacte en paysage natif */
+      /* Colonne des heures au strict minimum en rotation 90° (weekly.html) */
     .weekly-schedule th:first-child {
-      width: 36px !important;
-      min-width: 36px !important;
-      max-width: 42px !important;
+      width: 22px !important;
+      min-width: 22px !important;
+      max-width: 26px !important;
       text-align: center;
-      writing-mode: unset;
+      writing-mode: vertical-rl;
       white-space: nowrap;
-      padding: 2px;
+      padding: 1px;
       transform: none;
-      font-size: 0.95em;
+      font-size: 1em;
     }
 
       .weekly-schedule th:not(:first-child) {
-      width: calc((100% - 36px) / 7) !important;
+      width: calc((100% - 22px) / 7) !important;
       padding: 2px;
     }
 
     .weekly-schedule .time-cell {
-      width: 36px !important;
-      min-width: 36px !important;
-      max-width: 42px !important;
+      width: 22px !important;
+      min-width: 22px !important;
+      max-width: 26px !important;
       writing-mode: unset;
       font-size: 1em;
       white-space: nowrap;
@@ -1720,7 +1689,7 @@
     }
 
     .weekly-schedule .course-cell {
-      width: calc((100% - 36px) / 7) !important;
+      width: calc((100% - 22px) / 7) !important;
       padding: 2px;
     }
 
@@ -1957,14 +1926,24 @@
     margin-top: -15px !important;
   }
 
-  /* Modal TEST B — viewport standard (pas de rotation) */
+  /* Ajustement du modal pour la rotation */
   @media screen and (max-width: 767px) {
+    body {
+      transform: rotate(90deg);
+      transform-origin: bottom left;
+      position: fixed;
+      top: -100vw;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
+    }
+
     .modal-backdrop {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
+      width: 100vh !important;
+      height: 100vw !important;
       background-color: rgba(72,6,7, 0.95) !important;
       z-index: 999999 !important;
       display: none;
@@ -1978,8 +1957,8 @@
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
+      width: 100vh !important;
+      height: 100vw !important;
       z-index: 1000000 !important;
       display: none;
       overflow: hidden !important;
@@ -2004,8 +1983,9 @@
       background-color: transparent !important;
     }
 
+    /* Ajout de l'animation de rotation pour mobile */
     .modal-center-container img {
-      animation: zoom-logo 2s ease-in-out infinite !important;
+      animation: rotateAndPulse 1.5s ease-in-out forwards !important;
     }
   }
 
@@ -2073,7 +2053,105 @@
     }
   }
 
-  /* Styles pour l'ascenseur personnalisé — retiré (inutile) */
+  /* Styles pour l'ascenseur personnalisé */
+  .custom-scrollbar {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: calc(100% - 200px);
+    width: 50px;
+    z-index: 1000;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .scrollbar-track {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background-color: var(--primary-lighter);
+    box-shadow: 0 0 8px var(--primary-lighter);
+    border-radius: 2px;
+    opacity: 0.3;
+  }
+
+  /* Masquer le track sur les résolutions non mobiles */
+  @media screen and (min-width: 768px) {
+    .scrollbar-track {
+      display: none;
+    }
+  }
+
+  .scrollbar-thumb {
+    position: absolute;
+    right: 0;
+    width: 4px;
+    background-color: transparent;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    box-shadow: none;
+    opacity: 0;
+  }
+
+  .scrollbar-thumb:hover,
+  .scrollbar-thumb:active {
+    background-color: transparent;
+    box-shadow: none;
+    width: 4px;
+    right: 0;
+    opacity: 0;
+  }
+
+  .scrollbar-touch-area {
+    position: absolute;
+    right: -20px;
+    width: 50px;
+    height: 100%;
+    cursor: pointer;
+    background-color: transparent;
+    border-radius: 25px;
+  }
+
+  /* Ajustement pour la rotation mobile */
+  @media screen and (max-width: 767px) {
+    .custom-scrollbar {
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: calc(100% - 200px);
+      width: 50px;
+    }
+
+    .scrollbar-track {
+      width: 4px;
+      opacity: 0.3;
+      display: block;
+      height: 60%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .scrollbar-thumb {
+      width: 4px;
+      opacity: 0;
+    }
+
+    .scrollbar-thumb:hover,
+    .scrollbar-thumb:active {
+      width: 4px;
+      right: 0;
+      opacity: 0;
+    }
+
+    .scrollbar-touch-area {
+      right: -20px;
+      width: 50px;
+    }
+  }
 
     .navigation {
       position: fixed;
@@ -2252,106 +2330,10 @@
       line-height: 1.35;
     }
 
-    /* --- TEST B : paysage forcé — message seulement si le pivot auto échoue --- */
-    .portrait-hint {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 100400;
-      background: rgba(72, 6, 7, 0.97);
-      color: #fff;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 28px 24px;
-      gap: 18px;
-    }
-    .portrait-hint.is-visible {
-      display: flex;
-    }
-    /* Silhouette téléphone (portrait) qui bascule en paysage */
-    .portrait-hint-icon {
-      width: 40px;
-      height: 68px;
-      border: 3px solid rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
-      position: relative;
-      box-sizing: border-box;
-      animation: portrait-hint-tilt 1.8s ease-in-out infinite;
-      background: rgba(255, 255, 255, 0.06);
-    }
-    .portrait-hint-icon::before {
-      content: '';
-      position: absolute;
-      top: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 14px;
-      height: 3px;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.65);
-    }
-    .portrait-hint-icon::after {
-      content: '';
-      position: absolute;
-      bottom: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.45);
-      box-sizing: border-box;
-    }
-    @keyframes portrait-hint-tilt {
-      0%, 15% { transform: rotate(0deg); }
-      40%, 60% { transform: rotate(90deg); }
-      85%, 100% { transform: rotate(0deg); }
-    }
-    .portrait-hint p {
-      margin: 0;
-      font-size: 1.15em;
-      line-height: 1.45;
-      max-width: 280px;
-      font-weight: 600;
-    }
-    .portrait-hint small {
-      opacity: 0.85;
-      font-size: 0.9em;
-      max-width: 300px;
-      line-height: 1.45;
-      font-weight: 400;
-    }
-
-    /* En portrait : planning masqué tant que le message n’est pas encore décidé par le JS */
-    @media screen and (orientation: portrait) and (max-width: 1024px) {
-      body.portrait-blocked .content-wrapper,
-      body.portrait-blocked .rotation-view-button,
-      body.portrait-blocked .today-view-button,
-      body.portrait-blocked .navigation,
-      body.portrait-blocked .filters-sidebar,
-      body.portrait-blocked .ramadan-switch-button {
-        visibility: hidden;
-        pointer-events: none;
-      }
-    }
-    @media screen and (orientation: landscape) {
-      .portrait-hint.is-visible {
-        display: none !important;
-      }
-    }
-
 </style>
   <script src="./planning-resolve.js"></script>
 </head>
 <body onload="initializeWeeklyPage();">
-  <div class="portrait-hint" id="portraitHint" role="dialog" aria-live="polite" aria-hidden="true">
-    <div class="portrait-hint-icon" aria-hidden="true"></div>
-    <p>Tournez votre téléphone</p>
-    <small>Si rien ne bouge, déverrouillez la rotation dans le Centre de contrôle, puis pivotez.</small>
-  </div>
-
   <!-- Nouveau système de modal -->
   <div class="modal-backdrop" style="background-color: rgba(72,6,7, 1) !important;"></div>
   <div class="modal-content">
@@ -2460,68 +2442,6 @@
   <script src="./planning-embedded.js"></script>
   <script src="./webview-resume.js?v=1"></script>
   <script src="./weekly-vertical-inline.js"></script>
-  <script>
-    (function () {
-      var hint = document.getElementById('portraitHint');
-
-      function isPortrait() {
-        if (window.matchMedia) {
-          return window.matchMedia('(orientation: portrait)').matches;
-        }
-        return window.innerHeight > window.innerWidth;
-      }
-
-      function isPhoneLike() {
-        return Math.min(window.innerWidth, window.innerHeight) <= 1024;
-      }
-
-      function hideHint() {
-        if (hint) {
-          hint.classList.remove('is-visible');
-          hint.setAttribute('aria-hidden', 'true');
-        }
-        document.body.classList.remove('portrait-blocked');
-      }
-
-      function showHint() {
-        if (!hint || !isPortrait() || !isPhoneLike()) return;
-        hint.classList.add('is-visible');
-        hint.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('portrait-blocked');
-      }
-
-      function tryLockLandscape() {
-        if (!window.screen || !screen.orientation || typeof screen.orientation.lock !== 'function') {
-          return Promise.reject(new Error('unsupported'));
-        }
-        return screen.orientation.lock('landscape');
-      }
-
-      function syncForOrientation() {
-        if (!isPortrait() || !isPhoneLike()) {
-          hideHint();
-          return;
-        }
-        /* Tentative silencieuse ; message seulement si on reste en portrait */
-        tryLockLandscape().then(function () {
-          hideHint();
-        }).catch(function () {
-          showHint();
-        });
-      }
-
-      document.body.classList.add('portrait-blocked');
-      setTimeout(syncForOrientation, 120);
-
-      window.addEventListener('orientationchange', function () {
-        setTimeout(syncForOrientation, 200);
-      });
-      window.addEventListener('resize', function () {
-        if (!isPortrait()) hideHint();
-        else if (isPhoneLike()) syncForOrientation();
-      });
-    })();
-  </script>
 
 </body>
 </html>

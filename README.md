@@ -40,7 +40,7 @@ Une réorganisation future du dossier (sous‑dossiers `planning/`, etc.) reste 
 | `daily_grid.html` | Variante **grille** du jour (studios en colonnes indépendantes). Idem tokens + fetch planning / horaires de prière. |
 | `daily_matrix.html` | Variante **matrice** du jour (heures en lignes, studios en colonnes, fond bordeaux). Même données et thèmes que `daily_grid.html`. |
 | `daily_columns.html` | Daily style Story : **heures en colonnes**, matin/aprem (ftour en Ramadan). Vue app **Colonnes**. Fond photo (même logique qu’`horaires`). |
-| `weekly.html` | Planning **hebdomadaire** (tableau). `planning-tokens.css`, `planning-resolve.js`, `weekly-vertical-inline.js`. |
+| `weekly.html` | Planning **hebdomadaire** (tableau paysage natif). `planning-tokens.css`, `planning-resolve.js`, `weekly-vertical-inline.js`. Archives : `weekly_archived_css_rotate.html`, `weekly_rotate_content_archived.html`. |
 | `weekly_vertical.html` | Hebdo **vertical** (scroll jours). Mêmes scripts partagés. |
 | `weekly_vertical_fulldays.html` | Variante vertical **tous les jours** visibles. Mêmes scripts partagés. |
 | `prayer-times.html` | Page horaires de prière (si utilisée seule). |
