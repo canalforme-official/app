@@ -2270,30 +2270,44 @@
     .portrait-hint.is-visible {
       display: flex;
     }
+    /* Silhouette téléphone (portrait) qui bascule en paysage */
     .portrait-hint-icon {
-      width: 72px;
-      height: 72px;
-      border: 3px solid rgba(255, 255, 255, 0.85);
-      border-radius: 12px;
+      width: 40px;
+      height: 68px;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
       position: relative;
-      animation: portrait-hint-tilt 1.6s ease-in-out infinite;
-      box-shadow: 0 0 0 1px rgba(255, 166, 48, 0.35);
+      box-sizing: border-box;
+      animation: portrait-hint-tilt 1.8s ease-in-out infinite;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .portrait-hint-icon::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.65);
     }
     .portrait-hint-icon::after {
       content: '';
       position: absolute;
-      top: 8px;
+      bottom: 5px;
       left: 50%;
       transform: translateX(-50%);
-      width: 18px;
-      height: 4px;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.7);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      box-sizing: border-box;
     }
     @keyframes portrait-hint-tilt {
-      0%, 100% { transform: rotate(0deg); }
-      35% { transform: rotate(90deg); }
-      65% { transform: rotate(90deg); }
+      0%, 15% { transform: rotate(0deg); }
+      40%, 60% { transform: rotate(90deg); }
+      85%, 100% { transform: rotate(0deg); }
     }
     .portrait-hint p {
       margin: 0;
@@ -2303,25 +2317,11 @@
       font-weight: 600;
     }
     .portrait-hint small {
-      opacity: 0.8;
-      font-size: 0.88em;
+      opacity: 0.85;
+      font-size: 0.9em;
       max-width: 300px;
-      line-height: 1.4;
+      line-height: 1.45;
       font-weight: 400;
-    }
-    .portrait-hint button {
-      background: rgba(255, 166, 48, 0.95);
-      color: #480607;
-      border: none;
-      border-radius: 999px;
-      padding: 12px 22px;
-      font-size: 0.95em;
-      font-weight: 700;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .portrait-hint button:active {
-      transform: scale(0.97);
     }
 
     /* En portrait : planning masqué tant que le message n’est pas encore décidé par le JS */
@@ -2349,8 +2349,7 @@
   <div class="portrait-hint" id="portraitHint" role="dialog" aria-live="polite" aria-hidden="true">
     <div class="portrait-hint-icon" aria-hidden="true"></div>
     <p>Tournez votre téléphone</p>
-    <small>Le planning hebdomadaire s’affiche en mode paysage.</small>
-    <button type="button" id="tryLandscapeLock">C’est fait</button>
+    <small>Si rien ne bouge, déverrouillez la rotation dans le Centre de contrôle, puis pivotez.</small>
   </div>
 
   <!-- Nouveau système de modal -->
@@ -2464,7 +2463,6 @@
   <script>
     (function () {
       var hint = document.getElementById('portraitHint');
-      var btn = document.getElementById('tryLandscapeLock');
 
       function isPortrait() {
         if (window.matchMedia) {
@@ -2504,7 +2502,7 @@
           hideHint();
           return;
         }
-        /* Tentative silencieuse ; le message n’apparaît que si on reste en portrait */
+        /* Tentative silencieuse ; message seulement si on reste en portrait */
         tryLockLandscape().then(function () {
           hideHint();
         }).catch(function () {
@@ -2512,7 +2510,6 @@
         });
       }
 
-      /* Au chargement : tenter sans afficher tout de suite */
       document.body.classList.add('portrait-blocked');
       setTimeout(syncForOrientation, 120);
 
@@ -2521,19 +2518,8 @@
       });
       window.addEventListener('resize', function () {
         if (!isPortrait()) hideHint();
+        else if (isPhoneLike()) syncForOrientation();
       });
-
-      if (btn) {
-        btn.addEventListener('click', function () {
-          tryLockLandscape().then(function () {
-            hideHint();
-          }).catch(function () {
-            /* Toujours en portrait → rappeler de pivoter physiquement */
-            if (!isPortrait()) hideHint();
-            else showHint();
-          });
-        });
-      }
     })();
   </script>
 
