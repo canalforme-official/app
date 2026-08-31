@@ -530,10 +530,13 @@ td.cell-studio.is-favorite.is-favorite--outline {
   overflow: hidden !important;
 }
 
+/* Semaine : contour doré fixe (pas de flash — perf scroll / nombreux blocs) */
 .weekly-schedule .course-block.is-favorite.is-favorite--outline::after {
   inset: 0;
   border-radius: 10px;
   padding: 1.5px;
+  animation: none !important;
+  --cf-fav-angle: 275deg;
 }
 
 .weekly-schedule .course-block.is-favorite.is-favorite--outline .course-info,
