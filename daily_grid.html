@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="planning-tokens.css">
-  <link rel="stylesheet" href="planning-embedded.css?v=11">
+  <link rel="stylesheet" href="planning-tokens.css?v=39">
+  <link rel="stylesheet" href="planning-embedded.css?v=14">
 
   <!-- Meta viewport to prevent zooming -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -462,6 +462,11 @@
       line-height: 1.15;
       display: block;
       margin: 0;
+      width: 100%;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-align: right;
     }
 
     .planning-type-label {
@@ -1252,7 +1257,7 @@
       }
 
       .content-wrapper {
-        height: calc(100vh - 52px);
+        height: calc(100dvh - 52px);
         min-height: 0;
         padding-left: 5px;
         padding-right: 5px;
@@ -1703,6 +1708,29 @@
     function formatDateFrShort(ymd) {
       var d = parseYmdLocal(ymd);
       return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    }
+    function fitDateStr() {
+      var el = document.getElementById('dateStr');
+      if (!el) return;
+      var box = el.parentElement;
+      if (!box) return;
+      el.style.fontSize = '';
+      var maxPx = parseFloat(window.getComputedStyle(el).fontSize);
+      if (!maxPx) return;
+      var minPx = Math.max(10, maxPx * 0.62);
+      var avail = box.clientWidth;
+      if (avail <= 0) return;
+      if (el.scrollWidth <= avail) return;
+      var size = maxPx;
+      while (el.scrollWidth > avail && size > minPx) {
+        size -= 0.5;
+        el.style.fontSize = size + 'px';
+      }
+    }
+    function scheduleFitDateStr() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(fitDateStr);
+      });
     }
     function normalizePlanningKey(raw) {
       var s = String(raw || '').trim().toLowerCase();
@@ -2403,6 +2431,7 @@
       var dateStrEl = document.getElementById('dateStr');
       if (dayNameEl) dayNameEl.textContent = displayDayOfWeek;
       if (dateStrEl) dateStrEl.textContent = dateLabel;
+      scheduleFitDateStr();
 
       var rvBase = resolveDailyView(selectedDateYmd, allData);
       var rv = window.PlanningResolve && window.PlanningResolve.mergeResolvedViewForDate
@@ -2733,6 +2762,7 @@
     // Au load : ne pas rappeler loadAndDisplayCourses (évite de vider la grille puis refetch = capture Puppeteer blanche)
     window.addEventListener('load', function() {
       updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+      scheduleFitDateStr();
     });
     
     setInterval(loadAndDisplayCourses, 60000);
@@ -2749,6 +2779,7 @@
       }
       
       updateButtonVisibility(); // Gérer l'affichage automatique selon le contexte
+      scheduleFitDateStr();
     }
     
     // Appeler handleResize au redimensionnement de la fenêtre

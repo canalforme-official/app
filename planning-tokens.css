@@ -695,3 +695,70 @@ td.cell-studio.is-favorite .matrix-course-avatars.is-stacked .matrix-coach-avata
   z-index: var(--cf-z-fav-deco, 0);
 }
 
+/*
+ * CF-19 — états temporels > style favori.
+ * Sans ça, l’or / outline !important masque « en cours » (fond secondaire)
+ * et le favori ressemble à un cours passé (fade) pendant qu’il tourne encore.
+ */
+td.cell-studio.is-favorite.is-favorite--gold.cell-current,
+td.cell-studio.is-favorite.is-favorite--outline.cell-current {
+  background: var(--secondary-color) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 2px #c9a227 !important;
+  opacity: 1 !important;
+}
+
+td.cell-studio.is-favorite.is-favorite--gold.cell-current .matrix-course-name,
+td.cell-studio.is-favorite.is-favorite--gold.cell-current .matrix-course-coach,
+td.cell-studio.is-favorite.is-favorite--gold.cell-current .cell-empty,
+td.cell-studio.is-favorite.is-favorite--outline.cell-current .matrix-course-name,
+td.cell-studio.is-favorite.is-favorite--outline.cell-current .matrix-course-coach,
+td.cell-studio.is-favorite.is-favorite--outline.cell-current .cell-empty {
+  color: var(--primary-color) !important;
+}
+
+td.cell-studio.is-favorite.is-favorite--gold.cell-starting-soon,
+td.cell-studio.is-favorite.is-favorite--outline.cell-starting-soon {
+  background: var(--matrix-cell-bg, rgba(255, 255, 255, 0.72)) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 2px var(--secondary-color) !important;
+  opacity: 1 !important;
+}
+
+td.cell-studio.is-favorite.is-favorite--gold.cell-starting-soon .matrix-course-name,
+td.cell-studio.is-favorite.is-favorite--gold.cell-starting-soon .matrix-course-coach,
+td.cell-studio.is-favorite.is-favorite--gold.cell-starting-soon .cell-empty,
+td.cell-studio.is-favorite.is-favorite--outline.cell-starting-soon .matrix-course-name,
+td.cell-studio.is-favorite.is-favorite--outline.cell-starting-soon .matrix-course-coach,
+td.cell-studio.is-favorite.is-favorite--outline.cell-starting-soon .cell-empty {
+  color: var(--primary-color) !important;
+}
+
+/* Passé : atténuer toute la cellule or (comme non-favoris), sans toucher en cours */
+td.cell-studio.is-favorite.is-favorite--gold:has(> .matrix-cell-course.past):not(.cell-current):not(.cell-starting-soon) {
+  opacity: 0.45;
+}
+
+td.cell-studio.is-favorite.is-favorite--gold:has(> .matrix-cell-course.past):not(.cell-current):not(.cell-starting-soon) .matrix-cell-course.past {
+  opacity: 1;
+}
+
+.course-block.is-favorite.is-favorite--gold.current,
+.course-block.is-favorite.is-favorite--gold.starting-soon,
+.course-card.is-favorite.current,
+.course-card.is-favorite.starting-soon {
+  opacity: 1 !important;
+}
+
+.course-block.is-favorite.is-favorite--gold.past {
+  opacity: 0.5 !important;
+}
+
+.course-card.is-favorite.past {
+  opacity: 0.65 !important;
+}
+
+.course-card.is-favorite.is-favorite--gold.current .course-time {
+  box-shadow: inset 3px 0 0 var(--primary-color) !important;
+}
+

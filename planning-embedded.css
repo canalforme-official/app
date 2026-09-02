@@ -95,13 +95,18 @@ body.embedded.embedded-daily-matrix {
   padding-bottom: 0 !important;
 }
 
+/* Grille app : hauteur = écran − en-tête − réserve nav (fond page visible en bas sur iOS) */
 body.embedded.embedded-daily-grid .content-wrapper {
   margin-bottom: 0 !important;
-  height: calc(100vh - 52px) !important;
+  height: calc(100dvh - 52px - var(--cf-tab-clearance, 0px)) !important;
   min-height: 0 !important;
 }
 
-/* Matrice app : scroll vertical libre (pousser le pouce) — marge bas = nav bar sur téléphone */
+body.embedded.embedded-daily-grid .courses-container {
+  padding-bottom: 8px !important;
+}
+
+/* Matrice app : scroll libre — padding bas = réserve nav (fond mosaïque/gris sous le tableau) */
 body.embedded.embedded-daily-matrix .matrix-scroll {
   flex: 1 !important;
   min-height: 0 !important;
@@ -113,6 +118,6 @@ body.embedded.embedded-daily-matrix .matrix-scroll {
 
 @media (max-width: 640px) {
   body.embedded.embedded-daily-matrix .matrix-scroll {
-    padding-bottom: calc(10px + 58px) !important;
+    padding-bottom: calc(2px + var(--cf-tab-clearance, 90px)) !important;
   }
 }

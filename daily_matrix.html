@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="planning-tokens.css?v=31">
-  <link rel="stylesheet" href="planning-embedded.css?v=13">
+  <link rel="stylesheet" href="planning-tokens.css?v=39">
+  <link rel="stylesheet" href="planning-embedded.css?v=14">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     :root {
@@ -362,6 +362,11 @@
       line-height: 1.15;
       display: block;
       margin: 0;
+      width: 100%;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-align: right;
     }
 
     .planning-type-label {
@@ -978,8 +983,8 @@
       .studio-th-name { font-size: 0.58em; }
       .studio-th-inner { gap: 4px; }
       .cell-time { font-size: 0.68em; }
-      /* Téléphone : marge bas += hauteur nav bar app (58 px) pour dégager la pilule */
-      .matrix-scroll { padding: 12px 8px calc(10px + 58px); }
+      /* Téléphone : réserve nav (−8 px vs air 10 → tableau un peu plus bas) */
+      .matrix-scroll { padding: 12px 8px calc(2px + var(--cf-tab-clearance, 90px)); }
       body.puppeteer-view .matrix-scroll { padding: 12px 8px 10px; }
       .matrix-course-name { font-size: 0.78em; }
       .matrix-cell-course:not(.has-logo) .matrix-course-name,
@@ -1086,6 +1091,29 @@
 
     function formatDateFrShort(ymd) {
       return PR.parseYmdLocal(ymd).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    }
+    function fitDateStr() {
+      var el = document.getElementById('dateStr');
+      if (!el) return;
+      var box = el.parentElement;
+      if (!box) return;
+      el.style.fontSize = '';
+      var maxPx = parseFloat(window.getComputedStyle(el).fontSize);
+      if (!maxPx) return;
+      var minPx = Math.max(10, maxPx * 0.62);
+      var avail = box.clientWidth;
+      if (avail <= 0) return;
+      if (el.scrollWidth <= avail) return;
+      var size = maxPx;
+      while (el.scrollWidth > avail && size > minPx) {
+        size -= 0.5;
+        el.style.fontSize = size + 'px';
+      }
+    }
+    function scheduleFitDateStr() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(fitDateStr);
+      });
     }
 
     function updateMaghribBadge() {
@@ -1590,6 +1618,7 @@
       var dateStrEl = document.getElementById('dateStr');
       if (dayNameEl) dayNameEl.textContent = dayNames[dayIndex];
       if (dateStrEl) dateStrEl.textContent = formatDateFrShort(selectedDateYmd);
+      scheduleFitDateStr();
 
       var rvBase = PR.resolveDailyView(selectedDateYmd, allData);
       var rv = PR.mergeResolvedViewForDate
@@ -1819,6 +1848,7 @@
       var ds = document.getElementById('dateStr');
       if (dn) dn.textContent = names[d.getDay()];
       if (ds) ds.textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+      scheduleFitDateStr();
     })();
 
     function init() {
@@ -1834,10 +1864,12 @@
     window.addEventListener('load', function() {
       updateButtonVisibility();
       fitMatrixLayout();
+      scheduleFitDateStr();
     });
     window.addEventListener('resize', function() {
       updateButtonVisibility();
       fitMatrixLayout();
+      scheduleFitDateStr();
     });
     setInterval(loadAndDisplay, 60000);
     setInterval(updateCourseCellsState, 1000);
