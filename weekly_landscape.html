@@ -2465,6 +2465,24 @@
     (function () {
       var hint = document.getElementById('portraitHint');
 
+      function isEmbeddedApp() {
+        try {
+          return new URLSearchParams(window.location.search).get('embedded') === '1';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      /* App native : orientation gérée par expo-screen-orientation — pas d’overlay portrait. */
+      if (isEmbeddedApp()) {
+        if (hint) {
+          hint.classList.remove('is-visible');
+          hint.setAttribute('aria-hidden', 'true');
+        }
+        document.body.classList.remove('portrait-blocked');
+        return;
+      }
+
       function isPortrait() {
         if (window.matchMedia) {
           return window.matchMedia('(orientation: portrait)').matches;
