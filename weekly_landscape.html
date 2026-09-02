@@ -1619,16 +1619,17 @@
       max-height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
-      /* Comme weekly.html : petit padding, pas de bande réservée aux flèches (elles sont en overlay) */
       padding: 4px;
+      padding-left: max(8px, env(safe-area-inset-left, 0px));
+      padding-top: max(4px, env(safe-area-inset-top, 0px));
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
     }
 
     .navigation {
       display: flex !important;
-      left: max(6px, env(safe-area-inset-left, 0px));
-      right: max(6px, env(safe-area-inset-right, 0px));
+      left: max(8px, calc(env(safe-area-inset-left, 0px) + 6px));
+      right: max(8px, calc(env(safe-area-inset-right, 0px) + 6px));
       pointer-events: none;
       z-index: 10060;
     }
@@ -1675,7 +1676,7 @@
 
     /* Paysage natif : colonne heures un peu plus large */
     .weekly-schedule col.col-hours {
-      width: 36px !important;
+      width: 42px !important;
     }
 
     .weekly-schedule th,

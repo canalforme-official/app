@@ -53,8 +53,20 @@ body.embedded.embedded-weekly-horizontal .filters-sidebar.open {
 }
 
 body.embedded.embedded-weekly-horizontal .content-wrapper {
-  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-top: max(4px, var(--cf-embed-top, env(safe-area-inset-top, 0px))) !important;
+  padding-left: max(8px, var(--cf-embed-left, env(safe-area-inset-left, 0px))) !important;
+  padding-right: max(4px, var(--cf-embed-right, env(safe-area-inset-right, 0px))) !important;
+  padding-bottom: calc(16px + var(--cf-embed-bottom, env(safe-area-inset-bottom, 0px))) !important;
   overscroll-behavior-y: none !important;
+}
+
+body.embedded.embedded-weekly-horizontal .navigation {
+  left: max(8px, calc(var(--cf-embed-left, env(safe-area-inset-left, 0px)) + 6px)) !important;
+  right: max(8px, calc(var(--cf-embed-right, env(safe-area-inset-right, 0px)) + 6px)) !important;
+}
+
+body.embedded.embedded-weekly-horizontal .weekly-schedule col.col-hours {
+  width: 42px !important;
 }
 
 /* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer) */
