@@ -40,16 +40,17 @@ body.embedded.embedded-weekly-vertical .content-wrapper {
   overscroll-behavior-y: none !important;
 }
 
-/* weekly.html + weekly_landscape.html (Tableau) — iOS : inset ~88 px (barre glass). Android : inject app → 16 px. */
+/* Tableau app : filtre aligné à droite (même axe que flèche semaine), remonté au-dessus de la tab bar. */
 body.embedded.embedded-weekly-horizontal .filters-sidebar {
-  bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
-  right: 88px !important;
+  bottom: calc(var(--cf-embed-bottom, 70px) + 12px + env(safe-area-inset-bottom, 0px)) !important;
+  right: max(8px, calc(var(--cf-embed-right, env(safe-area-inset-right, 0px)) + 6px)) !important;
   left: auto !important;
+  top: auto !important;
   z-index: 10050 !important;
 }
 
 body.embedded.embedded-weekly-horizontal .filters-sidebar.open {
-  width: calc(100% - 104px) !important;
+  width: calc(100% - max(16px, calc(var(--cf-embed-right, env(safe-area-inset-right, 0px)) + 14px))) !important;
 }
 
 body.embedded.embedded-weekly-horizontal .content-wrapper {
