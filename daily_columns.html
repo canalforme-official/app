@@ -551,6 +551,11 @@
       pointer-events: none;
     }
 
+    /* Cours passés — même atténuation que Grille (0.65) */
+    .course-card.past {
+      opacity: 0.65;
+    }
+
     .dc-status {
       width: min(420px, 92vw);
       margin: 40px auto;
@@ -1091,8 +1096,45 @@
     if (PR && PR.fillPlanningEventConfetti) PR.fillPlanningEventConfetti(stack, { variant: 'compact' });
     if (PR && PR.wirePlanningImgTextFallbacks) PR.wirePlanningImgTextFallbacks(stack);
 
+    updateCourseCardsState();
     updateNav();
     updateButtonVisibility();
+  }
+
+  /** Jour passé / créneau terminé → classe .past (opacité comme Grille). */
+  function updateCourseCardsState() {
+    var todayStr = ymdFromDate(new Date());
+    var displayedStr = (typeof selectedDateYmd === 'string' && selectedDateYmd) ? selectedDateYmd : todayStr;
+    var isViewingToday = todayStr === displayedStr;
+    var isPastDay = displayedStr < todayStr;
+    var isFutureDay = displayedStr > todayStr;
+    var now = new Date();
+    var currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+    var cards = document.querySelectorAll('#dcBoardStack .course-card');
+    cards.forEach(function (card) {
+      var startStr = card.getAttribute('data-start-time');
+      var endStr = card.getAttribute('data-end-time');
+      if (!startStr) return;
+      var startParts = startStr.split(':');
+      var startMinutes = (parseInt(startParts[0], 10) || 0) * 60 + (parseInt(startParts[1], 10) || 0);
+      var endMinutes = startMinutes + 60;
+      if (endStr) {
+        var endParts = endStr.split(':');
+        endMinutes = (parseInt(endParts[0], 10) || 0) * 60 + (parseInt(endParts[1], 10) || 0);
+      }
+      var endSeconds = endMinutes * 60;
+
+      if (isPastDay) {
+        card.classList.add('past');
+        return;
+      }
+      if (isFutureDay) {
+        card.classList.remove('past');
+        return;
+      }
+      if (isViewingToday && currentSeconds >= endSeconds) card.classList.add('past');
+      else card.classList.remove('past');
+    });
   }
 
   function updateNav() {
@@ -1209,6 +1251,7 @@
       await renderBoard();
       updateButtonVisibility();
       document.body.setAttribute('data-daily-columns-ready', 'true');
+      setInterval(updateCourseCardsState, 1000);
     } catch (err) {
       console.error(err);
       renderStatus('Erreur', 'Impossible de charger le planning.');
