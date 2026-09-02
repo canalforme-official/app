@@ -70,6 +70,20 @@ body.embedded.embedded-weekly-horizontal .weekly-schedule col.col-hours {
   width: 42px !important;
 }
 
+/* Tableau app : pas d’anim navigation / transition pendant rotation écran */
+body.embedded.embedded-weekly-horizontal .navigation,
+body.embedded.embedded-weekly-horizontal .navigation.loaded {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+body.embedded.embedded-weekly-horizontal.embedded-orient-settling,
+body.embedded.embedded-weekly-horizontal.embedded-orient-settling * {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer) */
 body.embedded.embedded-daily-grid .coaches-section,
 body.embedded.embedded-daily-matrix .coaches-section {

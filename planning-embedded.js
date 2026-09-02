@@ -104,6 +104,23 @@
     document.body.classList.add('embedded');
     applyEmbeddedPageClass();
     bootEmbeddedFeatures();
+    bootWeeklyHorizontalEmbedded();
+  }
+
+  function bootWeeklyHorizontalEmbedded() {
+    var file = pageFileName();
+    if (file !== 'weekly_landscape.html') return;
+
+    function markSettling() {
+      document.body.classList.add('embedded-orient-settling');
+      if (window.__cfOrientSettleT) clearTimeout(window.__cfOrientSettleT);
+      window.__cfOrientSettleT = setTimeout(function () {
+        document.body.classList.remove('embedded-orient-settling');
+      }, 450);
+    }
+
+    window.addEventListener('resize', markSettling);
+    window.addEventListener('orientationchange', markSettling);
   }
 
   if (!isEmbedded()) return;
