@@ -84,6 +84,17 @@ body.embedded.embedded-weekly-horizontal.embedded-orient-settling * {
   animation: none !important;
 }
 
+/* Sticky titres + flèches (top:50%) : ne pas laisser WKWebView perciner le voile app. */
+body.embedded.embedded-weekly-horizontal.embedded-orient-settling .navigation,
+body.embedded.embedded-weekly-horizontal.embedded-orient-settling .navigation.loaded,
+body.embedded.embedded-weekly-horizontal.embedded-orient-settling .weekly-schedule thead,
+body.embedded.embedded-weekly-horizontal.embedded-orient-settling .filters-sidebar {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Grille / Matrice en app : en-tête dégradé bordeaux (comme Puppeteer) */
 body.embedded.embedded-daily-grid .coaches-section,
 body.embedded.embedded-daily-matrix .coaches-section {
