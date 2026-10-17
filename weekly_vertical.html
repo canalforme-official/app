@@ -786,6 +786,28 @@
       z-index: 1;
     }
 
+    /* Pastille Kids (feuille Cours col. E → JSON category) */
+    .course-block.kids {
+      position: relative;
+    }
+    .course-kids-badge {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      z-index: 3;
+      font-family: var(--font-title, inherit);
+      font-size: 0.58em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.2;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #fff;
+      background: #3d8fad;
+      pointer-events: none;
+    }
+
     /* Styles pour les cours en cours */
     .course-block.current {
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);

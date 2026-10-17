@@ -29,6 +29,20 @@
       return s === '100% femmes' || /^100\s*%\s*femmes/.test(s) || (s.indexOf('100') !== -1 && s.indexOf('femme') !== -1);
     }
 
+    /** Feuille Cours col. E → JSON `category` (Kids, Zen, …). */
+    function isKidsCategory(category) {
+      var s = String(category || '').trim().toLowerCase();
+      if (!s) return false;
+      if (s === 'kids' || s === 'kid' || s === 'enfants' || s === 'enfant') return true;
+      var parts = s.split(/[,;/|]+/);
+      var i, p;
+      for (i = 0; i < parts.length; i++) {
+        p = String(parts[i] || '').trim();
+        if (p === 'kids' || p === 'kid' || p === 'enfants' || p === 'enfant') return true;
+      }
+      return false;
+    }
+
     function parseForcedFilterFromUrl() {
       var params = new URLSearchParams(window.location.search);
       var filter = decodeURIComponent(params.get('filter') || '').toLowerCase();
@@ -37,6 +51,9 @@
       }
       if (filter === 'femmes' || filter === 'women' || filter === '100-femmes' || filter === '100%femmes') {
         return 'femmes';
+      }
+      if (filter === 'kids' || filter === 'kid' || filter === 'enfants' || filter === 'enfant') {
+        return 'kids';
       }
       return null;
     }
@@ -70,7 +87,7 @@
       } catch (e) {}
     }
 
-    /** Préserve semaine + filtre (aqua, femmes, etc.) lors du passage vertical ↔ horizontal. */
+    /** Préserve semaine + filtre (aqua, femmes, kids, etc.) lors du passage vertical ↔ horizontal. */
     function buildPlanningViewQuery() {
       var params = new URLSearchParams(window.location.search);
       if (weekMondayYmd) {
@@ -242,6 +259,7 @@
             coursId: course.coursId || '',
             courseName: courseInfo ? courseInfo.name : (PR.formatCourseNameFromCoursId ? PR.formatCourseNameFromCoursId(course.coursId) : 'Cours'),
             logo: courseInfo ? courseInfo.logo : '',
+            category: courseInfo && courseInfo.category ? String(courseInfo.category) : '',
             studio: studioInfo ? studioInfo.name : 'Studio inconnu',
             endTime: course.endTime,
             startTime: course.startTime,
@@ -468,6 +486,8 @@
               if (course.studio.toLowerCase().indexOf('piscine') !== -1 || course.studio.toLowerCase().indexOf('aqua') !== -1) {
                 courseClasses += ' piscine';
               }
+              var isKidsCourse = isKidsCategory(course.category);
+              if (isKidsCourse) courseClasses += ' kids';
 
               var targetD = PR.parseYmdLocal(col.ymd);
               var startTimeParts = course.startTime ? course.startTime.split(':') : ['00', '00'];
@@ -496,9 +516,12 @@
                   : ' course-block--planning-event';
               }
 
-              courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-cours-id="' + PR.escapeHtml(course.coursId || '') + '" data-coach-ids="' + PR.escapeHtml((course.coachIds || []).join(',')) + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
+              courseDisplay += '<div class="' + courseClasses + '" data-ymd="' + col.ymd + '" data-cours-id="' + PR.escapeHtml(course.coursId || '') + '" data-category="' + PR.escapeHtml(course.category || '') + '" data-coach-ids="' + PR.escapeHtml((course.coachIds || []).join(',')) + '" data-coaches="' + PR.escapeHtml(course.coachs.map(function(x) { return x.name; }).join(',')) + '" data-start-time="' + PR.escapeHtml(course.startTime || '') + '" data-end-time="' + PR.escapeHtml(course.endTime || '') + '">';
               if (isStartingSoon) {
                 courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
+              }
+              if (isKidsCourse) {
+                courseDisplay += '<span class="course-kids-badge" aria-label="Cours kids">Kids</span>';
               }
               courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
               courseDisplay += coachImagesHtml;
@@ -800,7 +823,7 @@
 
         applyForcedFilterCheckboxes();
         applyFilters();
-        if (forcedUrlFilter === 'femmes' || forcedUrlFilter === 'aqua') {
+        if (forcedUrlFilter === 'femmes' || forcedUrlFilter === 'aqua' || forcedUrlFilter === 'kids') {
           setTimeout(function() {
             applyForcedFilterCheckboxes();
             applyFilters();
@@ -1023,9 +1046,10 @@
       }
       const forceAquaOnly = forcedUrlFilter === 'aqua';
       const forceFemmesOnly = forcedUrlFilter === 'femmes';
+      const forceKidsOnly = forcedUrlFilter === 'kids';
       const showMixte = forceFemmesOnly ? false : chk('filter-mixte');
       const showWomenOnly = forceFemmesOnly ? true : chk('filter-women-only');
-      const showPiscine = forceAquaOnly || forceFemmesOnly ? true : chk('filter-piscine');
+      const showPiscine = forceAquaOnly || forceFemmesOnly || forceKidsOnly ? true : chk('filter-piscine');
       const showCoachImages = chk('filter-coach');
       const coachCheckboxes = document.querySelectorAll('#filtersSidebar #coachDropdownContent input[type="checkbox"], #coachDropdownContent input[type="checkbox"]');
       const selectedCoaches = Array.from(coachCheckboxes)
@@ -1041,16 +1065,21 @@
         const showByCoach = selectedCoaches.length === 0 ||
           courseCoaches.some(coach => selectedCoaches.includes(coach));
         const isPiscine = block.classList.contains('piscine');
+        const isKids = block.classList.contains('kids');
         const courseType = block.classList;
-        const showByType = forceFemmesOnly
-          ? courseType.contains('women-only')
-          : (
-            (courseType.contains('mixte') && showMixte) ||
-            (courseType.contains('women-only') && showWomenOnly)
-          );
+        /* Kids = catégorie JSON : on ignore Mixte/Femmes (un kids peut être Mixte). */
+        const showByType = forceKidsOnly
+          ? true
+          : forceFemmesOnly
+            ? courseType.contains('women-only')
+            : (
+              (courseType.contains('mixte') && showMixte) ||
+              (courseType.contains('women-only') && showWomenOnly)
+            );
 
         const showByAquaParam = !forceAquaOnly || isPiscine;
-        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine) && showByAquaParam) ? 'block' : 'none';
+        const showByKidsParam = !forceKidsOnly || isKids;
+        block.style.display = (showByCoach && showByType && (!isPiscine || showPiscine) && showByAquaParam && showByKidsParam) ? 'block' : 'none';
       }
 
       if (showCoachImages) {

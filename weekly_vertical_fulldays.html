@@ -566,6 +566,24 @@
     .course-block.piscine { background: none; box-shadow: none; }
     .course-block.women-only::before,
     .course-block.piscine::before { display: none; }
+    .course-block.kids { position: relative; }
+    .course-kids-badge {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      z-index: 3;
+      font-family: var(--font-title, inherit);
+      font-size: 0.58em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.2;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #fff;
+      background: #3d8fad;
+      pointer-events: none;
+    }
     .course-block.current { font-weight: bold; box-shadow: none; }
     .course-block.starting-soon { animation: pulse 1.5s infinite; box-shadow: none; }
     .course-block.past { opacity: 0.5; color: var(--state-past); }
