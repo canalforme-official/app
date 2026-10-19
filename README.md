@@ -99,7 +99,7 @@ Adapter le préfixe selon l’URL réelle de déploiement (domaine, sous-chemin)
 |-----------|---------|--------|
 | `filter` | `aqua`, `aquatique`, `piscine` | Affiche uniquement les cours **piscine** (filtre « Piscine » forcé). Utilisé par le site Canal Forme (page piscine). |
 | `filter` | `femmes`, `women`, `100-femmes` | Affiche uniquement les cours **100 % Femmes** (classe `.women-only`). Utilisé par le site (bouton planning femmes). |
-| `filter` | `kids`, `kid`, `enfants`, `enfant` | Affiche uniquement les cours **Kids** (JSON `category` = feuille Cours col. E). Pastille « Kids » sur la carte. Modal site. |
+| `filter` | `kids`, `kid`, `enfants`, `enfant` | Affiche uniquement les cours **Kids** (JSON `category` = feuille Cours col. E). Libellé dans le **nom** du cours. Modal site. |
 | `week` | `YYYY-MM-DD` (lundi de la semaine) | Semaine affichée |
 
 Exemple : `weekly_vertical.html?filter=femmes` · `weekly_vertical.html?filter=kids`

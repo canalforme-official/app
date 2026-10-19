@@ -520,9 +520,6 @@
               if (isStartingSoon) {
                 courseDisplay += '<div class="countdown-pill starting-soon" data-time-diff="' + Math.floor(timeDifference) + '"></div>';
               }
-              if (isKidsCourse) {
-                courseDisplay += '<span class="course-kids-badge" aria-label="Cours kids">Kids</span>';
-              }
               courseDisplay += '<div class="course-info">' + courseNameDisplay + '</div>';
               courseDisplay += coachImagesHtml;
               courseDisplay += '</div>';
