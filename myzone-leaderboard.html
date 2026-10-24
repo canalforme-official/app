@@ -2570,11 +2570,12 @@
       const today = new Date();
       const dayOfMonth = today.getDate();
 
-      // Challenge homme/femme : affiché uniquement s'il y a un classement (entraînements) pour le mois en cours
+      // Challenge homme/femme : masqué en secours page officielle (pas de genre)
       const hasRanking = data.current && data.current.data && data.current.data.length > 0 && !allMepsZero(data.current.data);
+      const hideGenderChallenge = !!(data.current && (data.current.source === 'myzone_web' || data.current.hideGenderChallenge));
       const currentCompetition = document.getElementById('currentMonthCompetition');
       if (currentCompetition) {
-        currentCompetition.style.display = hasRanking ? 'block' : 'none';
+        currentCompetition.style.display = (hasRanking && !hideGenderChallenge) ? 'block' : 'none';
       }
 
       // Vérifie si le mois actuel doit être affiché
