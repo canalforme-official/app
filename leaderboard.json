@@ -313,16 +313,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 10,
-        "nickname": "Oussama",
-        "meps": 2133,
-        "usrGUID": "99215234-1020-425c-a123-16e9ed11b0fd",
+        "nickname": "Nabil",
+        "meps": 2174,
+        "usrGUID": "aff78f9f-d00d-11ee-92c6-861db27673fb",
         "rank": 0,
         "type": "Unknown",
         "male": true,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Bronze",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
+        "status": "Platinum",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/384c13c0-7940-e279-465e-3b23111a5861.png"
       },
       {
         "moves": 0,
@@ -345,16 +345,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 11,
-        "nickname": "Nabil",
-        "meps": 2063,
-        "usrGUID": "aff78f9f-d00d-11ee-92c6-861db27673fb",
+        "nickname": "Oussama",
+        "meps": 2133,
+        "usrGUID": "99215234-1020-425c-a123-16e9ed11b0fd",
         "rank": 0,
         "type": "Unknown",
         "male": true,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Platinum",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/384c13c0-7940-e279-465e-3b23111a5861.png"
+        "status": "Bronze",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
       },
       {
         "moves": 0,
