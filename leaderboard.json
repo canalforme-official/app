@@ -601,16 +601,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 19,
-        "nickname": "Limouna",
-        "meps": 949,
-        "usrGUID": "11e57c20-63f8-11f0-8603-2635a5d58295",
+        "nickname": "Amoula L",
+        "meps": 970,
+        "usrGUID": "60dd19b0-d7ae-11ee-92c6-861db27673fb",
         "rank": 0,
         "type": "Unknown",
         "male": false,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Bronze",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
+        "status": "Gold",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/9ecbf90a-0bbf-b4be-9228-91006beffa17.png"
       },
       {
         "moves": 0,
@@ -633,16 +633,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 20,
-        "nickname": "عثمان",
-        "meps": 927,
-        "usrGUID": "4d0abe14-ca8e-11ee-92c6-861db27673fb",
+        "nickname": "Limouna",
+        "meps": 949,
+        "usrGUID": "11e57c20-63f8-11f0-8603-2635a5d58295",
         "rank": 0,
         "type": "Unknown",
-        "male": true,
+        "male": false,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Iron",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/97749204-22bb-f1bd-ba88-051b95c6dca5.png"
+        "status": "Bronze",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
       }
     ],
     "total_meps_by_gender": {
