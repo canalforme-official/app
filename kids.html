@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Canal Forme Kids</title>
+  <link rel="icon" href="https://mcusercontent.com/74abea872abd45d46efed5d41/images/20d3fcd8-43fc-852e-95b2-55ad6e8befe6.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="planning-tokens.css?v=39">
+  <style>
+    :root {
+      --font-title: 'Oswald', sans-serif;
+      --font-text: 'Lora', serif;
+      --primary-color: #480607;
+      --accent: #FFA630;
+      --accent-soft: #F6D5A2;
+      --women: #9e6187;
+      --pool: #35767c;
+      --card: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #666666;
+      --background-main: #F5F5F5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: var(--font-text);
+      color: var(--ink);
+      background: var(--background-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: var(--planning-pattern-mosaic-url);
+      background-size: 128px 128px;
+      opacity: 0.05;
+    }
+
+    .poster {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--background-main);
+    }
+
+    .hero {
+      padding: 20px 18px 4px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary-color);
+    }
+
+    .hero p {
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .activities {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 12px 16px;
+    }
+
+    .activity {
+      --act: var(--primary-color);
+      display: grid;
+      grid-template-columns: 108px 1fr;
+      align-items: stretch;
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(72, 6, 7, 0.08);
+      border-left: 5px solid var(--act);
+      min-height: 118px;
+    }
+
+    .activity--natation { --act: var(--pool); }
+    .activity--boxing { --act: var(--primary-color); }
+    .activity--cross { --act: var(--accent); }
+    .activity--dance { --act: var(--women); }
+
+    .activity:nth-child(even) {
+      grid-template-columns: 1fr 108px;
+      border-left: none;
+      border-right: 5px solid var(--act);
+    }
+
+    .activity:nth-child(even) .activity-photo-wrap { order: 2; }
+
+    .activity-photo-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      background: linear-gradient(180deg, #f3f3f3 0%, #ececec 100%);
+      min-height: 118px;
+    }
+
+    .activity-photo {
+      width: 100%;
+      height: 118px;
+      object-fit: contain;
+      object-position: center bottom;
+    }
+
+    .activity-body {
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .activity-body h2 {
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--act);
+      margin-bottom: 6px;
+    }
+
+    .activity-body ul {
+      list-style: none;
+    }
+
+    .activity-body li {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .activity-body .day {
+      font-family: var(--font-title);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-transform: capitalize;
+    }
+
+    .activity-body .time {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .soon {
+      font-family: var(--font-title);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--muted);
+    }
+
+    @media (min-width: 500px) {
+      .poster {
+        width: 390px;
+        min-height: 694px;
+        box-shadow: 0 8px 32px rgba(72, 6, 7, 0.12);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <header class="hero">
+      <h1>Kids</h1>
+      <p>8 – 16 ans</p>
+    </header>
+    <section id="activities" class="activities" aria-live="polite">
+      <p class="status">Chargement du planning…</p>
+    </section>
+  </main>
+
+  <script src="./planning-resolve.js"></script>
+  <script>
+    (function () {
+      var PR = window.PlanningResolve;
+      var DAY_ORDER = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+      var ACTIVITIES = [
+        { id: 'natation', title: 'Natation', match: /natation|nager|swim/, image: './images/kids/kids-natation.png' },
+        { id: 'boxing', title: 'Boxing', match: /box/, image: './images/kids/kids-boxing.png' },
+        { id: 'cross', title: 'Cross', match: /cross/, image: './images/kids/kids-cross.png' },
+        { id: 'dance', title: 'Dance', match: /danse|dance/, image: './images/kids/kids-dance.png' }
+      ];
+
+      function isKidsCategory(category) {
+        var s = String(category || '').trim().toLowerCase();
+        if (!s) return false;
+        if (s === 'kids' || s === 'kid' || s === 'enfants' || s === 'enfant') return true;
+        return s.split(/[,;/|]+/).some(function (p) {
+          p = String(p || '').trim();
+          return p === 'kids' || p === 'kid' || p === 'enfants' || p === 'enfant';
+        });
+      }
+
+      function isKidsCourse(info) {
+        if (!info) return false;
+        if (isKidsCategory(info.category)) return true;
+        return /\bkids\b|\benfant/.test(String(info.name || '').toLowerCase());
+      }
+
+      function matchActivity(name) {
+        var n = String(name || '').toLowerCase();
+        var i;
+        for (i = 0; i < ACTIVITIES.length; i++) {
+          if (ACTIVITIES[i].match.test(n)) return ACTIVITIES[i];
+        }
+        return null;
+      }
+
+      function hhmm(t) {
+        var s = String(t || '');
+        return s.length >= 5 ? s.slice(0, 5) : s;
+      }
+
+      function loadPlanning() {
+        return fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/planning-v2.json')
+          .then(function (r) {
+            if (!r.ok) throw new Error('remote');
+            return r.json();
+          })
+          .catch(function () {
+            return fetch('./planning-v2.json').then(function (r) {
+              if (!r.ok) throw new Error('local');
+              return r.json();
+            });
+          });
+      }
+
+      function collectKidsSlots(data) {
+        var catalog = data.cours || [];
+        var byId = {};
+        catalog.forEach(function (c) { byId[c.id] = c; });
+
+        var groups = {};
+        ACTIVITIES.forEach(function (a) {
+          groups[a.id] = { activity: a, byDay: {} };
+        });
+
+        var planning = data.planning || {};
+        DAY_ORDER.forEach(function (dayName) {
+          (planning[dayName] || []).forEach(function (slot) {
+            var info = byId[slot.coursId] || PR.courseDisplayFromCoursId(slot.coursId, catalog);
+            if (!isKidsCourse(info)) return;
+            var act = matchActivity(info.name);
+            if (!act) return;
+            if (!groups[act.id].byDay[dayName]) groups[act.id].byDay[dayName] = [];
+            groups[act.id].byDay[dayName].push({
+              start: hhmm(slot.startTime),
+              end: hhmm(slot.endTime)
+            });
+          });
+        });
+
+        Object.keys(groups).forEach(function (id) {
+          DAY_ORDER.forEach(function (day) {
+            var list = groups[id].byDay[day];
+            if (!list) return;
+            list.sort(function (a, b) { return String(a.start).localeCompare(String(b.start)); });
+          });
+        });
+
+        return groups;
+      }
+
+      function render(groups) {
+        var root = document.getElementById('activities');
+        var html = '';
+        ACTIVITIES.forEach(function (act) {
+          var g = groups[act.id] || { byDay: {} };
+          var days = DAY_ORDER.filter(function (day) { return (g.byDay[day] || []).length; });
+          html += '<article class="activity activity--' + act.id + '">';
+          html += '<div class="activity-photo-wrap">';
+          html += '<img class="activity-photo" src="' + PR.escapeHtml(act.image) + '" alt="" width="108" height="118">';
+          html += '</div>';
+          html += '<div class="activity-body">';
+          html += '<h2>' + PR.escapeHtml(act.title) + '</h2>';
+          if (!days.length) {
+            html += '<p class="soon">Bientôt</p>';
+          } else {
+            html += '<ul>';
+            days.forEach(function (day) {
+              var label = PR.capitalizeDayFr(day);
+              g.byDay[day].forEach(function (slot) {
+                html += '<li><span class="day">' + PR.escapeHtml(label) + '</span>';
+                html += '<span class="time">' + PR.escapeHtml(slot.start) + ' – ' + PR.escapeHtml(slot.end) + '</span></li>';
+              });
+            });
+            html += '</ul>';
+          }
+          html += '</div></article>';
+        });
+        root.innerHTML = html;
+      }
+
+      loadPlanning().then(function (data) {
+        render(collectKidsSlots(data));
+      }).catch(function () {
+        document.getElementById('activities').innerHTML =
+          '<p class="status">Planning indisponible. Réessayez.</p>';
+      });
+    })();
+  </script>
+</body>
+</html>

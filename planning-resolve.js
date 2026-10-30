@@ -180,6 +180,13 @@
     return false;
   }
 
+  function weekForNamedPeriod_(versions, periodName, fallbackWeek) {
+    if (periodName && versions && Object.prototype.hasOwnProperty.call(versions, periodName)) {
+      return versions[periodName] || {};
+    }
+    return fallbackWeek || {};
+  }
+
   function resolveDailyView(dateStr, data) {
     var periodes = data.metadata && data.metadata.periods ? data.metadata.periods : [];
     var eff = getEffectivePeriodForDate(dateStr, periodes);
@@ -204,18 +211,26 @@
       return { courses: [], planningKey: 'ferie', periodName: periodName, closed: false, indetermine: true, dayName: dayName };
     }
     if (key === 'ramadan') {
-      var arrR = planningRamadan[dayName] || [];
+      var weekR = weekForNamedPeriod_(data.planningRamadanVersions, periodName, planningRamadan);
+      var arrR = weekR[dayName] || [];
       return { courses: arrR, planningKey: 'ramadan', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
     }
     if (key === 'ete') {
-      var arrE = planningEte[dayName] || [];
+      var weekE = weekForNamedPeriod_(data.planningEteVersions, periodName, planningEte);
+      var arrE = weekE[dayName] || [];
       // Jour sans cours (ex. dimanche) ≠ « à déterminer » si le planning été existe déjà.
-      if (!arrE.length && !planningMapHasAnyCourses(planningEte)) {
+      if (!arrE.length && !planningMapHasAnyCourses(weekE)) {
         return { courses: [], planningKey: 'ete', periodName: periodName, closed: false, indetermine: true, dayName: dayName };
       }
       return { courses: arrE, planningKey: 'ete', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
     }
     var arrReg = planning[dayName] || [];
+    var byVer = data.planningRegulierVersions;
+    if (periodName && byVer && byVer[periodName] && byVer[periodName][dayName]) {
+      arrReg = byVer[periodName][dayName];
+    } else if (periodName && byVer && byVer[periodName]) {
+      arrReg = [];
+    }
     return { courses: arrReg, planningKey: 'regulier', periodName: periodName, closed: false, indetermine: false, dayName: dayName };
   }
 

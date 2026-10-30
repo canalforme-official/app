@@ -1411,11 +1411,15 @@
       html += '</colgroup><thead><tr><th class="col-hours-corner" aria-hidden="true"></th>';
 
       studios.forEach(function(studio) {
-        html += '<th><div class="studio-th-inner">';
+        var studioName = studio.name || '';
+        html += '<th title="' + escapeHtml(studioName) + '"><div class="studio-th-inner">';
         if (studio.imageUrl) {
-          html += '<img class="studio-th-icon" src="' + escapeHtml(studio.imageUrl) + '" alt="" onerror="this.style.display=\'none\'">';
+          html += '<img class="studio-th-icon" src="' + escapeHtml(studio.imageUrl) + '" alt="' + escapeHtml(studioName) + '" onerror="this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.hidden=false;">';
+          html += '<span class="studio-th-name" hidden>' + escapeHtml(studioName) + '</span>';
+        } else {
+          html += '<span class="studio-th-name">' + escapeHtml(studioName) + '</span>';
         }
-        html += '<span class="studio-th-name">' + escapeHtml(studio.name || '') + '</span></div></th>';
+        html += '</div></th>';
       });
       html += '</tr></thead><tbody>';
 

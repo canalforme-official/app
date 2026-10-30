@@ -1887,6 +1887,15 @@
       line-height: 1.35;
     }
 
+    /* Bouton daily (icône rotative) retiré — même règle que weekly_vertical */
+    .today-view-button,
+    .today-view-button-bottom {
+      display: none !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
   </style>
   <script src="./planning-resolve.js"></script>
 </head>
@@ -1895,12 +1904,6 @@
     <div id="planningViewSwitcher" style="display: none;"></div>
     <!-- Le planning hebdomadaire sera inséré ici -->
     <div id="weeklySchedule"></div>
-  </div>
-
-  <!-- Bouton pour revenir à aujourd'hui -->
-  <div class="today-view-button" id="todayViewButton">
-    <button onclick="returnToToday()">
-    </button>
   </div>
 
   <div class="navigation" id="weekNavigation">

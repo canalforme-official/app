@@ -2343,6 +2343,15 @@
       }
     }
 
+    /* Bouton daily (icône rotative) retiré — même règle que weekly_vertical, après les media queries */
+    .today-view-button,
+    .today-view-button-bottom {
+      display: none !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
 </style>
   <script src="./planning-resolve.js"></script>
 </head>
@@ -2367,12 +2376,6 @@
     <!-- Bouton de rotation vers weekly_vertical.html -->
     <div class="rotation-view-button" id="rotationViewButton" role="button" tabindex="0" aria-label="Vue verticale du planning" onclick="goToWeeklyVertical()">
       <button type="button" aria-label="Vue verticale du planning"></button>
-    </div>
-
-    <!-- Bouton pour revenir à aujourd'hui -->
-    <div class="today-view-button" id="todayViewButton">
-      <button onclick="returnToToday()">
-      </button>
     </div>
 
     <div class="navigation" id="weekNavigation">

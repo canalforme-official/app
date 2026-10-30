@@ -2112,25 +2112,36 @@
       }
     }
 
+    function leaderboardHasMeps(data) {
+      return !!(data && data.current && Array.isArray(data.current.data)
+        && data.current.data.some(function (user) { return Number(user.meps) > 0; }));
+    }
+
+    async function fetchLeaderboardFrom(url) {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (!leaderboardHasMeps(data)) throw new Error('EMPTY');
+      return data;
+    }
+
     async function fetchLeaderboardJson() {
-      try {
-        const localResp = await fetch('./leaderboard.json?timestamp=' + Date.now());
-        if (localResp.ok) {
-          const data = await localResp.json();
-          console.log('✅ Données leaderboard chargées depuis le fichier local');
+      const stamp = Date.now();
+      const urls = [
+        './leaderboard.json?timestamp=' + stamp,
+        'https://cdn.jsdelivr.net/gh/canalforme-official/app-data@main/leaderboard.json?t=' + stamp,
+        'https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=' + stamp
+      ];
+      for (let i = 0; i < urls.length; i++) {
+        try {
+          const data = await fetchLeaderboardFrom(urls[i]);
+          console.log('✅ Données leaderboard chargées depuis', urls[i]);
           return data;
+        } catch (e) {
+          console.log('⚠️ Source leaderboard ignorée:', urls[i], e && e.message);
         }
-        throw new Error('Fichier local non disponible');
-      } catch (localError) {
-        console.log('⚠️ Fichier local non disponible, utilisation de GitHub...');
-        const remoteResp = await fetch('https://raw.githubusercontent.com/canalforme-official/app-data/main/leaderboard.json?timestamp=' + Date.now());
-        if (!remoteResp.ok) {
-          throw new Error('Impossible de charger le leaderboard depuis GitHub');
-        }
-        const data = await remoteResp.json();
-        console.log('✅ Données leaderboard chargées depuis GitHub');
-        return data;
       }
+      throw new Error('Impossible de charger le leaderboard');
     }
 
     /**

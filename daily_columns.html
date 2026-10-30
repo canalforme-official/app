@@ -24,7 +24,7 @@
       --muted: rgba(255, 255, 255, 0.82);
       --col-gap: 5px;
       --shell-pad-x: 8px;
-      --shell-pad-top: 16px;
+      --shell-pad-top: 8px;
       --shell-pad-bottom: 28px;
       --dc-cols: 6;
       --card-h: 50px;
@@ -167,7 +167,7 @@
       display: flex;
       align-items: flex-start;
       justify-content: flex-end;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
 
     .dc-day { text-align: right; }
@@ -212,6 +212,8 @@
       justify-content: center;
       gap: var(--board-row-gap);
       min-height: 0;
+      margin-top: -6px;
+      padding-bottom: 16px;
     }
 
     .dc-section {
@@ -674,7 +676,7 @@
   var allData = null;
   var selectedDateYmd = '';
   var NAV_DAYS_LIMIT = (PR && PR.NAV_DAYS_LIMIT) || 180;
-  var DEFAULT_SPLIT = '14:00';
+  var DEFAULT_SPLIT = '12:00';
   var splitTime = DEFAULT_SPLIT;
 
   var BACKGROUND_IMAGES = [

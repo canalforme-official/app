@@ -1548,6 +1548,16 @@
       window.location.href = './weekly_vertical.html' + buildPlanningViewQuery();
     }
 
+    (function hideRetiredDailyButton() {
+      var nodes = document.querySelectorAll('.today-view-button, .today-view-button-bottom, #todayViewButton');
+      var i;
+      for (i = 0; i < nodes.length; i++) {
+        nodes[i].style.setProperty('display', 'none', 'important');
+        nodes[i].setAttribute('hidden', '');
+        nodes[i].setAttribute('aria-hidden', 'true');
+      }
+    })();
+
     (function initRotationButtonTapAnimation() {
       var el = document.getElementById('rotationViewButton');
       if (!el) return;

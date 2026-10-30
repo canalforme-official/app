@@ -44,6 +44,7 @@ Une réorganisation future du dossier (sous‑dossiers `planning/`, etc.) reste 
 | `weekly_landscape.html` | Tableau **paysage natif** — app Canal Forme (build avec orientation). |
 | `weekly_vertical.html` | Hebdo **vertical** (scroll jours). Mêmes scripts partagés. |
 | `weekly_vertical_fulldays.html` | Variante vertical **tous les jours** visibles. Mêmes scripts partagés. |
+| `kids.html` | Affiche **Kids** par activité (Natation, Boxing, Cross, Dance). Horaires JSON `category` = Kids. PNG `images/kids/`. |
 | `prayer-times.html` | Page horaires de prière (si utilisée seule). |
 | `myzone-leaderboard.html` | Classement Myzone général ; utilise `planning-resolve.js` (helpers partagés). |
 | `status-leaderboard.html` | Classement par statut ; `planning-resolve.js`. |
@@ -86,6 +87,7 @@ Exemples si le site expose la racine du dépôt `frontend/` :
 - Planning hebdo : `/weekly.html`
 - Hebdo vertical : `/weekly_vertical.html`
 - Hebdo vertical (tous les jours) : `/weekly_vertical_fulldays.html`
+- Affiche Kids : `/kids.html`
 - Classement Myzone : `/myzone-leaderboard.html`
 - Classement par statut : `/status-leaderboard.html`
 - Palmarès : `/palmares-myzone.html`
@@ -102,7 +104,7 @@ Adapter le préfixe selon l’URL réelle de déploiement (domaine, sous-chemin)
 | `filter` | `kids`, `kid`, `enfants`, `enfant` | Affiche uniquement les cours **Kids** (JSON `category` = feuille Cours col. E). Libellé dans le **nom** du cours. Modal site. |
 | `week` | `YYYY-MM-DD` (lundi de la semaine) | Semaine affichée |
 
-Exemple : `weekly_vertical.html?filter=femmes` · `weekly_vertical.html?filter=kids`
+Exemple : `weekly_vertical.html?filter=femmes` · `weekly_vertical.html?filter=kids` · affiche story : `kids.html`
 
 ---
 
@@ -126,6 +128,8 @@ frontend/
 ├── weekly.html
 ├── weekly_vertical.html
 ├── weekly_vertical_fulldays.html
+├── kids.html
+├── images/kids/
 ├── prayer-times.html
 ├── myzone-leaderboard.html
 ├── status-leaderboard.html

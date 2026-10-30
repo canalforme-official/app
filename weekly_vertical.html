@@ -1438,7 +1438,16 @@
       display: none;
     }
 
-    /* Style pour le bouton today-view (en haut) */
+    /* Bouton daily (icône rotative) retiré site + app — 25 oct. 2026 */
+    .today-view-button,
+    .today-view-button-bottom {
+      display: none !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
+    /* Style pour le bouton today-view (en haut) — conservé inerte */
     .today-view-button {
       position: fixed;
       top: 55px;
@@ -1451,10 +1460,7 @@
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
-      pointer-events: all;
       animation: none;
-      display: block;
-      opacity: 1;
       transform: translateY(0);
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
@@ -2204,6 +2210,15 @@
     }
     .weekly-empty { padding: 24px; text-align: center; color: var(--text-secondary); }
 
+    /* Bouton daily (icône rotative) retiré — en dernier pour battre tout style / media query */
+    .today-view-button,
+    .today-view-button-bottom {
+      display: none !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
   </style>
   <script src="./planning-resolve.js"></script>
 </head>
@@ -2221,12 +2236,6 @@
   </div>
   <div class="scroll-shadow-left" id="scrollShadowLeft" aria-hidden="true"></div>
   <div class="scroll-shadow-right" id="scrollShadowRight" aria-hidden="true"></div>
-
-  <!-- Bouton pour revenir à aujourd'hui -->
-  <div class="today-view-button" id="todayViewButton">
-    <button onclick="returnToToday()">
-    </button>
-  </div>
 
   <div class="navigation" id="weekNavigation">
     <button type="button" id="prevWeek" onclick="changeWeek(-1)" class="nav-button prev-button" aria-label="Semaine précédente">
