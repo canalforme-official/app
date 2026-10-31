@@ -63,10 +63,11 @@
       --state-past: #aaaaaa;
       --overlay-light: rgba(255, 255, 255, 0.3);
       --overlay-lighter: rgba(255, 255, 255, 0.2);
-      /* Planning vertical : 4 jours et quelques visibles, scroll pour le reste */
+      /* Planning vertical : 4 jours et quelques visibles, scroll pour le reste.
+         100% (pas 100vw) : 100vw suit parfois le visual viewport iOS après overscroll → bande à droite. */
       --schedule-hours-width: 38px;
       --schedule-hours-min-width: 38px;
-      --schedule-day-width: calc((100vw - var(--schedule-hours-width)) / 4.4);
+      --schedule-day-width: calc((100% - var(--schedule-hours-width)) / 4.4);
     }
     body.planning-ramadan {
       --primary-color: var(--planning-ramadan-primary);
@@ -272,6 +273,8 @@
       overflow: hidden;
       position: fixed;
       width: 100%;
+      max-width: 100%;
+      overscroll-behavior: none;
       font-family: Arial, sans-serif;
       background-color: var(--background-main);
       color: var(--primary-color);
@@ -295,8 +298,8 @@
       -ms-overflow-style: none;
       /* Vertical uniquement ici : le horizontal est géré par les wrappers enfants */
       touch-action: pan-y;
-      /* Évite le blocage iOS en bas de page (rubber-band / scroll imbriqué) */
-      overscroll-behavior-y: none;
+      /* Évite le blocage iOS (rubber-band / scroll imbriqué) qui laisse une bande vide */
+      overscroll-behavior: none;
     }
 
     /* Masquer la barre de défilement pour Chrome, Safari et Opera */
@@ -398,7 +401,7 @@
       width: 100%;
       -webkit-overflow-scrolling: touch;
       position: relative;
-      overscroll-behavior-x: contain;
+      overscroll-behavior-x: none;
       overscroll-behavior-y: none;
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -1705,7 +1708,7 @@
       :root {
         --schedule-hours-width: 36px;
         --schedule-hours-min-width: 36px;
-        --schedule-day-width: calc((100vw - 36px) / 4.4);
+        --schedule-day-width: calc((100% - 36px) / 4.4);
       }
 
       .header-wrapper h1 {
@@ -2302,7 +2305,7 @@
 
   <script src="./planning-embedded.js"></script>
   <script src="./webview-resume.js?v=1"></script>
-  <script src="./weekly-vertical-inline.js"></script>
+  <script src="./weekly-vertical-inline.js?v=50"></script>
 
 </body>
 </html>

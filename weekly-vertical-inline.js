@@ -183,6 +183,7 @@
     }
 
     function handleResize() {
+      syncWeeklyDayColumnWidth();
       var isMobile = window.innerWidth <= 1024;
       var nav = document.getElementById('weekNavigation');
       if (nav) {
@@ -191,6 +192,7 @@
         else nav.classList.remove('loaded');
       }
       if (scheduleData) renderPlanningViewSwitcher(scheduleData);
+      syncStickyHeaderToScrollLeft();
     }
 
     function isAfterNoon(timeStr) {
@@ -555,12 +557,84 @@
       }
     }
 
+    var weeklyHorizScrollSyncTimer = null;
+    var scrollToCurrentTimeOuterTimer = null;
+    var scrollToCurrentTimeInnerTimer = null;
+    var scrollToCurrentTimeHorizTimer = null;
+
+    function clearWeeklyAutoScrollTimers() {
+      if (scrollToCurrentTimeOuterTimer) {
+        clearTimeout(scrollToCurrentTimeOuterTimer);
+        scrollToCurrentTimeOuterTimer = null;
+      }
+      if (scrollToCurrentTimeInnerTimer) {
+        clearTimeout(scrollToCurrentTimeInnerTimer);
+        scrollToCurrentTimeInnerTimer = null;
+      }
+      if (scrollToCurrentTimeHorizTimer) {
+        clearTimeout(scrollToCurrentTimeHorizTimer);
+        scrollToCurrentTimeHorizTimer = null;
+      }
+      if (weeklyHorizScrollSyncTimer) {
+        clearTimeout(weeklyHorizScrollSyncTimer);
+        weeklyHorizScrollSyncTimer = null;
+      }
+    }
+
+    /** Largeur réelle du scroller (évite 100vw iOS qui rétrécit après overscroll → bande à droite). */
+    function syncWeeklyDayColumnWidth() {
+      var wrap = document.getElementById('scheduleScrollWrapper');
+      var hoursRaw = getComputedStyle(document.documentElement).getPropertyValue('--schedule-hours-width');
+      var hours = parseFloat(hoursRaw) || 38;
+      var w = (wrap && wrap.clientWidth) || document.documentElement.clientWidth;
+      if (w < 8) return;
+      document.documentElement.style.setProperty('--schedule-day-width', ((w - hours) / 4.4) + 'px');
+    }
+
+    function resetDocumentHScroll() {
+      if (document.documentElement) document.documentElement.scrollLeft = 0;
+      if (document.body) document.body.scrollLeft = 0;
+    }
+
+    function clampWeeklyScrollLeft(wrap, left) {
+      var max = Math.max(0, wrap.scrollWidth - wrap.clientWidth);
+      if (left < 0) return 0;
+      if (left > max) return max;
+      return left;
+    }
+
+    /** Position horizontale instantanée (pas de smooth) : le rubber-band iOS laisse sinon une bande vide. */
+    function applyWeeklyHorizontalScroll(wrap, left) {
+      if (!wrap) return;
+      var sticky = document.getElementById('stickyHeaderContent');
+      var target = clampWeeklyScrollLeft(wrap, left);
+      var prev = wrap.style.webkitOverflowScrolling;
+      wrap.style.webkitOverflowScrolling = 'auto';
+      wrap.scrollLeft = target;
+      if (sticky) sticky.style.transform = 'translate3d(' + (-target) + 'px,0,0)';
+      void wrap.offsetHeight;
+      wrap.style.webkitOverflowScrolling = prev || 'touch';
+      resetDocumentHScroll();
+    }
+
+    function resetWeeklyHorizontalScroll() {
+      var wrap = document.getElementById('scheduleScrollWrapper');
+      resetDocumentHScroll();
+      if (wrap) applyWeeklyHorizontalScroll(wrap, 0);
+      else {
+        var sticky = document.getElementById('stickyHeaderContent');
+        if (sticky) sticky.style.transform = 'translate3d(0,0,0)';
+      }
+    }
+
     /** Aligne la barre sticky sur `scrollLeft` (évite décalage en-tête / grille après changement de semaine sans scroll). */
     function syncStickyHeaderToScrollLeft() {
       var wrap = document.getElementById('scheduleScrollWrapper');
       var sticky = document.getElementById('stickyHeaderContent');
       if (!wrap || !sticky) return;
-      sticky.style.transform = 'translate3d(' + (-wrap.scrollLeft) + 'px,0,0)';
+      var sl = clampWeeklyScrollLeft(wrap, wrap.scrollLeft);
+      if (wrap.scrollLeft !== sl) wrap.scrollLeft = sl;
+      sticky.style.transform = 'translate3d(' + (-sl) + 'px,0,0)';
     }
 
     /**
@@ -573,15 +647,19 @@
       function runSync() {
         requestAnimationFrame(function() {
           requestAnimationFrame(function() {
-            syncStickyHeaderToScrollLeft();
-            void wrap.offsetHeight;
-            var sl = wrap.scrollLeft;
-            wrap.scrollLeft = sl;
+            applyWeeklyHorizontalScroll(wrap, wrap.scrollLeft);
           });
         });
       }
+      if (weeklyHorizScrollSyncTimer) {
+        clearTimeout(weeklyHorizScrollSyncTimer);
+        weeklyHorizScrollSyncTimer = null;
+      }
       runSync();
-      setTimeout(runSync, 220);
+      weeklyHorizScrollSyncTimer = setTimeout(function() {
+        weeklyHorizScrollSyncTimer = null;
+        runSync();
+      }, 220);
     }
 
     /** Si l’URL photo est invalide, remplace l’img par le placeholder initiales (aligné sur daily). */
@@ -613,6 +691,9 @@
     function refreshPlanningDisplay() {
       var el = document.getElementById('weeklySchedule');
       if (!el) return;
+      clearWeeklyAutoScrollTimers();
+      resetWeeklyHorizontalScroll();
+      syncWeeklyDayColumnWidth();
       el.innerHTML = generateWeeklyScheduleHtml();
       wireWeeklyCoachPhotoFallbacks();
       var PRfb = getPR();
@@ -681,8 +762,8 @@
       }
       scheduleWrapper.removeEventListener('scroll', onScroll);
       scheduleWrapper.addEventListener('scroll', onScroll, { passive: true });
-      syncStickyHeaderToScrollLeft();
       scheduleWrapper.style.webkitOverflowScrolling = 'touch';
+      applyWeeklyHorizontalScroll(scheduleWrapper, 0);
 
       applyFilters();
       markMultilineCourseNames();
@@ -696,6 +777,7 @@
         console.error('planning-resolve.js manquant');
         return;
       }
+      syncWeeklyDayColumnWidth();
       weekMondayYmd = parseWeekFromUrl();
       forcedUrlFilter = parseForcedFilterFromUrl();
       updateUrlWeekParam();
@@ -837,6 +919,9 @@
         setTimeout(checkCourseStates, 1000);
 
         window.addEventListener('resize', handleResize);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', handleResize);
+        }
         handleResize();
 
         if (window.__canalFormeWebViewResume && window.__canalFormeWebViewResume.markHealthy) {
@@ -1338,7 +1423,9 @@
     }
 
     function scrollToCurrentTime() {
-      setTimeout(function() {
+      clearWeeklyAutoScrollTimers();
+      scrollToCurrentTimeOuterTimer = setTimeout(function() {
+        scrollToCurrentTimeOuterTimer = null;
         requestAnimationFrame(function() {
           const contentWrapper = document.querySelector('.content-wrapper');
           const scrollWrapper = document.getElementById('scheduleScrollWrapper');
@@ -1380,36 +1467,50 @@
                 const thead = document.querySelector('.weekly-schedule thead');
                 const theadHeight = thead ? thead.offsetHeight : 0;
                 const targetPosition = targetRow.offsetTop - theadHeight - 10;
-                setTimeout(function() {
+                scrollToCurrentTimeInnerTimer = setTimeout(function() {
+                  scrollToCurrentTimeInnerTimer = null;
                   contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
                 }, 100);
               }
             } else {
-              setTimeout(function() {
+              scrollToCurrentTimeInnerTimer = setTimeout(function() {
+                scrollToCurrentTimeInnerTimer = null;
                 contentWrapper.scrollTo({ top: 0, behavior: 'smooth' });
               }, 100);
             }
           }
 
           if (scrollWrapper) {
-            setTimeout(function() {
+            scrollToCurrentTimeHorizTimer = setTimeout(function() {
+              scrollToCurrentTimeHorizTimer = null;
+              syncWeeklyDayColumnWidth();
+              if (weeklyHorizScrollSyncTimer) {
+                clearTimeout(weeklyHorizScrollSyncTimer);
+                weeklyHorizScrollSyncTimer = null;
+              }
               if (viewingCurrentWeek) {
-                var todayTh = document.querySelector('.weekly-schedule thead th.today') ||
-                  document.querySelector('#stickyHeaderContent th.today');
-                if (todayTh) {
-                  var targetLeft = todayTh.offsetLeft - (scrollWrapper.clientWidth / 2) + (todayTh.offsetWidth / 2);
-                  if (targetLeft < 0) targetLeft = 0;
-                  var maxLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
-                  if (targetLeft > maxLeft) targetLeft = maxLeft;
-                  scrollWrapper.scrollTo({ left: targetLeft, behavior: 'smooth' });
+                var todayYmd = getPR().ymdFromDate(new Date());
+                var todayCell = scrollWrapper.querySelector('.weekly-schedule td[data-ymd="' + todayYmd + '"]');
+                var todayTh = document.querySelector('#stickyHeaderContent th.today');
+                var col = todayCell || todayTh;
+                if (col) {
+                  var colLeft = col.offsetLeft;
+                  if (todayCell && scrollWrapper.contains(todayCell)) {
+                    var off = cumulativeOffsetToAncestor(todayCell, scrollWrapper);
+                    if (off) colLeft = off.x;
+                  }
+                  var targetLeft = colLeft - (scrollWrapper.clientWidth / 2) + (col.offsetWidth / 2);
+                  applyWeeklyHorizontalScroll(scrollWrapper, targetLeft);
+                  forceWeeklyVerticalScrollLayersSync();
                   return;
                 }
               }
-              scrollWrapper.scrollTo({ left: 0, behavior: 'smooth' });
-            }, 300);
+              applyWeeklyHorizontalScroll(scrollWrapper, 0);
+              forceWeeklyVerticalScrollLayersSync();
+            }, 80);
           }
         });
-      }, 500);
+      }, 120);
     }
 
     setInterval(function() {
