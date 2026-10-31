@@ -559,21 +559,25 @@
 
     var weeklyHorizScrollSyncTimer = null;
     var scrollToCurrentTimeOuterTimer = null;
-    var scrollToCurrentTimeInnerTimer = null;
-    var scrollToCurrentTimeHorizTimer = null;
+    var weeklySmoothAnimFrame = null;
+    var weeklySmoothFollowTimer = null;
+
+    function cancelWeeklySmoothScroll() {
+      if (weeklySmoothAnimFrame) {
+        cancelAnimationFrame(weeklySmoothAnimFrame);
+        weeklySmoothAnimFrame = null;
+      }
+      if (weeklySmoothFollowTimer) {
+        clearTimeout(weeklySmoothFollowTimer);
+        weeklySmoothFollowTimer = null;
+      }
+    }
 
     function clearWeeklyAutoScrollTimers() {
+      cancelWeeklySmoothScroll();
       if (scrollToCurrentTimeOuterTimer) {
         clearTimeout(scrollToCurrentTimeOuterTimer);
         scrollToCurrentTimeOuterTimer = null;
-      }
-      if (scrollToCurrentTimeInnerTimer) {
-        clearTimeout(scrollToCurrentTimeInnerTimer);
-        scrollToCurrentTimeInnerTimer = null;
-      }
-      if (scrollToCurrentTimeHorizTimer) {
-        clearTimeout(scrollToCurrentTimeHorizTimer);
-        scrollToCurrentTimeHorizTimer = null;
       }
       if (weeklyHorizScrollSyncTimer) {
         clearTimeout(weeklyHorizScrollSyncTimer);
@@ -603,7 +607,7 @@
       return left;
     }
 
-    /** Position horizontale instantanée (pas de smooth) : le rubber-band iOS laisse sinon une bande vide. */
+    /** Snap horizontal sans rubber-band iOS (fin d’animation / reset). */
     function applyWeeklyHorizontalScroll(wrap, left) {
       if (!wrap) return;
       var sticky = document.getElementById('stickyHeaderContent');
@@ -615,6 +619,64 @@
       void wrap.offsetHeight;
       wrap.style.webkitOverflowScrolling = prev || 'touch';
       resetDocumentHScroll();
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function weeklySmoothDuration(distance, minMs, maxMs) {
+      var d = Math.abs(distance);
+      var ms = 300 + d * 0.85;
+      if (ms < minMs) return minMs;
+      if (ms > maxMs) return maxMs;
+      return ms;
+    }
+
+    /**
+     * Glissement doux contrôlé (pas le smooth natif iOS, qui dépasse le bord).
+     * axis: 'left' | 'top'
+     */
+    function animateWeeklyScroll(el, axis, to, onDone) {
+      if (!el) {
+        if (onDone) onDone();
+        return;
+      }
+      cancelWeeklySmoothScroll();
+      var isLeft = axis === 'left';
+      var from = isLeft ? el.scrollLeft : el.scrollTop;
+      var target = isLeft ? clampWeeklyScrollLeft(el, to) : Math.max(0, to);
+      var dist = target - from;
+      if (Math.abs(dist) < 1.5) {
+        if (isLeft) applyWeeklyHorizontalScroll(el, target);
+        else el.scrollTop = target;
+        if (onDone) onDone();
+        return;
+      }
+      var duration = weeklySmoothDuration(dist, isLeft ? 420 : 480, isLeft ? 720 : 780);
+      var start = null;
+      if (isLeft) el.style.webkitOverflowScrolling = 'auto';
+
+      function step(ts) {
+        if (start === null) start = ts;
+        var t = Math.min(1, (ts - start) / duration);
+        var val = from + dist * easeInOutCubic(t);
+        if (isLeft) {
+          el.scrollLeft = val;
+          syncStickyHeaderToScrollLeft();
+        } else {
+          el.scrollTop = val;
+        }
+        if (t < 1) {
+          weeklySmoothAnimFrame = requestAnimationFrame(step);
+          return;
+        }
+        weeklySmoothAnimFrame = null;
+        if (isLeft) applyWeeklyHorizontalScroll(el, target);
+        else el.scrollTop = target;
+        if (onDone) onDone();
+      }
+      weeklySmoothAnimFrame = requestAnimationFrame(step);
     }
 
     function resetWeeklyHorizontalScroll() {
@@ -1422,95 +1484,97 @@
       });
     }
 
+    function weeklyVerticalTargetTop(contentWrapper, viewingCurrentWeek) {
+      if (!contentWrapper) return 0;
+      if (!viewingCurrentWeek) return 0;
+      var focusYmd = getPR().ymdFromDate(new Date());
+      var targetRow = document.querySelector('.course-block.current[data-ymd="' + focusYmd + '"]');
+      targetRow = targetRow && targetRow.closest('tr');
+      if (!targetRow) {
+        var soon = document.querySelector('.course-block.starting-soon[data-ymd="' + focusYmd + '"]');
+        targetRow = soon && soon.closest('tr');
+      }
+      if (!targetRow) {
+        var now = new Date();
+        var currentHour = now.getHours();
+        var currentMinutes = now.getMinutes();
+        var times = document.querySelectorAll('.time-cell');
+        var i;
+        for (i = 0; i < times.length; i++) {
+          var timeText = times[i].textContent.trim();
+          if (!timeText) continue;
+          var parts = timeText.split(':').map(Number);
+          var hour = parts[0];
+          var minute = parts[1] || 0;
+          if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
+            var candidateRow = times[i].parentElement;
+            if (candidateRow && candidateRow.querySelector('.course-block[data-ymd="' + focusYmd + '"]')) {
+              targetRow = candidateRow;
+              break;
+            }
+          }
+        }
+      }
+      if (!targetRow) return null;
+      var thead = document.querySelector('.weekly-schedule thead');
+      var theadHeight = thead ? thead.offsetHeight : 0;
+      return Math.max(0, targetRow.offsetTop - theadHeight - 10);
+    }
+
+    function weeklyHorizontalTargetLeft(scrollWrapper, viewingCurrentWeek) {
+      if (!scrollWrapper) return 0;
+      if (!viewingCurrentWeek) return 0;
+      var todayYmd = getPR().ymdFromDate(new Date());
+      var todayCell = scrollWrapper.querySelector('.weekly-schedule td[data-ymd="' + todayYmd + '"]');
+      var todayTh = document.querySelector('#stickyHeaderContent th.today');
+      var col = todayCell || todayTh;
+      if (!col) return 0;
+      var colLeft = col.offsetLeft;
+      if (todayCell && scrollWrapper.contains(todayCell)) {
+        var off = cumulativeOffsetToAncestor(todayCell, scrollWrapper);
+        if (off) colLeft = off.x;
+      }
+      return colLeft - (scrollWrapper.clientWidth / 2) + (col.offsetWidth / 2);
+    }
+
     function scrollToCurrentTime() {
       clearWeeklyAutoScrollTimers();
       scrollToCurrentTimeOuterTimer = setTimeout(function() {
         scrollToCurrentTimeOuterTimer = null;
         requestAnimationFrame(function() {
-          const contentWrapper = document.querySelector('.content-wrapper');
-          const scrollWrapper = document.getElementById('scheduleScrollWrapper');
+          var contentWrapper = document.querySelector('.content-wrapper');
+          var scrollWrapper = document.getElementById('scheduleScrollWrapper');
           if (!contentWrapper) return;
 
-          const viewingCurrentWeek = isViewingCurrentWeek();
+          var viewingCurrentWeek = isViewingCurrentWeek();
           /* Semaine courante + aujourd'hui sans cours → horizontal uniquement (vers aujourd'hui). */
-          const shouldScrollVertical = !viewingCurrentWeek || currentWeekTodayHasCourses();
+          var shouldScrollVertical = !viewingCurrentWeek || currentWeekTodayHasCourses();
+          var targetLeft = weeklyHorizontalTargetLeft(scrollWrapper, viewingCurrentWeek);
+          var targetTop = shouldScrollVertical
+            ? weeklyVerticalTargetTop(contentWrapper, viewingCurrentWeek)
+            : null;
 
-          if (shouldScrollVertical) {
-            if (viewingCurrentWeek) {
-              var focusYmd = getPR().ymdFromDate(new Date());
-              let targetRow = document.querySelector('.course-block.current[data-ymd="' + focusYmd + '"]')?.closest('tr');
-              if (!targetRow) {
-                targetRow = document.querySelector('.course-block.starting-soon[data-ymd="' + focusYmd + '"]')?.closest('tr');
-              }
-              if (!targetRow) {
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentMinutes = now.getMinutes();
-                const times = document.querySelectorAll('.time-cell');
-                for (let i = 0; i < times.length; i++) {
-                  const timeText = times[i].textContent.trim();
-                  if (!timeText) continue;
-                  const parts = timeText.split(':').map(Number);
-                  const hour = parts[0];
-                  const minute = parts[1] || 0;
-                  if (hour > currentHour || (hour === currentHour && minute >= currentMinutes)) {
-                    var candidateRow = times[i].parentElement;
-                    if (candidateRow && candidateRow.querySelector('.course-block[data-ymd="' + focusYmd + '"]')) {
-                      targetRow = candidateRow;
-                      break;
-                    }
-                  }
-                }
-              }
+          syncWeeklyDayColumnWidth();
 
-              if (targetRow) {
-                const thead = document.querySelector('.weekly-schedule thead');
-                const theadHeight = thead ? thead.offsetHeight : 0;
-                const targetPosition = targetRow.offsetTop - theadHeight - 10;
-                scrollToCurrentTimeInnerTimer = setTimeout(function() {
-                  scrollToCurrentTimeInnerTimer = null;
-                  contentWrapper.scrollTo({ top: targetPosition, behavior: 'smooth' });
-                }, 100);
-              }
-            } else {
-              scrollToCurrentTimeInnerTimer = setTimeout(function() {
-                scrollToCurrentTimeInnerTimer = null;
-                contentWrapper.scrollTo({ top: 0, behavior: 'smooth' });
-              }, 100);
-            }
+          function runVertical() {
+            if (targetTop == null) return;
+            animateWeeklyScroll(contentWrapper, 'top', targetTop);
           }
 
           if (scrollWrapper) {
-            scrollToCurrentTimeHorizTimer = setTimeout(function() {
-              scrollToCurrentTimeHorizTimer = null;
-              syncWeeklyDayColumnWidth();
-              if (weeklyHorizScrollSyncTimer) {
-                clearTimeout(weeklyHorizScrollSyncTimer);
-                weeklyHorizScrollSyncTimer = null;
-              }
-              if (viewingCurrentWeek) {
-                var todayYmd = getPR().ymdFromDate(new Date());
-                var todayCell = scrollWrapper.querySelector('.weekly-schedule td[data-ymd="' + todayYmd + '"]');
-                var todayTh = document.querySelector('#stickyHeaderContent th.today');
-                var col = todayCell || todayTh;
-                if (col) {
-                  var colLeft = col.offsetLeft;
-                  if (todayCell && scrollWrapper.contains(todayCell)) {
-                    var off = cumulativeOffsetToAncestor(todayCell, scrollWrapper);
-                    if (off) colLeft = off.x;
-                  }
-                  var targetLeft = colLeft - (scrollWrapper.clientWidth / 2) + (col.offsetWidth / 2);
-                  applyWeeklyHorizontalScroll(scrollWrapper, targetLeft);
-                  forceWeeklyVerticalScrollLayersSync();
-                  return;
-                }
-              }
-              applyWeeklyHorizontalScroll(scrollWrapper, 0);
+            animateWeeklyScroll(scrollWrapper, 'left', targetLeft, function() {
               forceWeeklyVerticalScrollLayersSync();
-            }, 80);
+              if (targetTop == null) return;
+              weeklySmoothFollowTimer = setTimeout(function() {
+                weeklySmoothFollowTimer = null;
+                runVertical();
+              }, 80);
+            });
+            return;
           }
+          runVertical();
         });
-      }, 120);
+      }, 180);
     }
 
     setInterval(function() {
