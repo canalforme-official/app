@@ -307,11 +307,12 @@
       display: none;
     }
 
-    /* Barre des jours sticky — en dehors du scroll horizontal pour que sticky fonctionne */
+    /* Barre des jours sticky — au-dessus de la colonne des heures (sticky left) */
     .sticky-days-bar {
       position: sticky;
       top: 0;
-      z-index: var(--cf-z-sticky-planning, 50);
+      z-index: 120;
+      isolation: isolate;
       background-color: var(--background-main);
       flex-shrink: 0;
     }
@@ -662,7 +663,7 @@
     .weekly-schedule td.time-cell {
       position: sticky;
       left: 0;
-      z-index: var(--cf-z-sticky-planning, 45);
+      z-index: 6;
     }
 
     /* La colonne des heures doit toujours rester au-dessus des blocs cours */
@@ -992,7 +993,7 @@
       top: 0;
       width: 100%;
       pointer-events: none;
-      z-index: 850;
+      z-index: 8;
       overflow: visible;
     }
 
@@ -1960,16 +1961,17 @@
       }
     }
 
-    /* Séparation matin / après-midi : motif 64×64 en tuilage, 50 % opaque ; colonne heures 100 % opaque */
+    /* Séparation matin / après-midi : fond opaque (sinon le motif férié se voit à travers) + mosaïque */
     tr.noon-separator td {
       height: 60px;
       min-height: 60px;
       padding: 0;
       margin: 0;
       border: none;
-      background-color: rgba(72, 6, 7, 0.12);
+      background-color: var(--background-main);
       position: relative;
       vertical-align: middle;
+      isolation: isolate;
     }
 
     tr.noon-separator td::before {
@@ -1979,17 +1981,18 @@
       right: 0;
       top: 0;
       bottom: 0;
+      background-color: rgba(72, 6, 7, 0.14);
       background-image: var(--planning-pattern-mosaic-url);
       background-size: 67px 67px;
       background-repeat: repeat;
-      opacity: 0.4;
+      opacity: 0.72;
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Colonne des heures (sticky) : ni fond ni motif */
+    /* Colonne des heures (sticky) : fond plein, pas de motif */
     tr.noon-separator td.time-cell {
-      background-color: transparent;
+      background-color: var(--background-main);
     }
 
     tr.noon-separator td.time-cell::before {
@@ -1997,7 +2000,8 @@
     }
 
     tr.noon-separator td.noon-separator-line {
-      background-color: rgba(72, 6, 7, 0.12);
+      background-color: var(--background-main);
+      z-index: 2;
     }
 
     /* Navigation semaine (identique principe daily.html) */

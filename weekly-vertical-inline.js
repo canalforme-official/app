@@ -307,8 +307,25 @@
       }
 
       var numBodyRows = bodyRows.length;
-      var rowspanCols = columns.map(function(col) {
-        return (col.rv.closed || col.rv.indetermine) ? numBodyRows : 0;
+      var noonIndex = -1;
+      for (var nidx = 0; nidx < bodyRows.length; nidx++) {
+        if (bodyRows[nidx].kind === 'noon') {
+          noonIndex = nidx;
+          break;
+        }
+      }
+      var statusCol = columns.map(function(col) {
+        return !!(col.rv.closed || col.rv.indetermine);
+      });
+      /* La bande midi doit exister aussi sur les colonnes férié/fermé : on coupe le rowspan autour. */
+      var rowspanMorning = columns.map(function(col, cidx) {
+        if (!statusCol[cidx]) return 0;
+        if (noonIndex < 0) return numBodyRows;
+        return noonIndex;
+      });
+      var rowspanAfternoon = columns.map(function(col, cidx) {
+        if (!statusCol[cidx] || noonIndex < 0) return 0;
+        return Math.max(0, numBodyRows - noonIndex - 1);
       });
 
       var html = '<table class="weekly-schedule">';
@@ -331,7 +348,9 @@
 
       var isWhiteRow = true;
       var ri, row, ci, col;
-      var rowspanDone = columns.map(function() { return false; });
+      var afterNoon = false;
+      var emittedMorning = columns.map(function() { return false; });
+      var emittedAfternoon = columns.map(function() { return false; });
 
       /**
        * @param {string} layout 'tranches' ( rowspan sur grille ) | 'centered' ( semaine entière sans créneau )
@@ -363,10 +382,27 @@
         return '<div class="weekly-msg-column" role="status">' + tr + tr + tr + '</div>';
       }
 
-      function emitRowspanCell(ci) {
+      function emitStatusCell(ci, rowspan, layout) {
         col = columns[ci];
-        var inner = weeklyStatusColumnHtml(col.rv);
-        return '<td class="course-cell course-cell--status-msg" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '" rowspan="' + rowspanCols[ci] + '">' + inner + '</td>';
+        var inner = weeklyStatusColumnHtml(col.rv, layout || 'tranches');
+        var rs = rowspan > 1 ? ' rowspan="' + rowspan + '"' : '';
+        return '<td class="course-cell course-cell--status-msg" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '"' + rs + '>' + inner + '</td>';
+      }
+
+      function emitStatusSegment(ci) {
+        if (!statusCol[ci]) return false;
+        if (!afterNoon) {
+          if (!emittedMorning[ci] && rowspanMorning[ci] > 0) {
+            emittedMorning[ci] = true;
+            html += emitStatusCell(ci, rowspanMorning[ci], noonIndex >= 0 ? 'centered' : 'tranches');
+          }
+          return true;
+        }
+        if (!emittedAfternoon[ci] && rowspanAfternoon[ci] > 0) {
+          emittedAfternoon[ci] = true;
+          html += emitStatusCell(ci, rowspanAfternoon[ci], 'centered');
+        }
+        return true;
       }
 
       for (ri = 0; ri < bodyRows.length; ri++) {
@@ -375,17 +411,11 @@
           html += '<tr class="noon-separator">';
           html += '<td class="time-cell time-cell-grey"></td>';
           for (ci = 0; ci < columns.length; ci++) {
-            if (rowspanCols[ci] > 0) {
-              if (!rowspanDone[ci]) {
-                rowspanDone[ci] = true;
-                html += emitRowspanCell(ci);
-              }
-              continue;
-            }
             col = columns[ci];
             html += '<td class="noon-separator-line course-cell" data-planning-key="' + PR.escapeHtml(col.pk) + '"></td>';
           }
           html += '</tr>';
+          afterNoon = true;
           continue;
         }
 
@@ -428,13 +458,7 @@
         html += '<td class="time-cell ' + timeCellClass + '">' + PR.escapeHtml(time) + '</td>';
 
         for (ci = 0; ci < columns.length; ci++) {
-          if (rowspanCols[ci] > 0) {
-            if (!rowspanDone[ci]) {
-              rowspanDone[ci] = true;
-              html += emitRowspanCell(ci);
-            }
-            continue;
-          }
+          if (emitStatusSegment(ci)) continue;
 
           col = columns[ci];
           html += '<td class="course-cell" data-planning-key="' + PR.escapeHtml(col.pk) + '" data-ymd="' + col.ymd + '">';
