@@ -323,6 +323,38 @@
         "pngCaricature": "",
         "status": "Bronze",
         "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
+      },
+      {
+        "moves": 0,
+        "calories": 0,
+        "totalMinutes": 0,
+        "zone0Minutes": 0,
+        "zone1Minutes": 0,
+        "zone2Minutes": 0,
+        "zone3Minutes": 0,
+        "zone4Minutes": 0,
+        "zone5Minutes": 0,
+        "targetZoneMinutes": 0,
+        "zone1MEPs": 0,
+        "zone2MEPs": 0,
+        "zone3MEPs": 0,
+        "zone4MEPs": 0,
+        "zone5MEPs": 0,
+        "avgEffort": 0,
+        "peakHR": 0,
+        "avgHR": 0,
+        "belt": 0,
+        "position": 1,
+        "nickname": "Abdelmou",
+        "meps": 194,
+        "usrGUID": "af57742c-64d5-4458-a82d-f985b9482bb4",
+        "rank": 0,
+        "type": "Unknown",
+        "male": true,
+        "coachLink": "",
+        "pngCaricature": "",
+        "status": "Silver",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/cc93b102-6716-a3a5-6da7-9d316c398900.png"
       }
     ],
     "total_meps_by_gender": {
@@ -332,7 +364,7 @@
     "active_users": {
       "male": 0,
       "female": 0,
-      "total": 10
+      "total": 11
     },
     "inactive_users": {
       "male": 0,
