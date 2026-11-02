@@ -2700,7 +2700,7 @@
         }
 
         const prevComp = document.getElementById('previousMonthCompetition');
-        const prevOk = data.previous && fillGenderChallengeBar(data.previous, {
+        const prevOk = !hideGenderChallenge && data.previous && fillGenderChallengeBar(data.previous, {
           menLabelId: 'prevMenLabel',
           womenLabelId: 'prevWomenLabel',
           maleBarId: 'prevMaleBar',
