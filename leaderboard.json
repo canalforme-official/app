@@ -281,16 +281,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 9,
-        "nickname": "Hatim",
-        "meps": 243,
-        "usrGUID": "ba9521c8-d400-11ef-9d19-7ebb81ed5510",
+        "nickname": "Majda",
+        "meps": 253,
+        "usrGUID": "f81aa847-ca0d-11ee-92c6-861db27673fb",
         "rank": 0,
         "type": "Unknown",
-        "male": true,
+        "male": false,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Gold",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/9ecbf90a-0bbf-b4be-9228-91006beffa17.png"
+        "status": "Bronze",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
       },
       {
         "moves": 0,
@@ -313,16 +313,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 10,
-        "nickname": "Majda",
-        "meps": 203,
-        "usrGUID": "f81aa847-ca0d-11ee-92c6-861db27673fb",
+        "nickname": "Hatim",
+        "meps": 243,
+        "usrGUID": "ba9521c8-d400-11ef-9d19-7ebb81ed5510",
         "rank": 0,
         "type": "Unknown",
-        "male": false,
+        "male": true,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Bronze",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/b7982c4d-7007-2abd-c73e-3e5f521f61ea.png"
+        "status": "Gold",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/9ecbf90a-0bbf-b4be-9228-91006beffa17.png"
       }
     ],
     "total_meps_by_gender": {
