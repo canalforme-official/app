@@ -402,6 +402,8 @@
       width: 100%;
       -webkit-overflow-scrolling: touch;
       position: relative;
+      /* pan-x + pan-y : horizontal ici, vertical remonte au content-wrapper */
+      touch-action: pan-x pan-y;
       overscroll-behavior-x: none;
       overscroll-behavior-y: none;
       scrollbar-width: none;
@@ -2309,7 +2311,7 @@
 
   <script src="./planning-embedded.js"></script>
   <script src="./webview-resume.js?v=1"></script>
-  <script src="./weekly-vertical-inline.js?v=50"></script>
+  <script src="./weekly-vertical-inline.js?v=51"></script>
 
 </body>
 </html>

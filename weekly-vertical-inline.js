@@ -585,6 +585,13 @@
     var scrollToCurrentTimeOuterTimer = null;
     var weeklySmoothAnimFrame = null;
     var weeklySmoothFollowTimer = null;
+    var weeklySmoothUserInterruptBound = false;
+
+    /** Remet l’inertie iOS (sinon scroll horizontal « gelé » après cancel / anim). */
+    function restoreWeeklyOverflowScrolling() {
+      var wrap = document.getElementById('scheduleScrollWrapper');
+      if (wrap) wrap.style.webkitOverflowScrolling = 'touch';
+    }
 
     function cancelWeeklySmoothScroll() {
       if (weeklySmoothAnimFrame) {
@@ -595,6 +602,7 @@
         clearTimeout(weeklySmoothFollowTimer);
         weeklySmoothFollowTimer = null;
       }
+      restoreWeeklyOverflowScrolling();
     }
 
     function clearWeeklyAutoScrollTimers() {
@@ -606,6 +614,27 @@
       if (weeklyHorizScrollSyncTimer) {
         clearTimeout(weeklyHorizScrollSyncTimer);
         weeklyHorizScrollSyncTimer = null;
+      }
+    }
+
+    /** Doigt / molette = priorité user (interrompt le refocus auto). */
+    function bindWeeklySmoothScrollUserInterrupt() {
+      if (weeklySmoothUserInterruptBound) return;
+      weeklySmoothUserInterruptBound = true;
+      function onUserScrollIntent() {
+        if (!weeklySmoothAnimFrame && !weeklySmoothFollowTimer && !scrollToCurrentTimeOuterTimer) return;
+        clearWeeklyAutoScrollTimers();
+      }
+      var opts = { passive: true, capture: true };
+      var cw = document.querySelector('.content-wrapper');
+      var sw = document.getElementById('scheduleScrollWrapper');
+      if (cw) {
+        cw.addEventListener('touchstart', onUserScrollIntent, opts);
+        cw.addEventListener('wheel', onUserScrollIntent, opts);
+      }
+      if (sw) {
+        sw.addEventListener('touchstart', onUserScrollIntent, opts);
+        sw.addEventListener('wheel', onUserScrollIntent, opts);
       }
     }
 
@@ -631,27 +660,36 @@
       return left;
     }
 
-    /** Snap horizontal sans rubber-band iOS (fin d’animation / reset). */
-    function applyWeeklyHorizontalScroll(wrap, left) {
+    /**
+     * Snap horizontal sans rubber-band iOS (fin d’animation / reset).
+     * soft: synchro calques sans couper l’inertie (évite le freeze horizontal).
+     */
+    function applyWeeklyHorizontalScroll(wrap, left, soft) {
       if (!wrap) return;
       var sticky = document.getElementById('stickyHeaderContent');
       var target = clampWeeklyScrollLeft(wrap, left);
-      var prev = wrap.style.webkitOverflowScrolling;
+      if (soft) {
+        wrap.scrollLeft = target;
+        if (sticky) sticky.style.transform = 'translate3d(' + (-target) + 'px,0,0)';
+        resetDocumentHScroll();
+        return;
+      }
       wrap.style.webkitOverflowScrolling = 'auto';
       wrap.scrollLeft = target;
       if (sticky) sticky.style.transform = 'translate3d(' + (-target) + 'px,0,0)';
       void wrap.offsetHeight;
-      wrap.style.webkitOverflowScrolling = prev || 'touch';
+      wrap.style.webkitOverflowScrolling = 'touch';
       resetDocumentHScroll();
     }
 
-    function easeInOutCubic(t) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    /** Ease-out : démarre tout de suite (ease-in-out = « saccade » / latence au début). */
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
     }
 
     function weeklySmoothDuration(distance, minMs, maxMs) {
       var d = Math.abs(distance);
-      var ms = 300 + d * 0.85;
+      var ms = 260 + d * 0.7;
       if (ms < minMs) return minMs;
       if (ms > maxMs) return maxMs;
       return ms;
@@ -667,6 +705,7 @@
         return;
       }
       cancelWeeklySmoothScroll();
+      bindWeeklySmoothScrollUserInterrupt();
       var isLeft = axis === 'left';
       var from = isLeft ? el.scrollLeft : el.scrollTop;
       var target = isLeft ? clampWeeklyScrollLeft(el, to) : Math.max(0, to);
@@ -677,14 +716,14 @@
         if (onDone) onDone();
         return;
       }
-      var duration = weeklySmoothDuration(dist, isLeft ? 420 : 480, isLeft ? 720 : 780);
+      var duration = weeklySmoothDuration(dist, isLeft ? 360 : 400, isLeft ? 640 : 680);
       var start = null;
       if (isLeft) el.style.webkitOverflowScrolling = 'auto';
 
       function step(ts) {
         if (start === null) start = ts;
         var t = Math.min(1, (ts - start) / duration);
-        var val = from + dist * easeInOutCubic(t);
+        var val = from + dist * easeOutCubic(t);
         if (isLeft) {
           el.scrollLeft = val;
           syncStickyHeaderToScrollLeft();
@@ -698,6 +737,7 @@
         weeklySmoothAnimFrame = null;
         if (isLeft) applyWeeklyHorizontalScroll(el, target);
         else el.scrollTop = target;
+        restoreWeeklyOverflowScrolling();
         if (onDone) onDone();
       }
       weeklySmoothAnimFrame = requestAnimationFrame(step);
@@ -731,9 +771,11 @@
       var wrap = document.getElementById('scheduleScrollWrapper');
       if (!wrap) return;
       function runSync() {
+        /* soft: ne pas basculer webkitOverflowScrolling (sinon inertie / scroll H gelés). */
         requestAnimationFrame(function() {
           requestAnimationFrame(function() {
-            applyWeeklyHorizontalScroll(wrap, wrap.scrollLeft);
+            applyWeeklyHorizontalScroll(wrap, wrap.scrollLeft, true);
+            restoreWeeklyOverflowScrolling();
           });
         });
       }
@@ -1481,6 +1523,8 @@
       if (!window._weeklyFerieSparkleListeners) {
         window._weeklyFerieSparkleListeners = true;
         function schedPos() {
+          /* Pendant le refocus auto : éviter layout thrash (saccades verticales). */
+          if (weeklySmoothAnimFrame) return;
           requestAnimationFrame(positionWeeklyFerieSparkles);
         }
         var wrap = document.getElementById('scheduleScrollWrapper');
@@ -1587,12 +1631,14 @@
 
           if (scrollWrapper) {
             animateWeeklyScroll(scrollWrapper, 'left', targetLeft, function() {
-              forceWeeklyVerticalScrollLayersSync();
+              /* Synchro sticky légère seulement — pas de force layers (coupe l’inertie H). */
+              syncStickyHeaderToScrollLeft();
+              restoreWeeklyOverflowScrolling();
               if (targetTop == null) return;
               weeklySmoothFollowTimer = setTimeout(function() {
                 weeklySmoothFollowTimer = null;
                 runVertical();
-              }, 80);
+              }, 40);
             });
             return;
           }
