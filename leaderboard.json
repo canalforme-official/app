@@ -633,16 +633,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 20,
-        "nickname": "sabra",
-        "meps": 18,
-        "usrGUID": "dd1bb3d2-6a2f-11ef-b68a-0e29ae1b4089",
+        "nickname": "yussi",
+        "meps": 107,
+        "usrGUID": "d8d38180-fda5-11ee-92c6-861db27673fb",
         "rank": 0,
-        "type": "Coach",
+        "type": "Unknown",
         "male": false,
-        "coachLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/3a11b343-4516-c9db-7e5c-a9fc370f6471.png",
-        "pngCaricature": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/08eb8564-6db7-46df-8d65-37efc5c594c3.png",
-        "status": "Iron",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/97749204-22bb-f1bd-ba88-051b95c6dca5.png"
+        "coachLink": "",
+        "pngCaricature": "",
+        "status": "Silver",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/cc93b102-6716-a3a5-6da7-9d316c398900.png"
       }
     ],
     "total_meps_by_gender": {
