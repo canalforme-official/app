@@ -601,16 +601,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 19,
-        "nickname": "عثمان",
-        "meps": 168,
-        "usrGUID": "4d0abe14-ca8e-11ee-92c6-861db27673fb",
+        "nickname": "yussi",
+        "meps": 178,
+        "usrGUID": "d8d38180-fda5-11ee-92c6-861db27673fb",
         "rank": 0,
         "type": "Unknown",
-        "male": true,
+        "male": false,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Iron",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/97749204-22bb-f1bd-ba88-051b95c6dca5.png"
+        "status": "Silver",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/cc93b102-6716-a3a5-6da7-9d316c398900.png"
       },
       {
         "moves": 0,
@@ -633,16 +633,16 @@
         "avgHR": 0,
         "belt": 0,
         "position": 20,
-        "nickname": "yussi",
-        "meps": 152,
-        "usrGUID": "d8d38180-fda5-11ee-92c6-861db27673fb",
+        "nickname": "عثمان",
+        "meps": 168,
+        "usrGUID": "4d0abe14-ca8e-11ee-92c6-861db27673fb",
         "rank": 0,
         "type": "Unknown",
-        "male": false,
+        "male": true,
         "coachLink": "",
         "pngCaricature": "",
-        "status": "Silver",
-        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/cc93b102-6716-a3a5-6da7-9d316c398900.png"
+        "status": "Iron",
+        "iconLink": "https://mcusercontent.com/74abea872abd45d46efed5d41/images/97749204-22bb-f1bd-ba88-051b95c6dca5.png"
       }
     ],
     "total_meps_by_gender": {
